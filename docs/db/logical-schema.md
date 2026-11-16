@@ -6,7 +6,7 @@
 
 ![OneLoaf logical schema](logical-schema.svg)
 
-The frame colour shows the functional block. Lines are relationships between tables of the domain. References to reference tables and to the owner are shown in the column row as "-> table" to keep the diagram readable: every workspace table references `users` (`owner_id`, `ON DELETE CASCADE`). Line ends: "||" - exactly one, "o|" - zero or one, "o<" - zero or many. Source of the diagram: [`logical-schema.dot`](logical-schema.dot).
+The overview shows every table with its key columns; all columns are in the per-block diagrams below and in the data dictionary. The frame colour shows the functional block. Lines are relationships between tables of the domain. References to reference tables, to the owner and to the same table (recipe variants) are shown in the column row as "-> table" to keep the diagram readable: every workspace table references `users` (`owner_id`, `ON DELETE CASCADE`). Line ends: "||" - exactly one, "o|" - zero or one, "o<" - zero or many. Source of the diagram: [`logical-schema.dot`](logical-schema.dot).
 
 ## Blocks
 
