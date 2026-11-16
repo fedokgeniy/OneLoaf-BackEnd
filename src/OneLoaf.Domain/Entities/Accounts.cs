@@ -1,0 +1,49 @@
+namespace OneLoaf.Domain.Entities;
+
+/// <summary>E1. Registered baker (or administrator). Owner of a private workspace.</summary>
+public class User
+{
+    public Guid Id { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string NormalizedEmail { get; set; } = string.Empty;
+    /// <summary>Salted hash produced by PasswordHasher (PBKDF2). Never plain text (NFR-04).</summary>
+    public string PasswordHash { get; set; } = string.Empty;
+    public string DisplayName { get; set; } = string.Empty;
+    public UserRole Role { get; set; } = UserRole.User;
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public DateTime? LastLoginAt { get; set; }
+
+    public KitchenSettings? KitchenSettings { get; set; }
+}
+
+/// <summary>E3, US-13, US-47 - US-49. One row per user: equipment and cost parameters.</summary>
+public class KitchenSettings
+{
+    public Guid UserId { get; set; }
+    public decimal? OvenPowerKw { get; set; }
+    public int? OvenCapacityLoaves { get; set; }
+    public decimal? MixerBowlCapacityKg { get; set; }
+    public decimal? ElectricityTariffPerKwh { get; set; }
+    public decimal PackagingCostPerLoaf { get; set; }
+    public decimal LossRatePercent { get; set; }
+    public decimal? LaborRatePerHour { get; set; }
+    public string Currency { get; set; } = "EUR";
+    public string TimeZone { get; set; } = "Europe/Vilnius";
+    public DateTime UpdatedAt { get; set; }
+
+    public User User { get; set; } = null!;
+}
+
+/// <summary>Web Push subscription of a user's device (Notification service).</summary>
+public class PushSubscription
+{
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
+    public string Endpoint { get; set; } = string.Empty;
+    public string P256dh { get; set; } = string.Empty;
+    public string Auth { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+
+    public User User { get; set; } = null!;
+}

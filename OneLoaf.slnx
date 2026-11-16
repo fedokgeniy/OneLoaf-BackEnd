@@ -1,0 +1,7 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/OneLoaf.DbMigrator/OneLoaf.DbMigrator.csproj" />
+    <Project Path="src/OneLoaf.Domain/OneLoaf.Domain.csproj" />
+    <Project Path="src/OneLoaf.Infrastructure/OneLoaf.Infrastructure.csproj" />
+  </Folder>
+</Solution>

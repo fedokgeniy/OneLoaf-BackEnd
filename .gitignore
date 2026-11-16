@@ -1,0 +1,23 @@
+# Secrets: never commit real connection strings or keys
+.env
+*.env
+!.env.example
+appsettings.*.local.json
+secrets.json
+
+# .NET build output
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+.vs/
+.vscode/
+.idea/
+TestResults/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/

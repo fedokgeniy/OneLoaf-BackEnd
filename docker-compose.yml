@@ -1,0 +1,47 @@
+# Local PostgreSQL 16 with the OneLoaf roles, and a one-shot migrator that creates the schema.
+# All passwords come from .env (see .env.example); nothing secret is stored in this file.
+#
+#   cp .env.example .env              # fill in the passwords
+#   docker compose up -d db           # first start runs db/security/bootstrap.sql (roles + database)
+#   docker compose run --rm migrator  # applies the migrations as app_admin
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      ONELOAF_DB: ${ONELOAF_DB:-oneloaf}
+      ONELOAF_ADMIN_PASSWORD: ${ONELOAF_ADMIN_PASSWORD:?Set ONELOAF_ADMIN_PASSWORD in .env}
+      ONELOAF_APP_PASSWORD: ${ONELOAF_APP_PASSWORD:?Set ONELOAF_APP_PASSWORD in .env}
+      ONELOAF_READER_PASSWORD: ${ONELOAF_READER_PASSWORD:?Set ONELOAF_READER_PASSWORD in .env}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/security/bootstrap.sql:/oneloaf/bootstrap.sql:ro
+      - ./db/security/docker-init.sh:/docker-entrypoint-initdb.d/10-oneloaf-bootstrap.sh:ro
+      - ./db:/oneloaf/db:ro
+    healthcheck:
+      # TCP check: during initialization the server listens only on the local socket,
+      # so the container becomes healthy only after bootstrap.sql has created the database
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d ${ONELOAF_DB:-oneloaf}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  migrator:
+    image: mcr.microsoft.com/dotnet/sdk:10.0
+    working_dir: /src
+    volumes:
+      - ./:/src
+    environment:
+      ConnectionStrings__OneLoaf: "Host=db;Port=5432;Database=${ONELOAF_DB:-oneloaf};Username=app_admin;Password=${ONELOAF_ADMIN_PASSWORD}"
+      DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+    command: ["dotnet", "run", "--project", "src/OneLoaf.DbMigrator"]
+    depends_on:
+      db:
+        condition: service_healthy
+    profiles: ["tools"]
+
+volumes:
+  pgdata:
