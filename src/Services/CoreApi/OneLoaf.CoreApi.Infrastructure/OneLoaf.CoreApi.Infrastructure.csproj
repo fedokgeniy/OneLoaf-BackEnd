@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Implements the Application ports: EF Core queries, DB function gateway, cache, publisher. -->
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OneLoaf.CoreApi.Application\OneLoaf.CoreApi.Application.csproj" />
+    <ProjectReference Include="..\..\..\OneLoaf.Infrastructure\OneLoaf.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\OneLoaf.ServiceDefaults\OneLoaf.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
+  </ItemGroup>
+
+</Project>
