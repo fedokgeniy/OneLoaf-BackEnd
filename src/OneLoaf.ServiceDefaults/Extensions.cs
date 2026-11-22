@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -42,11 +43,20 @@ public static class Extensions
         services.AddOneLoafHealthChecks();
         services.AddOneLoafObservability(serviceName);
         services.AddSingleton(TimeProvider.System);
+        services.Configure<ForwardedHeadersOptions>(options =>
+        {
+            // Only the reverse proxy (Caddy) is reachable from outside the Docker network, so its X-Forwarded-For is
+            // trusted; the client IP is needed for per-IP rate limiting and logs.
+            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            options.KnownIPNetworks.Clear();
+            options.KnownProxies.Clear();
+        });
         return builder;
     }
 
     /// <summary>
-    /// Adds the middleware in the required order: correlation id (so every later log has it) → request logging →
+    /// Adds the middleware in the required order: forwarded headers (client IP) → correlation id (so every later log
+    /// has it) → request logging →
     /// exception handler → status code pages (empty 401/404 become ProblemDetails) → Swagger UI (public static files)
     /// → authentication → authorization.
     /// </summary>
@@ -54,6 +64,7 @@ public static class Extensions
     {
         ArgumentNullException.ThrowIfNull(app);
 
+        app.UseForwardedHeaders();
         app.UseMiddleware<CorrelationIdMiddleware>();
         app.UseOneLoafRequestLogging();
         app.UseExceptionHandler();

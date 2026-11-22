@@ -1,4 +1,7 @@
+using OneLoaf.CoreApi.Application;
+using OneLoaf.CoreApi.Endpoints;
 using OneLoaf.CoreApi.Infrastructure;
+using OneLoaf.CoreApi.RateLimiting;
 using OneLoaf.ServiceDefaults;
 using OneLoaf.ServiceDefaults.Constants;
 using OneLoaf.ServiceDefaults.Health;
@@ -12,12 +15,18 @@ if (HealthProbe.IsRequested(args))
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults(ServiceNames.CoreApi);
+builder.Services.AddCoreApiApplication();
 builder.Services.AddCoreApiInfrastructure(builder.Configuration);
+builder.Services.AddAuthRateLimiting();
 
 var app = builder.Build();
 
 app.UseServiceDefaults();
+app.UseRateLimiter();
+
 app.MapServiceDefaults();
+app.MapAuthEndpoints();
+app.MapMeEndpoints();
 
 await app.RunAsync();
 return 0;

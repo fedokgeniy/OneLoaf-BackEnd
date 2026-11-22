@@ -21,5 +21,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/OneLoaf.ArchitectureTests/OneLoaf.ArchitectureTests.csproj" />
     <Project Path="tests/OneLoaf.CoreApi.UnitTests/OneLoaf.CoreApi.UnitTests.csproj" />
+    <Project Path="tests/OneLoaf.IntegrationTests/OneLoaf.IntegrationTests.csproj" />
   </Folder>
 </Solution>

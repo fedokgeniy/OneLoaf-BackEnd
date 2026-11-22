@@ -12,6 +12,12 @@ public static class ProblemTypes
     /// <summary>Malformed request or invalid argument (400).</summary>
     public const string BadRequest = BaseUri + "bad-request";
 
+    /// <summary>Missing or invalid credentials (401).</summary>
+    public const string Unauthorized = BaseUri + "unauthorized";
+
+    /// <summary>Rate limit exceeded (429).</summary>
+    public const string TooManyRequests = BaseUri + "too-many-requests";
+
     /// <summary>Not allowed (403).</summary>
     public const string Forbidden = BaseUri + "forbidden";
 

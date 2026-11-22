@@ -6,6 +6,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Services\CoreApi\OneLoaf.CoreApi.Application\OneLoaf.CoreApi.Application.csproj" />
+    <ProjectReference Include="..\..\src\Services\CoreApi\OneLoaf.CoreApi.Infrastructure\OneLoaf.CoreApi.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\OneLoaf.ServiceDefaults\OneLoaf.ServiceDefaults.csproj" />
   </ItemGroup>
 

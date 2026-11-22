@@ -16,7 +16,8 @@ public static class ExceptionMapper
     /// <summary>Non-standard status for a request cancelled by the client (nginx convention); no body is written.</summary>
     public const int ClientClosedRequest = 499;
 
-    internal const string ValidationTitle = "One or more validation errors occurred.";
+    /// <summary>Title of every validation problem (400).</summary>
+    public const string ValidationTitle = "One or more validation errors occurred.";
     internal const string BadRequestTitle = "The request is invalid.";
     internal const string ForbiddenTitle = "You are not allowed to perform this action.";
     internal const string NotFoundTitle = "The requested resource was not found.";
@@ -109,8 +110,11 @@ public static class ExceptionMapper
     private static ProblemMapping Internal() =>
         new(StatusCodes.Status500InternalServerError, ProblemTypes.Internal, InternalTitle, null, LogLevel.Error);
 
-    private static Dictionary<string, string[]> ToErrors(ValidationException exception) =>
-        exception.Errors
+    private static Dictionary<string, string[]> ToErrors(ValidationException exception) => ToErrors(exception.Errors);
+
+    /// <summary>Validation failures grouped by camelCase property name (the JSON names of the request).</summary>
+    public static Dictionary<string, string[]> ToErrors(IEnumerable<FluentValidation.Results.ValidationFailure> failures) =>
+        failures
             .GroupBy(e => JsonNamingPolicy.CamelCase.ConvertName(e.PropertyName ?? string.Empty), StringComparer.Ordinal)
             .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).Distinct(StringComparer.Ordinal).ToArray(),
                 StringComparer.Ordinal);
