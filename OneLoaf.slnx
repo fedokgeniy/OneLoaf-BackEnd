@@ -1,7 +1,26 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/OneLoaf.DbMigrator/OneLoaf.DbMigrator.csproj" />
     <Project Path="src/OneLoaf.Domain/OneLoaf.Domain.csproj" />
     <Project Path="src/OneLoaf.Infrastructure/OneLoaf.Infrastructure.csproj" />
+    <Project Path="src/OneLoaf.ServiceDefaults/OneLoaf.ServiceDefaults.csproj" />
+    <Project Path="src/OneLoaf.SharedKernel/OneLoaf.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/src/Services/" />
+  <Folder Name="/src/Services/CoreApi/">
+    <Project Path="src/Services/CoreApi/OneLoaf.CoreApi/OneLoaf.CoreApi.csproj" />
+    <Project Path="src/Services/CoreApi/OneLoaf.CoreApi.Application/OneLoaf.CoreApi.Application.csproj" />
+    <Project Path="src/Services/CoreApi/OneLoaf.CoreApi.Infrastructure/OneLoaf.CoreApi.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/OneLoaf.ArchitectureTests/OneLoaf.ArchitectureTests.csproj" />
+    <Project Path="tests/OneLoaf.CoreApi.UnitTests/OneLoaf.CoreApi.UnitTests.csproj" />
+    <Project Path="tests/OneLoaf.IntegrationTests/OneLoaf.IntegrationTests.csproj" />
   </Folder>
 </Solution>
