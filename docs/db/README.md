@@ -5,7 +5,7 @@ Database of the bachelor project **"AI-assisted web application for managing rec
 and reminders, baking history, AI assistant, shared recipe library.
 
 Type: relational transactional database (OLTP), **PostgreSQL 16**. The structure is described with EF Core (.NET 10,
-Code First) and created **only by scripts**: a chain of migrations or the DDL script [`db/schema.sql`](db/schema.sql)
+Code First) and created **only by scripts**: a chain of migrations or the DDL script [`db/schema.sql`](../../db/schema.sql)
 generated from it.
 
 **Contents:** 29 tables (5 of them reference tables), 53 foreign keys, 96 CHECK constraints, 97 indexes, 29 triggers,
@@ -15,11 +15,11 @@ generated from it.
 
 | Document | Contents |
 |---|---|
-| [Data dictionary](docs/db/data-dictionary.md) | Every table and column: types, NULL, defaults, keys, indexes, CHECK constraints, triggers, data quality expectations; reference values; views; functions and procedures |
-| [Logical schema](docs/db/logical-schema.md) | Colour-coded diagram by functional block ([SVG](docs/db/logical-schema.svg)), relationship types, ER diagram of every block |
-| [Design](docs/db/design.md) | Choice of the DBMS, data layers, normalization to 3NF and deliberate denormalization, variant model, reference tables, JSON columns, index justification with query plans, logic in the database, versioning |
-| [Integrity and transactions](docs/db/integrity-and-transactions.md) | Levels of integrity, delete policy, rules in triggers, life cycles, atomic operations, isolation level, error codes |
-| [Security](docs/db/security.md) | Roles and access matrix, privileges on new objects, storage of passwords and secrets, masking and anonymization of personal data |
+| [Data dictionary](data-dictionary.md) | Every table and column: types, NULL, defaults, keys, indexes, CHECK constraints, triggers, data quality expectations; reference values; views; functions and procedures |
+| [Logical schema](logical-schema.md) | Colour-coded diagram by functional block ([SVG](logical-schema.svg)), relationship types, ER diagram of every block |
+| [Design](design.md) | Choice of the DBMS, data layers, normalization to 3NF and deliberate denormalization, variant model, reference tables, JSON columns, index justification with query plans, logic in the database, versioning |
+| [Integrity and transactions](integrity-and-transactions.md) | Levels of integrity, delete policy, rules in triggers, life cycles, atomic operations, isolation level, error codes |
+| [Security](security.md) | Roles and access matrix, privileges on new objects, storage of passwords and secrets, masking and anonymization of personal data |
 
 ## Requirements coverage
 
@@ -27,51 +27,51 @@ generated from it.
 
 | Requirement | Where |
 |---|---|
-| Data dictionary: tables, columns, types, keys, data quality expectations | [data-dictionary.md](docs/db/data-dictionary.md); generated from the schema by `tools/generate_data_dictionary.py` |
-| Data layers | [design.md - Data layers](docs/db/design.md#data-layers) |
-| Data integrity and transactions | [integrity-and-transactions.md](docs/db/integrity-and-transactions.md) |
-| Logical schema with highlighted blocks and colour coding, ER diagram | [logical-schema.md](docs/db/logical-schema.md), [logical-schema.svg](docs/db/logical-schema.svg) |
-| DDL script | [`db/schema.sql`](db/schema.sql) |
-| Versioning of the structure | [design.md - Versioning](docs/db/design.md#versioning-of-the-structure) |
+| Data dictionary: tables, columns, types, keys, data quality expectations | [data-dictionary.md](data-dictionary.md); generated from the schema by `tools/generate_data_dictionary.py` |
+| Data layers | [design.md - Data layers](design.md#data-layers) |
+| Data integrity and transactions | [integrity-and-transactions.md](integrity-and-transactions.md) |
+| Logical schema with highlighted blocks and colour coding, ER diagram | [logical-schema.md](logical-schema.md), [logical-schema.svg](logical-schema.svg) |
+| DDL script | [`db/schema.sql`](../../db/schema.sql) |
+| Versioning of the structure | [design.md - Versioning](design.md#versioning-of-the-structure) |
 
 **Design**
 
 | Requirement | Where |
 |---|---|
-| Modern relational DBMS | PostgreSQL 16; justification in [design.md - Choice of the DBMS](docs/db/design.md#choice-of-the-dbms) |
-| Normalization to 3NF | [design.md - Normalization](docs/db/design.md#normalization) |
-| Enough tables and different relationship types | 29 tables; 1:1, 1:N, M:N, recursive, reference - [logical-schema.md - Relationship types](docs/db/logical-schema.md#relationship-types) |
-| PK, FK, NOT NULL, UNIQUE, CHECK, meaningful data types | Every table; `numeric` for money and quantities, `timestamptz`/`date` for time - [data dictionary](docs/db/data-dictionary.md) |
-| JSON only with a designed model | Three columns with a documented structure checked by CHECK functions - [design.md - JSON columns](docs/db/design.md#json-columns) |
-| Indexes with justification | [design.md - Indexes](docs/db/design.md#indexes), plans in [`db/queries/explain_plans.sql`](db/queries/explain_plans.sql) |
-| Different DBMS types, raw - staging - mart layers | Not required by the task; justification in [design.md](docs/db/design.md#choice-of-the-dbms) |
+| Modern relational DBMS | PostgreSQL 16; justification in [design.md - Choice of the DBMS](design.md#choice-of-the-dbms) |
+| Normalization to 3NF | [design.md - Normalization](design.md#normalization) |
+| Enough tables and different relationship types | 29 tables; 1:1, 1:N, M:N, recursive, reference - [logical-schema.md - Relationship types](logical-schema.md#relationship-types) |
+| PK, FK, NOT NULL, UNIQUE, CHECK, meaningful data types | Every table; `numeric` for money and quantities, `timestamptz`/`date` for time - [data dictionary](data-dictionary.md) |
+| JSON only with a designed model | Three columns with a documented structure checked by CHECK functions - [design.md - JSON columns](design.md#json-columns) |
+| Indexes with justification | [design.md - Indexes](design.md#indexes), plans in [`db/queries/explain_plans.sql`](../../db/queries/explain_plans.sql) |
+| Different DBMS types, raw - staging - mart layers | Not required by the task; justification in [design.md](design.md#choice-of-the-dbms) |
 
 **Deployment and data**
 
 | Requirement | Where |
 |---|---|
 | Structure created by scripts or migrations, not manually | EF Core migrations and `db/schema.sql`; see [Getting started](#getting-started) |
-| Scripts and migrations in Git | [`src/OneLoaf.Infrastructure/Persistence/Migrations/`](src/OneLoaf.Infrastructure/Persistence/Migrations) (7 migrations and their SQL scripts), [`db/`](db) |
-| Scripts for reference tables | `InitialSchema` migration (EF Core `HasData`, [`ReferenceData.cs`](src/OneLoaf.Infrastructure/Persistence/ReferenceData.cs)); values in the [dictionary](docs/db/data-dictionary.md#reference-values) |
-| Test data covering edge cases | [`db/seed/test_data.sql`](db/seed/test_data.sql) (5 users, every status; the edge cases are listed in the file header); volume data in [`db/seed/volume_data.sql`](db/seed/volume_data.sql) |
+| Scripts and migrations in Git | [`src/OneLoaf.Infrastructure/Persistence/Migrations/`](../../src/OneLoaf.Infrastructure/Persistence/Migrations) (7 migrations and their SQL scripts), [`db/`](../../db) |
+| Scripts for reference tables | `InitialSchema` migration (EF Core `HasData`, [`ReferenceData.cs`](../../src/OneLoaf.Infrastructure/Persistence/ReferenceData.cs)); values in the [dictionary](data-dictionary.md#reference-values) |
+| Test data covering edge cases | [`db/seed/test_data.sql`](../../db/seed/test_data.sql) (5 users, every status; the edge cases are listed in the file header); volume data in [`db/seed/volume_data.sql`](../../db/seed/volume_data.sql) |
 
 **Usage and security**
 
 | Requirement | Where |
 |---|---|
-| Roles `app_read`, `app_write`, admin | `app_read`, `app_write`, `app_admin` - [security.md](docs/db/security.md); created by [`db/security/bootstrap.sql`](db/security/bootstrap.sql), privileges in the `AccessPrivileges` migration |
+| Roles `app_read`, `app_write`, admin | `app_read`, `app_write`, `app_admin` - [security.md](security.md); created by [`db/security/bootstrap.sql`](../../db/security/bootstrap.sql), privileges in the `AccessPrivileges` migration |
 | The application does not run as a superuser | Migrator - `app_admin`, services - `oneloaf_app`, reports - `oneloaf_reader`; a superuser is used only for the one-time bootstrap |
-| Privileges checked when objects are added | Default privileges and an access policy audit in CI - [security.md - Privileges on new objects](docs/db/security.md#3-privileges-on-new-objects) |
+| Privileges checked when objects are added | Default privileges and an access policy audit in CI - [security.md - Privileges on new objects](security.md#3-privileges-on-new-objects) |
 | Passwords only in encrypted form, no outdated algorithms | PBKDF2-HMAC-SHA512 with at least 100000 iterations; a CHECK rejects plain text, MD5 and SHA-1; role passwords are SCRAM-SHA-256 |
-| Integrity through constraints and transactions | [integrity-and-transactions.md](docs/db/integrity-and-transactions.md) |
-| Triggers, procedures and functions with business logic | [design.md - Logic in the database](docs/db/design.md#logic-in-the-database) |
-| Views and materialized views | 7 views and `mv_bake_statistics` - [dictionary - Views](docs/db/data-dictionary.md#views) |
-| Masking and anonymization of personal data | `v_users_masked`, `fn_mask_email`, `fn_mask_name`, `sp_anonymize_user` - [security.md - Personal data](docs/db/security.md#5-personal-data) |
+| Integrity through constraints and transactions | [integrity-and-transactions.md](integrity-and-transactions.md) |
+| Triggers, procedures and functions with business logic | [design.md - Logic in the database](design.md#logic-in-the-database) |
+| Views and materialized views | 7 views and `mv_bake_statistics` - [dictionary - Views](data-dictionary.md#views) |
+| Masking and anonymization of personal data | `v_users_masked`, `fn_mask_email`, `fn_mask_name`, `sp_anonymize_user` - [security.md - Personal data](security.md#5-personal-data) |
 
 ## Getting started
 
 Passwords are provided through the environment; the repository contains none. For Docker they are kept in the file `.env`,
-which is excluded from Git.
+which is excluded from Git. All commands below are run from the repository root.
 
 ### Option 1. Docker
 
@@ -136,17 +136,17 @@ date and that the model has no changes without a migration, compares the databas
 from `schema.sql`, rolls all migrations back to an empty database and applies them again, loads the test data as the
 application role, runs all tests under the matching roles, prints the data quality report, checks that the data dictionary and
 the logical schema match the database, loads the volume data and shows the query plans. The same script runs in GitHub Actions
-([`.github/workflows/database.yml`](.github/workflows/database.yml)).
+([`.github/workflows/database.yml`](../../.github/workflows/database.yml)).
 
 ## Tests
 
 | File | Role | What it checks | Checks |
 |---|---|---|---|
-| [`db/tests/constraint_tests.sql`](db/tests/constraint_tests.sql) | `oneloaf_app` | The database rejects invalid data with an integrity error: formats, ranges, reference data, user isolation, variant rules, status transitions, JSON structure, weak password hashes; cascading account deletion | 71 |
-| [`db/tests/business_tests.sql`](db/tests/business_tests.sql) | `oneloaf_app` | Functions, procedures, triggers and views return the values of the acceptance criteria US-06 - US-52 | 64 |
-| [`db/tests/security_audit.sql`](db/tests/security_audit.sql) | `app_admin` | Privileges of every table and view match the policy; role attributes; default privileges; no function is executable by `PUBLIC` | 57 |
-| [`db/tests/security_app.sql`](db/tests/security_app.sql) | `oneloaf_app` | The application role writes data but cannot change the structure, reference data, migration history or its own privileges | 17 |
-| [`db/tests/security_reader.sql`](db/tests/security_reader.sql) | `oneloaf_reader` | The reporting role sees personal data only masked and cannot change anything | 16 |
+| [`db/tests/constraint_tests.sql`](../../db/tests/constraint_tests.sql) | `oneloaf_app` | The database rejects invalid data with an integrity error: formats, ranges, reference data, user isolation, variant rules, status transitions, JSON structure, weak password hashes; cascading account deletion | 71 |
+| [`db/tests/business_tests.sql`](../../db/tests/business_tests.sql) | `oneloaf_app` | Functions, procedures, triggers and views return the values of the acceptance criteria US-06 - US-52 | 64 |
+| [`db/tests/security_audit.sql`](../../db/tests/security_audit.sql) | `app_admin` | Privileges of every table and view match the policy; role attributes; default privileges; no function is executable by `PUBLIC` | 57 |
+| [`db/tests/security_app.sql`](../../db/tests/security_app.sql) | `oneloaf_app` | The application role writes data but cannot change the structure, reference data, migration history or its own privileges | 17 |
+| [`db/tests/security_reader.sql`](../../db/tests/security_reader.sql) | `oneloaf_reader` | The reporting role sees personal data only masked and cannot change anything | 16 |
 
 The tests run in a transaction that is rolled back and fail if any check fails.
 
