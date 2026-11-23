@@ -87,10 +87,15 @@ services:
       Jwt__SigningKeyPem: ${Jwt__SigningKeyPem:?Set Jwt__SigningKeyPem in .env}
       Jwt__PublicKeyPem: ${Jwt__PublicKeyPem:?Set Jwt__PublicKeyPem in .env}
       Serilog__MinimumLevel__Default: ${Serilog__MinimumLevel__Default:-Information}
+      RabbitMq__Host: rabbitmq
+      RabbitMq__UserName: ${RABBITMQ_DEFAULT_USER:-oneloaf}
+      RabbitMq__Password: ${RABBITMQ_DEFAULT_PASS}
     ports:
       - "${CORE_API_PORT:-5080}:8080"
     depends_on:
       db:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
       migrator:
         condition: service_completed_successfully

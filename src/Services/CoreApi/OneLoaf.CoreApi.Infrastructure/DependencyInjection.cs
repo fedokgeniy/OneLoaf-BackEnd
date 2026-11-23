@@ -2,6 +2,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OneLoaf.CoreApi.Application.Account;
 using OneLoaf.CoreApi.Application.Auth;
+using OneLoaf.CoreApi.Application.Batches;
+using OneLoaf.CoreApi.Application.History;
+using OneLoaf.CoreApi.Application.Starters;
 using OneLoaf.CoreApi.Application.Calculations;
 using OneLoaf.CoreApi.Application.Catalog;
 using OneLoaf.CoreApi.Application.Kitchen;
@@ -11,6 +14,7 @@ using OneLoaf.CoreApi.Application.Warnings;
 using OneLoaf.CoreApi.Infrastructure.Auth;
 using OneLoaf.CoreApi.Infrastructure.Persistence;
 using OneLoaf.Infrastructure;
+using OneLoaf.Messaging.RabbitMq;
 using OneLoaf.Infrastructure.Persistence;
 using OneLoaf.ServiceDefaults.Constants;
 using OneLoaf.ServiceDefaults.Options;
@@ -26,7 +30,7 @@ public static class DependencyInjection
     /// <summary>Name of the database readiness check.</summary>
     public const string DatabaseHealthCheckName = "postgres";
 
-    /// <summary>Registers the database context, repositories, password hashing, token issuing and the readiness check.</summary>
+    /// <summary>Registers the database context, repositories, password hashing, token issuing, the event publisher and the readiness checks.</summary>
     public static IServiceCollection AddCoreApiInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
@@ -50,6 +54,10 @@ public static class DependencyInjection
         services.AddScoped<IRecipeRepository, RecipeRepository>();
         services.AddScoped<IRecipeCalculations, RecipeCalculations>();
         services.AddScoped<IWarningsReader, WarningsReader>();
+        services.AddScoped<IBatchRepository, BatchRepository>();
+        services.AddScoped<IStarterRepository, StarterRepository>();
+        services.AddScoped<IBakeRecordRepository, BakeRecordRepository>();
+        services.AddRabbitMqPublisher();
         services.AddSingleton<IPasswordHasher, PasswordHasherAdapter>();
         services.AddValidatedOptions<JwtIssuerOptions>(JwtIssuerOptions.SectionName);
         services.AddSingleton<IAccessTokenIssuer, JwtTokenIssuer>();

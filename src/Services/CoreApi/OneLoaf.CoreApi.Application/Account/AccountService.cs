@@ -1,5 +1,7 @@
 using Microsoft.Extensions.Logging;
 using OneLoaf.CoreApi.Application.Auth;
+using OneLoaf.Messaging;
+using OneLoaf.Messaging.Contracts;
 using OneLoaf.SharedKernel.Exceptions;
 using OneLoaf.SharedKernel.Security;
 
@@ -10,6 +12,8 @@ public sealed partial class AccountService(
     IUserRepository users,
     IPasswordHasher passwordHasher,
     ICurrentUser currentUser,
+    IEventPublisher events,
+    TimeProvider timeProvider,
     ILogger<AccountService> logger)
 {
     /// <summary>Message when the user of a valid token no longer exists.</summary>
@@ -26,7 +30,7 @@ public sealed partial class AccountService(
 
     /// <summary>
     /// Deletes the current user after re-checking the password. The database removes the whole workspace by cascade
-    /// (US-04).
+    /// (US-04); other services are told with <c>account.deleted</c>.
     /// </summary>
     /// <exception cref="NotFoundException">The account no longer exists.</exception>
     /// <exception cref="ForbiddenException">The password is wrong.</exception>
@@ -49,6 +53,7 @@ public sealed partial class AccountService(
         }
 
         LogDeleted(logger, userId);
+        await events.PublishAsync(new AccountDeleted(userId, timeProvider.GetUtcNow()), cancellationToken);
     }
 
     [LoggerMessage(Level = LogLevel.Information, Message = "User {UserId} deleted the account")]

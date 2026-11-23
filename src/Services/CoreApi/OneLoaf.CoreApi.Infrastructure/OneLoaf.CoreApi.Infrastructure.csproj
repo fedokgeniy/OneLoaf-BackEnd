@@ -9,6 +9,7 @@
     <ProjectReference Include="..\OneLoaf.CoreApi.Application\OneLoaf.CoreApi.Application.csproj" />
     <ProjectReference Include="..\..\..\OneLoaf.Infrastructure\OneLoaf.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\OneLoaf.ServiceDefaults\OneLoaf.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\..\OneLoaf.Messaging.RabbitMq\OneLoaf.Messaging.RabbitMq.csproj" />
   </ItemGroup>
 
   <ItemGroup>

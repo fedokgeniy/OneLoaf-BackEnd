@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Event contracts and the publishing port shared by the services. No dependencies, so Application layers can
+       reference it; the broker implementation lives in OneLoaf.Messaging.RabbitMq. -->
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+</Project>

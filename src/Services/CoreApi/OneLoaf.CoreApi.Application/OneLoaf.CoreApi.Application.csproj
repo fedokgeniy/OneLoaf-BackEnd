@@ -8,6 +8,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\OneLoaf.Domain\OneLoaf.Domain.csproj" />
     <ProjectReference Include="..\..\..\OneLoaf.SharedKernel\OneLoaf.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\OneLoaf.Messaging\OneLoaf.Messaging.csproj" />
   </ItemGroup>
 
   <ItemGroup>
