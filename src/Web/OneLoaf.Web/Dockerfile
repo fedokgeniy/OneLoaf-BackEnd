@@ -20,10 +20,12 @@ RUN dotnet restore src/Web/OneLoaf.Web/OneLoaf.Web.csproj --locked-mode
 COPY src/Web/ src/Web/
 RUN dotnet publish src/Web/OneLoaf.Web/OneLoaf.Web.csproj --configuration Release --no-restore --output /app
 
-FROM nginx:alpine AS runtime
+# Official nginx image variant that runs as the non-root user nginx (uid 101) and listens on 8080.
+FROM nginxinc/nginx-unprivileged:alpine AS runtime
 COPY src/Web/OneLoaf.Web/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build /app/wwwroot /usr/share/nginx/html
-EXPOSE 80
+USER 101
+EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-    CMD ["wget", "-q", "--spider", "http://127.0.0.1/index.html"]
+    CMD ["wget", "-q", "--spider", "http://127.0.0.1:8080/index.html"]
