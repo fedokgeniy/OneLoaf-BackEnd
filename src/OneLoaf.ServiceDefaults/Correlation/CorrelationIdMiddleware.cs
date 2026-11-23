@@ -7,7 +7,7 @@ namespace OneLoaf.ServiceDefaults.Correlation;
 
 /// <summary>
 /// Reads <c>X-Correlation-ID</c> or creates a new one, stores it in <see cref="ICorrelationContext"/>, returns it in
-/// the response header and adds it to the log context and the current <see cref="Activity"/> (architecture.md §7).
+/// the response header and adds it to the log context and the current <see cref="Activity"/>.
 /// </summary>
 public sealed class CorrelationIdMiddleware(RequestDelegate next, ICorrelationContext correlation)
 {

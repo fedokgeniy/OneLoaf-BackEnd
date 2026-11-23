@@ -7,7 +7,7 @@ using OneLoaf.SharedKernel.Security;
 
 namespace OneLoaf.ServiceDefaults.Security;
 
-/// <summary>Authentication and authorization setup shared by all services (architecture.md §4).</summary>
+/// <summary>Authentication and authorization setup shared by all services.</summary>
 public static class SecurityExtensions
 {
     /// <summary>

@@ -1,6 +1,6 @@
 namespace OneLoaf.ServiceDefaults.Correlation;
 
-/// <summary>Correlation id of the current logical operation (HTTP request now, consumed message later).</summary>
+/// <summary>Correlation id of the current logical operation (an HTTP request or a consumed message).</summary>
 public interface ICorrelationContext
 {
     /// <summary>The current correlation id, or null outside of an operation.</summary>

@@ -7,9 +7,9 @@ using OpenTelemetry.Resources;
 namespace OneLoaf.ServiceDefaults.Observability;
 
 /// <summary>
-/// OpenTelemetry metrics exported for Prometheus on <c>/metrics</c> (requirement X5, architecture.md §7):
+/// OpenTelemetry metrics exported for Prometheus on <c>/metrics</c>:
 /// HTTP server and client, .NET runtime (GC, memory, thread pool), Npgsql pool and the custom OneLoaf meter.
-/// Tracing export (OTLP) is a later bonus item; W3C <c>traceparent</c> is already propagated by <c>HttpClient</c>.
+/// W3C <c>traceparent</c> is propagated by <c>HttpClient</c>.
 /// </summary>
 public static class ObservabilityExtensions
 {

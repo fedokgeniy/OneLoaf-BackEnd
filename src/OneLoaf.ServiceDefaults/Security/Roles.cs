@@ -6,6 +6,6 @@ public static class Roles
     /// <summary>Registered baker.</summary>
     public const string User = "user";
 
-    /// <summary>Administrator (content moderation, LR-11).</summary>
+    /// <summary>Administrator (content moderation).</summary>
     public const string Admin = "admin";
 }

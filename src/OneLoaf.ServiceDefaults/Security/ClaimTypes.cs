@@ -1,7 +1,7 @@
 namespace OneLoaf.ServiceDefaults.Security;
 
 /// <summary>
-/// Claim names of the OneLoaf access token (architecture.md §4). Short JWT names are kept as issued:
+/// Claim names of the OneLoaf access token. Short JWT names are kept as issued:
 /// inbound claim mapping is switched off.
 /// </summary>
 public static class ClaimTypes

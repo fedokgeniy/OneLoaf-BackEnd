@@ -7,7 +7,7 @@ namespace OneLoaf.ServiceDefaults.OpenApi;
 
 /// <summary>
 /// Declares the bearer (JWT) security scheme and requires it on every operation that is not anonymous, so Swagger UI
-/// shows the lock and the "Authorize" button (api-design.md §1).
+/// shows the lock and the "Authorize" button.
 /// </summary>
 public sealed class BearerSecuritySchemeTransformer : IOpenApiDocumentTransformer, IOpenApiOperationTransformer
 {

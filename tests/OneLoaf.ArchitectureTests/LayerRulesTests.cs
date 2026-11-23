@@ -12,7 +12,7 @@ using Assembly = System.Reflection.Assembly;
 
 namespace OneLoaf.ArchitectureTests;
 
-/// <summary>Layer rules of architecture.md §2 (CLAUDE.md rule 7).</summary>
+/// <summary>Layer dependency rules of the solution.</summary>
 public sealed class LayerRulesTests
 {
     private static readonly Assembly DomainAssembly = typeof(User).Assembly;
@@ -43,7 +43,7 @@ public sealed class LayerRulesTests
             CoreApiAssembly, CoreApiApplicationAssembly, CoreApiInfrastructureAssembly)
         .Build();
 
-    /// <summary>Namespaces the Application layer must never use (architecture.md §2).</summary>
+    /// <summary>Namespaces the Application layer must never use.</summary>
     public static TheoryData<string> ForbiddenInApplication => new()
     {
         "Microsoft.EntityFrameworkCore",

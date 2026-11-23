@@ -8,7 +8,7 @@ namespace OneLoaf.ServiceDefaults.Validation;
 
 /// <summary>
 /// Endpoint filter that validates the <typeparamref name="TRequest"/> argument with its FluentValidation validator and
-/// answers 400 <c>ValidationProblemDetails</c> before the handler runs (CLAUDE.md rule 8).
+/// answers 400 <c>ValidationProblemDetails</c> before the handler runs.
 /// </summary>
 public sealed class ValidationFilter<TRequest> : IEndpointFilter
     where TRequest : class

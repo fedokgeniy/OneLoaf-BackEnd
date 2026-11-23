@@ -7,7 +7,7 @@ namespace OneLoaf.CoreApi.Infrastructure.Auth;
 /// <summary>
 /// <see cref="IPasswordHasher"/> over ASP.NET Core Identity <see cref="PasswordHasher{TUser}"/> (Identity v3 format:
 /// PBKDF2-HMAC-SHA512, 100 000 iterations, 128-bit salt), the format required by <c>fn_is_strong_password_hash</c>.
-/// No custom cryptography (requirement C7).
+/// No custom cryptography.
 /// </summary>
 public sealed class PasswordHasherAdapter : IPasswordHasher
 {

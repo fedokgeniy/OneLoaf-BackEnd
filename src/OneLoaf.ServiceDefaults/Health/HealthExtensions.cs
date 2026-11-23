@@ -10,7 +10,7 @@ using OneLoaf.ServiceDefaults.Constants;
 namespace OneLoaf.ServiceDefaults.Health;
 
 /// <summary>
-/// Liveness and readiness endpoints (NFR-05). Services add their dependency checks with tag
+/// Liveness and readiness endpoints. Services add their dependency checks with tag
 /// <see cref="HealthTags.Ready"/>; <c>/health/live</c> checks only the process.
 /// </summary>
 public static class HealthExtensions

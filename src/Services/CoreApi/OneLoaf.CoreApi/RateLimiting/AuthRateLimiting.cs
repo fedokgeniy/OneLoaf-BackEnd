@@ -13,7 +13,7 @@ namespace OneLoaf.CoreApi.RateLimiting;
 /// <summary>Names of the rate limiting policies.</summary>
 public static class RateLimitPolicies
 {
-    /// <summary>Fixed window per client IP on <c>/auth/*</c> (brute force protection, architecture.md §4).</summary>
+    /// <summary>Fixed window per client IP on <c>/auth/*</c> (brute force protection).</summary>
     public const string Auth = "auth";
 }
 

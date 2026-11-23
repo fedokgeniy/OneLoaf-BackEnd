@@ -10,7 +10,7 @@ using Serilog.Formatting.Compact;
 namespace OneLoaf.ServiceDefaults.Logging;
 
 /// <summary>
-/// Serilog setup (requirement M8): compact JSON to the console (collected from Docker), enriched with
+/// Serilog setup: compact JSON to the console (collected from Docker), enriched with
 /// <c>Service</c>, <c>Environment</c>, <c>CorrelationId</c> (log context) and <c>UserId</c>. Serilog records the
 /// W3C trace and span ids of the current Activity itself (<c>@tr</c>, <c>@sp</c>). Levels come from the
 /// <c>Serilog</c> configuration section (<c>Serilog__MinimumLevel__Default</c>).

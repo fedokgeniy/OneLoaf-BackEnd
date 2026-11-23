@@ -86,7 +86,7 @@ public static class Extensions
         return app;
     }
 
-    /// <summary>JSON on the wire: camelCase properties, enums as snake_case strings like in the database (CLAUDE.md rule 10).</summary>
+    /// <summary>JSON on the wire: camelCase properties, enums as snake_case strings like in the database.</summary>
     public static void ConfigureJson(JsonSerializerOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);

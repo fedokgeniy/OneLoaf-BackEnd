@@ -7,7 +7,7 @@ using OneLoaf.ServiceDefaults.Validation;
 
 namespace OneLoaf.CoreApi.Endpoints;
 
-/// <summary>E1: registration and login (US-01, US-02). Rate limited per client IP.</summary>
+/// <summary>Registration and login (US-01, US-02). Rate limited per client IP.</summary>
 public static class AuthEndpoints
 {
     /// <summary>Route of the group.</summary>

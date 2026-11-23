@@ -1,6 +1,6 @@
 namespace OneLoaf.ServiceDefaults.Constants;
 
-/// <summary>Names of the meters exported on <c>/metrics</c> (architecture.md §7).</summary>
+/// <summary>Names of the meters exported on <c>/metrics</c>.</summary>
 public static class Meters
 {
     /// <summary>Custom business meter of OneLoaf (<c>oneloaf.*</c> instruments).</summary>

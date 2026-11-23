@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Coverage scope = business logic (testing.md §2): OneLoaf.Domain and the *.Application projects.
+<!-- Coverage scope = business logic: OneLoaf.Domain and the *.Application projects.
      dotnet test OneLoaf.slnx -s coverlet.runsettings -collect:"XPlat Code Coverage" -->
 <RunSettings>
   <DataCollectionRunSettings>

@@ -26,7 +26,7 @@ public sealed partial class AccountService(
 
     /// <summary>
     /// Deletes the current user after re-checking the password. The database removes the whole workspace by cascade
-    /// (US-04, LR-03).
+    /// (US-04).
     /// </summary>
     /// <exception cref="NotFoundException">The account no longer exists.</exception>
     /// <exception cref="ForbiddenException">The password is wrong.</exception>

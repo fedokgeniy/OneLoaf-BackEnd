@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Business logic of the Core API. Never references EF Core, ASP.NET Core or broker types (CLAUDE.md rule 7). -->
+  <!-- Business logic of the Core API. Never references EF Core, ASP.NET Core or broker types. -->
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>

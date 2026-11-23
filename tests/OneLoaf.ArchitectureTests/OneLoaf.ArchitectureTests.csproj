@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <!-- No coverlet here: coverage instrumentation injects tracker types into the inspected assemblies and would
-       break the "depends on nothing" rules. Coverage is measured by the unit test projects (testing.md §2). -->
+       break the "depends on nothing" rules. Coverage is measured by the unit test projects. -->
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\OneLoaf.Domain\OneLoaf.Domain.csproj" />
