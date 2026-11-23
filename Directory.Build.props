@@ -9,7 +9,6 @@
     <AnalysisLevel>latest-recommended</AnalysisLevel>
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <Deterministic>true</Deterministic>
-    <InvariantGlobalization>true</InvariantGlobalization>
     <!-- CI restores with the locked mode option, so the lock files must be committed. -->
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <!-- Vulnerable packages fail the build. -->

@@ -2,6 +2,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using OneLoaf.CoreApi.Application.Account;
 using OneLoaf.CoreApi.Application.Auth;
+using OneLoaf.CoreApi.Application.Calculations;
+using OneLoaf.CoreApi.Application.Catalog;
+using OneLoaf.CoreApi.Application.Kitchen;
+using OneLoaf.CoreApi.Application.Recipes;
+using OneLoaf.CoreApi.Application.Reference;
+using OneLoaf.CoreApi.Application.Warnings;
 using OneLoaf.CoreApi.Infrastructure.Auth;
 using OneLoaf.CoreApi.Infrastructure.Persistence;
 using OneLoaf.Infrastructure;
@@ -37,6 +43,13 @@ public static class DependencyInjection
             .AddDbContextCheck<OneLoafDbContext>(DatabaseHealthCheckName, tags: [HealthTags.Ready]);
 
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IReferenceDataReader, ReferenceDataReader>();
+        services.AddScoped<IKitchenSettingsRepository, KitchenSettingsRepository>();
+        services.AddScoped<IFlourRepository, FlourRepository>();
+        services.AddScoped<IIngredientRepository, IngredientRepository>();
+        services.AddScoped<IRecipeRepository, RecipeRepository>();
+        services.AddScoped<IRecipeCalculations, RecipeCalculations>();
+        services.AddScoped<IWarningsReader, WarningsReader>();
         services.AddSingleton<IPasswordHasher, PasswordHasherAdapter>();
         services.AddValidatedOptions<JwtIssuerOptions>(JwtIssuerOptions.SectionName);
         services.AddSingleton<IAccessTokenIssuer, JwtTokenIssuer>();

@@ -30,7 +30,9 @@ public sealed class JwtValidationKey : IDisposable
             throw new InvalidOperationException("Jwt:PublicKeyPem is not a valid PEM-encoded RSA public key.", ex);
         }
 
-        SecurityKey = new RsaSecurityKey(_rsa);
+        // A factory per key: the default factory caches providers globally by key contents and would keep using this
+        // RSA instance after it is disposed.
+        SecurityKey = new RsaSecurityKey(_rsa) { CryptoProviderFactory = new CryptoProviderFactory() };
     }
 
     /// <summary>Key for <see cref="TokenValidationParameters.IssuerSigningKey"/>.</summary>
