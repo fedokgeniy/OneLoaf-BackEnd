@@ -61,7 +61,8 @@ jobs:
 
       - name: No inline styles in components
         run: |
-          if grep -rn --include=*.razor 'style="' src/Web; then
+          # Allowed: a computed width (progress bars), documented by a comment next to it (rule 5).
+          if grep -rn --include=*.razor 'style="' src/Web | grep -v 'style="width: @'; then
             echo "::error::Inline style attributes found; use ol-* classes or .razor.css"
             exit 1
           fi

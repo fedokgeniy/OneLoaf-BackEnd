@@ -1,0 +1,202 @@
+@page "/batches/{Id:guid}"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Production.State
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+
+@switch (State.Value.Batch)
+{
+    case Loadable<BatchDto>.Failed { Error: var error }:
+        <ShellTitle Text="Batch" BackHref="batches" BackLabel="Back to the calendar" />
+        <div class="ol-container batch">
+            @if (error.Kind == ApiErrorKind.NotFound)
+            {
+                <OlEmptyState Title="Batch not found" Text="This batch does not exist or is not yours." Icon="IconName.Batches">
+                    <Action><OlButton Href="batches">Back to the calendar</OlButton></Action>
+                </OlEmptyState>
+            }
+            else
+            {
+                <OlAlert Kind="AlertKind.Danger" Title="The batch could not be loaded." CorrelationId="@error.CorrelationId">
+                    <p>@error.Message</p>
+                    <OlButton Variant="ButtonVariant.Secondary" OnClick="() => Dispatcher.Dispatch(new OpenBatch(Id))">Try again</OlButton>
+                </OlAlert>
+            }
+        </div>
+        break;
+    case { Value: { } batch }:
+        var stages = AllStages(batch);
+        var current = CurrentStage(stages);
+        var open = batch.Status is BatchStatuses.Planned or BatchStatuses.InProgress;
+        <ShellTitle Text="@($"{batch.Name} · {DisplayFormat.Loaves(batch.Items.Sum(i => i.Loaves))}")" BackHref="batches" BackLabel="Back to the calendar" />
+        <div class="ol-container batch">
+            <section class="batch__summary" aria-label="Progress">
+                <div class="batch__summary-line">
+                    <span class="ol-badge @StatusBadge(batch.Status)">@StatusText(batch.Status)</span>
+                    <span>@(current is null ? $"{stages.Count} stages" : $"Stage {stages.IndexOf(current) + 1} of {stages.Count}")</span>
+                    @if (batch.PlannedReadyFrom is { } from && batch.PlannedReadyTo is { } to)
+                    {
+                        <span class="ol-num">Ready @DisplayFormat.TimeWindow(from, to, batch.PlannedStartAt)</span>
+                    }
+                </div>
+                <div class="batch__progress" role="progressbar" aria-label="Batch progress" aria-valuemin="0" aria-valuemax="@stages.Count"
+                     aria-valuenow="@Finished(stages)" aria-valuetext="@($"{Finished(stages)} of {stages.Count} stages finished")">
+                    @* Width is the share of finished stages: a computed value that cannot be a class. *@
+                    <div class="batch__progress-bar" style="width: @ProgressWidth(stages)"></div>
+                </div>
+            </section>
+
+            <div class="batch__layout">
+                <section class="batch__current" aria-labelledby="batch-current">
+                    <h2 class="h3 batch__heading" id="batch-current">@(current is null ? "Stages" : "Current stage")</h2>
+                    @if (current is not null)
+                    {
+                        <OlStageItem Stage="current" Number="stages.IndexOf(current) + 1" Busy="State.Value.BusyStageId == current.Id" Actionable="open"
+                                     OnStart="s => Run(batch, s, StageCommandKind.Start)" OnComplete="s => Run(batch, s, StageCommandKind.Complete)"
+                                     OnExtend="s => Run(batch, s, StageCommandKind.Extend)" OnSkip="s => Run(batch, s, StageCommandKind.Skip)"
+                                     OnAdjust="OpenAdjust" />
+                    }
+                    else if (batch.Status == BatchStatuses.Done)
+                    {
+                        <OlAlert Kind="AlertKind.Success" Title="Batch completed.">
+                            @if (batch.BakeRecordId is { } record)
+                            {
+                                <OlLink Href="@($"history/{record}")">Rate the bake in your history</OlLink>
+                            }
+                        </OlAlert>
+                    }
+                    else if (batch.Status == BatchStatuses.Cancelled)
+                    {
+                        <OlAlert Kind="AlertKind.Info" Title="This batch was cancelled." />
+                    }
+                    else if (open)
+                    {
+                        <OlAlert Kind="AlertKind.Success" Title="All stages are finished.">
+                            <p>Complete the batch to add it to your history.</p>
+                        </OlAlert>
+                    }
+
+                    <div class="batch__figures">
+                        @foreach (var item in batch.Items)
+                        {
+                            <div class="batch__figure" @key="item.Id">
+                                <span class="batch__figure-title">@item.RecipeTitle · @DisplayFormat.Loaves(item.Loaves)</span>
+                                <span class="batch__figure-meta">
+                                    @(item.StarterAmountG is { } starter ? $"Starter {DisplayFormat.Grams(starter)}" : "No starter")
+                                    · @(item.KneadingCycles switch { null => "kneading cycles unknown", 1 => "1 kneading cycle", var n => $"{n} kneading cycles" })
+                                    @(item.StarterReminderMinutes is { } remind ? $" · reminder {remind} min before kneading" : null)
+                                </span>
+                            </div>
+                        }
+                        @if (State.Value.Plan.Value is { TotalMergedCycles: { } merged, TotalSeparateCycles: { } separate } plan && merged < separate)
+                        {
+                            <OlAlert Kind="AlertKind.Info" Title="@($"Knead together: {merged} instead of {separate} cycles")">
+                                @foreach (var group in plan.Groups)
+                                {
+                                    <p class="batch__explanation">@group.Explanation</p>
+                                }
+                            </OlAlert>
+                        }
+                        <span class="batch__cost">
+                            Total cost @(batch.TotalCost is { } cost ? DisplayFormat.Money(cost, batch.Currency) : "incomplete") · prices as of @DisplayFormat.Date(batch.PriceDate)
+                        </span>
+                    </div>
+
+                    @if (open)
+                    {
+                        <div class="batch__actions">
+                            @if (current is null)
+                            {
+                                <OlButton Large="true" Loading="State.Value.BusyBatch" OnClick="() => Dispatcher.Dispatch(new CompleteBatch(batch.Id))">Complete batch</OlButton>
+                            }
+                            <OlButton Variant="ButtonVariant.Ghost" Disabled="State.Value.BusyBatch" OnClick="() => _confirmCancel = true">Cancel batch</OlButton>
+                        </div>
+                    }
+                    @if (batch.Status == BatchStatuses.Done || stages.Any(s => s.ActualEndAt is not null))
+                    {
+                        <div class="batch__actions">
+                            <OlButton Variant="ButtonVariant.Secondary" Disabled="State.Value.BusyBatch" OnClick="() => _variantTitle = string.Empty">Save as recipe variant</OlButton>
+                        </div>
+                    }
+                </section>
+
+                <section class="batch__stages" aria-labelledby="batch-all">
+                    <h2 class="h3 batch__heading" id="batch-all">All stages</h2>
+                    @foreach (var item in batch.Items)
+                    {
+                        @if (batch.Items.Count > 1)
+                        {
+                            <h3 class="ol-card__overline">@item.RecipeTitle</h3>
+                        }
+                        <ol class="batch__list">
+                            @foreach (var stage in item.Stages.OrderBy(s => s.SortOrder))
+                            {
+                                <li @key="stage.Id">
+                                    <OlStageItem Stage="stage" Number="stages.IndexOf(stage) + 1" Busy="State.Value.BusyStageId == stage.Id"
+                                                 Actionable="@(open && stage != current)"
+                                                 OnStart="s => Run(batch, s, StageCommandKind.Start)" OnComplete="s => Run(batch, s, StageCommandKind.Complete)"
+                                                 OnExtend="s => Run(batch, s, StageCommandKind.Extend)" OnSkip="s => Run(batch, s, StageCommandKind.Skip)"
+                                                 OnAdjust="OpenAdjust" />
+                                </li>
+                            }
+                        </ol>
+                    }
+                </section>
+            </div>
+        </div>
+
+        <OlDialog Open="_adjust is not null" Title="@($"Adjust {_adjust?.Name}")" OnClose="() => _adjust = null">
+            <ChildContent>
+                @if (_adjust is not null)
+                {
+                    <div class="batch__adjust">
+                        <OlNumberStepper Label="Minimum" Value="_adjustMin" Min="0" Max="10080" Step="5" DecreaseLabel="5 minutes less" IncreaseLabel="5 minutes more"
+                                         ValueChanged="v => _adjustMin = v" />
+                        <OlNumberStepper Label="Maximum" Value="_adjustMax" Min="0" Max="10080" Step="5" DecreaseLabel="5 minutes less" IncreaseLabel="5 minutes more"
+                                         ValueChanged="v => _adjustMax = v" />
+                        @if (_adjustMax < _adjustMin)
+                        {
+                            <p class="ol-field__error" role="alert">The maximum must not be shorter than the minimum.</p>
+                        }
+                    </div>
+                }
+            </ChildContent>
+            <Footer>
+                @if (_adjust is { IsOverridden: true })
+                {
+                    <OlButton Variant="ButtonVariant.Ghost" OnClick="() => SubmitAdjust(batch, reset: true)">Reset to recipe</OlButton>
+                }
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _adjust = null">Cancel</OlButton>
+                <OlButton Disabled="@(_adjustMax < _adjustMin)" OnClick="() => SubmitAdjust(batch, reset: false)">Save durations</OlButton>
+            </Footer>
+        </OlDialog>
+
+        <OlDialog Open="_confirmCancel" Title="Cancel this batch?" OnClose="() => _confirmCancel = false">
+            <ChildContent><p>Reminders for this batch stop. The batch stays in the calendar as cancelled.</p></ChildContent>
+            <Footer>
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmCancel = false">Keep the batch</OlButton>
+                <OlButton Variant="ButtonVariant.Danger" OnClick="() => CancelBatch(batch)">Cancel batch</OlButton>
+            </Footer>
+        </OlDialog>
+
+        <OlDialog Open="_variantTitle is not null" Title="Save as recipe variant" OnClose="() => _variantTitle = null">
+            <ChildContent>
+                <p class="batch__explanation">The stage durations you actually used become a variant of the recipe@(batch.Items.Count > 1 ? " (first recipe of the batch)" : null).</p>
+                <div class="ol-field">
+                    <label class="ol-field__label" for="variant-title">Title (optional)</label>
+                    <input id="variant-title" class="ol-input" value="@_variantTitle" @onchange="e => _variantTitle = e.Value as string ?? string.Empty" />
+                </div>
+            </ChildContent>
+            <Footer>
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _variantTitle = null">Cancel</OlButton>
+                <OlButton Loading="State.Value.BusyBatch" OnClick="() => SaveVariant(batch)">Save variant</OlButton>
+            </Footer>
+        </OlDialog>
+        break;
+    default:
+        <ShellTitle Text="Batch" BackHref="batches" BackLabel="Back to the calendar" />
+        <div class="ol-container batch" aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Row" Count="6" /></div>
+        break;
+}
