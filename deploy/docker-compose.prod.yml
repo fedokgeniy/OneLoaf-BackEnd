@@ -40,7 +40,11 @@ services:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
-    depends_on: [core-api, assistant, notification, grafana]
+    depends_on: [web, core-api, assistant, notification, grafana]
+
+  web:
+    <<: *service
+    image: ghcr.io/${GHCR_OWNER}/oneloaf-web:${IMAGE_TAG:-latest}
 
   db:
     <<: *service
