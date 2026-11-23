@@ -39,3 +39,8 @@ h1[tabindex="-1"]:focus-visible { outline: none; }
 @media (max-width: 37.49em) {
   .app-hide-compact { display: none; }
 }
+
+/* Top-bar actions that only make sense while a side pane is hidden (e.g. the assistant's Conversations button). */
+@media (min-width: 64em) {
+  .app-hide-expanded { display: none; }
+}

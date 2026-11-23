@@ -10,7 +10,7 @@
 
 <ShellTitle Text="Assistant">
     <Actions>
-        <OlButton Variant="ButtonVariant.Ghost" class="assistant__convs-button" OnClick="() => _listOpen = true">Conversations</OlButton>
+        <OlButton Variant="ButtonVariant.Ghost" class="app-hide-expanded" OnClick="() => _listOpen = true">Conversations</OlButton>
         <OlButton Href="assistant" Icon="IconName.Plus" Variant="ButtonVariant.Secondary">New chat</OlButton>
     </Actions>
 </ShellTitle>
@@ -95,7 +95,7 @@
             <label class="ol-visually-hidden" for="composer">Message</label>
             <textarea id="composer" class="ol-textarea" rows="1" placeholder="Message" maxlength="@MaxLength"
                       @bind="_draft" @bind:event="oninput" @onkeydown="OnKeyDown" aria-describedby="composer-help"></textarea>
-            <OlIconButton Type="submit" Icon="IconName.ChevronRight" Label="Send message" Variant="ButtonVariant.Primary"
+            <OlIconButton Type="submit" Icon="IconName.ChevronRight" Label="Send message" class="assistant__send"
                           Disabled="@(State.Value.Sending is not null || string.IsNullOrWhiteSpace(_draft))" />
         </form>
         <p class="assistant__help" id="composer-help">

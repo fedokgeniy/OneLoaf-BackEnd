@@ -42,6 +42,15 @@
     flex: 1 1 auto;
 }
 
+.assistant__main ::deep .assistant__send:not(:disabled) {
+    background: var(--primary);
+    color: var(--ink-on-primary);
+}
+
+.assistant__main ::deep .assistant__send:not(:disabled):hover {
+    background: var(--primary-strong);
+}
+
 .assistant__help {
     width: 100%;
     max-width: var(--reading-max);
@@ -60,9 +69,5 @@
         display: block;
         position: sticky;
         top: var(--space-4);
-    }
-
-    ::deep .assistant__convs-button {
-        display: none;
     }
 }

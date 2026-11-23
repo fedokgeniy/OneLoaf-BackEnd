@@ -135,7 +135,7 @@ public static class AssistantReducers
     {
         ConversationId = action.Conversation.Id,
         Conversations = state.Conversations.Value is { } list
-            ? new Loadable<IReadOnlyList<ConversationDto>>.Loaded([action.Conversation, .. list])
+            ? new Loadable<IReadOnlyList<ConversationDto>>.Loaded([action.Conversation, .. list.Where(c => c.Id != action.Conversation.Id)])
             : state.Conversations,
     };
 
