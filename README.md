@@ -22,15 +22,22 @@ GitHub Container Registry, Anthropic Claude API.
 
 ## Getting started
 
-Requires Docker and the .NET 10 SDK. Passwords come from `.env`, which is excluded from Git.
+Requires Docker and the .NET 10 SDK. Passwords and keys come from `.env`, which is excluded from Git.
 
 ```bash
-cp .env.example .env                # set the passwords
-docker compose up -d db             # PostgreSQL 16; the first start creates the roles and the database
-docker compose run --rm migrator    # applies the migrations as app_admin
+cp .env.example .env                # set the passwords and the JWT keys (generation command inside)
+docker compose up -d --build        # PostgreSQL, migrator, RabbitMQ, Redis, Core API
 ```
 
-More options (own PostgreSQL, SQL only, full verification): [docs/db/README.md](docs/db/README.md#getting-started).
+The Core API listens on `http://localhost:5080` (Swagger UI at `/swagger`, health at `/health/ready`).
+Database only: `docker compose up -d db && docker compose run --rm migrator`; more options in
+[docs/db/README.md](docs/db/README.md#getting-started).
+
+Tests (integration tests need a running Docker engine):
+
+```bash
+dotnet test OneLoaf.slnx --settings coverlet.runsettings --collect:"XPlat Code Coverage"
+```
 
 ## Status: in development
 
