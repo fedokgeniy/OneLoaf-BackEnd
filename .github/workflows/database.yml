@@ -48,7 +48,8 @@ env:
 jobs:
   verify:
     name: Migrations, schema.sql, tests, docs
-    runs-on: ubuntu-latest
+    # Ubuntu 24.04 ships the PostgreSQL 16 client (psql, pg_dump) matching the server version.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
 
