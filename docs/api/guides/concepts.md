@@ -74,7 +74,8 @@ Stage states: `pending → running → done`, or `pending → skipped`. A pendin
 ## History
 
 Completing a batch creates a **bake record**: loaves, cost, and the **stage log** with planned vs actual times and
-deviations. The baker rates it (1–5) and comments; the assistant can analyse it (US-36). Statistics aggregate ratings
+deviations. The baker rates it (1–5), comments and attaches crumb photos (US-51); the assistant can analyse it (US-36).
+A batch that went differently from the recipe can be saved as a new **variant** with the real durations (US-25). Statistics aggregate ratings
 and deviations per recipe. Everything exports to CSV.
 
 ## Reminders and notifications

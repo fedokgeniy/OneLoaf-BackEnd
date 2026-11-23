@@ -2,7 +2,7 @@
   {
     "case": "not the author",
     "method": "POST",
-    "path": "/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/unpublish",
+    "path": "/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b/unpublish",
     "authenticated": true,
     "status": 404,
     "responseContentType": "application/problem+json",
@@ -11,15 +11,15 @@
       "title": "The requested resource was not found.",
       "status": 404,
       "detail": "Publication not found.",
-      "instance": "/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/unpublish",
-      "traceId": "00-ca84fb67b7a7cfdae8e41a09eb6fe7f4-05b7b315450d24f8-02",
-      "correlationId": "9b17888517e8490eb2cf862c8b99f4bc"
+      "instance": "/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b/unpublish",
+      "traceId": "00-c2b98b5f737f955c6702c9a777e745d2-ffeab759d364a128-02",
+      "correlationId": "15dd3b4858eb4e27adfb0919b07dcbb5"
     }
   },
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/unpublish",
+    "path": "/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b/unpublish",
     "authenticated": true,
     "status": 204
   }

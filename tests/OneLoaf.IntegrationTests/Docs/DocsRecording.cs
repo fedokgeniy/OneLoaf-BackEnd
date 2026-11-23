@@ -74,8 +74,10 @@ public sealed class DocClient(string service, HttpMessageHandler handler, Uri ba
         }
 
         using var response = await _http.SendAsync(request, TestContext.Current.CancellationToken);
-        var text = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var mediaType = response.Content.Headers.ContentType?.MediaType;
+        var text = mediaType?.StartsWith("image/", StringComparison.Ordinal) == true
+            ? $"<binary {mediaType}, {(await response.Content.ReadAsByteArrayAsync(TestContext.Current.CancellationToken)).Length} bytes>"
+            : await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         JsonNode? json = null;
         if (text.Length > 0 && mediaType is not null && mediaType.Contains("json", StringComparison.Ordinal))
         {
@@ -90,6 +92,25 @@ public sealed class DocClient(string service, HttpMessageHandler handler, Uri ba
         }
         store.Add(service, operationId, new RecordedExchange(caseName, method.Method, path, _http.DefaultRequestHeaders.Authorization is not null,
             requestJson?.DeepClone(), (int)response.StatusCode, mediaType, recorded?.DeepClone()));
+        return json;
+    }
+
+    /// <summary>Uploads a file as multipart/form-data and records the exchange (the request body is described, not embedded).</summary>
+    public async Task<JsonNode?> UploadAsync(string operationId, string caseName, string path, string field, string fileName, string contentType, byte[] content)
+    {
+        using var form = new MultipartFormDataContent();
+        var file = new ByteArrayContent(content);
+        file.Headers.ContentType = new MediaTypeHeaderValue(contentType);
+        form.Add(file, field, fileName);
+        using var response = await _http.PostAsync(path, form, TestContext.Current.CancellationToken);
+        var text = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
+        var json = text.Length > 0 ? JsonNode.Parse(text) : null;
+        var description = new JsonObject
+        {
+            ["multipart/form-data"] = new JsonObject { [field] = $"<{fileName}, {contentType}, {content.Length} bytes>" },
+        };
+        store.Add(service, operationId, new RecordedExchange(caseName, "POST", path, _http.DefaultRequestHeaders.Authorization is not null,
+            description, (int)response.StatusCode, response.Content.Headers.ContentType?.MediaType, json?.DeepClone()));
         return json;
     }
 

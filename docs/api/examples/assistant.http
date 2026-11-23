@@ -5,7 +5,7 @@
 @token = <access token>
 
 ### Analyse a finished bake
-POST {{baseUrl}}/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea/analysis
+POST {{baseUrl}}/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/analysis
 Authorization: Bearer {{token}}
 
 ### Today's assistant usage
@@ -26,15 +26,15 @@ Content-Type: application/json
 }
 
 ### Delete a conversation and its messages
-DELETE {{baseUrl}}/api/v1/conversations/8a75d663-8bbb-408b-ba17-062204e69b47
+DELETE {{baseUrl}}/api/v1/conversations/53e74d48-ef6c-4476-97d9-6decc9111c6d
 Authorization: Bearer {{token}}
 
 ### Messages of a conversation
-GET {{baseUrl}}/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/messages
+GET {{baseUrl}}/api/v1/conversations/7023ffdd-69d5-4ec9-9779-cc7cf0f735a8/messages
 Authorization: Bearer {{token}}
 
 ### Send a message to the assistant
-POST {{baseUrl}}/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/messages
+POST {{baseUrl}}/api/v1/conversations/7023ffdd-69d5-4ec9-9779-cc7cf0f735a8/messages
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -43,10 +43,10 @@ Content-Type: application/json
 }
 
 ### Confirm a batch proposal
-POST {{baseUrl}}/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/actions/fd033985-8f54-45eb-94a3-11f82c7f75ca/confirm
+POST {{baseUrl}}/api/v1/conversations/7023ffdd-69d5-4ec9-9779-cc7cf0f735a8/actions/c8e1be90-68b7-4f0e-8e40-6505a2f8ab74/confirm
 Authorization: Bearer {{token}}
 
 ### Decline a batch proposal
-POST {{baseUrl}}/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/actions/a292b2ea-6abf-4716-b05d-0945d2de06e4/decline
+POST {{baseUrl}}/api/v1/conversations/7023ffdd-69d5-4ec9-9779-cc7cf0f735a8/actions/e544f861-b07d-42aa-a56c-ca9ab31cf7e7/decline
 Authorization: Bearer {{token}}
 

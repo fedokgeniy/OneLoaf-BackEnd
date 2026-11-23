@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "PUT",
-    "path": "/api/v1/ingredients/9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+    "path": "/api/v1/ingredients/180012fa-8da7-4292-baae-b071aea57ec4",
     "authenticated": true,
     "requestBody": {
       "name": "Sea salt",
@@ -13,7 +13,7 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+      "id": "180012fa-8da7-4292-baae-b071aea57ec4",
       "name": "Sea salt",
       "categoryCode": "salt",
       "unitCode": "g",
@@ -21,8 +21,8 @@
       "flourName": null,
       "proteinPercent": null,
       "currentPrice": null,
-      "createdAt": "2026-11-23T04:18:07.063126+00:00",
-      "updatedAt": "2026-11-23T04:18:07.112011+00:00"
+      "createdAt": "2026-11-23T10:08:54.062006+00:00",
+      "updatedAt": "2026-11-23T10:08:54.133395+00:00"
     }
   }
 ]

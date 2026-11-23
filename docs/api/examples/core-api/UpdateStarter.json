@@ -2,23 +2,23 @@
   {
     "case": "typical",
     "method": "PUT",
-    "path": "/api/v1/starters/841da49e-2392-4552-8e41-23efa6388d33",
+    "path": "/api/v1/starters/1953c953-6626-48eb-bae0-29cc6d218d8b",
     "authenticated": true,
     "requestBody": {
       "name": "Rye mother",
       "hydrationPercent": 100,
       "feedingMode": "regular",
       "feedingIntervalHours": 12,
-      "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "flourId": "091556f9-e047-41ba-a3c4-34037d3833f6",
       "riseHours": 8,
       "notes": "Kitchen counter"
     },
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "841da49e-2392-4552-8e41-23efa6388d33",
+      "id": "1953c953-6626-48eb-bae0-29cc6d218d8b",
       "name": "Rye mother",
-      "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "flourId": "091556f9-e047-41ba-a3c4-34037d3833f6",
       "hydrationPercent": 100.0,
       "feedingMode": "regular",
       "feedingIntervalHours": 12,
@@ -28,8 +28,8 @@
       "lastFedAt": null,
       "nextFeedingAt": null,
       "expectedPeakAt": null,
-      "createdAt": "2026-11-23T04:18:07.92986+00:00",
-      "updatedAt": "2026-11-23T04:18:07.984362+00:00"
+      "createdAt": "2026-11-23T10:08:55.062935+00:00",
+      "updatedAt": "2026-11-23T10:08:55.125738+00:00"
     }
   }
 ]

@@ -217,7 +217,7 @@ internal sealed class FakeBakeRecordRepository : IBakeRecordRepository
     {
         var id = Guid.NewGuid();
         Records[id] = (owner, new BakeRecordDto(id, Guid.NewGuid(), new DateOnly(2026, 11, 21), 3, 11.22m, "EUR", null, null, null,
-            null, [new(Guid.NewGuid(), Guid.NewGuid(), "Loaf", 3, 11.22m)], DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch));
+            null, [new(Guid.NewGuid(), Guid.NewGuid(), "Loaf", 3, 11.22m)], DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch, []));
         return id;
     }
 

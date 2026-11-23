@@ -16,9 +16,10 @@ namespace OneLoaf.CoreApi.Application.History;
 /// <param name="Rating">Rating 1-5.</param>
 /// <param name="HasAnalysis">The assistant analysed the result.</param>
 /// <param name="RecipeTitles">Recipe titles of the items.</param>
+/// <param name="PhotoCount">Crumb photos of the record (US-51).</param>
 public sealed record BakeRecordSummaryDto(
     Guid Id, Guid? BatchId, DateOnly BakedOn, int TotalLoaves, decimal? TotalCost, string Currency, short? Rating,
-    bool HasAnalysis, IReadOnlyList<string> RecipeTitles);
+    bool HasAnalysis, IReadOnlyList<string> RecipeTitles, int PhotoCount = 0);
 
 /// <summary>Item of a history record.</summary>
 /// <param name="Id">Id.</param>
@@ -42,10 +43,11 @@ public sealed record BakeRecordItemDto(Guid Id, Guid? RecipeId, string RecipeTit
 /// <param name="Items">Items.</param>
 /// <param name="CreatedAt">Creation time.</param>
 /// <param name="UpdatedAt">Last change.</param>
+/// <param name="Photos">Crumb photos, oldest first (US-51).</param>
 public sealed record BakeRecordDto(
     Guid Id, Guid? BatchId, DateOnly BakedOn, int TotalLoaves, decimal? TotalCost, string Currency, short? Rating,
     string? Comment, string? AssistantAnalysis, DateTimeOffset? AnalysisAt, IReadOnlyList<BakeRecordItemDto> Items,
-    DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt);
+    DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt, IReadOnlyList<BakeRecordPhotoDto> Photos);
 
 /// <summary>Query of <c>GET /bake-records</c> (US-33).</summary>
 /// <param name="RecipeId">Only records with this recipe.</param>

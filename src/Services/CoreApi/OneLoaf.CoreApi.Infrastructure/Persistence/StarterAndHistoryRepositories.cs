@@ -173,24 +173,27 @@ public sealed class BakeRecordRepository(OneLoafDbContext db) : IBakeRecordRepos
                 r.Id, r.BatchId, r.BakedOn, r.TotalLoaves, r.TotalCost, r.Currency, r.Rating,
                 HasAnalysis = r.AssistantAnalysis != null,
                 Titles = r.Items.Select(i => i.RecipeTitle).ToList(),
+                Photos = r.Photos.Count,
             })
             .ToListAsync(cancellationToken);
         var items = rows.Select(r => new BakeRecordSummaryDto(r.Id, r.BatchId, r.BakedOn, r.TotalLoaves, r.TotalCost,
-            r.Currency.Trim(), r.Rating, r.HasAnalysis, r.Titles)).ToList();
+            r.Currency.Trim(), r.Rating, r.HasAnalysis, r.Titles, r.Photos)).ToList();
         return new PagedResult<BakeRecordSummaryDto>(items, query.Page, query.PageSize, total);
     }
 
     /// <inheritdoc />
     public async Task<BakeRecordDto?> GetAsync(Guid ownerId, Guid id, CancellationToken cancellationToken)
     {
-        var r = await db.BakeRecords.AsNoTracking().Include(x => x.Items)
+        var r = await db.BakeRecords.AsNoTracking().Include(x => x.Items).Include(x => x.Photos)
             .SingleOrDefaultAsync(x => x.OwnerId == ownerId && x.Id == id, cancellationToken);
         return r is null
             ? null
             : new BakeRecordDto(r.Id, r.BatchId, r.BakedOn, r.TotalLoaves, r.TotalCost, r.Currency.Trim(), r.Rating, r.Comment,
                 r.AssistantAnalysis, Utc(r.AnalysisAt),
                 r.Items.OrderBy(i => i.RecipeTitle).Select(i => new BakeRecordItemDto(i.Id, i.RecipeId, i.RecipeTitle, i.Loaves, i.Cost)).ToList(),
-                Utc(r.CreatedAt), Utc(r.UpdatedAt));
+                Utc(r.CreatedAt), Utc(r.UpdatedAt),
+                r.Photos.OrderBy(p => p.CreatedAt).ThenBy(p => p.Id)
+                    .Select(p => new BakeRecordPhotoDto(p.Id, p.ContentType, BakeRecordPhotoService.Url(r.Id, p.Id), Utc(p.CreatedAt))).ToList());
     }
 
     /// <inheritdoc />

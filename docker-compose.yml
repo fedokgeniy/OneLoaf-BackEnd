@@ -91,6 +91,9 @@ services:
       RabbitMq__UserName: ${RABBITMQ_DEFAULT_USER:-oneloaf}
       RabbitMq__Password: ${RABBITMQ_DEFAULT_PASS}
       Redis__ConnectionString: "redis:6379,password=${REDIS_PASSWORD}"
+      Storage__PhotosPath: /data/photos
+    volumes:
+      - photos:/data/photos
     ports:
       - "${CORE_API_PORT:-5080}:8080"
     depends_on:
@@ -171,3 +174,4 @@ volumes:
   pgdata:
   rabbitmqdata:
   redisdata:
+  photos:

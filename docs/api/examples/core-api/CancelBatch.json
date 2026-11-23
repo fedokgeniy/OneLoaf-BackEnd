@@ -1,8 +1,15 @@
 [
   {
+    "case": "untouched batch",
+    "method": "POST",
+    "path": "/api/v1/batches/ea723662-db8b-4789-9a4e-78a43c4c2f4c/cancel",
+    "authenticated": true,
+    "status": 204
+  },
+  {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/cancel",
+    "path": "/api/v1/batches/5635b892-0e3d-4618-ae90-f780c2d648c9/cancel",
     "authenticated": true,
     "status": 204
   },
@@ -19,8 +26,8 @@
       "status": 404,
       "detail": "The batch was not found.",
       "instance": "/api/v1/batches/00000000-0000-4000-9999-000000000000/cancel",
-      "traceId": "00-4ac601d0f3295d5e81d2b4603f2929f6-5e6c8022b3e7a1c3-02",
-      "correlationId": "799417fb87af4fd78e6c41a6d256e755"
+      "traceId": "00-54ffd81325b8bf9366711b5be3665c08-e5eac8c64f96fa13-02",
+      "correlationId": "aba24972c42643e68169210f21c241f3"
     }
   }
 ]

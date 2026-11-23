@@ -131,6 +131,7 @@ public sealed class ApiFixture : IAsyncLifetime
             ["RabbitMq:UserName"] = RabbitUser,
             ["RabbitMq:Password"] = RabbitPassword,
             ["Redis:ConnectionString"] = _redis.GetConnectionString(),
+            ["Storage:PhotosPath"] = Path.Combine(Path.GetTempPath(), "oneloaf-tests", "photos", Guid.NewGuid().ToString("N")),
         });
         _factories.Add(factory);
         return factory;

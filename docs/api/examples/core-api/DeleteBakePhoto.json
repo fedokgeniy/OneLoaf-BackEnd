@@ -1,0 +1,26 @@
+[
+  {
+    "case": "typical",
+    "method": "DELETE",
+    "path": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos/a689cec9-115f-40ea-97d3-ff234626b464",
+    "authenticated": true,
+    "status": 204
+  },
+  {
+    "case": "not found or another user's",
+    "method": "DELETE",
+    "path": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos/a689cec9-115f-40ea-97d3-ff234626b464",
+    "authenticated": true,
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "The photo was not found.",
+      "instance": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos/a689cec9-115f-40ea-97d3-ff234626b464",
+      "traceId": "00-1fc0fcd168d21ebae451c2a85874195e-80e75ac265bc0767-02",
+      "correlationId": "039662a1b6de4026aa31d0e41bad6068"
+    }
+  }
+]

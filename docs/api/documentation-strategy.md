@@ -65,6 +65,6 @@ user-visible change gets a [changelog](CHANGELOG.md) entry in the same pull requ
 | No `Idempotency-Key` support for creates | retries of `POST` can create duplicates | documented read-back strategy ([idempotency](guides/idempotency.md)) |
 | No server-sent streaming of assistant answers | a turn with tool calls takes several seconds | clients show progress; streaming is a possible extension |
 | Examples contain ids and timestamps of the generation run | values differ between regenerations | they are illustrative; the shapes are checked |
-| Photo upload for bake records (US-51) and saving a diverged batch as a variant (US-25) are not implemented | no endpoints | optional ("could") stories |
+| Photos are stored on a local volume, not in object storage | one server only; back up the `photos` volume with the database | the storage is behind `IPhotoStorage`, an S3-compatible implementation can replace it |
 | Production URLs (`<domain>`) are placeholders | — | filled in when the server is deployed |
 | No published SDKs | clients write their own HTTP layer | the OpenAPI documents work with any generator (e.g. NSwag, openapi-generator) |

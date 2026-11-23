@@ -3036,6 +3036,95 @@
         ]
       }
     },
+    "/api/v1/batches/{id}/save-as-variant": {
+      "post": {
+        "tags": [
+          "Production"
+        ],
+        "summary": "Save how the batch was baked as a recipe variant",
+        "description": "US-25. Finished stages take their measured duration, changed or extended stages their batch durations; everything else is inherited. 422 when the batch followed the recipe.",
+        "operationId": "SaveBatchAsVariant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveAsVariantRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaveAsVariantResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/batches/{id}/kneading-plan": {
       "get": {
         "tags": [
@@ -4508,6 +4597,292 @@
         ]
       }
     },
+    "/api/v1/bake-records/{id}/photos": {
+      "post": {
+        "tags": [
+          "History"
+        ],
+        "summary": "Upload a crumb photo",
+        "description": "US-51. multipart/form-data with the image in the field 'file'; JPEG, PNG or WebP (checked by content), up to 5 MB, at most 10 per record.",
+        "operationId": "UploadBakePhoto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "$ref": "#/components/schemas/IFormFile"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BakeRecordPhotoDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "summary": "Crumb photos of a bake record",
+        "description": "US-51. Oldest first.",
+        "operationId": "ListBakePhotos",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BakeRecordPhotoDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/bake-records/{id}/photos/{photoId}": {
+      "get": {
+        "tags": [
+          "History"
+        ],
+        "summary": "The image of a crumb photo",
+        "description": "US-51. Only the owner of the record.",
+        "operationId": "GetBakePhoto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "photoId",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "$ref": "#/components/schemas/Stream"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "History"
+        ],
+        "summary": "Delete a crumb photo",
+        "description": "US-51.",
+        "operationId": "DeleteBakePhoto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "photoId",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/bake-records/{id}/analysis": {
       "put": {
         "tags": [
@@ -5577,7 +5952,8 @@
           "analysisAt",
           "items",
           "createdAt",
-          "updatedAt"
+          "updatedAt",
+          "photos"
         ],
         "type": "object",
         "properties": {
@@ -5662,6 +6038,13 @@
             "type": "string",
             "description": "Last change.",
             "format": "date-time"
+          },
+          "photos": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BakeRecordPhotoDto"
+            },
+            "description": "Crumb photos, oldest first (US-51)."
           }
         },
         "description": "History record created when a batch is completed (US-31, US-32, US-36)."
@@ -5708,6 +6091,36 @@
           }
         },
         "description": "Item of a history record."
+      },
+      "BakeRecordPhotoDto": {
+        "required": [
+          "id",
+          "contentType",
+          "url",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Photo.",
+            "format": "uuid"
+          },
+          "contentType": {
+            "type": "string",
+            "description": "image/jpeg, image/png or image/webp."
+          },
+          "url": {
+            "type": "string",
+            "description": "Relative URL of the image (needs the bearer token)."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Upload time.",
+            "format": "date-time"
+          }
+        },
+        "description": "A crumb photo of a bake record (US-51)."
       },
       "BakeRecordSummaryDto": {
         "required": [
@@ -5776,6 +6189,12 @@
               "type": "string"
             },
             "description": "Recipe titles of the items."
+          },
+          "photoCount": {
+            "type": "integer",
+            "description": "Crumb photos of the record (US-51).",
+            "format": "int32",
+            "default": 0
           }
         },
         "description": "History record in a list (US-33)."
@@ -6921,6 +7340,10 @@
           }
         },
         "description": "Problem details of a 400 validation error; errors maps each invalid field (camelCase) to its messages."
+      },
+      "IFormFile": {
+        "type": "string",
+        "format": "binary"
       },
       "IngredientCategoryDto": {
         "required": [
@@ -9010,6 +9433,47 @@
         },
         "description": "Body of PUT /bake-records/{id}/analysis (US-36, saved by the assistant)."
       },
+      "SaveAsVariantRequest": {
+        "type": "object",
+        "properties": {
+          "itemId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Batch item whose recipe gets the variant; the first item when omitted.",
+            "format": "uuid"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Title of the new variant; \"recipe title (batch name)\" when omitted."
+          }
+        },
+        "description": "Body of POST /batches/{id}/save-as-variant."
+      },
+      "SaveAsVariantResponse": {
+        "required": [
+          "recipe",
+          "changes"
+        ],
+        "type": "object",
+        "properties": {
+          "recipe": {
+            "$ref": "#/components/schemas/RecipeDto"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StageChangeDto"
+            },
+            "description": "Stages that differ from the parent recipe."
+          }
+        },
+        "description": "Result of saving a batch as a variant (US-25)."
+      },
       "ScaledIngredientDto": {
         "required": [
           "lineId",
@@ -9105,6 +9569,48 @@
           }
         },
         "description": "Body of the stage actions start/complete/skip (US-23)."
+      },
+      "StageChangeDto": {
+        "required": [
+          "name",
+          "recipeMinMinutes",
+          "recipeMaxMinutes",
+          "variantMinMinutes",
+          "variantMaxMinutes",
+          "source"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Stage name."
+          },
+          "recipeMinMinutes": {
+            "type": "integer",
+            "description": "Minimum in the recipe.",
+            "format": "int32"
+          },
+          "recipeMaxMinutes": {
+            "type": "integer",
+            "description": "Maximum in the recipe.",
+            "format": "int32"
+          },
+          "variantMinMinutes": {
+            "type": "integer",
+            "description": "Minimum in the new variant.",
+            "format": "int32"
+          },
+          "variantMaxMinutes": {
+            "type": "integer",
+            "description": "Maximum in the new variant.",
+            "format": "int32"
+          },
+          "source": {
+            "type": "string",
+            "description": "actual (measured start to end) or planned (durations changed or extended in the batch)."
+          }
+        },
+        "description": "A stage whose duration changed in the variant."
       },
       "StageComparisonDto": {
         "required": [
@@ -9530,6 +10036,10 @@
           }
         },
         "description": "Start window for a desired ready time (US-52)."
+      },
+      "Stream": {
+        "type": "string",
+        "format": "binary"
       },
       "TimelineDto": {
         "required": [

@@ -269,6 +269,13 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
         var completed = await api.CallAsync("CompleteBatch", "typical", HttpMethod.Post, $"/api/v1/batches/{batchId}/complete");
         await api.CallAsync("CompleteBatch", "already completed", HttpMethod.Post, $"/api/v1/batches/{batchId}/complete");
 
+        await api.CallAsync("SaveBatchAsVariant", "typical", HttpMethod.Post, $"/api/v1/batches/{batchId}/save-as-variant",
+            new { itemId = (string?)null, title = "Country sourdough, as baked" });
+        var untouched = Id(await api.CallAsync("CreateBatch", "batch that follows the recipe", HttpMethod.Post, "/api/v1/batches",
+            batchBody with { name = "Untouched bake", plannedStartAt = start.AddDays(5) }));
+        await api.CallAsync("SaveBatchAsVariant", "batch followed the recipe", HttpMethod.Post, $"/api/v1/batches/{untouched}/save-as-variant",
+            new { itemId = (string?)null, title = (string?)null });
+        await api.CallAsync("CancelBatch", "untouched batch", HttpMethod.Post, $"/api/v1/batches/{untouched}/cancel");
         var second = Id(await api.CallAsync("CreateBatch", "second batch", HttpMethod.Post, "/api/v1/batches",
             batchBody with { name = "Weekday bake", plannedStartAt = start.AddDays(3) }));
         var secondStages = (await api.CallAsync("GetBatch", "second batch", HttpMethod.Get, $"/api/v1/batches/{second}"))!["items"]![0]!["stages"]!
@@ -299,6 +306,19 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
             await api.CallAsync("GetStageLog", "typical", HttpMethod.Get, $"/api/v1/bake-records/{bakeRecord}/stage-log");
             await api.CallAsync("SaveBakeAnalysis", "typical", HttpMethod.Put, $"/api/v1/bake-records/{bakeRecord}/analysis",
                 new { analysis = "Bulk fermentation ended early; give the dough more time next bake." });
+        }
+
+        if (bakeRecord is not null)
+        {
+            byte[] png = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2, 0, 0, 0];
+            var photo = Id(await api.UploadAsync("UploadBakePhoto", "typical", $"/api/v1/bake-records/{bakeRecord}/photos", "file", "crumb.png", "image/png", png));
+            await api.UploadAsync("UploadBakePhoto", "not an image", $"/api/v1/bake-records/{bakeRecord}/photos", "file", "notes.png", "image/png", "plain text"u8.ToArray());
+            await api.CallAsync("ListBakePhotos", "typical", HttpMethod.Get, $"/api/v1/bake-records/{bakeRecord}/photos");
+            await api.CallAsync("GetBakePhoto", "typical", HttpMethod.Get, $"/api/v1/bake-records/{bakeRecord}/photos/{photo}");
+            await api.CallAsync("GetBakeRecord", "with a photo", HttpMethod.Get, $"/api/v1/bake-records/{bakeRecord}");
+            var spare = Id(await api.UploadAsync("UploadBakePhoto", "second photo", $"/api/v1/bake-records/{bakeRecord}/photos", "file", "crumb-2.png", "image/png", png));
+            await api.CallAsync("DeleteBakePhoto", "typical", HttpMethod.Delete, $"/api/v1/bake-records/{bakeRecord}/photos/{spare}");
+            await api.CallAsync("DeleteBakePhoto", "not found or another user's", HttpMethod.Delete, $"/api/v1/bake-records/{bakeRecord}/photos/{spare}");
         }
 
         await api.CallAsync("GetBakeStatistics", "typical", HttpMethod.Get, "/api/v1/bake-records/statistics");

@@ -2,13 +2,13 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea",
+    "path": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "c13eeb78-1208-4cbf-99fe-a587c002adea",
-      "batchId": "9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee",
+      "id": "cb026621-c131-4daa-b02c-23ce49686fa7",
+      "batchId": "dcab64b0-9720-4f19-997d-b3bcd2492ddc",
       "bakedOn": "2026-11-23",
       "totalLoaves": 3,
       "totalCost": 8.94,
@@ -19,15 +19,55 @@
       "analysisAt": null,
       "items": [
         {
-          "id": "bea28c10-2260-4fab-aaea-c0bea5a69a27",
-          "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+          "id": "4483e631-67d7-44f6-8f7e-8f4f7800c12f",
+          "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
           "cost": 8.94
         }
       ],
-      "createdAt": "2026-11-23T04:18:08.632727+00:00",
-      "updatedAt": "2026-11-23T04:18:08.632727+00:00"
+      "createdAt": "2026-11-23T10:08:55.834209+00:00",
+      "updatedAt": "2026-11-23T10:08:55.834209+00:00",
+      "photos": []
+    }
+  },
+  {
+    "case": "with a photo",
+    "method": "GET",
+    "path": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "cb026621-c131-4daa-b02c-23ce49686fa7",
+      "batchId": "dcab64b0-9720-4f19-997d-b3bcd2492ddc",
+      "bakedOn": "2026-11-23",
+      "totalLoaves": 3,
+      "totalCost": 8.94,
+      "currency": "EUR",
+      "rating": 4,
+      "comment": "Good oven spring, crumb a bit tight.",
+      "assistantAnalysis": "Bulk fermentation ended early; give the dough more time next bake.",
+      "analysisAt": "2026-11-23T10:08:56.231968+00:00",
+      "items": [
+        {
+          "id": "4483e631-67d7-44f6-8f7e-8f4f7800c12f",
+          "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
+          "recipeTitle": "Country sourdough",
+          "loaves": 3,
+          "cost": 8.94
+        }
+      ],
+      "createdAt": "2026-11-23T10:08:55.834209+00:00",
+      "updatedAt": "2026-11-23T10:08:56.235486+00:00",
+      "photos": [
+        {
+          "id": "c3b9e25c-54c6-416b-af75-94f88ee6d076",
+          "contentType": "image/png",
+          "url": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos/c3b9e25c-54c6-416b-af75-94f88ee6d076",
+          "createdAt": "2026-11-23T10:08:56.274685+00:00"
+        }
+      ]
     }
   }
 ]
