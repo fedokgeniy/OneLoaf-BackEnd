@@ -21,14 +21,7 @@ public sealed class RecipeEditorPageTests : BunitContext
 
     public RecipeEditorPageTests()
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
-        Services.AddSingleton(TimeProvider.System);
-        Services.AddScoped<DeviceContext>();
-        Services.AddSingleton<IRecipesApi>(_api);
-        Services.AddSingleton<ICatalogApi>(new CatalogStub());
-        Services.AddSingleton<IReferenceApi>(new ReferenceStub());
-        Services.AddFluxor(o => o.ScanAssemblies(typeof(SessionState).Assembly, typeof(RecipeEditorPage).Assembly));
-        Render<Fluxor.Blazor.Web.StoreInitializer>();
+        this.AddRecipesFakes(_api, new EditorCatalog());
     }
 
     [Fact]
@@ -114,41 +107,9 @@ public sealed class RecipeEditorPageTests : BunitContext
         }
     }
 
-    private sealed class CatalogStub : ICatalogApi
+    private sealed class EditorCatalog : CatalogApiStub
     {
-        public Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(string? search, string? category, int page, int pageSize, CancellationToken ct = default) =>
+        public override Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(string? search, string? category, int page, int pageSize, CancellationToken ct = default) =>
             Task.FromResult(ApiResult<PagedResult<IngredientDto>>.Ok(new PagedResult<IngredientDto>([Flour, Water], 1, 100, 2)));
-
-        public Task<ApiResult<IngredientDto>> CreateIngredientAsync(IngredientRequest request, CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<IngredientDto>> UpdateIngredientAsync(Guid id, IngredientRequest request, CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult> DeleteIngredientAsync(Guid id, CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<IReadOnlyList<PriceDto>>> GetPricesAsync(Guid id, CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<PriceDto>> AddPriceAsync(Guid id, PriceRequest request, CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<PagedResult<FlourDto>>> ListFloursAsync(CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<IReadOnlyList<WarningDto>>> GetWarningsAsync(CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<KitchenSettingsDto>> GetKitchenAsync(CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<KitchenSettingsDto>> SaveKitchenAsync(KitchenSettingsRequest request, CancellationToken ct = default) => throw new NotSupportedException();
-    }
-
-    private sealed class ReferenceStub : IReferenceApi
-    {
-        public Task<ApiResult<IReadOnlyList<StageTypeDto>>> GetStageTypesAsync(CancellationToken ct = default) =>
-            Task.FromResult(ApiResult<IReadOnlyList<StageTypeDto>>.Ok([new StageTypeDto("bulk_fermentation", "Bulk fermentation", true, false, false)]));
-
-        public Task<ApiResult<IReadOnlyList<UnitDto>>> GetUnitsAsync(CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<IReadOnlyList<CurrencyDto>>> GetCurrenciesAsync(CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<IReadOnlyList<IngredientCategoryDto>>> GetIngredientCategoriesAsync(CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<IReadOnlyList<FlourTypeDto>>> GetFlourTypesAsync(CancellationToken ct = default) => throw new NotSupportedException();
     }
 }

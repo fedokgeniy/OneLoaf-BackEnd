@@ -17,13 +17,8 @@ public sealed class RecipesPageTests : BunitContext
 
     public RecipesPageTests()
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
-        Services.AddSingleton(TimeProvider.System);
-        Services.AddScoped<DeviceContext>();
-        Services.AddSingleton<IRecipesApi>(_api);
-        Services.AddFluxor(o => o.ScanAssemblies(typeof(SessionState).Assembly, typeof(RecipesPage).Assembly));
+        this.AddRecipesFakes(_api);
         Services.GetRequiredService<NavigationManager>().NavigateTo("recipes");
-        Render<Fluxor.Blazor.Web.StoreInitializer>();
     }
 
     [Fact]
