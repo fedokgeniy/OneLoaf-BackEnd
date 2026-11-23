@@ -43,6 +43,7 @@ public sealed class RecipesJourneyTests(WebAppFixture app) : IClassFixture<WebAp
         await Assertions.Expect(page).ToHaveTitleAsync("Recipes · OneLoaf");
         Directory.CreateDirectory(ScreenshotDir);
         await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(ScreenshotDir, $"recipes-{width}.png"), FullPage = true });
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "recipes");
 
         await page.RunAndWaitForRequestAsync(
             () => page.GetByRole(AriaRole.Searchbox, new() { Name = "Search recipes" }).FillAsync("country"),

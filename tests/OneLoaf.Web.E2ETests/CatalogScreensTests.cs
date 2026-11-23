@@ -41,15 +41,18 @@ public sealed class CatalogScreensTests(WebAppFixture app) : IClassFixture<WebAp
         await page.GetByRole(AriaRole.Button, new() { Name = "Bread flour" }).ClickAsync();
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Price history" })).ToBeVisibleAsync();
         await Shot(page, "ingredients", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "ingredients");
 
         await page.GotoAsync($"/recipes/{(string)recipe["id"]!}/edit");
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Stages" })).ToBeVisibleAsync();
         await Assertions.Expect(page.GetByLabel("Title", new() { Exact = true })).ToHaveValueAsync((string)recipe["title"]!);
         await Shot(page, "recipe-editor", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "recipe-editor");
 
         await page.GotoAsync("/settings/kitchen");
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Costs" })).ToBeVisibleAsync();
         await Shot(page, "kitchen", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "kitchen");
     }
 
     private static async Task Route(IPage page, string pattern, string operation, string caseName = "typical", bool login = false)

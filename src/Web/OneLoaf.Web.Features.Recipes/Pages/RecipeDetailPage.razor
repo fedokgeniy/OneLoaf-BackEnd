@@ -131,6 +131,7 @@
                                 </OlAlert>
                                 break;
                             case { Value: { } cost }:
+                                <OlBarChart Caption="Where the money goes" Items="CostBars(cost)" />
                                 <CostTable Cost="cost" />
                                 break;
                             default:

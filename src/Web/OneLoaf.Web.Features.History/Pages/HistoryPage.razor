@@ -130,6 +130,7 @@
                 <p class="history__help">Statistics appear after your first bake.</p>
                 break;
             case { Value: { } stats }:
+                <OlBarChart Caption="Bakes per recipe" Items="BakeBars(stats)" />
                 <div class="ol-table-wrap">
                     <table class="ol-table ol-table--stack">
                         <caption class="ol-visually-hidden">Bakes, loaves, average rating and cost per loaf by recipe</caption>
@@ -178,6 +179,11 @@
             Dispatcher.Dispatch(new LoadHistory(Query));
         }
     }
+
+    private static IReadOnlyList<BarDatum> BakeBars(IReadOnlyList<BakeStatisticsDto> stats) =>
+        [.. stats.OrderByDescending(s => s.BakesCount).Select(s => new BarDatum(s.RecipeTitle, s.BakesCount,
+            s.BakesCount.ToString(System.Globalization.CultureInfo.InvariantCulture),
+            s.AvgRating is { } avg ? $"average rating {DisplayFormat.Number(avg, 1)} of 5" : "not rated yet"))];
 
     private void Apply(HistoryQuery query) => Dispatcher.Dispatch(new LoadHistory(query));
 

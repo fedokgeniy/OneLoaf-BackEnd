@@ -43,23 +43,28 @@ public sealed class ProductionScreensTests(WebAppFixture app) : IClassFixture<We
         await page.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Recent bakes" })).ToBeVisibleAsync();
         await Shot(page, "home", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "home");
 
         await page.GotoAsync("/batches/new");
         await page.GetByLabel("Recipe 1").SelectOptionAsync(new SelectOptionValue { Index = 1 });
         await Assertions.Expect(page.Locator(".new-batch__preview .ol-stats")).ToBeVisibleAsync();
         await Shot(page, "new-batch", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "new-batch");
 
         await page.GotoAsync($"/batches/{batchId}");
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Name = "All stages" })).ToBeVisibleAsync();
         await Shot(page, "batch", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "batch");
 
         await page.GotoAsync("/batches?week=2026-W48");
         await Assertions.Expect(page.Locator(".calendar__batch").First).ToBeVisibleAsync();
         await Shot(page, "calendar", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "calendar");
 
         await page.GotoAsync("/starters");
         await Assertions.Expect(page.GetByRole(AriaRole.Button, new() { Name = "Log feeding" }).First).ToBeVisibleAsync();
         await Shot(page, "starters", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "starters");
     }
 
     private static async Task Route(IPage page, string pattern, string service, string operation, string caseName, bool login = false)

@@ -155,4 +155,9 @@ public sealed partial class RecipeDetailPage
         var hour = new DateTimeOffset(now.Year, now.Month, now.Day, now.Hour, 0, 0, now.Offset);
         return hour.AddHours(1);
     }
+
+    // Cost lines with an amount, largest first; the total line is the table's last row, not a bar.
+    private static IReadOnlyList<BarDatum> CostBars(CostBreakdownDto cost) =>
+        [.. cost.Lines.Where(l => l.Type != CostLineTypes.Total && l.Amount is > 0).OrderByDescending(l => l.Amount)
+            .Select(l => new BarDatum(l.Description, l.Amount!.Value, DisplayFormat.Money(l.Amount.Value, cost.Currency)))];
 }

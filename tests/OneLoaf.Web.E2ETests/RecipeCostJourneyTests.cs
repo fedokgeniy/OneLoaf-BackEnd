@@ -53,6 +53,7 @@ public sealed partial class RecipeCostJourneyTests(WebAppFixture app) : IClassFi
 
         Directory.CreateDirectory(ScreenshotDir);
         await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(ScreenshotDir, $"recipe-cost-{width}.png"), FullPage = true });
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "recipe-cost");
     }
 
     private static async Task RouteRecorded(IPage page)

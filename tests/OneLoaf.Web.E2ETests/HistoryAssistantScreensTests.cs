@@ -59,11 +59,13 @@ public sealed class HistoryAssistantScreensTests(WebAppFixture app) : IClassFixt
         await Assertions.Expect(page.Locator(".history__card").First).ToBeVisibleAsync();
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Name = "By recipe" })).ToBeVisibleAsync();
         await Shot(page, "history", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "history");
 
         await page.GotoAsync($"/history/{recordId}");
         await Assertions.Expect(page.GetByRole(AriaRole.Group, new() { Name = "Rating" })).ToBeVisibleAsync();
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Stages" })).ToBeVisibleAsync();
         await Shot(page, "bake-record", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "bake-record");
 
         await page.GotoAsync("/assistant");
         await page.GetByRole(AriaRole.Textbox, new() { Name = "Message" }).FillAsync("Plan 2 loaves of my Country sourdough for next Saturday morning.");
@@ -72,6 +74,7 @@ public sealed class HistoryAssistantScreensTests(WebAppFixture app) : IClassFixt
         await Assertions.Expect(confirm).ToBeVisibleAsync();
         Assert.Equal(0, confirms);
         await Shot(page, "assistant", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "assistant");
 
         await confirm.ClickAsync();
         await Assertions.Expect(page.Locator(".ol-plan").GetByText("Saved as a batch.")).ToBeVisibleAsync();

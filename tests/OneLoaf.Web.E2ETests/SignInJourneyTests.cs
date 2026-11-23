@@ -40,6 +40,7 @@ public sealed class SignInJourneyTests(WebAppFixture app) : IClassFixture<WebApp
             .ToHaveAttributeAsync("aria-current", "page");
         Directory.CreateDirectory(ScreenshotDir);
         await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(ScreenshotDir, $"home-{navigation}-{width}.png") });
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "home");
 
         if (navigation == "bottom-bar")
         {
