@@ -71,6 +71,9 @@ public interface IProductionApi
     /// <summary><c>POST starters/{id}/feedings</c> (US-28).</summary>
     Task<ApiResult<FeedingDto>> AddFeedingAsync(Guid starterId, FeedingRequest request, CancellationToken ct = default);
 
+    /// <summary><c>GET flours</c> for the starter form.</summary>
+    Task<ApiResult<PagedResult<FlourDto>>> ListFloursAsync(CancellationToken ct = default);
+
     /// <summary>Notification <c>GET reminders?status=scheduled&amp;from=&amp;to=</c> (US-29).</summary>
     Task<ApiResult<IReadOnlyList<ReminderDto>>> ListRemindersAsync(DateTimeOffset from, DateTimeOffset to, CancellationToken ct = default);
 }
@@ -161,6 +164,10 @@ public sealed class ProductionApi(ApiClientFactory api) : IProductionApi
     /// <inheritdoc />
     public Task<ApiResult<FeedingDto>> AddFeedingAsync(Guid starterId, FeedingRequest request, CancellationToken ct = default) =>
         api.Core.PostAsync<FeedingRequest, FeedingDto>($"api/v1/starters/{starterId}/feedings", request, ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<PagedResult<FlourDto>>> ListFloursAsync(CancellationToken ct = default) =>
+        api.Core.GetAsync<PagedResult<FlourDto>>(Url.Build("api/v1/flours", ("pageSize", 100)), ct);
 
     /// <inheritdoc />
     public Task<ApiResult<IReadOnlyList<ReminderDto>>> ListRemindersAsync(DateTimeOffset from, DateTimeOffset to, CancellationToken ct = default) =>

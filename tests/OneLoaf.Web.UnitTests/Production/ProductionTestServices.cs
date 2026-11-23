@@ -80,6 +80,9 @@ internal class ProductionApiStub : IProductionApi
     public virtual Task<ApiResult<FeedingDto>> AddFeedingAsync(Guid starterId, FeedingRequest request, CancellationToken ct = default) =>
         Ok(new FeedingDto(Guid.NewGuid(), request.FedAt, request.FlourG, request.WaterG, request.StarterKeptG, request.TemperatureC, null, null, request.Note));
 
+    public virtual Task<ApiResult<PagedResult<FlourDto>>> ListFloursAsync(CancellationToken ct = default) =>
+        Ok(new PagedResult<FlourDto>([], 1, 100, 0));
+
     public virtual Task<ApiResult<IReadOnlyList<ReminderDto>>> ListRemindersAsync(DateTimeOffset from, DateTimeOffset to, CancellationToken ct = default) =>
         Ok<IReadOnlyList<ReminderDto>>([]);
 

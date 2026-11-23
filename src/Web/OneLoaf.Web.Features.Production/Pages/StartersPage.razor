@@ -1,0 +1,198 @@
+@page "/starters"
+@inherits FluxorComponent
+@using System.Globalization
+@using OneLoaf.Web.Features.Production.Models
+@using OneLoaf.Web.Features.Production.State
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.Forms
+@using OneLoaf.Web.Shared.State
+@inject IState<StartersState> State
+@inject IDispatcher Dispatcher
+@inject TimeProvider Time
+
+<ShellTitle Text="Starters">
+    <Actions>
+        <OlButton Href="starters/new" Icon="IconName.Plus" class="app-hide-compact">New starter</OlButton>
+    </Actions>
+</ShellTitle>
+
+<div class="ol-container starters">
+    @switch (State.Value.Starters)
+    {
+        case Loadable<IReadOnlyList<StarterDto>>.Failed { Error: var error }:
+            <OlAlert Kind="AlertKind.Danger" Title="The starters could not be loaded." CorrelationId="@error.CorrelationId">
+                <p>@error.Message</p>
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => Dispatcher.Dispatch(new LoadStarters())">Try again</OlButton>
+            </OlAlert>
+            break;
+        case { Value: { } starters } when starters.Count == 0:
+            <OlEmptyState Title="No starters yet" Icon="IconName.Starter" Text="Add your sourdough starter to get feeding reminders and see when it peaks.">
+                <Action><OlButton Href="starters/new" Icon="IconName.Plus">New starter</OlButton></Action>
+            </OlEmptyState>
+            break;
+        case { Value: { } starters }:
+            <p class="starters__help">Active starters get a feeding reminder when push reminders are on in Settings.</p>
+            <div class="ol-cards">
+                @foreach (var starter in starters)
+                {
+                    <article class="ol-card starters__card" @key="starter.Id" aria-labelledby="@($"starter-{starter.Id}")">
+                        <div class="ol-card__body">
+                            <span class="ol-card__overline">@DisplayFormat.Number(starter.HydrationPercent, 0) % hydration · @ModeText(starter)</span>
+                            <h2 class="ol-card__title" id="@($"starter-{starter.Id}")">@starter.Name</h2>
+                            <dl class="starters__times">
+                                <dt>Next feeding</dt>
+                                <dd class="ol-num">@(starter.NextFeedingAt is { } next ? When(next) : "—")</dd>
+                                <dt>Peak</dt>
+                                <dd class="ol-num">@(starter.ExpectedPeakAt is { } peak ? When(peak) : "—")</dd>
+                                <dt>Last fed</dt>
+                                <dd class="ol-num">@(starter.LastFedAt is { } fed ? When(fed) : "not yet")</dd>
+                            </dl>
+                            <div class="ol-card__foot">
+                                @if (starter.IsActive)
+                                {
+                                    @if (starter.NextFeedingAt is { } due && due < Time.GetUtcNow())
+                                    {
+                                        <span class="ol-badge ol-badge--overdue">Feeding due</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="ol-badge ol-badge--done">Active</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="ol-badge ol-badge--neutral">Resting</span>
+                                }
+                                <a class="ol-link" href="@($"starters/{starter.Id}/edit")">Edit</a>
+                            </div>
+                            <div class="starters__actions">
+                                <OlButton Icon="IconName.Plus" OnClick="() => OpenFeeding(starter)">Log feeding</OlButton>
+                                <OlButton Variant="ButtonVariant.Ghost" aria-expanded="@(State.Value.SelectedId == starter.Id ? "true" : "false")"
+                                          OnClick="() => Dispatcher.Dispatch(new SelectStarter(State.Value.SelectedId == starter.Id ? null : starter.Id))">
+                                    @(State.Value.SelectedId == starter.Id ? "Hide feedings" : "Feedings")
+                                </OlButton>
+                            </div>
+                            @if (State.Value.SelectedId == starter.Id)
+                            {
+                                <div class="starters__log" aria-live="polite">
+                                    @switch (State.Value.Feedings)
+                                    {
+                                        case Loadable<IReadOnlyList<FeedingDto>>.Failed { Error: var feedingError }:
+                                            <OlAlert Kind="AlertKind.Danger" CorrelationId="@feedingError.CorrelationId">@feedingError.Message</OlAlert>
+                                            break;
+                                        case { Value: { } feedings } when feedings.Count == 0:
+                                            <p class="starters__help">No feedings logged yet.</p>
+                                            break;
+                                        case { Value: { } feedings }:
+                                            <ul class="starters__feedings">
+                                                @foreach (var feeding in feedings)
+                                                {
+                                                    <li @key="feeding.Id">
+                                                        <span class="ol-num">@When(feeding.FedAt)</span>
+                                                        <span>@DisplayFormat.Grams(feeding.FlourG) flour · @DisplayFormat.Grams(feeding.WaterG) water@(feeding.StarterKeptG is { } kept ? $" · kept {DisplayFormat.Grams(kept)}" : null)@(feeding.TemperatureC is { } t ? $" · {DisplayFormat.Number(t, 1)} °C" : null)</span>
+                                                    </li>
+                                                }
+                                            </ul>
+                                            break;
+                                        default:
+                                            <OlSkeleton Variant="SkeletonVariant.Row" Count="3" />
+                                            break;
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </article>
+                }
+            </div>
+            break;
+        default:
+            <div aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Card" Count="2" /></div>
+            break;
+    }
+</div>
+
+<OlDialog Open="_feedingFor is not null" Title="@($"Log feeding · {_feedingFor?.Name}")" OnClose="() => _feedingFor = null">
+    <ChildContent>
+        @if (_feeding is not null)
+        {
+            <EditForm id="feeding-form" Model="_feeding" OnValidSubmit="SaveFeeding" class="form-grid" novalidate>
+                <ObjectGraphValidation />
+                <ServerValidation @ref="_server" />
+                <div class="form-grid__wide"><OlTextField Label="Fed at" Type="datetime-local" @bind-Value="_feeding.FedAt" /></div>
+                <OlNumberField TValue="decimal?" Label="Flour" Suffix="g" @bind-Value="_feeding.FlourG" />
+                <OlNumberField TValue="decimal?" Label="Water" Suffix="g" @bind-Value="_feeding.WaterG" />
+                <OlNumberField TValue="decimal?" Label="Starter kept" Suffix="g" Help="What you kept before feeding." @bind-Value="_feeding.StarterKeptG" />
+                <OlNumberField TValue="decimal?" Label="Temperature" Suffix="°C" @bind-Value="_feeding.TemperatureC" />
+                <div class="form-grid__wide"><OlTextField Label="Note" @bind-Value="_feeding.Note" /></div>
+                @if (_error is not null)
+                {
+                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@_error.CorrelationId">@_error.Message</OlAlert>
+                }
+            </EditForm>
+        }
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _feedingFor = null">Cancel</OlButton>
+        <OlButton Type="submit" form="feeding-form" Loading="State.Value.Busy">Log feeding</OlButton>
+    </Footer>
+</OlDialog>
+
+@code {
+    private StarterDto? _feedingFor;
+    private FeedingForm? _feeding;
+    private ServerValidation? _server;
+    private Shared.Api.ApiError? _error;
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<FeedingLogged>(_ => _feedingFor = null);
+        SubscribeToAction<StarterCommandFailed>(a =>
+        {
+            if (a.Command == nameof(LogFeeding))
+            {
+                _error = a.Error.Kind == Shared.Api.ApiErrorKind.Validation && _server is not null && _server.Display(a.Error.FieldErrors).Count == 0 ? null : a.Error;
+            }
+        });
+        if (State.Value.Starters is Loadable<IReadOnlyList<StarterDto>>.NotAsked)
+        {
+            Dispatcher.Dispatch(new LoadStarters());
+        }
+    }
+
+    private static string ModeText(StarterDto starter) => starter.FeedingMode switch
+    {
+        "weekly" => "weekly",
+        "fridge" => "in the fridge",
+        _ => $"every {starter.FeedingIntervalHours} h",
+    };
+
+    private string When(DateTimeOffset moment)
+    {
+        var local = moment.ToLocalTime();
+        var today = Time.GetLocalNow().Date;
+        var day = local.Date == today ? "today" : local.Date == today.AddDays(1) ? "tomorrow" : local.Date == today.AddDays(-1) ? "yesterday"
+            : local.ToString("ddd d MMM", CultureInfo.InvariantCulture);
+        return $"{day} {local.ToString("HH:mm", CultureInfo.InvariantCulture)}";
+    }
+
+    private void OpenFeeding(StarterDto starter)
+    {
+        _error = null;
+        _feedingFor = starter;
+        _feeding = new FeedingForm { FedAt = Time.GetLocalNow().ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture) };
+    }
+
+    private void SaveFeeding()
+    {
+        if (State.Value.Busy || _feedingFor is null || _feeding?.ToRequest() is not { } request)
+        {
+            return;
+        }
+
+        _error = null;
+        Dispatcher.Dispatch(new LogFeeding(_feedingFor.Id, request));
+    }
+}
