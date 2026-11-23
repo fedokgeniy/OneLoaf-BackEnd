@@ -16,6 +16,8 @@ public sealed class RecipesJourneyTests(WebAppFixture app) : IClassFixture<WebAp
         Assert.SkipWhen(WebAppFixture.WebRoot is null, $"Set {WebAppFixture.WebRootVariable} to the published wwwroot.");
         await using var context = await app.Browser.NewContextAsync(new BrowserNewContextOptions
         {
+            // Route mocks do not see requests made by the service worker; the app works without it.
+            ServiceWorkers = ServiceWorkerPolicy.Block,
             BaseURL = app.BaseAddress.ToString(),
             ViewportSize = new ViewportSize { Width = width, Height = height },
         });

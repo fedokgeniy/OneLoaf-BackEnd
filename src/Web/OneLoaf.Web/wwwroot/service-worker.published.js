@@ -14,7 +14,13 @@ const cachedApi = /\/core\/api\/v1\/(recipes|reference)(\/|\?|$)/;
 
 self.addEventListener('install', event => event.waitUntil(onInstall()));
 self.addEventListener('activate', event => event.waitUntil(onActivate()));
-self.addEventListener('fetch', event => event.respondWith(onFetch(event)));
+self.addEventListener('fetch', event => {
+    // Only app assets, page navigations and recipe reads are served here; every other request (writes, other APIs,
+    // other origins) goes straight to the network without the worker.
+    if (handles(event.request)) {
+        event.respondWith(onFetch(event));
+    }
+});
 self.addEventListener('message', event => {
     // Sent on sign out: cached recipe data belongs to the user who signed out.
     if (event.data === 'clear-user-data') {
@@ -39,12 +45,20 @@ async function onActivate() {
     await self.clients.claim();
 }
 
+function handles(request) {
+    if (request.method !== 'GET') {
+        return false;
+    }
+    const url = new URL(request.url);
+    if (url.origin !== self.location.origin) {
+        return false;
+    }
+    const isApi = /^\/(core|assistant\/api|notify)\//.test(url.pathname);
+    return !isApi || cachedApi.test(url.pathname + url.search);
+}
+
 async function onFetch(event) {
     const request = event.request;
-    if (request.method !== 'GET') {
-        return fetch(request);
-    }
-
     const url = new URL(request.url);
     if (url.origin === self.location.origin && cachedApi.test(url.pathname + url.search)) {
         return networkFirst(request);

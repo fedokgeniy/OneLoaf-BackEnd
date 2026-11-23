@@ -11,6 +11,13 @@
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
   </PropertyGroup>
 
+  <!-- ADR-F04: rarely used features are downloaded on first navigation (FeatureAssemblies.Lazy, App.razor). -->
+  <ItemGroup>
+    <BlazorWebAssemblyLazyLoad Include="OneLoaf.Web.Features.History.wasm" />
+    <BlazorWebAssemblyLazyLoad Include="OneLoaf.Web.Features.Assistant.wasm" />
+    <BlazorWebAssemblyLazyLoad Include="OneLoaf.Web.Features.Library.wasm" />
+  </ItemGroup>
+
   <ItemGroup>
     <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
   </ItemGroup>

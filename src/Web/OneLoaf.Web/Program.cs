@@ -4,14 +4,12 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using OneLoaf.Web;
 using OneLoaf.Web.Account;
-using OneLoaf.Web.Features.Assistant;
-using OneLoaf.Web.Features.History;
-using OneLoaf.Web.Features.Library;
 using OneLoaf.Web.Features.Production;
 using OneLoaf.Web.Features.Recipes;
 using OneLoaf.Web.Shared.Api;
 using OneLoaf.Web.Shared.Auth;
 using OneLoaf.Web.Shared.Device;
+using OneLoaf.Web.Shared.State;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -34,12 +32,17 @@ services.AddScoped<AccountApi>();
 services.AddScoped<ISettingsService, SettingsService>();
 
 services.AddRecipesFeature()
-    .AddProductionFeature()
-    .AddHistoryFeature()
-    .AddAssistantFeature()
-    .AddLibraryFeature();
+    .AddProductionFeature();
+
+// History, Assistant and Library are loaded on first navigation (App.razor); their Fluxor features are added to the
+// store then, and their states are resolved through LazyState (ADR-F04).
+services.AddScoped<LazyFeatureRegistry>();
 
 services.AddFluxor(options => options.ScanAssemblies(typeof(App).Assembly, [.. FeatureAssemblies.Shared]));
+
+// After AddFluxor: Fluxor maps IState<> as an open generic too, and the last open-generic registration wins.
+// LazyState finds any feature in the store, so it also serves the states found by the startup scan.
+services.AddScoped(typeof(IState<>), typeof(LazyState<>));
 
 var host = builder.Build();
 

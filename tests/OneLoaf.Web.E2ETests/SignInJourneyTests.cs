@@ -16,6 +16,8 @@ public sealed class SignInJourneyTests(WebAppFixture app) : IClassFixture<WebApp
         Assert.SkipWhen(WebAppFixture.WebRoot is null, $"Set {WebAppFixture.WebRootVariable} to the published wwwroot.");
         await using var context = await app.Browser.NewContextAsync(new BrowserNewContextOptions
         {
+            // Route mocks do not see requests made by the service worker; the app works without it.
+            ServiceWorkers = ServiceWorkerPolicy.Block,
             BaseURL = app.BaseAddress.ToString(),
             ViewportSize = new ViewportSize { Width = width, Height = height },
         });
@@ -53,7 +55,7 @@ public sealed class SignInJourneyTests(WebAppFixture app) : IClassFixture<WebApp
     public async Task SignIn_WrongPassword_ShowsOneGenericMessage()
     {
         Assert.SkipWhen(WebAppFixture.WebRoot is null, $"Set {WebAppFixture.WebRootVariable} to the published wwwroot.");
-        await using var context = await app.Browser.NewContextAsync(new BrowserNewContextOptions { BaseURL = app.BaseAddress.ToString() });
+        await using var context = await app.Browser.NewContextAsync(new BrowserNewContextOptions { BaseURL = app.BaseAddress.ToString(), ServiceWorkers = ServiceWorkerPolicy.Block });
         var page = await context.NewPageAsync();
         var (status, body) = RecordedApi.Case("core-api", "Login", "wrong password");
         await RecordedApi.RouteAsync(page, "**/api/v1/auth/login", status, body);
