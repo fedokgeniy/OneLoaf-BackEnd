@@ -134,11 +134,8 @@
                             @foreach (var stage in item.Stages.OrderBy(s => s.SortOrder))
                             {
                                 <li @key="stage.Id">
-                                    <OlStageItem Stage="stage" Number="stages.IndexOf(stage) + 1" Busy="State.Value.BusyStageId == stage.Id"
-                                                 Actionable="@(open && stage != current)"
-                                                 OnStart="s => Run(batch, s, StageCommandKind.Start)" OnComplete="s => Run(batch, s, StageCommandKind.Complete)"
-                                                 OnExtend="s => Run(batch, s, StageCommandKind.Extend)" OnSkip="s => Run(batch, s, StageCommandKind.Skip)"
-                                                 OnAdjust="OpenAdjust" />
+                                    @* The list is read-only like the Batch-* boards; actions live on the current stage card. *@
+                                    <OlStageItem Stage="stage" Number="stages.IndexOf(stage) + 1" Actionable="false" />
                                 </li>
                             }
                         </ol>
