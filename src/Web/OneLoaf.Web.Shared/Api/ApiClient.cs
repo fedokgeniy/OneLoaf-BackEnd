@@ -32,6 +32,10 @@ public sealed partial class ApiClient(HttpClient http, ApiJsonOptions json, ILog
         SendAsync<T>(WithBody(HttpMethod.Put, path, body), ct);
 
     /// <summary>POST without a request body, returning a body (e.g. complete a batch).</summary>
+    /// <summary>PUT with a JSON body and no response body (204).</summary>
+    public Task<ApiResult> PutAsync<TBody>(string path, TBody body, CancellationToken ct = default) =>
+        SendAsync(WithBody(HttpMethod.Put, path, body), ct);
+
     public Task<ApiResult<T>> PostEmptyAsync<T>(string path, CancellationToken ct = default) =>
         SendAsync<T>(new HttpRequestMessage(HttpMethod.Post, path), ct);
 
@@ -76,6 +80,10 @@ public sealed partial class ApiClient(HttpClient http, ApiJsonOptions json, ILog
     /// <summary>DELETE, no response body.</summary>
     public Task<ApiResult> DeleteAsync(string path, CancellationToken ct = default) =>
         SendAsync(new HttpRequestMessage(HttpMethod.Delete, path), ct);
+
+    /// <summary>DELETE with a JSON body (e.g. the password of <c>DELETE /me</c>).</summary>
+    public Task<ApiResult> DeleteAsync<TBody>(string path, TBody body, CancellationToken ct = default) =>
+        SendAsync(WithBody(HttpMethod.Delete, path, body), ct);
 
     private HttpRequestMessage WithBody<TBody>(HttpMethod method, string path, TBody body) =>
         new(method, path) { Content = JsonContent.Create(body, json.TypeInfo<TBody>()) };

@@ -85,6 +85,14 @@ public sealed class RecordedExamplesTests
         ["assistant/ListMessages"] = typeof(IReadOnlyList<MessageDto>),
         ["assistant/SendMessage"] = typeof(ChatReplyDto),
         ["assistant/ConfirmAction"] = typeof(ConfirmActionResponse),
+        ["core-api/SearchLibrary"] = typeof(PagedResult<LibraryItemDto>),
+        ["core-api/GetPublication"] = typeof(PublishedRecipeDto),
+        ["core-api/ListComments"] = typeof(PagedResult<CommentDto>),
+        ["core-api/AddComment"] = typeof(CommentDto),
+        ["core-api/CopyPublication"] = typeof(RecipeDto),
+        ["core-api/PublishRecipe"] = typeof(PublishResponse),
+        ["core-api/ReportContent"] = typeof(ReportCreatedResponse),
+        ["core-api/ListReports"] = typeof(PagedResult<ReportDto>),
     };
 
     private static readonly JsonSerializerOptions Strict = new(new ApiJsonOptions([SharedJsonContext.Default]).Options)

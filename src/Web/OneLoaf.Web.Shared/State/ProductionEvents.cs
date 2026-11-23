@@ -8,3 +8,6 @@ public sealed record BatchCreated(Guid BatchId, string Name);
 
 /// <summary>Global action: a batch was completed and became a bake record (US-31); History reloads.</summary>
 public sealed record BatchCompleted(Guid BatchId, Guid? BakeRecordId);
+
+/// <summary>Global action: the user's recipes changed outside the Recipes feature (copied from the library); the list reloads.</summary>
+public sealed record RecipesChanged;

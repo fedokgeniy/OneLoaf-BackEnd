@@ -20,3 +20,6 @@ public sealed record UserDto(
     string Role,
     DateTimeOffset CreatedAt,
     DateTimeOffset? LastLoginAt);
+
+/// <summary><c>DELETE /me</c> body (US-04): the password confirms the deletion.</summary>
+public sealed record DeleteAccountRequest(string Password);

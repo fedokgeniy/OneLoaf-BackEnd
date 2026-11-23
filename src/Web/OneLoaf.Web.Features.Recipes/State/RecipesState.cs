@@ -47,6 +47,10 @@ public sealed record MoreRecipesLoadFailed(ApiError Error);
 /// <summary>Pure reducers of <see cref="RecipesState"/>.</summary>
 public static class RecipesReducers
 {
+    /// <summary>A recipe was added elsewhere (library copy): the list reloads on the next visit.</summary>
+    [ReducerMethod(typeof(RecipesChanged))]
+    public static RecipesState OnRecipesChanged(RecipesState state) => state with { List = Loadable<RecipeList>.Idle, LoadingMore = false };
+
     /// <summary>New filter; the old cards stay visible until the new page arrives.</summary>
     [ReducerMethod]
     public static RecipesState OnSetQuery(RecipesState state, SetRecipeQuery action) =>

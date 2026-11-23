@@ -76,6 +76,7 @@
                 {
                     <OlButton Variant="ButtonVariant.Ghost" Href="@($"recipes/{recipe.Id}/compare")">Compare with original</OlButton>
                 }
+                <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Library" Href="@($"recipes/{recipe.Id}/publish")">Publish to library</OlButton>
             </div>
 
             <OlTabs Label="Recipe sections" Tabs="Tabs" ActiveId="@_tab" ActiveIdChanged="t => _tab = t" IdPrefix="recipe" Class="recipe__tabs" />
