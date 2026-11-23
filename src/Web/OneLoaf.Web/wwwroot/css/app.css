@@ -16,6 +16,8 @@
 /* Focus target after navigation (FocusOnNavigate puts focus on the page h1). */
 h1:focus { outline: none; }
 h1:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* Headings with tabindex="-1" only receive focus programmatically (after navigation); no ring for them. */
+h1[tabindex="-1"]:focus-visible { outline: none; }
 
 /* Blazor's validation summary renders a plain list inside OlAlert. */
 .validation-errors { margin: 0; padding-left: var(--space-5); }

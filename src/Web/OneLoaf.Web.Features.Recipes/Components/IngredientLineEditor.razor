@@ -49,7 +49,10 @@
 
     private IngredientDto? Selected => Ingredients.FirstOrDefault(i => i.Id.ToString() == Line.IngredientId);
 
-    private string Name => Selected?.Name ?? $"ingredient {Index + 1}";
+    /// <summary>Option text is "Name (unit)"; used when the ingredient is not on the loaded catalog page.</summary>
+    private SelectOption? SelectedOption => Options.FirstOrDefault(o => o.Value == Line.IngredientId);
 
-    private string? Unit => Selected?.UnitCode;
+    private string Name => Selected?.Name ?? SelectedOption?.Text.Split(" (")[0] ?? $"ingredient {Index + 1}";
+
+    private string? Unit => Selected?.UnitCode ?? SelectedOption?.Text.Split(" (").LastOrDefault()?.TrimEnd(')');
 }

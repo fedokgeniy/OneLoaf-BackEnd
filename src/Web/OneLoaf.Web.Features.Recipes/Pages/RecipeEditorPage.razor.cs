@@ -70,7 +70,13 @@ public sealed partial class RecipeEditorPage
         }
 
         _form = data.Recipe is { } recipe ? RecipeForm.From(recipe) : RecipeForm.New();
-        _ingredientOptions = [.. data.Ingredients.OrderBy(i => i.Name).Select(i => new SelectOption(i.Id.ToString(), $"{i.Name} ({i.UnitCode})"))];
+        // Lines whose ingredient is not on the loaded catalog page (e.g. beyond the first 100) stay selectable.
+        var missing = (data.Recipe?.Ingredients ?? [])
+            .Where(line => data.Ingredients.All(i => i.Id != line.IngredientId))
+            .DistinctBy(line => line.IngredientId)
+            .Select(line => new SelectOption(line.IngredientId.ToString(), $"{line.IngredientName} ({line.UnitCode})"));
+        _ingredientOptions = [.. data.Ingredients.Select(i => new SelectOption(i.Id.ToString(), $"{i.Name} ({i.UnitCode})"))
+            .Concat(missing).OrderBy(o => o.Text, StringComparer.CurrentCultureIgnoreCase)];
         _stageTypeOptions = [.. data.StageTypes.Select(t => new SelectOption(t.Code, t.Name))];
         _formReady = true;
         StateHasChanged();

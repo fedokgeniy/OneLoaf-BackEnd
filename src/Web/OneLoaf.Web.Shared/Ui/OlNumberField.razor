@@ -65,8 +65,13 @@
     }
 
     /// <inheritdoc />
-    protected override string? FormatValueAsString(TValue? value) =>
-        value is IFormattable f ? f.ToString(null, System.Globalization.CultureInfo.InvariantCulture) : null;
+    protected override string? FormatValueAsString(TValue? value) => value switch
+    {
+        // Decimals keep the scale of the JSON ("500.0"); show them without trailing zeros.
+        decimal d => d.ToString("0.######", System.Globalization.CultureInfo.InvariantCulture),
+        IFormattable f => f.ToString(null, System.Globalization.CultureInfo.InvariantCulture),
+        _ => null,
+    };
 
     /// <inheritdoc />
     protected override bool TryParseValueFromString(
