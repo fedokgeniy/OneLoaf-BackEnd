@@ -1,0 +1,20 @@
+# gitleaks configuration: the default rules plus an allowlist of known, non-secret values.
+# Every entry is a public example or a placeholder; real secrets live only in .env / GitHub secrets.
+title = "OneLoaf gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public examples and placeholders"
+regexes = [
+  # Example Web Push subscription keys (browser public key and auth secret) from the Web Push specification examples.
+  '''tBHItJI5svbpez7KI4CCXg''',
+  '''BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM''',
+  # Shortened JWT header used as a placeholder in the documentation; no payload or signature.
+  '''eyJhbGciOiJSUzI1NiIs(InR5cCI6IkpXVCJ9)?\.\.\.''',
+  # File name of an SQL script referenced by a migration.
+  '''01_privileges\.sql''',
+  # MD5 of the word "password", used by a database test to prove such hashes are rejected.
+  '''5f4dcc3b5aa765d61d8327deb882cf99''',
+]
