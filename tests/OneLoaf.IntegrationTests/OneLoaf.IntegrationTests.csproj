@@ -9,12 +9,14 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Services\CoreApi\OneLoaf.CoreApi\OneLoaf.CoreApi.csproj" />
     <ProjectReference Include="..\..\src\OneLoaf.Infrastructure\OneLoaf.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\src\Services\Assistant\OneLoaf.Assistant\OneLoaf.Assistant.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
     <PackageReference Include="Testcontainers.PostgreSql" />
     <PackageReference Include="Testcontainers.RabbitMq" />
+    <PackageReference Include="Testcontainers.Redis" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="xunit.v3" />
     <PackageReference Include="xunit.runner.visualstudio">

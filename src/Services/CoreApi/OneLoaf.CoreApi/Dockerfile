@@ -11,6 +11,8 @@ COPY src/OneLoaf.Domain/*.csproj src/OneLoaf.Domain/packages.lock.json src/OneLo
 COPY src/OneLoaf.SharedKernel/*.csproj src/OneLoaf.SharedKernel/packages.lock.json src/OneLoaf.SharedKernel/
 COPY src/OneLoaf.Infrastructure/*.csproj src/OneLoaf.Infrastructure/packages.lock.json src/OneLoaf.Infrastructure/
 COPY src/OneLoaf.ServiceDefaults/*.csproj src/OneLoaf.ServiceDefaults/packages.lock.json src/OneLoaf.ServiceDefaults/
+COPY src/OneLoaf.Messaging/*.csproj src/OneLoaf.Messaging/packages.lock.json src/OneLoaf.Messaging/
+COPY src/OneLoaf.Messaging.RabbitMq/*.csproj src/OneLoaf.Messaging.RabbitMq/packages.lock.json src/OneLoaf.Messaging.RabbitMq/
 COPY src/Services/CoreApi/OneLoaf.CoreApi.Application/*.csproj src/Services/CoreApi/OneLoaf.CoreApi.Application/packages.lock.json src/Services/CoreApi/OneLoaf.CoreApi.Application/
 COPY src/Services/CoreApi/OneLoaf.CoreApi.Infrastructure/*.csproj src/Services/CoreApi/OneLoaf.CoreApi.Infrastructure/packages.lock.json src/Services/CoreApi/OneLoaf.CoreApi.Infrastructure/
 COPY src/Services/CoreApi/OneLoaf.CoreApi/*.csproj src/Services/CoreApi/OneLoaf.CoreApi/packages.lock.json src/Services/CoreApi/OneLoaf.CoreApi/

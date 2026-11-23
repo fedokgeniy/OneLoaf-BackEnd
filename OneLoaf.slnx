@@ -20,8 +20,14 @@
     <Project Path="src/Services/CoreApi/OneLoaf.CoreApi.Application/OneLoaf.CoreApi.Application.csproj" />
     <Project Path="src/Services/CoreApi/OneLoaf.CoreApi.Infrastructure/OneLoaf.CoreApi.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Services/Assistant/">
+    <Project Path="src/Services/Assistant/OneLoaf.Assistant/OneLoaf.Assistant.csproj" />
+    <Project Path="src/Services/Assistant/OneLoaf.Assistant.Application/OneLoaf.Assistant.Application.csproj" />
+    <Project Path="src/Services/Assistant/OneLoaf.Assistant.Infrastructure/OneLoaf.Assistant.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/OneLoaf.ArchitectureTests/OneLoaf.ArchitectureTests.csproj" />
+    <Project Path="tests/OneLoaf.Assistant.UnitTests/OneLoaf.Assistant.UnitTests.csproj" />
     <Project Path="tests/OneLoaf.CoreApi.UnitTests/OneLoaf.CoreApi.UnitTests.csproj" />
     <Project Path="tests/OneLoaf.IntegrationTests/OneLoaf.IntegrationTests.csproj" />
   </Folder>

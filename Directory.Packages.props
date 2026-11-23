@@ -26,8 +26,11 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.15" />
   </ItemGroup>
 
-  <ItemGroup Label="Messaging">
+  <ItemGroup Label="Messaging, cache, AI, HTTP">
     <PackageVersion Include="RabbitMQ.Client" Version="7.2.2" />
+    <PackageVersion Include="StackExchange.Redis" Version="3.4.35" />
+    <PackageVersion Include="Anthropic" Version="13.12.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.11.1" />
   </ItemGroup>
 
   <ItemGroup Label="Logging, telemetry, health">
@@ -51,5 +54,6 @@
     <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.15" />
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.17.0" />
     <PackageVersion Include="Testcontainers.RabbitMq" Version="4.17.0" />
+    <PackageVersion Include="Testcontainers.Redis" Version="4.17.0" />
   </ItemGroup>
 </Project>

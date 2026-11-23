@@ -22,17 +22,21 @@ public sealed class LayerRulesTests
     private static readonly Assembly CoreApiAssembly = typeof(Program).Assembly;
     private static readonly Assembly CoreApiApplicationAssembly = typeof(CoreApiApplicationAssembly).Assembly;
     private static readonly Assembly CoreApiInfrastructureAssembly = typeof(CoreApi.Infrastructure.DependencyInjection).Assembly;
+    private static readonly Assembly AssistantAssembly = typeof(Assistant.Endpoints.AssistantEntryPoint).Assembly;
+    private static readonly Assembly AssistantApplicationAssembly = typeof(Assistant.Application.DependencyInjection).Assembly;
+    private static readonly Assembly AssistantInfrastructureAssembly = typeof(Assistant.Infrastructure.DependencyInjection).Assembly;
 
-    /// <summary>Application assemblies of all services; extended when the Assistant and Notification are added.</summary>
-    private static readonly Assembly[] ApplicationAssemblies = [CoreApiApplicationAssembly];
+    /// <summary>Application assemblies of all services.</summary>
+    private static readonly Assembly[] ApplicationAssemblies = [CoreApiApplicationAssembly, AssistantApplicationAssembly];
 
     /// <summary>Presentation (web) assemblies of all services.</summary>
-    private static readonly Assembly[] PresentationAssemblies = [CoreApiAssembly];
+    private static readonly Assembly[] PresentationAssemblies = [CoreApiAssembly, AssistantAssembly];
 
     /// <summary>Assemblies of each service by service prefix.</summary>
     private static readonly Dictionary<string, Assembly[]> ServiceAssemblies = new(StringComparer.Ordinal)
     {
         ["OneLoaf.CoreApi"] = [CoreApiAssembly, CoreApiApplicationAssembly, CoreApiInfrastructureAssembly],
+        ["OneLoaf.Assistant"] = [AssistantAssembly, AssistantApplicationAssembly, AssistantInfrastructureAssembly],
     };
 
     /// <summary>Prefixes of every service, also those not created yet, so a future cross-reference fails.</summary>
@@ -40,7 +44,8 @@ public sealed class LayerRulesTests
 
     private static readonly Architecture Architecture = new ArchLoader()
         .LoadAssemblies(DomainAssembly, SharedKernelAssembly, ServiceDefaultsAssembly, InfrastructureAssembly,
-            CoreApiAssembly, CoreApiApplicationAssembly, CoreApiInfrastructureAssembly)
+            CoreApiAssembly, CoreApiApplicationAssembly, CoreApiInfrastructureAssembly,
+            AssistantAssembly, AssistantApplicationAssembly, AssistantInfrastructureAssembly)
         .Build();
 
     /// <summary>Namespaces the Application layer must never use.</summary>
@@ -54,6 +59,7 @@ public sealed class LayerRulesTests
         "Anthropic",
         "OneLoaf.Infrastructure",
         "OneLoaf.ServiceDefaults",
+        "OneLoaf.Messaging.RabbitMq",
     };
 
     [Theory]
