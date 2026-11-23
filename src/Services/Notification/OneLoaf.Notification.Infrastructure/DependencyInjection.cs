@@ -1,8 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using Lib.Net.Http.WebPush;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Options;
 using OneLoaf.Infrastructure;
 using OneLoaf.Infrastructure.Persistence;
@@ -13,59 +11,12 @@ using OneLoaf.Notification.Application;
 using OneLoaf.Notification.Application.Events;
 using OneLoaf.Notification.Application.Push;
 using OneLoaf.Notification.Application.Reminders;
-using OneLoaf.ServiceDefaults;
 using OneLoaf.ServiceDefaults.Constants;
 using OneLoaf.ServiceDefaults.Correlation;
 using OneLoaf.ServiceDefaults.Options;
 using StackExchange.Redis;
 
 namespace OneLoaf.Notification.Infrastructure;
-
-/// <summary>Redis settings (<c>Redis__ConnectionString</c>).</summary>
-public sealed class RedisOptions
-{
-    /// <summary>Configuration section name.</summary>
-    public const string SectionName = "Redis";
-
-    /// <summary>StackExchange.Redis connection string.</summary>
-    [Required]
-    public string ConnectionString { get; set; } = string.Empty;
-}
-
-/// <summary>Cache keys used by the Notification service.</summary>
-public static class CacheKeys
-{
-    /// <summary>Marker of a reminder handed to the dispatcher.</summary>
-    public static string ReminderInFlight(Guid reminderId) => $"reminder:inflight:{reminderId:N}";
-}
-
-/// <summary><c>SET reminder:inflight:{id} NX EX</c>.</summary>
-public sealed class RedisReminderInFlightMarker(IConnectionMultiplexer redis) : IReminderInFlightMarker
-{
-    private const string MarkerValue = "1";
-
-    /// <inheritdoc />
-    public Task<bool> TryMarkAsync(Guid reminderId, TimeSpan lifetime, CancellationToken cancellationToken) =>
-        redis.GetDatabase().StringSetAsync(CacheKeys.ReminderInFlight(reminderId), MarkerValue, lifetime, When.NotExists);
-}
-
-/// <summary>Readiness check: Redis answers PING.</summary>
-public sealed class RedisHealthCheck(IConnectionMultiplexer redis) : IHealthCheck
-{
-    /// <inheritdoc />
-    public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            await redis.GetDatabase().PingAsync();
-            return HealthCheckResult.Healthy();
-        }
-        catch (RedisException ex)
-        {
-            return HealthCheckResult.Unhealthy(exception: ex);
-        }
-    }
-}
 
 /// <summary>Registration of the Notification infrastructure. Called only from <c>Program.cs</c>.</summary>
 public static class DependencyInjection

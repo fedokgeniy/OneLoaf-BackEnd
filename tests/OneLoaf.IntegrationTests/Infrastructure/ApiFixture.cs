@@ -1,19 +1,19 @@
 using System.Buffers.Text;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
+using DotNet.Testcontainers.Builders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Npgsql;
+using OneLoaf.Assistant.Application.Claude;
 using OneLoaf.CoreApi.Application.Auth;
 using OneLoaf.CoreApi.Infrastructure.Auth;
 using OneLoaf.Domain;
 using OneLoaf.Infrastructure.Persistence;
-using DotNet.Testcontainers.Builders;
+using RabbitMQ.Client;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 using Testcontainers.Redis;
-using OneLoaf.Assistant.Application.Claude;
-using RabbitMQ.Client;
 
 namespace OneLoaf.IntegrationTests.Infrastructure;
 

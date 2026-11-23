@@ -1,5 +1,4 @@
 using System.Text.Json;
-using FluentValidation;
 using OneLoaf.Domain;
 
 namespace OneLoaf.Assistant.Application.Chat;
@@ -83,19 +82,6 @@ public static class PendingActionKinds
 public sealed record PendingAction(
     Guid Id, Guid UserId, Guid ConversationId, string Kind, string Payload, DateTimeOffset CreatedAt, DateTimeOffset ExpiresAt);
 
-/// <summary>Proposals waiting for confirmation (Redis with expiry).</summary>
-public interface IPendingActionStore
-{
-    /// <summary>Stores a proposal.</summary>
-    Task SaveAsync(PendingAction action, TimeSpan lifetime, CancellationToken cancellationToken);
-
-    /// <summary>The proposal, or null when unknown or expired.</summary>
-    Task<PendingAction?> GetAsync(Guid actionId, CancellationToken cancellationToken);
-
-    /// <summary>Removes a proposal; false when it was already gone (used or expired).</summary>
-    Task<bool> DeleteAsync(Guid actionId, CancellationToken cancellationToken);
-}
-
 /// <summary>A message to store.</summary>
 /// <param name="Role">Role.</param>
 /// <param name="Content">Text.</param>
@@ -105,53 +91,3 @@ public interface IPendingActionStore
 /// <param name="OutputTokens">Output tokens of the turn (assistant messages).</param>
 public sealed record NewMessage(
     ChatRole Role, string Content, string? ToolName = null, string? ToolPayload = null, int? InputTokens = null, int? OutputTokens = null);
-
-/// <summary>Conversations and messages (<c>chat_conversations</c>, <c>chat_messages</c>); scoped to the owner.</summary>
-public interface IConversationRepository
-{
-    /// <summary>Conversations, newest first.</summary>
-    Task<IReadOnlyList<ConversationDto>> ListAsync(Guid ownerId, CancellationToken cancellationToken);
-
-    /// <summary>The conversation, or null.</summary>
-    Task<ConversationDto?> GetAsync(Guid ownerId, Guid id, CancellationToken cancellationToken);
-
-    /// <summary>Creates a conversation.</summary>
-    Task<ConversationDto> CreateAsync(Guid ownerId, string? title, CancellationToken cancellationToken);
-
-    /// <summary>Deletes a conversation with its messages; false when not found.</summary>
-    Task<bool> DeleteAsync(Guid ownerId, Guid id, CancellationToken cancellationToken);
-
-    /// <summary>Messages in order; tool messages only when requested.</summary>
-    Task<IReadOnlyList<MessageDto>> GetMessagesAsync(Guid conversationId, bool includeTools, CancellationToken cancellationToken);
-
-    /// <summary>Appends a message and touches the conversation; returns the stored message.</summary>
-    Task<MessageDto> AddMessageAsync(Guid conversationId, NewMessage message, CancellationToken cancellationToken);
-
-    /// <summary>Sets the title when it is empty.</summary>
-    Task SetTitleIfEmptyAsync(Guid conversationId, string title, CancellationToken cancellationToken);
-}
-
-/// <summary>Limits of chat requests.</summary>
-public static class ChatLimits
-{
-    /// <summary>Longest message of the baker.</summary>
-    public const int MaxMessageLength = 2000;
-
-    /// <summary>Longest conversation title.</summary>
-    public const int MaxTitleLength = 200;
-}
-
-/// <summary>Validates <see cref="SendMessageRequest"/>.</summary>
-public sealed class SendMessageRequestValidator : AbstractValidator<SendMessageRequest>
-{
-    /// <summary>Creates the rules.</summary>
-    public SendMessageRequestValidator() =>
-        RuleFor(x => x.Content).NotEmpty().Must(c => !string.IsNullOrWhiteSpace(c)).MaximumLength(ChatLimits.MaxMessageLength);
-}
-
-/// <summary>Validates <see cref="CreateConversationRequest"/>.</summary>
-public sealed class CreateConversationRequestValidator : AbstractValidator<CreateConversationRequest>
-{
-    /// <summary>Creates the rules.</summary>
-    public CreateConversationRequestValidator() => RuleFor(x => x.Title).MaximumLength(ChatLimits.MaxTitleLength);
-}

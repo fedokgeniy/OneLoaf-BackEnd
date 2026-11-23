@@ -65,7 +65,14 @@ public sealed class LibraryRepository(OneLoafDbContext db, HybridCache cache, Ca
             .Where(p => p.Id == id)
             .Select(p => new
             {
-                p.Id, p.Title, p.Description, p.Author.DisplayName, p.AuthorId, p.Status, p.PublishedAt, p.Snapshot,
+                p.Id,
+                p.Title,
+                p.Description,
+                p.Author.DisplayName,
+                p.AuthorId,
+                p.Status,
+                p.PublishedAt,
+                p.Snapshot,
                 Comments = p.Comments.Count(c => !c.IsRemoved),
                 MyReaction = p.Reactions.Where(r => r.UserId == viewerId).Select(r => (ReactionType?)r.Reaction).FirstOrDefault(),
             })
@@ -183,7 +190,10 @@ public sealed class LibraryRepository(OneLoafDbContext db, HybridCache cache, Ca
                 Title = r.PublishedRecipe != null ? r.PublishedRecipe.Title : r.Comment != null ? r.Comment.PublishedRecipe.Title : null,
                 r.CommentId,
                 CommentBody = r.Comment != null ? r.Comment.Body : null,
-                r.Reason, r.Status, r.CreatedAt, r.ResolvedAt,
+                r.Reason,
+                r.Status,
+                r.CreatedAt,
+                r.ResolvedAt,
             })
             .ToListAsync(cancellationToken);
         return new PagedResult<ReportDto>(

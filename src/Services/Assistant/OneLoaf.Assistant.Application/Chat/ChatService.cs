@@ -11,51 +11,6 @@ using OneLoaf.SharedKernel.Security;
 
 namespace OneLoaf.Assistant.Application.Chat;
 
-/// <summary>Embedded prompt texts.</summary>
-public static class Prompts
-{
-    /// <summary>System prompt of the chat.</summary>
-    public static string System { get; } = Read("Prompts.system.md");
-
-    /// <summary>System prompt of the bake analysis.</summary>
-    public static string Analysis { get; } = Read("Prompts.analysis.md");
-
-    /// <summary>Disclaimer for general advice (no tool was used).</summary>
-    public const string AdviceDisclaimer =
-        "General information, not based on your data. No guarantee of food safety or allergen content.";
-
-    /// <summary>Correction sent once when the answer contains numbers without a source.</summary>
-    public const string NumberCorrection =
-        "Your answer contains numbers that no tool returned: {0}. Rewrite the answer using only numbers from the tool results; call a tool if a number is missing.";
-
-    /// <summary>Answer when the tool round limit is reached.</summary>
-    public const string RoundLimitAnswer =
-        "I could not finish this request in a reasonable number of steps. Please rephrase it or use the planning form.";
-
-    /// <summary>Answer when the safety system declined the request.</summary>
-    public const string RefusalAnswer = "I can't help with that request.";
-
-    /// <summary>Title of the confirmation message.</summary>
-    public const string BatchSavedMessage = "The batch is saved. You can follow it in the production calendar.";
-
-    private static string Read(string name)
-    {
-        using var stream = typeof(Prompts).Assembly.GetManifestResourceStream(name)
-            ?? throw new InvalidOperationException($"Embedded prompt '{name}' is missing.");
-        using var reader = new StreamReader(stream);
-        return reader.ReadToEnd();
-    }
-
-    /// <summary>Per-request context: the baker's local date and time zone.</summary>
-    public static string Context(DateTimeOffset now, TimeZoneInfo zone)
-    {
-        ArgumentNullException.ThrowIfNull(zone);
-        var local = TimeZoneInfo.ConvertTime(now, zone);
-        return string.Create(CultureInfo.InvariantCulture,
-            $"Today is {local:yyyy-MM-dd dddd}, the time is {local:HH:mm}, the baker's time zone is {zone.Id} (UTC offset {local:zzz}).");
-    }
-}
-
 /// <summary>
 /// The conversation loop (US-34 - US-38): Claude chooses tools, the tools call the Core API with the baker's token,
 /// numbers in the final answer are checked against the tool results, and nothing is saved without confirmation.
@@ -128,8 +83,8 @@ public sealed partial class ChatService(
             .ToList();
 
         var turn = new Turn(new ToolContext(currentUser.Id, id));
-        var request1 = new ClaudeRequest(Prompts.System, Prompts.Context(timeProvider.GetUtcNow(), zone), tools.Definitions, messages);
-        var answer = await RunLoopAsync(request1, turn, cancellationToken);
+        var claudeRequest = new ClaudeRequest(Prompts.System, Prompts.Context(timeProvider.GetUtcNow(), zone), tools.Definitions, messages);
+        var answer = await RunLoopAsync(claudeRequest, turn, cancellationToken);
 
         var userTexts = history.Where(m => m.Role == ChatRole.User).Select(m => m.Content).Append(content).ToList();
         var check = NumberProvenanceVerifier.Verify(answer, turn.ToolOutputs, userTexts, zone);
@@ -138,7 +93,7 @@ public sealed partial class ChatService(
             messages.Add(ClaudeMessage.Text(ClaudeRole.Assistant, answer));
             messages.Add(ClaudeMessage.Text(ClaudeRole.User,
                 string.Format(CultureInfo.InvariantCulture, NumberCorrectionFormat, string.Join(", ", check.Unverified))));
-            answer = await RunLoopAsync(request1 with { Messages = messages }, turn, cancellationToken);
+            answer = await RunLoopAsync(claudeRequest with { Messages = messages }, turn, cancellationToken);
             check = NumberProvenanceVerifier.Verify(answer, turn.ToolOutputs, userTexts, zone);
             if (!check.IsValid)
             {

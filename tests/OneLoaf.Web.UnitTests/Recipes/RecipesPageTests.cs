@@ -1,13 +1,10 @@
-using Fluxor;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.DependencyInjection;
 using OneLoaf.Web.Features.Recipes.Pages;
 using OneLoaf.Web.Features.Recipes.Services;
 using OneLoaf.Web.Shared.Api;
-using OneLoaf.Web.Shared.Auth;
 using OneLoaf.Web.Shared.Contracts;
 using OneLoaf.Web.Shared.Contracts.Core;
-using OneLoaf.Web.Shared.Device;
 
 namespace OneLoaf.Web.UnitTests.Recipes;
 
