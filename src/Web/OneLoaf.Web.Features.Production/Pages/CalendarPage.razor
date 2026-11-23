@@ -1,0 +1,145 @@
+@page "/batches"
+@inherits FluxorComponent
+@using System.Globalization
+@using OneLoaf.Web.Features.Production.State
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+@inject IState<CalendarState> State
+@inject IDispatcher Dispatcher
+@inject NavigationManager Navigation
+@inject TimeProvider Time
+
+<ShellTitle Text="Batches">
+    <Actions>
+        <OlButton Href="batches/new" Icon="IconName.Plus" class="app-hide-compact">New batch</OlButton>
+    </Actions>
+</ShellTitle>
+
+<div class="ol-container calendar">
+    <div class="calendar__bar">
+        <div class="calendar__nav">
+            <OlIconButton Icon="IconName.ChevronLeft" Label="Previous week" OnClick="() => Go(Week.Shift(-1))" />
+            <h2 class="title calendar__week" aria-live="polite">@WeekLabel</h2>
+            <OlIconButton Icon="IconName.ChevronRight" Label="Next week" OnClick="() => Go(Week.Shift(1))" />
+            <OlButton Variant="ButtonVariant.Ghost" Disabled="@(Week == ThisWeek)" OnClick="() => Go(ThisWeek)">Today</OlButton>
+        </div>
+        <OlButton Href="batches/new" Icon="IconName.Plus" class="calendar__new">New batch</OlButton>
+    </div>
+    <ul class="calendar__legend" aria-label="Status legend">
+        <li><span class="ol-badge ol-badge--planned">Planned</span></li>
+        <li><span class="ol-badge ol-badge--running">In progress</span></li>
+        <li><span class="ol-badge ol-badge--done">Done</span></li>
+        <li><span class="ol-badge ol-badge--neutral">Cancelled</span></li>
+        <li class="calendar__legend-reminder"><OlIcon Name="IconName.Bell" Size="IconSize.Sm" /> Reminder</li>
+    </ul>
+
+    @switch (State.Value.Plan)
+    {
+        case Loadable<WeekPlan>.Failed { Error: var error }:
+            <OlAlert Kind="AlertKind.Danger" Title="The week could not be loaded." CorrelationId="@error.CorrelationId">
+                <p>@error.Message</p>
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => Dispatcher.Dispatch(new LoadWeek(Week))">Try again</OlButton>
+            </OlAlert>
+            break;
+        case { Value: { } plan }:
+            @if (plan.RemindersError is { } reminderError)
+            {
+                <OlAlert Kind="AlertKind.Warning" Title="Reminders are not available right now." CorrelationId="@reminderError.CorrelationId">Batches are shown without their reminders.</OlAlert>
+            }
+            @if (plan.Batches.Count == 0 && plan.Reminders.Count == 0)
+            {
+                <OlEmptyState Title="Nothing planned this week" Icon="IconName.Batches" Text="Plan a batch and its stages appear here with their reminders.">
+                    <Action><OlButton Href="batches/new" Icon="IconName.Plus">New batch</OlButton></Action>
+                </OlEmptyState>
+            }
+            else
+            {
+                <ol class="calendar__days" aria-busy="@(State.Value.Plan is Loadable<WeekPlan>.Loading ? "true" : "false")">
+                    @for (var d = 0; d < 7; d++)
+                    {
+                        var day = Week.Start.AddDays(d);
+                        var batches = plan.Batches.Where(b => b.PlannedStartAt.ToLocalTime().Date == day.Date).OrderBy(b => b.PlannedStartAt).ToList();
+                        var reminders = plan.Reminders.Where(r => r.DueAt.ToLocalTime().Date == day.Date).OrderBy(r => r.DueAt).ToList();
+                        var isToday = day.Date == Time.GetLocalNow().Date;
+                        <li class="calendar__day @(isToday ? "calendar__day--today" : null) @(batches.Count + reminders.Count == 0 ? "calendar__day--empty" : null)">
+                            <h3 class="calendar__day-name">
+                                @day.ToString("ddd d MMM", CultureInfo.InvariantCulture)
+                                @if (isToday)
+                                {
+                                    <span class="ol-badge ol-badge--neutral">Today</span>
+                                }
+                            </h3>
+                            @foreach (var batch in batches)
+                            {
+                                <a class="calendar__batch" href="@($"batches/{batch.Id}")" @key="batch.Id">
+                                    <span class="calendar__time ol-num">@DisplayFormat.Time(batch.PlannedStartAt)</span>
+                                    <span class="calendar__name">@batch.Name</span>
+                                    <span class="calendar__meta">
+                                        @DisplayFormat.Loaves(batch.TotalLoaves)
+                                        @if (batch.PlannedReadyFrom is { } from && batch.PlannedReadyTo is { } to)
+                                        {
+                                            <span> · ready @DisplayFormat.TimeWindow(from, to, batch.PlannedStartAt)</span>
+                                        }
+                                    </span>
+                                    <span class="ol-badge @Badge(batch.Status)">@StatusText(batch.Status)</span>
+                                </a>
+                            }
+                            @foreach (var reminder in reminders)
+                            {
+                                <div class="calendar__reminder" @key="reminder.Id">
+                                    <OlIcon Name="IconName.Bell" Size="IconSize.Sm" Label="Reminder" />
+                                    <span class="ol-num">@DisplayFormat.Time(reminder.DueAt)</span>
+                                    <span>@reminder.Message</span>
+                                </div>
+                            }
+                        </li>
+                    }
+                </ol>
+            }
+            break;
+        default:
+            <div aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Row" Count="7" /></div>
+            break;
+    }
+</div>
+
+@code {
+    /// <summary>ISO week from the query string, e.g. 2026-W48; defaults to this week.</summary>
+    [SupplyParameterFromQuery(Name = "week")]
+    public string? WeekParameter { get; set; }
+
+    private CalendarWeek ThisWeek => CalendarWeek.Of(Time.GetLocalNow());
+
+    private CalendarWeek Week => CalendarWeek.Parse(WeekParameter) ?? ThisWeek;
+
+    private string WeekLabel => $"{Week.Start.ToString("d MMM", CultureInfo.InvariantCulture)} – {Week.End.AddDays(-1).ToString("d MMM yyyy", CultureInfo.InvariantCulture)}";
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        if (State.Value.Week != Week || State.Value.Plan is Loadable<WeekPlan>.NotAsked)
+        {
+            Dispatcher.Dispatch(new LoadWeek(Week));
+        }
+    }
+
+    private static string Badge(string status) => status switch
+    {
+        BatchStatuses.InProgress => "ol-badge--running",
+        BatchStatuses.Done => "ol-badge--done",
+        BatchStatuses.Cancelled => "ol-badge--neutral",
+        _ => "ol-badge--planned",
+    };
+
+    private static string StatusText(string status) => status switch
+    {
+        BatchStatuses.InProgress => "In progress",
+        BatchStatuses.Done => "Done",
+        BatchStatuses.Cancelled => "Cancelled",
+        _ => "Planned",
+    };
+
+    private void Go(CalendarWeek week) =>
+        Navigation.NavigateTo(Navigation.GetUriWithQueryParameter("week", week == ThisWeek ? null : week.Code));
+}
