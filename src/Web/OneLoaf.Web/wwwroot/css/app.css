@@ -1,0 +1,33 @@
+/* OneLoaf Web: app layer on top of tokens.css and components.css (design-system-in-blazor.md §1, layer 3).
+   Tokens only; breakpoints in em, mirroring the "breakpoint" tokens. Component-specific rules live in *.razor.css. */
+
+/* Boot screen shown by index.html until Blazor renders. */
+.app-boot { min-height: 100dvh; display: grid; place-items: center; background: var(--bg); }
+.app-boot__brand { font: 600 2rem/1 var(--font-display); color: var(--ink); }
+
+/* Fatal error bar: hidden until Blazor sets display:block on #blazor-error-ui after an unhandled exception. */
+.app-fatal { display: none; position: fixed; inset: auto 0 0 0; z-index: var(--z-toast); padding: var(--space-3) var(--space-4) calc(var(--space-3) + env(safe-area-inset-bottom)); background: var(--danger-tint); color: var(--danger); border-top: 2px solid var(--danger); }
+.app-fatal__text { margin: 0 0 var(--space-2); color: var(--ink); }
+
+/* Skip link: first focusable element, visible only on focus. */
+.app-skip { position: absolute; left: var(--space-3); top: var(--space-3); z-index: var(--z-toast); transform: translateY(-200%); background: var(--surface-raised); }
+.app-skip:focus-visible { transform: none; }
+
+/* Focus target after navigation (FocusOnNavigate puts focus on the page h1). */
+h1:focus { outline: none; }
+h1:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* Blazor's validation summary renders a plain list inside OlAlert. */
+.validation-errors { margin: 0; padding-left: var(--space-5); }
+
+/* Small transitions only when the user allows motion (design-system-in-blazor.md §3). */
+@media (prefers-reduced-motion: no-preference) {
+  .app-fade-in { animation: app-fade-in .2s ease-out; }
+}
+@keyframes app-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* Sign-in and registration forms (LoginPage, RegisterPage). Global because EditForm renders the <form> element,
+   which CSS isolation of the page does not reach. */
+.auth-form { display: flex; flex-direction: column; gap: var(--space-4); width: 100%; margin: 0; }
+.auth-form__alt { margin: 0; text-align: center; font-size: 0.9375rem; color: var(--ink-muted); }
+.auth-form__fine { margin: 0; text-align: center; font-size: 0.8125rem; color: var(--ink-muted); }

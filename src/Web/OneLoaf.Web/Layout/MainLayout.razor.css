@@ -1,0 +1,29 @@
+.public-page {
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+.public-page__bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    min-height: var(--topbar-height);
+    padding: var(--space-2) var(--space-4);
+    padding-top: max(var(--space-2), env(safe-area-inset-top));
+    border-bottom: 1px solid var(--border-hairline);
+}
+
+.public-page__home {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--target-min);
+    color: var(--ink);
+    text-decoration: none;
+}
+
+.public-page__main {
+    flex: 1;
+    padding-block: var(--space-5);
+}

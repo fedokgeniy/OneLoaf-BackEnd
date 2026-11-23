@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <!-- Host of the OneLoaf web client: Blazor WebAssembly standalone SPA (ADR-F01). The only executable web project;
+       it composes the shared layer and the feature libraries. -->
+  <PropertyGroup>
+    <RootNamespace>OneLoaf.Web</RootNamespace>
+    <!-- Fingerprinted framework files in index.html (blazor.webassembly#[.{fingerprint}].js, import map), so the web
+         server can cache _framework/ forever and never serve a stale runtime. -->
+    <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" PrivateAssets="all" />
+    <PackageReference Include="Fluxor.Blazor.Web" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OneLoaf.Web.Shared\OneLoaf.Web.Shared.csproj" />
+    <ProjectReference Include="..\OneLoaf.Web.Features.Recipes\OneLoaf.Web.Features.Recipes.csproj" />
+    <ProjectReference Include="..\OneLoaf.Web.Features.Production\OneLoaf.Web.Features.Production.csproj" />
+    <ProjectReference Include="..\OneLoaf.Web.Features.History\OneLoaf.Web.Features.History.csproj" />
+    <ProjectReference Include="..\OneLoaf.Web.Features.Assistant\OneLoaf.Web.Features.Assistant.csproj" />
+    <ProjectReference Include="..\OneLoaf.Web.Features.Library\OneLoaf.Web.Features.Library.csproj" />
+  </ItemGroup>
+
+  <!-- Fluxor discovers features, reducers and effects by reflection, and the forms use DataAnnotations by reflection:
+       keep our own assemblies whole when the publish trims the app. -->
+  <ItemGroup>
+    <TrimmerRootAssembly Include="OneLoaf.Web" />
+    <TrimmerRootAssembly Include="OneLoaf.Web.Shared" />
+    <TrimmerRootAssembly Include="OneLoaf.Web.Features.Recipes" />
+    <TrimmerRootAssembly Include="OneLoaf.Web.Features.Production" />
+    <TrimmerRootAssembly Include="OneLoaf.Web.Features.History" />
+    <TrimmerRootAssembly Include="OneLoaf.Web.Features.Assistant" />
+    <TrimmerRootAssembly Include="OneLoaf.Web.Features.Library" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="OneLoaf.Web.UnitTests" />
+  </ItemGroup>
+
+</Project>

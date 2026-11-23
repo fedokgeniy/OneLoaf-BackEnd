@@ -1,0 +1,38 @@
+@* One toast (.ol-toast): message, optional correlation id and action link, close button. *@
+<div class="ol-toast" role="@(IsError ? "alert" : null)">
+    <OlIcon Name="@(IsError ? IconName.Alert : IconName.CheckCircle)" />
+    <span class="ol-toast__text">
+        @Message
+        @if (!string.IsNullOrEmpty(CorrelationId))
+        {
+            <span class="ol-toast__ref">Reference: <span class="ol-num">@CorrelationId</span></span>
+        }
+    </span>
+    @if (!string.IsNullOrEmpty(ActionText) && !string.IsNullOrEmpty(ActionHref))
+    {
+        <OlButton Variant="ButtonVariant.Ghost" Href="@ActionHref">@ActionText</OlButton>
+    }
+    <button type="button" class="ol-icon-btn ol-toast__close" aria-label="Close message" @onclick="OnDismiss">
+        <OlIcon Name="IconName.Close" />
+    </button>
+</div>
+
+@code {
+    /// <summary>Message text.</summary>
+    [Parameter, EditorRequired] public string Message { get; set; } = string.Empty;
+
+    /// <summary>Error toasts use role=alert and stay until closed.</summary>
+    [Parameter] public bool IsError { get; set; }
+
+    /// <summary>Correlation id of the failed request.</summary>
+    [Parameter] public string? CorrelationId { get; set; }
+
+    /// <summary>Action link text, e.g. "Open batch".</summary>
+    [Parameter] public string? ActionText { get; set; }
+
+    /// <summary>Action link target.</summary>
+    [Parameter] public string? ActionHref { get; set; }
+
+    /// <summary>Close button pressed.</summary>
+    [Parameter] public EventCallback OnDismiss { get; set; }
+}

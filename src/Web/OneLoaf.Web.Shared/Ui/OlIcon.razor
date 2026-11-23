@@ -1,0 +1,21 @@
+@* Inline SVG icon of the design system; decorative unless Label is set. *@
+<svg class="@CssClass" viewBox="0 0 24 24" aria-hidden="@(Label is null ? "true" : null)" role="@(Label is null ? null : "img")"
+     aria-label="@Label" focusable="false">@((MarkupString)IconPaths.Get(Name))</svg>
+
+@code {
+    /// <summary>Icon to render.</summary>
+    [Parameter, EditorRequired] public IconName Name { get; set; }
+
+    /// <summary>Size: sm (1rem), md (1.25rem, default), lg (1.5rem).</summary>
+    [Parameter] public IconSize Size { get; set; } = IconSize.Md;
+
+    /// <summary>Accessible name; only for an icon that carries meaning on its own.</summary>
+    [Parameter] public string? Label { get; set; }
+
+    private string CssClass => Size switch
+    {
+        IconSize.Sm => "ol-icon ol-icon--sm",
+        IconSize.Lg => "ol-icon ol-icon--lg",
+        _ => "ol-icon",
+    };
+}

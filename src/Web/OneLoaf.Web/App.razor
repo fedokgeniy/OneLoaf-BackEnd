@@ -1,0 +1,50 @@
+@* Root component: Fluxor store, authentication state, router with route guard, focus on navigation, toasts. *@
+@using OneLoaf.Web.Pages
+@using OneLoaf.Web.Shared.Device
+@implements IAsyncDisposable
+@inject SessionMonitor SessionMonitor
+@inject DeviceContext Device
+
+<Fluxor.Blazor.Web.StoreInitializer />
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(App).Assembly" AdditionalAssemblies="FeatureAssemblies.Pages" NotFoundPage="typeof(NotFoundPage)">
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+                <NotAuthorized>
+                    @if (context.User.Identity?.IsAuthenticated == true)
+                    {
+                        <ForbiddenView />
+                    }
+                    else
+                    {
+                        <RedirectToLogin />
+                    }
+                </NotAuthorized>
+                <Authorizing>
+                    <div class="ol-container" aria-busy="true">
+                        <OlSkeleton />
+                    </div>
+                </Authorizing>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+    </Router>
+</CascadingAuthenticationState>
+<OlToastHost />
+
+@code {
+    /// <inheritdoc />
+    protected override void OnInitialized() => SessionMonitor.Start();
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Device.StartAsync();
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync() => await Device.DisposeAsync();
+}
