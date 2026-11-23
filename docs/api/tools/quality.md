@@ -40,3 +40,21 @@ reads, cost, timeline and the library:
 ```powershell
 k6 run -e BASE_URL=http://localhost:5080 tests/load/core-api.js
 ```
+
+Result on 2026-11-23 (local Docker stack with the seed data, Production settings, k6 1.3 in a container): 14 286
+requests in 2 min 50 s at up to 20 virtual users, **0 % failed**, p95 **5.3 ms** overall (cost 3.7 ms, timeline 6.0 ms),
+max 381 ms. All thresholds passed. A server VM will be slower than a workstation; rerun against it after deployment.
+
+## Backup and restore test
+
+`deploy/backup/restore-test.sh` dumps the database exactly like the `db-backup` service (`pg_dump -Fc` as
+`app_admin`), restores the dump into a scratch database, compares the row count of every table, runs `fn_recipe_cost`
+on the copy and drops it:
+
+```powershell
+docker compose exec -T -e PGPASSWORD=<admin password> db sh -s < deploy/backup/restore-test.sh
+```
+
+Result on 2026-11-23 with the seed data: dump 232 KB, row counts equal in all 30 tables, functions present and
+`fn_recipe_cost` working on the restored copy. Photos (US-51) are files on the `photos` volume; back that volume up
+together with the dumps.
