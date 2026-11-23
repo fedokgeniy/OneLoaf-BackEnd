@@ -39,7 +39,10 @@ public sealed class JwtTokenIssuer : IAccessTokenIssuer, IDisposable
             throw new InvalidOperationException("Jwt:SigningKeyPem is not a valid PEM-encoded RSA private key.", ex);
         }
 
-        _signingCredentials = new SigningCredentials(new RsaSecurityKey(_rsa), SecurityAlgorithms.RsaSha256);
+        // A factory per key: the default factory caches providers globally by key contents and would keep using this
+        // RSA instance after it is disposed.
+        var key = new RsaSecurityKey(_rsa) { CryptoProviderFactory = new CryptoProviderFactory() };
+        _signingCredentials = new SigningCredentials(key, SecurityAlgorithms.RsaSha256);
     }
 
     /// <inheritdoc />

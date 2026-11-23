@@ -1,6 +1,11 @@
+using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Npgsql;
+using OneLoaf.CoreApi.Application.Auth;
+using OneLoaf.CoreApi.Infrastructure.Auth;
+using OneLoaf.Domain;
 using OneLoaf.Infrastructure.Persistence;
 using DotNet.Testcontainers.Builders;
 using Testcontainers.PostgreSql;
@@ -24,12 +29,15 @@ public sealed class ApiFixture : IAsyncLifetime
     private const string MigrationsHistoryTable = "__ef_migrations_history";
 
     private readonly RSA _rsa = RSA.Create(2048);
+    private readonly string _root;
     private readonly PostgreSqlContainer _postgres;
     private readonly List<CoreApiFactory> _factories = [];
+    private JwtTokenIssuer? _issuer;
 
     public ApiFixture()
     {
         var root = FindRepositoryRoot();
+        _root = root;
         _postgres = new PostgreSqlBuilder("postgres:16-alpine")
             .WithEnvironment("ONELOAF_DB", Database)
             .WithEnvironment("ONELOAF_ADMIN_PASSWORD", AdminPassword)
@@ -61,7 +69,32 @@ public sealed class ApiFixture : IAsyncLifetime
             await db.Database.MigrateAsync();
         }
 
+        await using (var connection = await OpenAppConnectionAsync())
+        await using (var seed = connection.CreateCommand())
+        {
+            seed.CommandText = await File.ReadAllTextAsync(Path.Combine(_root, "db", "seed", "test_data.sql"));
+            await seed.ExecuteNonQueryAsync();
+        }
+
         Api = CreateApi(authPermitLimit: 10_000);
+    }
+
+    /// <summary>
+    /// A client authenticated as an existing user (the seed users have no known password): the token is signed with
+    /// the test key exactly like a login would do.
+    /// </summary>
+    public HttpClient CreateClientAs(Guid userId, UserRole role = UserRole.User)
+    {
+        _issuer ??= new JwtTokenIssuer(Options.Create(new JwtIssuerOptions
+        {
+            Issuer = Issuer,
+            Audience = Audience,
+            SigningKeyPem = _rsa.ExportRSAPrivateKeyPem(),
+        }), TimeProvider.System);
+        var token = _issuer.Issue(new TokenSubject(userId, $"{userId:N}@example.com", "Seed user", role));
+        var client = Api.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
+        return client;
     }
 
     /// <summary>Creates another API instance, for example with a low rate limit.</summary>
@@ -97,6 +130,7 @@ public sealed class ApiFixture : IAsyncLifetime
         }
 
         await _postgres.DisposeAsync();
+        _issuer?.Dispose();
         _rsa.Dispose();
     }
 

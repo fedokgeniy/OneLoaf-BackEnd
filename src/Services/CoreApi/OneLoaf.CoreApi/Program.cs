@@ -27,6 +27,9 @@ app.UseRateLimiter();
 app.MapServiceDefaults();
 app.MapAuthEndpoints();
 app.MapMeEndpoints();
+app.MapWorkspaceEndpoints();
+app.MapCatalogEndpoints();
+app.MapRecipeEndpoints();
 
 await app.RunAsync();
 return 0;
