@@ -57,6 +57,26 @@ public sealed class CalculatorTests(ApiFixture fixture)
     }
 
     [Fact]
+    public async Task US19_US50_OvenLoadingWithinCapacityAndCsvExport()
+    {
+        using var anna = fixture.CreateClientAs(Seed.Anna);
+        using var boris = fixture.CreateClientAs(Seed.Boris);
+        var request = new OvenLoadingRequest([new OvenLoadingItem(Seed.R1, 6)]);
+
+        var plan = await (await anna.PostAsJsonAsync("/api/v1/calculations/oven-loading", request, CoreApiFactory.Json, Ct)).ReadAsync<OvenLoadingPlanDto>();
+        using var noCapacity = await boris.PostAsJsonAsync("/api/v1/calculations/oven-loading",
+            new OvenLoadingRequest([new OvenLoadingItem(Seed.R5, 2)]), CoreApiFactory.Json, Ct);
+        using var csv = await anna.GetAsync("/api/v1/export/recipes.csv", Ct);
+        var text = await csv.Content.ReadAsStringAsync(Ct);
+
+        Assert.Equal([4, 2], plan.Rounds.Select(r => r.Loaves));
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, noCapacity.StatusCode);
+        Assert.Equal("text/csv", csv.Content.Headers.ContentType?.MediaType);
+        Assert.StartsWith("title,is_variant,yield_loaves", text.TrimStart('﻿'), StringComparison.Ordinal);
+        Assert.Contains("White homemade loaf", text, StringComparison.Ordinal);
+    }
+
+    [Fact]
     public async Task Cache_PriceAdded_NextCostIsRecalculated()
     {
         using var boris = fixture.CreateClientAs(Seed.Boris);

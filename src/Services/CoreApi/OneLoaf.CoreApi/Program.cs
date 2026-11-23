@@ -33,6 +33,8 @@ app.MapWorkspaceEndpoints();
 app.MapCatalogEndpoints();
 app.MapRecipeEndpoints();
 app.MapProductionEndpoints();
+app.MapLibraryEndpoints();
+app.MapToolsEndpoints();
 
 await app.RunAsync();
 return 0;

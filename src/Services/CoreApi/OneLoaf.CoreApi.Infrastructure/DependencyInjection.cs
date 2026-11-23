@@ -8,6 +8,7 @@ using OneLoaf.CoreApi.Application.Starters;
 using OneLoaf.CoreApi.Application.Calculations;
 using OneLoaf.CoreApi.Application.Catalog;
 using OneLoaf.CoreApi.Application.Kitchen;
+using OneLoaf.CoreApi.Application.Library;
 using OneLoaf.CoreApi.Application.Recipes;
 using OneLoaf.CoreApi.Application.Reference;
 using OneLoaf.CoreApi.Application.Warnings;
@@ -57,6 +58,8 @@ public static class DependencyInjection
         services.AddScoped<IBatchRepository, BatchRepository>();
         services.AddScoped<IStarterRepository, StarterRepository>();
         services.AddScoped<IBakeRecordRepository, BakeRecordRepository>();
+        services.AddScoped<ILibraryRepository, LibraryRepository>();
+        services.AddScoped<Application.Export.IExportReader, ExportReader>();
         services.AddRabbitMqPublisher();
         services.AddSingleton<IPasswordHasher, PasswordHasherAdapter>();
         services.AddValidatedOptions<JwtIssuerOptions>(JwtIssuerOptions.SectionName);

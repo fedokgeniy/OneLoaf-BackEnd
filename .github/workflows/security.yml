@@ -1,0 +1,85 @@
+name: security
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    # Weekly, so new vulnerabilities in unchanged dependencies and images are found too.
+    - cron: "0 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secrets:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read   # the action lists the commits of the pull request
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      # Known public examples and placeholders are allowlisted in .gitleaks.toml.
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_CONFIG: .gitleaks.toml
+
+  filesystem:
+    name: Dependencies and configuration (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Vulnerabilities, secrets and misconfigurations
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          scanners: vuln,secret,misconfig
+          skip-dirs: "**/bin,**/obj"
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+  images:
+    name: Images (Trivy)
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        service:
+          - { name: core-api, dockerfile: src/Services/CoreApi/OneLoaf.CoreApi/Dockerfile }
+          - { name: assistant, dockerfile: src/Services/Assistant/OneLoaf.Assistant/Dockerfile }
+          - { name: notification, dockerfile: src/Services/Notification/OneLoaf.Notification/Dockerfile }
+          - { name: migrator, dockerfile: src/OneLoaf.DbMigrator/Dockerfile }
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: docker/setup-buildx-action@v4
+
+      - name: Build ${{ matrix.service.name }}
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ${{ matrix.service.dockerfile }}
+          load: true
+          tags: oneloaf-${{ matrix.service.name }}:scan
+          cache-from: type=gha,scope=${{ matrix.service.name }}
+
+      - name: Scan ${{ matrix.service.name }}
+        uses: aquasecurity/trivy-action@v0.35.0
+        with:
+          image-ref: oneloaf-${{ matrix.service.name }}:scan
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
