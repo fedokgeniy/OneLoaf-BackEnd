@@ -27,14 +27,11 @@ coverage/
 coveragereport/
 *.cobertura.xml
 
-# Local Claude Code settings (machine-specific permissions)
-.claude/settings.local.json
-
 # Keys and certificates (JWT signing keys, TLS)
 *.pem
 *.key
 
-# Local-only working material (agent instructions, planning docs); not part of the delivered repository
+# Local working notes and tool settings; not part of the delivered repository
 CLAUDE.md
 .claude/
 docs/backend/
