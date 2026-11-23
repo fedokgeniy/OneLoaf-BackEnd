@@ -34,3 +34,12 @@
   .editor__general .editor__wide { grid-column: 1 / -1; }
   .editor__foot { bottom: 0; }
 }
+
+/* Form layouts used inside EditForm (whose <form> element CSS isolation of a page cannot reach). */
+.form-stack { display: flex; flex-direction: column; gap: var(--space-4); margin: 0; }
+.form-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-3) var(--space-4); align-items: end; margin: 0; }
+.form-grid > .ol-alert, .form-grid__wide { grid-column: 1 / -1; }
+@media (min-width: 37.5em) {
+  .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .form-grid__end { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
+}

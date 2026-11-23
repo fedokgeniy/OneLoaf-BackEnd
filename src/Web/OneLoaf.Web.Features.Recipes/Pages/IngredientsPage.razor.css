@@ -1,0 +1,147 @@
+.ingredients {
+    padding-block: var(--space-5);
+}
+
+.ingredients__list,
+.ingredients__detail {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    min-width: 0;
+}
+
+.ingredients__filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    align-items: center;
+}
+
+.ingredients__search {
+    flex: 1 1 14rem;
+}
+
+.ingredients__search-icon {
+    position: absolute;
+    left: var(--space-4);
+    display: flex;
+    color: var(--ink-muted);
+    pointer-events: none;
+}
+
+.ingredients__search-input {
+    padding-left: 3rem;
+}
+
+.ingredients__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.ingredients__rows {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ingredients__row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: var(--space-1) var(--space-3);
+    width: 100%;
+    min-height: var(--target-min);
+    padding: var(--space-3) var(--space-4);
+    border: 0;
+    border-top: 1px solid var(--border-hairline);
+    background: none;
+    color: var(--ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.ingredients__rows li:first-child .ingredients__row {
+    border-top: 0;
+}
+
+.ingredients__row:hover {
+    background: var(--surface-sunken);
+}
+
+.ingredients__row[aria-current="true"] {
+    background: var(--primary-tint);
+}
+
+.ingredients__name {
+    font-weight: 600;
+}
+
+.ingredients__price {
+    justify-self: end;
+}
+
+.ingredients__category,
+.ingredients__more,
+.ingredients__empty {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--ink-muted);
+}
+
+.ingredients__card {
+    gap: var(--space-4);
+    padding: var(--space-5);
+}
+
+.ingredients__card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.ingredients__title {
+    margin: 0;
+}
+
+.ingredients__card-actions {
+    display: flex;
+    gap: var(--space-1);
+}
+
+.ingredients__placeholder {
+    display: none;
+}
+
+/* Phones and tablets: the selected ingredient replaces the list; a button goes back. */
+@media (max-width: 63.99em) {
+    .ingredients__split--detail .ingredients__list {
+        display: none;
+    }
+
+    .ingredients__split:not(.ingredients__split--detail) .ingredients__detail {
+        display: none;
+    }
+}
+
+/* Desktop: list and detail side by side (Ingredients-Desktop). */
+@media (min-width: 64em) {
+    .ingredients__back {
+        display: none;
+    }
+
+    .ingredients__placeholder {
+        display: block;
+    }
+
+    .ingredients__filters ::deep .ingredients__new {
+        display: none;
+    }
+}
+
+@media (max-width: 37.49em) {
+    .ingredients__filters ::deep .ingredients__new {
+        flex: 1 1 100%;
+    }
+}
