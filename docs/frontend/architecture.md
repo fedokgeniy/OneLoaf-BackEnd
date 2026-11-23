@@ -201,10 +201,13 @@ Conventions:
 ### Lazy-loaded features and Fluxor
 
 Fluxor discovers features by assembly scanning at start-up, but a lazy assembly is not loaded yet. Lazy features
-therefore register their slice **when they are loaded**: `App.razor` `OnNavigateAsync` → `LazyAssemblyLoader` → the
-assembly's `IFeatureModule.Register(IStore store, IServiceProvider sp)` calls `store.AddFeature(…)` / `store.AddEffect(…)`
-for its hand-declared `Feature<TState>` class and effects. A lazy feature whose state is used only by its own pages
-may instead keep that state in a scoped page service (ADR-F04).
+therefore register their slice **when they are loaded**: `App.razor` `OnNavigateAsync` matches the path against
+`FeatureAssemblies.Lazy` → `LazyAssemblyLoader.LoadAssembliesAsync` → `LazyFeatureRegistry.Register(assembly)` (Shared).
+The registry reads the same attributes the start-up scan uses — `[FeatureState]`, `[ReducerMethod]`, `[EffectMethod]` —
+and calls `store.AddFeature(…)` / `store.AddEffect(…)`. Services the effects need beyond the start-up container (the
+feature's typed API service) come from the assembly's `IFeatureModule.CreateServices`. Pages inject `IState<TState>` as
+usual: `LazyState<TState>`, registered as the open generic after `AddFluxor`, finds the feature in the store on first
+use. The host references the lazy projects only for the build; no type of theirs is used at start-up.
 
 ## 5. Routing
 
@@ -223,12 +226,13 @@ flowchart LR
     admin[Admin role] --> mod[/admin/reports/]
 ```
 
-- `App.razor`: `<Router AppAssembly=… AdditionalAssemblies=@_lazyLoaded OnNavigateAsync=…>` with `AuthorizeRouteView`
-  (`RedirectToLogin` for anonymous users, `Forbidden` for missing role) and `<Navigating>` showing a top progress bar.
+- `App.razor`: `<Router AppAssembly=… AdditionalAssemblies=@_assemblies OnNavigateAsync=…>` with `AuthorizeRouteView`
+  (`RedirectToLogin` for anonymous users, `Forbidden` for missing role) and `<Navigating>` showing a skeleton while a
+  lazy feature downloads.
 - Pages use `[Authorize]` by default (an `_Imports.razor` attribute in each feature); anonymous pages use
-  `[AllowAnonymous]` (`/login`, `/register`, `/library`, `/library/{id}`).
-- Query-string state for shareable views: `/recipes?search=rye&archived=true`, `/history?recipeId=…&minRating=4`,
-  `/batches?week=2026-W48` (`[SupplyParameterFromQuery]`).
+  `[AllowAnonymous]` (`/login`, `/register`, `/library`, `/library/{id}`, `/offline`).
+- Query-string state for shareable views: `/recipes?search=rye&archived=true`, `/batches?week=2026-W48`
+  (`[SupplyParameterFromQuery]`).
 
 ## 6. Request pipeline
 

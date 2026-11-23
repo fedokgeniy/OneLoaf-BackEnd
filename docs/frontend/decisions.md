@@ -62,7 +62,7 @@ accessible, themeable; limited to the three charts we need.
 
 | Used | Deliberately not used |
 |---|---|
-| Fluxor.Blazor.Web (+ ReduxDevTools in Debug), Microsoft.AspNetCore.Components.* , Microsoft.Extensions.Http, System.Text.Json, bunit, xunit.v3, Microsoft.Playwright, ArchUnitNET | any UI component library (MudBlazor, Radzen, Syncfusion, Telerik, Blazorise, FluentUI), jQuery or any JS framework, Newtonsoft.Json, Blazored.LocalStorage (a small JS interop is used instead), AutoMapper, chart libraries, analytics/trackers, CDN-loaded scripts other than Google Fonts |
+| Fluxor.Blazor.Web (+ ReduxDevTools in Debug), Microsoft.AspNetCore.Components.* , Microsoft.Extensions.Http, System.Text.Json, bunit, xunit.v3, Microsoft.Playwright, Deque.AxeCore.Playwright (e2e accessibility checks), ArchUnitNET | any UI component library (MudBlazor, Radzen, Syncfusion, Telerik, Blazorise, FluentUI), jQuery or any JS framework, Newtonsoft.Json, Blazored.LocalStorage (a small JS interop is used instead), AutoMapper, chart libraries, analytics/trackers, CDN-loaded scripts other than Google Fonts |
 
 All package versions are managed centrally in `Directory.Packages.props`; lock files are committed
 (`RestorePackagesWithLockFile`).

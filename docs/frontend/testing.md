@@ -22,6 +22,10 @@ Coverage gate for `OneLoaf.Web.Shared` and feature libraries: **70 %** lines (sa
 | `AssistantTests` | `PlanCard`, `AssistantPage` (Assistant) | the card shows start, loaves, starter amount, kneading cycles, ready window and total cost from the mapped `BatchDto`; Confirm raises its callback; a reply with a proposal saves nothing until Confirm, then the card links to `/batches/{id}` and `BatchCreated` is dispatched; 503 keeps the draft and offers the manual form; the recorded `SendMessage` plan maps to a batch |
 | `NewBatchFormTests` | `NewBatchPage` form | required fields, loaves 1–100, at least one recipe; server `errors["items[0].loaves"]` appears under the right field; submit disabled while saving |
 | `LoginPageTests` | `LoginPage` | 401 shows one generic message; success dispatches `LoggedIn` and navigates to `returnUrl` |
+| `OlBarChartTests` | `OlBarChart` | bar lengths are scaled to the largest API value; every row carries its label and formatted value; the bars are hidden from screen readers |
+| `LibraryTests` | `LibraryPage`, `LibraryDetailPage`, `PublishPage`, `ModerationPage` | signed out the recipe is readable and actions ask to sign in; a reaction is sent and its count comes back from the API; copy opens the new recipe; comment and report validation; publish opens the publication; a moderation decision needs a reason |
+| `SettingsPageTests` | `SettingsPage` | the theme switch updates the display preferences; deleting the account needs the password, a 403 shows under the field, success signs out |
+| `LazyFeatureRegistryTests` | `LazyFeatureRegistry` | a feature assembly registered at run time gets its state, reducers and effects in the running store (once); its effects call the API |
 
 Plus unit tests (no rendering): `RecipesReducersTests`, `ProductionEffectsTests` (fake `BatchesApi`, debounced preview
 cancels the previous call), `ProblemDetailsHandlerTests` (each status → `ApiError.Kind`, 401 dispatches
@@ -70,15 +74,25 @@ $env:ONELOAF_E2E_WEB_ROOT = "$PWD/artifacts/web/wwwroot"; dotnet test tests/OneL
 | `CatalogScreensTests` at 360×640 and 1440×900 | ingredients with price history, kitchen settings and variant comparison render from recorded answers; full-page screenshots |
 | `ProductionScreensTests.ProductionScreens_RecordedData_Render` at 360×640 and 1440×900 | Home, new batch with the API preview, batch page, week calendar and starters render from recorded answers; full-page screenshots |
 | `HistoryAssistantScreensTests.HistoryAndAssistant_RecordedData_PlanIsSavedOnlyOnConfirm` at 360×640 and 1440×900 | history list with statistics, bake record with the rating group and stage log, assistant plan card; Confirm is the only call that saves the batch |
+| `LibrarySettingsScreensTests.LibraryAndSettings_RecordedData_Render` at 360×640 and 1440×900 | signed out: library list and recipe with comments; signed in: settings, the dark theme applies to `<html>` |
 
 ## 4. Accessibility and responsive checks
 
-- axe-core (`Deque.AxeCore.Playwright`) on the main pages in both e2e tests: zero serious/critical violations.
+- axe-core (`Deque.AxeCore.Playwright`, WCAG 2.0/2.1 A and AA rules) runs on every screen the e2e tests screenshot
+  (`Accessibility.AssertNoSeriousViolationsAsync`): zero serious or critical violations, light and dark.
+- The e2e browser contexts block the service worker: Playwright route mocks do not see requests a service worker makes.
 - Screenshots of key pages at 360×640 (16:9), 360×840 (21:9), 768×1024, 1440×900, 2560×1080, light and dark — attached
   as CI artifacts (visual review, not pixel diffs).
 - Keyboard-only pass of the two journeys (Playwright `keyboard.press("Tab")`) for focus order and visible focus.
 
-## 5. Lighthouse (Direction 3 bonus)
+## 5. Lazy loading (ADR-F04)
+
+Measured on the Release publish (Brotli files in `_framework`): History 30.1 KB, Assistant 27.6 KB and Library 35.5 KB —
+93 KB of the 479 KB of the app's own assemblies (19 %) are no longer part of the first download; they are fetched on
+the first visit of their routes. The e2e journeys open `/history`, `/assistant` and `/library` from a cold start, so
+every lazy path is exercised.
+
+## 6. Lighthouse (Direction 3 bonus)
 
 Run on the published app served by Caddy (compression on). Record results here:
 

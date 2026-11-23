@@ -19,7 +19,7 @@ Auth: **A** = signed-in baker, **P** = public (anonymous allowed), **Adm** = adm
 | `/recipes/{id}` | `RecipeDetailPage` (Recipes) — tabs Ingredients · Stages · Cost · Timeline | A | `Calculator-*`, `Calculator-Desktop-dark` | US-06, US-14–18, US-47–49, US-52, US-11 | `GET /recipes/{id}`, `/scaled?loaves=`, `/cost?loaves=&asOf=`, `/production-figures?loaves=`, `/timeline?start=`, `/start-window?readyAt=` |
 | `/recipes/{id}/variant` | `CreateVariantDialog` on the detail page | A | — (DS Dialog) | US-07 | `POST /recipes/{id}/variants` |
 | `/recipes/{id}/compare` | `VariantComparePage` (Recipes) | A | `VariantCompare-*` | US-08 | `GET /recipes/{id}/comparison` |
-| `/recipes/{id}/publish` | `PublishDialog` (Library, opened from the detail page) | A | `Publish-Tablet` | US-39 | `POST /recipes/{id}/publish` |
+| `/recipes/{id}/publish` | `PublishPage` (Library, lazy) — publish dialog opened from the recipe page | A | `Publish-Tablet` | US-39 | `POST /recipes/{id}/publish` |
 | `/ingredients` | `IngredientsPage` (Recipes) — list + detail pane with price history | A | `Ingredients-*` | US-10, US-11, US-12 | `GET/POST/PUT/DELETE /ingredients`, `GET/POST /ingredients/{id}/prices`, `GET /flours`, `GET /warnings` |
 | `/settings/kitchen` | `KitchenPage` (Recipes) | A | `Kitchen-*` | US-13, US-47, US-48, US-49 | `GET/PUT /kitchen-settings`, `GET /reference/currencies` |
 | `/batches` | `CalendarPage` (Production) — week view | A | `Calendar-*` | US-26 | `GET /batches?from=&to=`, `GET /notify/api/v1/reminders` |
@@ -32,7 +32,7 @@ Auth: **A** = signed-in baker, **P** = public (anonymous allowed), **Adm** = adm
 | `/assistant`, `/assistant/{conversationId}` | `AssistantPage` (Assistant, lazy) | A | `Assistant-*`, `Assistant-Phone-keyboard` | US-34, US-35, US-37, US-38, LR-10, LR-12 | `GET/POST /conversations`, `GET/POST /conversations/{id}/messages`, `POST …/actions/{actionId}/confirm\|decline`, `GET /usage/me` |
 | `/library` | `LibraryPage` (Library, lazy) | P | `Library-*` | US-40 | `GET /library?search=&page=` |
 | `/library/{id}` | `LibraryDetailPage` (Library) | P (actions A) | `LibraryDetail-*` | US-40, US-41, US-42, LR-11 | `GET /library/{id}`, `GET/POST /library/{id}/comments`, `PUT/DELETE /library/{id}/reactions/me`, `POST /library/{id}/copy`, `POST /library/{id}/reports`, `POST /library/{id}/unpublish` (owner) |
-| `/admin/reports` | `ModerationPage` (Library) | Adm | — (DS table + Dialog; no mockup) | LR-11 | `GET /admin/reports`, `POST /admin/reports/{id}/resolve`, `POST /admin/library/{id}/remove` |
+| `/admin/reports` | `ModerationPage` (Library, lazy) | Adm | — (DS table + Dialog; no mockup) | LR-11 | `GET /admin/reports?status=`, `POST /admin/reports/{id}/resolve` (`remove` takes the content down, `reject` keeps it) |
 | `/settings` | `SettingsPage` (Host) — Display, Reminders, Account | A | `Settings-*` | US-04, US-29, US-50, adaptive UI settings | `GET /me`, `DELETE /me`, `GET /export/*.csv`, push: `GET /notify/api/v1/push/vapid-public-key`, `POST/DELETE /push/subscriptions`, `POST /push/test` |
 | `/offline` | `OfflinePage` (Host) | P | `Recipes-Phone-offline` (banner) | US-44 | — |
 | `*` | `NotFoundPage` (Host) | P | — | — | — |
@@ -55,7 +55,7 @@ Components and states: `Components-States` board = the component library with al
 | US-01 Register | M | `/register` | after 201 log in automatically; privacy notice checkbox required |
 | US-02 Log in / out | M | `/login`, avatar menu, rail, sidebar | same message for wrong e-mail and wrong password (the API already returns one) |
 | US-03 Own data only | M | all | 404 from the API → `NotFoundPage`; never show ids from other users |
-| US-04 Delete account | S | `/settings` → Account | confirm dialog with password (`DELETE /me` body), then clear session |
+| US-04 Delete account | S | `/settings` → Account | confirm dialog with password (`DELETE /me` body); 403 shows "The password is incorrect." under the field; success signs out |
 | US-05 Recipe CRUD | M | `/recipes`, editor | list: search (debounced), paging ("Show more recipes"), archived filter, filter kept in the address bar; cards show title, "Variant of …", loaves, last change, Archived badge (the list API has no photo, cost or hydration); editor: ingredients and stages as editable lists with add/remove/reorder (buttons + keyboard, no drag-only) |
 | US-06 Scale to N | M | recipe detail stepper | `GET /scaled?loaves=`; stepping is debounced (300 ms), 1–1000 loaves as the cost endpoint accepts |
 | US-07 Variant | M | detail → Create variant | list shows "Variant of …"; editor marks inherited rows |
@@ -84,7 +84,7 @@ Components and states: `Components-States` board = the component library with al
 | US-25 Save as variant | C | batch overflow menu | |
 | US-27 Create starter | M | `/starters/new` | |
 | US-28 Feeding + next | M | `/starters` log feeding sheet | |
-| US-29 Reminders | M | new batch checkbox, starter form, settings → push subscription | Web Push permission asked only after a user gesture |
+| US-29 Reminders | M | new batch checkbox, starter form, settings → push subscription | Web Push permission asked only after the switch is pressed; the device is registered with `POST /push/subscriptions` (the same call returns the id needed to unsubscribe); *Send test*; browsers without push see an explanation |
 | US-30 Expected peak | S | starter card | |
 | US-31 Auto record | M | history list after batch complete | completing a batch resets the history list and statistics, so the new record appears on the next visit |
 | US-32 Rating + comment | M | `/history/{id}` | 1–5 radio group in a fieldset (arrow keys, "4 of 5" labels) plus *No rating*; `PATCH` with null clears a value |
@@ -95,11 +95,11 @@ Components and states: `Components-States` board = the component library with al
 | US-36 Analyse bake | M | `/history/{id}` → Ask the assistant | 422 shows the API `detail` and focuses the comment field; 429 / 503 inline; the analysis is stored by the assistant and shown with "Informational only" |
 | US-37 Search recipes / flour filter | S | `/assistant`, `/recipes` | `/recipes`: "Minimum flour protein" segmented control (any, ≥ 11, ≥ 12, ≥ 13 %) → `minProteinPercent` |
 | US-38 Substitutions | S | `/assistant` | render `disclaimer` under the answer ("Informational only") |
-| US-39 Publish / unpublish | S | publish dialog, library detail (owner) | |
-| US-40 Browse catalog | S | `/library` | must work signed out: show a "Sign in to copy and comment" bar instead of the app navigation |
-| US-41 Comment, react | S | `/library/{id}` | |
-| US-42 Copy | C | `/library/{id}` | then navigate to the new recipe |
-| LR-11 Report / moderate | — | `/library/{id}` Report, `/admin/reports` | |
+| US-39 Publish / unpublish | S | publish dialog, library detail (owner) | the API publishes a snapshot of the recipe (no body): the dialog shows the title and description that will be public; the author removes it with *Remove from library* |
+| US-40 Browse catalog | S | `/library` | works signed out (public layout with a "Sign in to copy and comment" notice); search; paging ("Show more recipes") |
+| US-41 Comment, react | S | `/library/{id}` | like / love / want to bake as toggle buttons (`aria-pressed`); counts are reloaded from the API after each change; own comments can be deleted |
+| US-42 Copy | C | `/library/{id}` | *Copy to my recipes*, then the new recipe opens and the recipe list reloads |
+| LR-11 Report / moderate | — | `/library/{id}` Report, `/admin/reports` | report the publication or a comment with a reason; administrators decide each open report with a reason (409 "already decided" reloads the queue) |
 | US-43 360 px phone | M | all | Playwright at 360×640 |
-| US-44 PWA offline | S | all | |
-| US-50 CSV export | C | `/settings` → Export my data | download via `GET /export/*.csv` with the token (fetch → blob → save) |
+| US-44 PWA offline | S | all | installable (manifest, icons); the published service worker caches the app shell and recipe reads (network first); offline banner; cached recipe data is dropped on sign out |
+| US-50 CSV export | C | `/settings` → Export my data | recipes and bake history: `GET /export/*.csv` with the token through the pipeline, saved as a file by the browser |
