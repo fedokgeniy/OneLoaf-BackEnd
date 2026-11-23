@@ -1,0 +1,48 @@
+# Reverse proxy with automatic HTTPS (Let's Encrypt). Each service gets a path prefix that Caddy strips, so the
+# services themselves serve /api/v1/..., /swagger, /health and /metrics at their root.
+{
+	email {$ACME_EMAIL:admin@example.com}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# Metrics are scraped inside the Docker network only.
+	@metrics path */metrics
+	respond @metrics 404
+
+	handle_path /core/* {
+		reverse_proxy core-api:8080
+	}
+
+	handle_path /assistant/* {
+		reverse_proxy assistant:8080 {
+			# Claude tool loops can take several seconds.
+			transport http {
+				read_timeout 90s
+			}
+		}
+	}
+
+	handle_path /notify/* {
+		reverse_proxy notification:8080
+	}
+
+	handle /grafana/* {
+		basic_auth {
+			admin {$GRAFANA_BASIC_AUTH_HASH}
+		}
+		reverse_proxy grafana:3000
+	}
+
+	handle {
+		respond "OneLoaf API. See /core/swagger, /assistant/swagger, /notify/swagger." 200
+	}
+}

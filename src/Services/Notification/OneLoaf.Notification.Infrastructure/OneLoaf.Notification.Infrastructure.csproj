@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Implements the Notification ports: reminder and subscription tables, Redis in-flight markers,
+       Web Push (VAPID) and e-mail (SMTP) channels. -->
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OneLoaf.Notification.Application\OneLoaf.Notification.Application.csproj" />
+    <ProjectReference Include="..\..\..\OneLoaf.Infrastructure\OneLoaf.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\OneLoaf.ServiceDefaults\OneLoaf.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\..\..\OneLoaf.Messaging.RabbitMq\OneLoaf.Messaging.RabbitMq.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Lib.Net.Http.WebPush" />
+    <PackageReference Include="MailKit" />
+    <PackageReference Include="Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore" />
+    <PackageReference Include="StackExchange.Redis" />
+  </ItemGroup>
+
+</Project>

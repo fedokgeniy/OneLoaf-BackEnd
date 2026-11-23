@@ -15,6 +15,7 @@
     <ProjectReference Include="..\..\src\Services\CoreApi\OneLoaf.CoreApi.Application\OneLoaf.CoreApi.Application.csproj" />
     <ProjectReference Include="..\..\src\Services\CoreApi\OneLoaf.CoreApi.Infrastructure\OneLoaf.CoreApi.Infrastructure.csproj" />
     <ProjectReference Include="..\..\src\Services\Assistant\OneLoaf.Assistant\OneLoaf.Assistant.csproj" />
+    <ProjectReference Include="..\..\src\Services\Notification\OneLoaf.Notification\OneLoaf.Notification.csproj" />
   </ItemGroup>
 
   <ItemGroup>

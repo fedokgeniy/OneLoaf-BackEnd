@@ -42,6 +42,7 @@ public sealed class ApiFixture : IAsyncLifetime
     private readonly RabbitMqContainer _rabbitMq = new RabbitMqBuilder("rabbitmq:4-management-alpine")
         .WithUsername(RabbitUser).WithPassword(RabbitPassword).Build();
     private readonly List<CoreApiFactory> _factories = [];
+    private NotificationFactory? _notification;
     private JwtTokenIssuer? _issuer;
 
     public ApiFixture()
@@ -123,6 +124,7 @@ public sealed class ApiFixture : IAsyncLifetime
             ["RabbitMq:Port"] = _rabbitMq.GetMappedPublicPort(RabbitMqBuilder.RabbitMqPort).ToString(System.Globalization.CultureInfo.InvariantCulture),
             ["RabbitMq:UserName"] = RabbitUser,
             ["RabbitMq:Password"] = RabbitPassword,
+            ["Redis:ConnectionString"] = _redis.GetConnectionString(),
         });
         _factories.Add(factory);
         return factory;
@@ -169,6 +171,34 @@ public sealed class ApiFixture : IAsyncLifetime
             ["Assistant:CoreApiBaseUrl"] = "http://core-api.test",
             ["Serilog:MinimumLevel:Default"] = "Warning",
         }, claude, Api.Server.CreateHandler);
+        _assistants.Add(factory);
+        return factory;
+    }
+
+    /// <summary>
+    /// The Notification service in-process with a recording channel instead of Web Push and e-mail. One instance per
+    /// fixture, so a single dispatcher consumes the shared queues; retries are fast (1 s) and limited to 2 attempts.
+    /// </summary>
+    public NotificationFactory Notification => _notification ??= CreateNotification();
+
+    private NotificationFactory CreateNotification()
+    {
+        var factory = new NotificationFactory(new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["ConnectionStrings:OneLoaf"] = AppConnectionString,
+            ["Jwt:Issuer"] = Issuer,
+            ["Jwt:Audience"] = Audience,
+            ["Jwt:PublicKeyPem"] = _rsa.ExportSubjectPublicKeyInfoPem(),
+            ["Redis:ConnectionString"] = _redis.GetConnectionString(),
+            ["RabbitMq:Host"] = _rabbitMq.Hostname,
+            ["RabbitMq:Port"] = _rabbitMq.GetMappedPublicPort(RabbitMqBuilder.RabbitMqPort).ToString(System.Globalization.CultureInfo.InvariantCulture),
+            ["RabbitMq:UserName"] = RabbitUser,
+            ["RabbitMq:Password"] = RabbitPassword,
+            ["RabbitMq:RetryDelaySeconds"] = "1",
+            ["RabbitMq:MaxAttempts"] = "2",
+            ["Notification:SchedulerIntervalSeconds"] = "3600",
+            ["Serilog:MinimumLevel:Default"] = "Warning",
+        });
         _assistants.Add(factory);
         return factory;
     }

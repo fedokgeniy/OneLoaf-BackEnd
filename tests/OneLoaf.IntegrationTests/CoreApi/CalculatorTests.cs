@@ -1,5 +1,7 @@
 using System.Net;
+using System.Net.Http.Json;
 using OneLoaf.CoreApi.Application.Calculations;
+using OneLoaf.CoreApi.Application.Catalog;
 using OneLoaf.CoreApi.Application.Recipes;
 using OneLoaf.IntegrationTests.Infrastructure;
 
@@ -52,6 +54,23 @@ public sealed class CalculatorTests(ApiFixture fixture)
         Assert.False(cost.IsComplete);
         Assert.Single(cost.MissingPrices);
         Assert.Null(cost.Lines.Single(l => l.IngredientId == cost.MissingPrices[0].IngredientId).Amount);
+    }
+
+    [Fact]
+    public async Task Cache_PriceAdded_NextCostIsRecalculated()
+    {
+        using var boris = fixture.CreateClientAs(Seed.Boris);
+        var url = $"{Recipe(Seed.R5)}/cost?loaves=1&asOf=2031-01-01";
+
+        var before = await (await boris.GetAsync(url, Ct)).ReadAsync<CostBreakdownDto>();
+        var cached = await (await boris.GetAsync(url, Ct)).ReadAsync<CostBreakdownDto>();
+        using var price = await boris.PostAsJsonAsync($"/api/v1/ingredients/{before.MissingPrices[0].IngredientId}/prices",
+            new PriceRequest(2.00m, 1000m, "EUR", new DateOnly(2030, 12, 1)), CoreApiFactory.Json, Ct);
+        var after = await (await boris.GetAsync(url, Ct)).ReadAsync<CostBreakdownDto>();
+
+        Assert.NotEmpty(cached.MissingPrices);
+        Assert.Equal(HttpStatusCode.Created, price.StatusCode);
+        Assert.Empty(after.MissingPrices);
     }
 
     [Fact]

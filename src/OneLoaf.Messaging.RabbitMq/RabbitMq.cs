@@ -7,7 +7,6 @@ using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OneLoaf.Messaging.Contracts;
-using OneLoaf.ServiceDefaults;
 using OneLoaf.ServiceDefaults.Constants;
 using OneLoaf.ServiceDefaults.Correlation;
 using OneLoaf.ServiceDefaults.Options;
@@ -48,6 +47,18 @@ public sealed class RabbitMqOptions
     /// <summary>Publish attempts before an event is given up (logged).</summary>
     [Range(1, 10)]
     public int PublishAttempts { get; set; } = 3;
+
+    /// <summary>Delivery attempts of a consumed message before it is dead-lettered.</summary>
+    [Range(1, 20)]
+    public int MaxAttempts { get; set; } = 5;
+
+    /// <summary>Delay before a failed message is delivered again.</summary>
+    [Range(1, 3600)]
+    public int RetryDelaySeconds { get; set; } = 30;
+
+    /// <summary>Unacknowledged messages a consumer receives at once.</summary>
+    [Range(1, 1000)]
+    public ushort PrefetchCount { get; set; } = 10;
 }
 
 /// <summary>One shared broker connection for the process; channels are created per operation.</summary>
@@ -129,13 +140,12 @@ public sealed partial class RabbitMqEventPublisher(
 {
     private const string JsonContentType = "application/json";
     private static readonly TimeSpan RetryDelay = TimeSpan.FromMilliseconds(200);
-    private static readonly JsonSerializerOptions Json = CreateJson();
 
     /// <inheritdoc />
     public async Task PublishAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(integrationEvent);
-        var body = JsonSerializer.SerializeToUtf8Bytes(integrationEvent, integrationEvent.GetType(), Json);
+        var body = JsonSerializer.SerializeToUtf8Bytes(integrationEvent, integrationEvent.GetType(), MessagingJson.Options);
         var properties = CreateProperties(integrationEvent);
 
         for (var attempt = 1; ; attempt++)
@@ -191,13 +201,6 @@ public sealed partial class RabbitMqEventPublisher(
             Timestamp = new AmqpTimestamp(integrationEvent.OccurredAt.ToUnixTimeSeconds()),
             Headers = headers,
         };
-    }
-
-    private static JsonSerializerOptions CreateJson()
-    {
-        var json = new JsonSerializerOptions(JsonSerializerDefaults.Web);
-        Extensions.ConfigureJson(json);
-        return json;
     }
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Published {RoutingKey} {MessageId}")]
