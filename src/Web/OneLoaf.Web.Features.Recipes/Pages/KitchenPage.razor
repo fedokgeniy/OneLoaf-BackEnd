@@ -1,0 +1,117 @@
+@page "/settings/kitchen"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Recipes.Models
+@using OneLoaf.Web.Features.Recipes.State
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Forms
+@using OneLoaf.Web.Shared.State
+@inject IState<KitchenState> State
+@inject IDispatcher Dispatcher
+
+<ShellTitle Text="Kitchen" BackHref="settings" BackLabel="Back to settings">
+    <Actions>
+        @if (_form is not null)
+        {
+            <OlButton Type="submit" form="kitchen-form" Loading="@State.Value.Busy" class="app-hide-compact">Save</OlButton>
+        }
+    </Actions>
+</ShellTitle>
+
+@switch (State.Value.Data)
+{
+    case Loadable<KitchenData>.Failed { Error: var error }:
+        <div class="ol-container editor">
+            <OlAlert Kind="AlertKind.Danger" Title="The kitchen settings could not be loaded." CorrelationId="@error.CorrelationId">
+                <p>@error.Message</p>
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => Dispatcher.Dispatch(new LoadKitchen())">Try again</OlButton>
+            </OlAlert>
+        </div>
+        break;
+    case { Value: { } data } when _form is not null:
+        <EditForm id="kitchen-form" Model="_form" OnValidSubmit="Save" class="ol-container editor" novalidate>
+            <ObjectGraphValidation />
+            <ServerValidation @ref="_server" />
+            @if (data.Settings is null)
+            {
+                <OlAlert Kind="AlertKind.Info" Title="Not set up yet.">
+                    The calculator needs the oven and the costs below. Fill in what you know and save; you can change it any time.
+                </OlAlert>
+            }
+            @if (_error is not null)
+            {
+                <OlAlert Kind="AlertKind.Danger" CorrelationId="@_error.CorrelationId">@_error.Message</OlAlert>
+            }
+
+            <section class="ol-card editor__card" aria-labelledby="kitchen-oven">
+                <h2 class="h3 editor__card-title" id="kitchen-oven">Oven</h2>
+                <div class="editor__general">
+                    <OlNumberField TValue="decimal?" Label="Power" Suffix="kW" Help="From the type plate; used for the electricity cost." @bind-Value="_form.OvenPowerKw" />
+                    <OlNumberField TValue="int?" Label="Capacity" Suffix="loaves" Help="Loaves in one oven load." @bind-Value="_form.OvenCapacityLoaves" />
+                </div>
+            </section>
+
+            <section class="ol-card editor__card" aria-labelledby="kitchen-mixer">
+                <h2 class="h3 editor__card-title" id="kitchen-mixer">Mixer</h2>
+                <div class="editor__general">
+                    <OlNumberField TValue="decimal?" Label="Bowl capacity" Suffix="kg" Help="Dough per kneading cycle." @bind-Value="_form.MixerBowlCapacityKg" />
+                </div>
+            </section>
+
+            <section class="ol-card editor__card" aria-labelledby="kitchen-costs">
+                <h2 class="h3 editor__card-title" id="kitchen-costs">Costs</h2>
+                <div class="editor__general">
+                    <OlSelect Label="Currency" Options="CurrencyOptions(data)" @bind-Value="_form.Currency" />
+                    <OlNumberField TValue="decimal?" Label="Electricity" Suffix="@($"{_form.Currency}/kWh")" @bind-Value="_form.ElectricityTariffPerKwh" />
+                    <OlNumberField TValue="decimal?" Label="Packaging per loaf" Suffix="@_form.Currency" @bind-Value="_form.PackagingCostPerLoaf" />
+                    <OlNumberField TValue="decimal?" Label="Expected loss" Suffix="%" Help="Unsold or failed loaves." @bind-Value="_form.LossRatePercent" />
+                    <OlNumberField TValue="decimal?" Label="Labor rate" Suffix="@($"{_form.Currency}/h")" Help="Leave empty to leave labor out of the cost." @bind-Value="_form.LaborRatePerHour" />
+                    <OlTextField Label="Time zone" Help="IANA name, e.g. Europe/Vilnius; batch times and reminders use it." @bind-Value="_form.TimeZone" />
+                </div>
+            </section>
+
+            <div class="editor__foot">
+                <OlButton Type="submit" Loading="@State.Value.Busy">Save settings</OlButton>
+            </div>
+        </EditForm>
+        break;
+    default:
+        <div class="ol-container editor" aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Row" Count="6" /></div>
+        break;
+}
+
+@code {
+    private KitchenForm? _form;
+    private ServerValidation? _server;
+    private ApiError? _error;
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<KitchenLoaded>(a =>
+        {
+            if (a.Data is Loadable<KitchenData>.Loaded { Data: var data })
+            {
+                _form = KitchenForm.From(data.Settings, TimeZoneInfo.Local.Id);
+            }
+        });
+        SubscribeToAction<KitchenSaveFailed>(a =>
+        {
+            _error = a.Error.Kind == ApiErrorKind.Validation && _server is not null && _server.Display(a.Error.FieldErrors).Count == 0 ? null : a.Error;
+        });
+        SubscribeToAction<KitchenSaved>(_ => _error = null);
+        Dispatcher.Dispatch(new LoadKitchen());
+    }
+
+    private static IReadOnlyList<SelectOption> CurrencyOptions(KitchenData data) =>
+        data.Currencies.Count == 0 ? [new SelectOption("EUR", "EUR")] : data.Currencies.Select(c => new SelectOption(c.Code, $"{c.Code} · {c.Name}")).ToList();
+
+    private void Save()
+    {
+        if (!State.Value.Busy && _form is not null)
+        {
+            _error = null;
+            Dispatcher.Dispatch(new SaveKitchen(_form.ToRequest()));
+        }
+    }
+}
