@@ -1,0 +1,22 @@
+[
+  {
+    "case": "defaults after registration",
+    "method": "GET",
+    "path": "/api/v1/kitchen-settings",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "ovenPowerKw": null,
+      "ovenCapacityLoaves": null,
+      "mixerBowlCapacityKg": null,
+      "electricityTariffPerKwh": null,
+      "packagingCostPerLoaf": 0.0000,
+      "lossRatePercent": 0.00,
+      "laborRatePerHour": null,
+      "currency": "EUR",
+      "timeZone": "Europe/Vilnius",
+      "updatedAt": "2026-11-23T04:18:06.224807+00:00"
+    }
+  }
+]

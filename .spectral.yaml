@@ -1,0 +1,86 @@
+# OpenAPI lint rules for docs/api/reference/*.openapi.json (Spectral, https://github.com/stoplightio/spectral).
+#   npx @stoplight/spectral-cli@6.15.0 lint "docs/api/reference/*.openapi.json" --fail-severity=warn
+extends:
+  - spectral:oas
+
+rules:
+  # House rules of the OneLoaf API (see docs/api/guides/conventions.md).
+  oneloaf-operation-summary:
+    description: Every operation has a summary.
+    given: $.paths[*][get,post,put,patch,delete]
+    severity: error
+    then:
+      field: summary
+      function: truthy
+
+  oneloaf-operation-id-pascal-case:
+    description: Operation ids are PascalCase verbs (CreateRecipe).
+    given: $.paths[*][get,post,put,patch,delete].operationId
+    severity: error
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[A-Z][A-Za-z]+$"
+
+  oneloaf-versioned-paths:
+    description: Business endpoints live under /api/v1.
+    given: $.paths
+    severity: error
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        match: "^/api/v1/"
+
+  oneloaf-kebab-case-paths:
+    description: Path segments are lower-case kebab-case (parameters excepted).
+    given: $.paths
+    severity: warn
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        match: "^(/([a-z0-9]+(-[a-z0-9]+)*(\\.csv)?|\\{[a-zA-Z]+\\}))+$"
+
+  oneloaf-camel-case-properties:
+    description: JSON properties are camelCase.
+    given: $.components.schemas[*].properties
+    severity: error
+    then:
+      field: "@key"
+      function: casing
+      functionOptions:
+        type: camel
+
+  oneloaf-error-responses-are-problem-details:
+    description: 4xx and 5xx responses use application/problem+json.
+    given: $.paths[*][*].responses[?(@property >= '400')].content
+    severity: error
+    then:
+      field: application/problem+json
+      function: truthy
+
+  oneloaf-success-response:
+    description: Every operation documents a 2xx response.
+    given: $.paths[*][get,post,put,patch,delete].responses
+    severity: error
+    then:
+      function: schema
+      functionOptions:
+        schema:
+          type: object
+          patternProperties:
+            "^2\\d\\d$": {}
+          minProperties: 1
+          anyOf:
+            - required: ["200"]
+            - required: ["201"]
+            - required: ["204"]
+
+  # Tags are attached per operation and described in the reference pages, not in a top-level list.
+  openapi-tags: off
+  # One shared error model per status; the generator does not emit operation-level examples (they live in docs/api/examples).
+  oas3-valid-media-example: warn
+  # Servers differ per deployment (Caddy path prefix); documented in the guides instead.
+  oas3-api-servers: off
+  info-contact: off

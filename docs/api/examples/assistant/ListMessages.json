@@ -1,0 +1,440 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/messages",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": [
+      {
+        "id": "3c3082ff-f777-4b2d-aa19-13a6c4d9121e",
+        "role": "user",
+        "content": "Plan 2 loaves of my Country sourdough for next Saturday morning.",
+        "toolName": null,
+        "toolPayload": null,
+        "createdAt": "2026-11-23T04:18:09.739087+00:00"
+      },
+      {
+        "id": "a16e1e1f-bd10-4e38-a122-e045207908d4",
+        "role": "assistant",
+        "content": "I am an AI assistant. I prepared the Saturday bake of Country sourdough; it costs 7.98 EUR. Please confirm it.",
+        "toolName": null,
+        "toolPayload": null,
+        "createdAt": "2026-11-23T04:18:09.852421+00:00"
+      },
+      {
+        "id": "052b2bc2-dc1e-4afe-8822-3960abb422ba",
+        "role": "assistant",
+        "content": "The batch is saved. You can follow it in the production calendar.",
+        "toolName": null,
+        "toolPayload": null,
+        "createdAt": "2026-11-23T04:18:09.912792+00:00"
+      },
+      {
+        "id": "059f4401-8bd8-4827-a3ef-1b8e59a57997",
+        "role": "user",
+        "content": "And one loaf on Sunday.",
+        "toolName": null,
+        "toolPayload": null,
+        "createdAt": "2026-11-23T04:18:09.923218+00:00"
+      },
+      {
+        "id": "b06d87ba-a3b7-4501-9487-bd84738b6be3",
+        "role": "assistant",
+        "content": "I prepared the Sunday bake as well. Confirm or decline it.",
+        "toolName": null,
+        "toolPayload": null,
+        "createdAt": "2026-11-23T04:18:09.945882+00:00"
+      }
+    ]
+  },
+  {
+    "case": "audit with tool calls",
+    "method": "GET",
+    "path": "/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/messages?includeTools=true",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": [
+      {
+        "id": "3c3082ff-f777-4b2d-aa19-13a6c4d9121e",
+        "role": "user",
+        "content": "Plan 2 loaves of my Country sourdough for next Saturday morning.",
+        "toolName": null,
+        "toolPayload": null,
+        "createdAt": "2026-11-23T04:18:09.739087+00:00"
+      },
+      {
+        "id": "0f3301ef-4f57-422d-b3be-35e0eb55332f",
+        "role": "tool",
+        "content": "ok",
+        "toolName": "find_recipes",
+        "toolPayload": {
+          "input": {
+            "query": "Country sourdough"
+          },
+          "output": {
+            "page": 1,
+            "items": [
+              {
+                "id": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+                "title": "Country sourdough",
+                "updatedAt": "2026-11-23T04:18:07.615878+00:00",
+                "isArchived": false,
+                "yieldLoaves": 1,
+                "parentRecipeId": null
+              },
+              {
+                "id": "e9af6e00-0768-4872-af7b-ca7321dd291a",
+                "title": "Country sourdough, longer bulk",
+                "updatedAt": "2026-11-23T04:18:07.870975+00:00",
+                "isArchived": false,
+                "yieldLoaves": 1,
+                "parentRecipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4"
+              }
+            ],
+            "pageSize": 10,
+            "totalCount": 2
+          }
+        },
+        "createdAt": "2026-11-23T04:18:09.811241+00:00"
+      },
+      {
+        "id": "1dd553af-857b-4e7f-992f-b91efc41f0c2",
+        "role": "tool",
+        "content": "ok",
+        "toolName": "propose_batch",
+        "toolPayload": {
+          "input": {
+            "name": "Saturday bake",
+            "items": [
+              {
+                "loaves": 2,
+                "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4"
+              }
+            ],
+            "plannedStartAt": "2026-12-02T08:00:00.0000000+02:00"
+          },
+          "output": {
+            "plan": {
+              "id": "00000000-0000-0000-0000-000000000000",
+              "name": "Saturday bake",
+              "items": [
+                {
+                  "id": "00000000-0000-0000-0000-000000000000",
+                  "loaves": 2,
+                  "stages": [
+                    {
+                      "id": "00000000-0000-0000-0000-000000000000",
+                      "name": "Mix",
+                      "note": null,
+                      "status": "pending",
+                      "sortOrder": 1,
+                      "actualEndAt": null,
+                      "isOverridden": false,
+                      "actualStartAt": null,
+                      "stageTypeCode": "mix",
+                      "plannedStartAt": "2026-12-02T06:00:00+00:00",
+                      "extendedMinutes": 0,
+                      "plannedEndMaxAt": "2026-12-02T06:20:00+00:00",
+                      "plannedEndMinAt": "2026-12-02T06:15:00+00:00",
+                      "plannedMaxMinutes": 20,
+                      "plannedMinMinutes": 15,
+                      "actualTemperatureC": null
+                    },
+                    {
+                      "id": "00000000-0000-0000-0000-000000000000",
+                      "name": "Bulk fermentation",
+                      "note": null,
+                      "status": "pending",
+                      "sortOrder": 2,
+                      "actualEndAt": null,
+                      "isOverridden": false,
+                      "actualStartAt": null,
+                      "stageTypeCode": "bulk_fermentation",
+                      "plannedStartAt": "2026-12-02T06:15:00+00:00",
+                      "extendedMinutes": 0,
+                      "plannedEndMaxAt": "2026-12-02T11:20:00+00:00",
+                      "plannedEndMinAt": "2026-12-02T10:15:00+00:00",
+                      "plannedMaxMinutes": 300,
+                      "plannedMinMinutes": 240,
+                      "actualTemperatureC": null
+                    },
+                    {
+                      "id": "00000000-0000-0000-0000-000000000000",
+                      "name": "Shape",
+                      "note": null,
+                      "status": "pending",
+                      "sortOrder": 3,
+                      "actualEndAt": null,
+                      "isOverridden": false,
+                      "actualStartAt": null,
+                      "stageTypeCode": "shape",
+                      "plannedStartAt": "2026-12-02T10:15:00+00:00",
+                      "extendedMinutes": 0,
+                      "plannedEndMaxAt": "2026-12-02T11:35:00+00:00",
+                      "plannedEndMinAt": "2026-12-02T10:25:00+00:00",
+                      "plannedMaxMinutes": 15,
+                      "plannedMinMinutes": 10,
+                      "actualTemperatureC": null
+                    },
+                    {
+                      "id": "00000000-0000-0000-0000-000000000000",
+                      "name": "Cold proof",
+                      "note": null,
+                      "status": "pending",
+                      "sortOrder": 4,
+                      "actualEndAt": null,
+                      "isOverridden": false,
+                      "actualStartAt": null,
+                      "stageTypeCode": "proof",
+                      "plannedStartAt": "2026-12-02T10:25:00+00:00",
+                      "extendedMinutes": 0,
+                      "plannedEndMaxAt": "2026-12-02T23:35:00+00:00",
+                      "plannedEndMinAt": "2026-12-02T20:25:00+00:00",
+                      "plannedMaxMinutes": 720,
+                      "plannedMinMinutes": 600,
+                      "actualTemperatureC": null
+                    },
+                    {
+                      "id": "00000000-0000-0000-0000-000000000000",
+                      "name": "Bake",
+                      "note": null,
+                      "status": "pending",
+                      "sortOrder": 5,
+                      "actualEndAt": null,
+                      "isOverridden": false,
+                      "actualStartAt": null,
+                      "stageTypeCode": "bake",
+                      "plannedStartAt": "2026-12-02T20:25:00+00:00",
+                      "extendedMinutes": 0,
+                      "plannedEndMaxAt": "2026-12-03T00:20:00+00:00",
+                      "plannedEndMinAt": "2026-12-02T21:05:00+00:00",
+                      "plannedMaxMinutes": 45,
+                      "plannedMinMinutes": 40,
+                      "actualTemperatureC": null
+                    }
+                  ],
+                  "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+                  "sortOrder": 1,
+                  "starterId": null,
+                  "recipeTitle": "Country sourdough",
+                  "kneadingCycles": 1,
+                  "starterAmountG": 200.0,
+                  "starterReminderMinutes": null
+                }
+              ],
+              "notes": null,
+              "source": "manual",
+              "status": "planned",
+              "currency": "EUR",
+              "priceDate": "2026-11-23",
+              "totalCost": 7.98,
+              "completedAt": null,
+              "bakeRecordId": null,
+              "actualStartAt": null,
+              "plannedReadyTo": "2026-12-03T00:20:00+00:00",
+              "plannedStartAt": "2026-12-02T06:00:00+00:00",
+              "plannedReadyFrom": "2026-12-02T21:05:00+00:00"
+            },
+            "actionId": "fd033985-8f54-45eb-94a3-11f82c7f75ca"
+          }
+        },
+        "createdAt": "2026-11-23T04:18:09.844092+00:00"
+      },
+      {
+        "id": "a16e1e1f-bd10-4e38-a122-e045207908d4",
+        "role": "assistant",
+        "content": "I am an AI assistant. I prepared the Saturday bake of Country sourdough; it costs 7.98 EUR. Please confirm it.",
+        "toolName": null,
+        "toolPayload": null,
+        "createdAt": "2026-11-23T04:18:09.852421+00:00"
+      },
+      {
+        "id": "052b2bc2-dc1e-4afe-8822-3960abb422ba",
+        "role": "assistant",
+        "content": "The batch is saved. You can follow it in the production calendar.",
+        "toolName": null,
+        "toolPayload": null,
+        "createdAt": "2026-11-23T04:18:09.912792+00:00"
+      },
+      {
+        "id": "059f4401-8bd8-4827-a3ef-1b8e59a57997",
+        "role": "user",
+        "content": "And one loaf on Sunday.",
+        "toolName": null,
+        "toolPayload": null,
+        "createdAt": "2026-11-23T04:18:09.923218+00:00"
+      },
+      {
+        "id": "84bf8ad6-2904-4e46-87d2-299d1c854f29",
+        "role": "tool",
+        "content": "ok",
+        "toolName": "propose_batch",
+        "toolPayload": {
+          "input": {
+            "name": "Sunday bake",
+            "items": [
+              {
+                "loaves": 1,
+                "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4"
+              }
+            ],
+            "plannedStartAt": "2026-12-03T08:00:00.0000000+02:00"
+          },
+          "output": {
+            "plan": {
+              "id": "00000000-0000-0000-0000-000000000000",
+              "name": "Sunday bake",
+              "items": [
+                {
+                  "id": "00000000-0000-0000-0000-000000000000",
+                  "loaves": 1,
+                  "stages": [
+                    {
+                      "id": "00000000-0000-0000-0000-000000000000",
+                      "name": "Mix",
+                      "note": null,
+                      "status": "pending",
+                      "sortOrder": 1,
+                      "actualEndAt": null,
+                      "isOverridden": false,
+                      "actualStartAt": null,
+                      "stageTypeCode": "mix",
+                      "plannedStartAt": "2026-12-03T06:00:00+00:00",
+                      "extendedMinutes": 0,
+                      "plannedEndMaxAt": "2026-12-03T06:20:00+00:00",
+                      "plannedEndMinAt": "2026-12-03T06:15:00+00:00",
+                      "plannedMaxMinutes": 20,
+                      "plannedMinMinutes": 15,
+                      "actualTemperatureC": null
+                    },
+                    {
+                      "id": "00000000-0000-0000-0000-000000000000",
+                      "name": "Bulk fermentation",
+                      "note": null,
+                      "status": "pending",
+                      "sortOrder": 2,
+                      "actualEndAt": null,
+                      "isOverridden": false,
+                      "actualStartAt": null,
+                      "stageTypeCode": "bulk_fermentation",
+                      "plannedStartAt": "2026-12-03T06:15:00+00:00",
+                      "extendedMinutes": 0,
+                      "plannedEndMaxAt": "2026-12-03T11:20:00+00:00",
+                      "plannedEndMinAt": "2026-12-03T10:15:00+00:00",
+                      "plannedMaxMinutes": 300,
+                      "plannedMinMinutes": 240,
+                      "actualTemperatureC": null
+                    },
+                    {
+                      "id": "00000000-0000-0000-0000-000000000000",
+                      "name": "Shape",
+                      "note": null,
+                      "status": "pending",
+                      "sortOrder": 3,
+                      "actualEndAt": null,
+                      "isOverridden": false,
+                      "actualStartAt": null,
+                      "stageTypeCode": "shape",
+                      "plannedStartAt": "2026-12-03T10:15:00+00:00",
+                      "extendedMinutes": 0,
+                      "plannedEndMaxAt": "2026-12-03T11:35:00+00:00",
+                      "plannedEndMinAt": "2026-12-03T10:25:00+00:00",
+                      "plannedMaxMinutes": 15,
+                      "plannedMinMinutes": 10,
+                      "actualTemperatureC": null
+                    },
+                    {
+                      "id": "00000000-0000-0000-0000-000000000000",
+                      "name": "Cold proof",
+                      "note": null,
+                      "status": "pending",
+                      "sortOrder": 4,
+                      "actualEndAt": null,
+                      "isOverridden": false,
+                      "actualStartAt": null,
+                      "stageTypeCode": "proof",
+                      "plannedStartAt": "2026-12-03T10:25:00+00:00",
+                      "extendedMinutes": 0,
+                      "plannedEndMaxAt": "2026-12-03T23:35:00+00:00",
+                      "plannedEndMinAt": "2026-12-03T20:25:00+00:00",
+                      "plannedMaxMinutes": 720,
+                      "plannedMinMinutes": 600,
+                      "actualTemperatureC": null
+                    },
+                    {
+                      "id": "00000000-0000-0000-0000-000000000000",
+                      "name": "Bake",
+                      "note": null,
+                      "status": "pending",
+                      "sortOrder": 5,
+                      "actualEndAt": null,
+                      "isOverridden": false,
+                      "actualStartAt": null,
+                      "stageTypeCode": "bake",
+                      "plannedStartAt": "2026-12-03T20:25:00+00:00",
+                      "extendedMinutes": 0,
+                      "plannedEndMaxAt": "2026-12-04T00:20:00+00:00",
+                      "plannedEndMinAt": "2026-12-03T21:05:00+00:00",
+                      "plannedMaxMinutes": 45,
+                      "plannedMinMinutes": 40,
+                      "actualTemperatureC": null
+                    }
+                  ],
+                  "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+                  "sortOrder": 1,
+                  "starterId": null,
+                  "recipeTitle": "Country sourdough",
+                  "kneadingCycles": 1,
+                  "starterAmountG": 100.0,
+                  "starterReminderMinutes": null
+                }
+              ],
+              "notes": null,
+              "source": "manual",
+              "status": "planned",
+              "currency": "EUR",
+              "priceDate": "2026-11-23",
+              "totalCost": 7.00,
+              "completedAt": null,
+              "bakeRecordId": null,
+              "actualStartAt": null,
+              "plannedReadyTo": "2026-12-04T00:20:00+00:00",
+              "plannedStartAt": "2026-12-03T06:00:00+00:00",
+              "plannedReadyFrom": "2026-12-03T21:05:00+00:00"
+            },
+            "actionId": "a292b2ea-6abf-4716-b05d-0945d2de06e4"
+          }
+        },
+        "createdAt": "2026-11-23T04:18:09.943481+00:00"
+      },
+      {
+        "id": "b06d87ba-a3b7-4501-9487-bd84738b6be3",
+        "role": "assistant",
+        "content": "I prepared the Sunday bake as well. Confirm or decline it.",
+        "toolName": null,
+        "toolPayload": null,
+        "createdAt": "2026-11-23T04:18:09.945882+00:00"
+      }
+    ]
+  },
+  {
+    "case": "deleted conversation",
+    "method": "GET",
+    "path": "/api/v1/conversations/8a75d663-8bbb-408b-ba17-062204e69b47/messages",
+    "authenticated": true,
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "The conversation was not found.",
+      "instance": "/api/v1/conversations/8a75d663-8bbb-408b-ba17-062204e69b47/messages",
+      "traceId": "00-6b0709dafeb8b1626ba186b11210e49d-6917b1d9c4c52e18-02",
+      "correlationId": "1ed1681c496d41148c3804f19418526a"
+    }
+  }
+]

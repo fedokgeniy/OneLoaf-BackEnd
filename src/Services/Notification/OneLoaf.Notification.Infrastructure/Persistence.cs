@@ -4,6 +4,7 @@ using OneLoaf.Infrastructure.Persistence;
 using OneLoaf.Notification.Application;
 using OneLoaf.Notification.Application.Push;
 using OneLoaf.Notification.Application.Reminders;
+using OneLoaf.SharedKernel.Text;
 
 namespace OneLoaf.Notification.Infrastructure;
 
@@ -70,7 +71,7 @@ public sealed class ReminderRepository(OneLoafDbContext db) : IReminderRepositor
     {
         ArgumentNullException.ThrowIfNull(query);
         var reminders = db.Reminders.AsNoTracking().Where(r => r.OwnerId == ownerId);
-        if (query.Status is { } status)
+        if (WireEnumNames.ParseOrNull<ReminderStatus>(query.Status) is { } status)
         {
             reminders = reminders.Where(r => r.Status == status);
         }

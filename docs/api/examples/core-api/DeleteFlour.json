@@ -1,0 +1,9 @@
+[
+  {
+    "case": "typical",
+    "method": "DELETE",
+    "path": "/api/v1/flours/0b54adc1-4f33-4c0c-acb6-4b4c07f22055",
+    "authenticated": true,
+    "status": 204
+  }
+]

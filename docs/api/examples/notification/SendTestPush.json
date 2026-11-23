@@ -1,0 +1,13 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/push/test",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "delivered": true
+    }
+  }
+]

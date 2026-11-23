@@ -1,0 +1,12 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/admin/library/c3cc7934-aeeb-4233-86b0-0b3f056ad5a7/remove",
+    "authenticated": true,
+    "requestBody": {
+      "reason": "Duplicate of an earlier publication."
+    },
+    "status": 204
+  }
+]

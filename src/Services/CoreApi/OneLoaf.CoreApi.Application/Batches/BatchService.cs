@@ -11,6 +11,7 @@ using OneLoaf.Messaging;
 using OneLoaf.Messaging.Contracts;
 using OneLoaf.SharedKernel.Exceptions;
 using OneLoaf.SharedKernel.Security;
+using OneLoaf.SharedKernel.Text;
 
 namespace OneLoaf.CoreApi.Application.Batches;
 
@@ -61,7 +62,8 @@ public sealed class BatchListQueryValidator : AbstractValidator<BatchListQuery>
     public BatchListQueryValidator()
     {
         this.AddPagingRules(x => x.Page, x => x.PageSize);
-        RuleFor(x => x.Status).IsInEnum();
+        RuleFor(x => x.Status).Must(WireEnumNames.IsNullOrDefined<BatchStatus>)
+            .WithMessage($"status must be one of: {WireEnumNames.Values<BatchStatus>()}.");
         RuleFor(x => x.To).GreaterThan(x => x.From).When(x => x.From.HasValue && x.To.HasValue);
     }
 }

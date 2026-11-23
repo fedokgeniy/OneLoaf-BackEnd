@@ -46,6 +46,7 @@ public static class NotificationEndpoints
 
         app.MapGet(Routes.ApiV1 + "/reminders", async ([AsParameters] ReminderListQuery query, ReminderQueryService s, CancellationToken ct) =>
                 TypedResults.Ok(await s.ListAsync(query, ct)))
+            .WithValidation<ReminderListQuery>()
             .WithTags(NotificationApi.RemindersTag).RequireAuthorization().ProducesProblem(StatusCodes.Status401Unauthorized)
             .WithName("ListReminders").WithSummary("Own reminders")
             .WithDescription("US-29. Filter by status and due time (from inclusive, to exclusive); ordered by due time, at most 200.");

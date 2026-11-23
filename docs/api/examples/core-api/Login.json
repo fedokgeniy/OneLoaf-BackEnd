@@ -1,0 +1,70 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/auth/login",
+    "authenticated": false,
+    "requestBody": {
+      "email": "docs.baker.58152a7fa@example.com",
+      "password": "Rye-Bread-2026!"
+    },
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.<payload>.<signature>",
+      "expiresAt": "2026-11-23T05:18:06.4386125+00:00",
+      "user": {
+        "id": "fb6730bd-1f99-4903-b880-b682637be697",
+        "email": "docs.baker.58152a7fa@example.com",
+        "displayName": "Docs Baker",
+        "role": "user",
+        "createdAt": "2026-11-23T04:18:06.224807+00:00",
+        "lastLoginAt": "2026-11-23T04:18:06.4219224+00:00"
+      }
+    }
+  },
+  {
+    "case": "wrong password",
+    "method": "POST",
+    "path": "/api/v1/auth/login",
+    "authenticated": false,
+    "requestBody": {
+      "email": "docs.baker.58152a7fa@example.com",
+      "password": "Wrong-Password-1"
+    },
+    "status": 401,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/unauthorized",
+      "title": "Invalid e-mail or password.",
+      "status": 401,
+      "instance": "/api/v1/auth/login",
+      "traceId": "00-44554d75dc2f7611ea68065248c4f151-921543c0d157560f-02",
+      "correlationId": "a330b25377214113b8be9f6098993473"
+    }
+  },
+  {
+    "case": "second account",
+    "method": "POST",
+    "path": "/api/v1/auth/login",
+    "authenticated": false,
+    "requestBody": {
+      "email": "leaving.3df41a25@example.com",
+      "password": "Rye-Bread-2026!"
+    },
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.<payload>.<signature>",
+      "expiresAt": "2026-11-23T05:18:09.379429+00:00",
+      "user": {
+        "id": "c1a76c6b-ee09-4397-86a8-f4e330b2b323",
+        "email": "leaving.3df41a25@example.com",
+        "displayName": "Leaving Baker",
+        "role": "user",
+        "createdAt": "2026-11-23T04:18:09.318834+00:00",
+        "lastLoginAt": "2026-11-23T04:18:09.3773681+00:00"
+      }
+    }
+  }
+]

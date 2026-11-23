@@ -1,0 +1,55 @@
+{
+  "type": [
+    "object",
+    "null"
+  ],
+  "properties": {
+    "starterId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "ownerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "fedAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "nextFeedingAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "expectedPeakAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "routingKey": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "starterId",
+    "ownerId",
+    "fedAt",
+    "nextFeedingAt",
+    "expectedPeakAt",
+    "occurredAt"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "StarterFed",
+  "description": "Body of the 'starter.fed' message on the 'oneloaf.events' topic exchange."
+}

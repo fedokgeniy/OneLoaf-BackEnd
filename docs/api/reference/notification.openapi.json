@@ -1,0 +1,597 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "OneLoaf notification API",
+    "description": "Part of OneLoaf, a web application for managing bread recipes and planning home baking. Authenticate with a bearer token from POST /api/v1/auth/login of the Core API. Errors are RFC 9457 problem details (application/problem+json) with a correlationId; JSON uses camelCase and enums are snake_case strings. Guides: docs/api in the repository.",
+    "license": {
+      "name": "Proprietary (bachelor project)"
+    },
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "..",
+      "description": "This service"
+    }
+  ],
+  "paths": {
+    "/api/v1/reminders": {
+      "get": {
+        "tags": [
+          "Reminders"
+        ],
+        "summary": "Own reminders",
+        "description": "US-29. Filter by status and due time (from inclusive, to exclusive); ordered by due time, at most 200.",
+        "operationId": "ListReminders",
+        "parameters": [
+          {
+            "name": "Status",
+            "in": "query",
+            "description": "Only this status: scheduled, sent, cancelled or failed.",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "From",
+            "in": "query",
+            "description": "Due at or after.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "To",
+            "in": "query",
+            "description": "Due before.",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "Limit",
+            "in": "query",
+            "description": "Most rows returned (1-200, default 50).",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReminderDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/push/vapid-public-key": {
+      "get": {
+        "tags": [
+          "Push"
+        ],
+        "summary": "VAPID public key",
+        "description": "applicationServerKey for PushManager.subscribe in the browser; 503 when Web Push is not configured.",
+        "operationId": "GetVapidPublicKey",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VapidPublicKeyResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/push/subscriptions": {
+      "post": {
+        "tags": [
+          "Push"
+        ],
+        "summary": "Register a device for notifications",
+        "description": "US-29. Body is PushSubscription.toJSON() of the browser. Upsert by endpoint: 201 for a new device, 200 when known.",
+        "operationId": "Subscribe",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubscribeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushSubscriptionDto"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PushSubscriptionDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/push/subscriptions/{id}": {
+      "delete": {
+        "tags": [
+          "Push"
+        ],
+        "summary": "Remove a device",
+        "description": "Only own devices; another user's id gives 404.",
+        "operationId": "Unsubscribe",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/push/test": {
+      "post": {
+        "tags": [
+          "Push"
+        ],
+        "summary": "Send a test notification to own devices",
+        "description": "422 when no device is subscribed, 503 when the push service cannot be reached.",
+        "operationId": "SendTestPush",
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestPushResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HttpValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "description": "Problem details of a 400 validation error; errors maps each invalid field (camelCase) to its messages."
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "RFC 9457 problem details: type, title, status, detail, instance, plus correlationId and traceId for support. Retry-After is sent as a header with 429 and 503."
+      },
+      "PushKeys": {
+        "required": [
+          "p256dh",
+          "auth"
+        ],
+        "type": "object",
+        "properties": {
+          "p256dh": {
+            "type": "string",
+            "description": "Public key of the browser (base64url)."
+          },
+          "auth": {
+            "type": "string",
+            "description": "Authentication secret (base64url)."
+          }
+        },
+        "description": "Encryption keys."
+      },
+      "PushSubscriptionDto": {
+        "required": [
+          "id",
+          "endpoint",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id.",
+            "format": "uuid"
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "Push service URL."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Creation time.",
+            "format": "date-time"
+          }
+        },
+        "description": "A stored push subscription."
+      },
+      "ReminderChannel": {
+        "enum": [
+          "push",
+          "email"
+        ],
+        "description": "Channel."
+      },
+      "ReminderDto": {
+        "required": [
+          "id",
+          "kind",
+          "channel",
+          "status",
+          "message",
+          "dueAt",
+          "sentAt",
+          "attempts",
+          "batchId",
+          "starterId"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Reminder.",
+            "format": "uuid"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ReminderKind"
+          },
+          "channel": {
+            "$ref": "#/components/schemas/ReminderChannel"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ReminderStatus"
+          },
+          "message": {
+            "type": "string",
+            "description": "Text."
+          },
+          "dueAt": {
+            "type": "string",
+            "description": "Due time.",
+            "format": "date-time"
+          },
+          "sentAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Delivery time.",
+            "format": "date-time"
+          },
+          "attempts": {
+            "type": "integer",
+            "description": "Delivery attempts so far.",
+            "format": "int32"
+          },
+          "batchId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Batch, if any.",
+            "format": "uuid"
+          },
+          "starterId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Starter, if any.",
+            "format": "uuid"
+          }
+        },
+        "description": "A reminder in the baker's list."
+      },
+      "ReminderKind": {
+        "enum": [
+          "starter_feeding",
+          "before_kneading",
+          "stage_start"
+        ],
+        "description": "Kind."
+      },
+      "ReminderStatus": {
+        "enum": [
+          "scheduled",
+          "sent",
+          "cancelled",
+          "failed"
+        ],
+        "description": "Status."
+      },
+      "SubscribeRequest": {
+        "required": [
+          "endpoint",
+          "keys"
+        ],
+        "type": "object",
+        "properties": {
+          "endpoint": {
+            "type": "string",
+            "description": "Push service URL of the device."
+          },
+          "keys": {
+            "$ref": "#/components/schemas/PushKeys"
+          }
+        },
+        "description": "Body of POST /push/subscriptions."
+      },
+      "TestPushResponse": {
+        "required": [
+          "delivered"
+        ],
+        "type": "object",
+        "properties": {
+          "delivered": {
+            "type": "boolean",
+            "description": "At least one device accepted the notification."
+          }
+        },
+        "description": "Response of POST /push/test."
+      },
+      "VapidPublicKeyResponse": {
+        "required": [
+          "publicKey"
+        ],
+        "type": "object",
+        "properties": {
+          "publicKey": {
+            "type": "string",
+            "description": "VAPID public key (base64url) for applicationServerKey."
+          }
+        },
+        "description": "Response of GET /push/vapid-public-key."
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Access token issued by POST /api/v1/auth/login of the Core API.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Reminders"
+    },
+    {
+      "name": "Push"
+    }
+  ]
+}

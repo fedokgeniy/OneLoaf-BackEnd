@@ -1,0 +1,67 @@
+{
+  "type": [
+    "object",
+    "null"
+  ],
+  "properties": {
+    "batchId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "ownerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "name": {
+      "type": "string"
+    },
+    "plannedStartAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "plannedReadyFrom": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "plannedReadyTo": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "firstReminderAt": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time"
+    },
+    "routingKey": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "batchId",
+    "ownerId",
+    "name",
+    "plannedStartAt",
+    "plannedReadyFrom",
+    "plannedReadyTo",
+    "firstReminderAt",
+    "occurredAt"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BatchPlanned",
+  "description": "Body of the 'batch.planned' message on the 'oneloaf.events' topic exchange."
+}

@@ -1,0 +1,159 @@
+[
+  {
+    "case": "flour linked to a flour",
+    "method": "POST",
+    "path": "/api/v1/ingredients",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Bread flour",
+      "categoryCode": "flour",
+      "unitCode": "g",
+      "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3"
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "52323c40-349b-41b4-8318-1c0639ca9e1c",
+      "name": "Bread flour",
+      "categoryCode": "flour",
+      "unitCode": "g",
+      "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "flourName": "Bread flour T550",
+      "proteinPercent": 12.8,
+      "currentPrice": null,
+      "createdAt": "2026-11-23T04:18:06.937121+00:00",
+      "updatedAt": "2026-11-23T04:18:06.937121+00:00"
+    }
+  },
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/ingredients",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Water",
+      "categoryCode": "water",
+      "unitCode": "g",
+      "flourId": null
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "14ad3a67-e6f4-4d52-a2df-79933f4de510",
+      "name": "Water",
+      "categoryCode": "water",
+      "unitCode": "g",
+      "flourId": null,
+      "flourName": null,
+      "proteinPercent": null,
+      "currentPrice": null,
+      "createdAt": "2026-11-23T04:18:07.056041+00:00",
+      "updatedAt": "2026-11-23T04:18:07.056041+00:00"
+    }
+  },
+  {
+    "case": "salt",
+    "method": "POST",
+    "path": "/api/v1/ingredients",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Salt",
+      "categoryCode": "salt",
+      "unitCode": "g",
+      "flourId": null
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+      "name": "Salt",
+      "categoryCode": "salt",
+      "unitCode": "g",
+      "flourId": null,
+      "flourName": null,
+      "proteinPercent": null,
+      "currentPrice": null,
+      "createdAt": "2026-11-23T04:18:07.063126+00:00",
+      "updatedAt": "2026-11-23T04:18:07.063126+00:00"
+    }
+  },
+  {
+    "case": "starter",
+    "method": "POST",
+    "path": "/api/v1/ingredients",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Rye starter",
+      "categoryCode": "starter",
+      "unitCode": "g",
+      "flourId": null
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "b5d44e02-8459-4682-ade6-1d740eddba74",
+      "name": "Rye starter",
+      "categoryCode": "starter",
+      "unitCode": "g",
+      "flourId": null,
+      "flourName": null,
+      "proteinPercent": null,
+      "currentPrice": null,
+      "createdAt": "2026-11-23T04:18:07.076077+00:00",
+      "updatedAt": "2026-11-23T04:18:07.076077+00:00"
+    }
+  },
+  {
+    "case": "unknown unit",
+    "method": "POST",
+    "path": "/api/v1/ingredients",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Honey",
+      "categoryCode": "sweetener",
+      "unitCode": "spoon",
+      "flourId": null
+    },
+    "status": 400,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/validation",
+      "title": "One or more validation errors occurred.",
+      "status": 400,
+      "instance": "/api/v1/ingredients",
+      "errors": {
+        "unitCode": [
+          "Unknown unit 'spoon'."
+        ]
+      },
+      "traceId": "00-ceae749fd7f48e3bdeec6ae7187dfe05-b06a374ca96e8b8b-02",
+      "correlationId": "ee1d69f5fde04762b8fa5e8d447358b2"
+    }
+  },
+  {
+    "case": "unused ingredient",
+    "method": "POST",
+    "path": "/api/v1/ingredients",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Sesame",
+      "categoryCode": "add_in",
+      "unitCode": "g",
+      "flourId": null
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "713def41-2884-4ff5-b003-861a786a0db2",
+      "name": "Sesame",
+      "categoryCode": "add_in",
+      "unitCode": "g",
+      "flourId": null,
+      "flourName": null,
+      "proteinPercent": null,
+      "currentPrice": null,
+      "createdAt": "2026-11-23T04:18:07.188492+00:00",
+      "updatedAt": "2026-11-23T04:18:07.188492+00:00"
+    }
+  }
+]

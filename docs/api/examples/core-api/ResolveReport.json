@@ -1,0 +1,34 @@
+[
+  {
+    "case": "reject",
+    "method": "POST",
+    "path": "/api/v1/admin/reports/405e7edc-05b1-4a63-b75c-22ec2e8fe956/resolve",
+    "authenticated": true,
+    "requestBody": {
+      "action": "reject",
+      "reason": "The comment was already removed by its author."
+    },
+    "status": 204
+  },
+  {
+    "case": "already decided",
+    "method": "POST",
+    "path": "/api/v1/admin/reports/405e7edc-05b1-4a63-b75c-22ec2e8fe956/resolve",
+    "authenticated": true,
+    "requestBody": {
+      "action": "remove",
+      "reason": "Advertising is not allowed."
+    },
+    "status": 409,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/conflict",
+      "title": "The request conflicts with existing data.",
+      "status": 409,
+      "detail": "The report was already decided.",
+      "instance": "/api/v1/admin/reports/405e7edc-05b1-4a63-b75c-22ec2e8fe956/resolve",
+      "traceId": "00-e19f4355e35f7d48166f997dcc22b425-bcd1d76d83719fa7-02",
+      "correlationId": "998d3cb53b0a43319963662f75f8e2af"
+    }
+  }
+]

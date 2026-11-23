@@ -1,0 +1,11 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/warnings",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": []
+  }
+]

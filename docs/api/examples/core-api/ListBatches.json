@@ -1,0 +1,71 @@
+[
+  {
+    "case": "by status",
+    "method": "GET",
+    "path": "/api/v1/batches?status=planned",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "items": [
+        {
+          "id": "9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee",
+          "name": "Weekend bake",
+          "status": "planned",
+          "plannedStartAt": "2026-11-25T06:00:00+00:00",
+          "plannedReadyFrom": "2026-11-25T21:05:00+00:00",
+          "plannedReadyTo": "2026-11-26T00:20:00+00:00",
+          "totalLoaves": 3
+        }
+      ],
+      "page": 1,
+      "pageSize": 20,
+      "totalCount": 1
+    }
+  },
+  {
+    "case": "unknown status",
+    "method": "GET",
+    "path": "/api/v1/batches?status=baking",
+    "authenticated": true,
+    "status": 400,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/validation",
+      "title": "One or more validation errors occurred.",
+      "status": 400,
+      "instance": "/api/v1/batches",
+      "errors": {
+        "status": [
+          "status must be one of: planned, in_progress, done, cancelled."
+        ]
+      },
+      "traceId": "00-61a70f3844d0240bb568d126c35273e1-ac7f6a32f49c7e44-02",
+      "correlationId": "f7fba1c9d6b841749b805f5c0900f1a8"
+    }
+  },
+  {
+    "case": "calendar range",
+    "method": "GET",
+    "path": "/api/v1/batches?from=2026-11-24T08%3A00%3A00.0000000%2B02%3A00&page=1&pageSize=20",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "items": [
+        {
+          "id": "9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee",
+          "name": "Weekend bake",
+          "status": "planned",
+          "plannedStartAt": "2026-11-25T06:00:00+00:00",
+          "plannedReadyFrom": "2026-11-25T21:05:00+00:00",
+          "plannedReadyTo": "2026-11-26T00:20:00+00:00",
+          "totalLoaves": 3
+        }
+      ],
+      "page": 1,
+      "pageSize": 20,
+      "totalCount": 1
+    }
+  }
+]

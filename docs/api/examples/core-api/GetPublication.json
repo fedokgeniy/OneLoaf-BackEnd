@@ -1,0 +1,121 @@
+[
+  {
+    "case": "anonymous",
+    "method": "GET",
+    "path": "/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7",
+    "authenticated": false,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "a2a7f970-ae2b-4712-b5c1-04734e1314c7",
+      "title": "Country sourdough",
+      "description": "Open crumb, crisp crust.",
+      "authorName": "Docs Baker",
+      "status": "published",
+      "publishedAt": "2026-11-23T04:18:08.928441+00:00",
+      "snapshot": {
+        "stages": [
+          {
+            "name": "Mix",
+            "proofMode": null,
+            "stageType": "mix",
+            "isOptional": false,
+            "maxMinutes": 20,
+            "minMinutes": 15,
+            "temperatureC": null
+          },
+          {
+            "name": "Bulk fermentation",
+            "proofMode": null,
+            "stageType": "bulk_fermentation",
+            "isOptional": false,
+            "maxMinutes": 300,
+            "minMinutes": 240,
+            "temperatureC": 24.0
+          },
+          {
+            "name": "Shape",
+            "proofMode": null,
+            "stageType": "shape",
+            "isOptional": false,
+            "maxMinutes": 15,
+            "minMinutes": 10,
+            "temperatureC": null
+          },
+          {
+            "name": "Cold proof",
+            "proofMode": "cold",
+            "stageType": "proof",
+            "isOptional": false,
+            "maxMinutes": 720,
+            "minMinutes": 600,
+            "temperatureC": 4.0
+          },
+          {
+            "name": "Bake",
+            "proofMode": null,
+            "stageType": "bake",
+            "isOptional": false,
+            "maxMinutes": 45,
+            "minMinutes": 40,
+            "temperatureC": 240.0
+          }
+        ],
+        "ingredients": [
+          {
+            "name": "Bread flour",
+            "unit": "g",
+            "category": "flour",
+            "quantity": 500.000,
+            "isOptional": false
+          },
+          {
+            "name": "Water",
+            "unit": "g",
+            "category": "water",
+            "quantity": 350.000,
+            "isOptional": false
+          },
+          {
+            "name": "Sea salt",
+            "unit": "g",
+            "category": "salt",
+            "quantity": 10.000,
+            "isOptional": false
+          },
+          {
+            "name": "Rye starter",
+            "unit": "g",
+            "category": "starter",
+            "quantity": 100.000,
+            "isOptional": false
+          }
+        ],
+        "loafWeightG": 900.0,
+        "yieldLoaves": 1,
+        "schemaVersion": 1
+      },
+      "commentCount": 0,
+      "reactions": {},
+      "myReaction": null,
+      "isMine": false
+    }
+  },
+  {
+    "case": "not found",
+    "method": "GET",
+    "path": "/api/v1/library/00000000-0000-4000-9999-000000000000",
+    "authenticated": false,
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "Publication not found.",
+      "instance": "/api/v1/library/00000000-0000-4000-9999-000000000000",
+      "traceId": "00-5cf3717759351baa1177de404e7424d0-7dc4a6c90fe91aa1-02",
+      "correlationId": "fb982792a95648feb9ee85dedc4db9b3"
+    }
+  }
+]

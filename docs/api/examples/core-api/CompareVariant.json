@@ -1,0 +1,375 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/recipes/e9af6e00-0768-4872-af7b-ca7321dd291a/comparison",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "recipeId": "e9af6e00-0768-4872-af7b-ca7321dd291a",
+      "parentRecipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+      "changedFields": [
+        "title",
+        "notes"
+      ],
+      "ingredients": [
+        {
+          "change": "removed",
+          "parent": {
+            "lineId": "8ed6837b-51ef-4f64-b0c9-41fbfe37da7d",
+            "ingredientId": "52323c40-349b-41b4-8318-1c0639ca9e1c",
+            "ingredientName": "Bread flour",
+            "categoryCode": "flour",
+            "unitCode": "g",
+            "quantity": 500.000,
+            "isOptional": false,
+            "sortOrder": 1,
+            "note": null,
+            "proteinPercent": 12.8,
+            "isInherited": false
+          },
+          "variant": null
+        },
+        {
+          "change": "removed",
+          "parent": {
+            "lineId": "37ccc8f3-f72e-42b5-9e79-b32a190080ca",
+            "ingredientId": "14ad3a67-e6f4-4d52-a2df-79933f4de510",
+            "ingredientName": "Water",
+            "categoryCode": "water",
+            "unitCode": "g",
+            "quantity": 350.000,
+            "isOptional": false,
+            "sortOrder": 2,
+            "note": null,
+            "proteinPercent": null,
+            "isInherited": false
+          },
+          "variant": null
+        },
+        {
+          "change": "removed",
+          "parent": {
+            "lineId": "f27ef284-9f31-4ef7-8080-3ccb8004ffd5",
+            "ingredientId": "9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+            "ingredientName": "Sea salt",
+            "categoryCode": "salt",
+            "unitCode": "g",
+            "quantity": 10.000,
+            "isOptional": false,
+            "sortOrder": 3,
+            "note": null,
+            "proteinPercent": null,
+            "isInherited": false
+          },
+          "variant": null
+        },
+        {
+          "change": "removed",
+          "parent": {
+            "lineId": "c80975a2-84e7-42c9-9c4c-eed836d86ed5",
+            "ingredientId": "b5d44e02-8459-4682-ade6-1d740eddba74",
+            "ingredientName": "Rye starter",
+            "categoryCode": "starter",
+            "unitCode": "g",
+            "quantity": 100.000,
+            "isOptional": false,
+            "sortOrder": 4,
+            "note": null,
+            "proteinPercent": null,
+            "isInherited": false
+          },
+          "variant": null
+        },
+        {
+          "change": "added",
+          "parent": null,
+          "variant": {
+            "lineId": "60b16405-10fc-4166-ab6a-e5f41dbbc10c",
+            "ingredientId": "52323c40-349b-41b4-8318-1c0639ca9e1c",
+            "ingredientName": "Bread flour",
+            "categoryCode": "flour",
+            "unitCode": "g",
+            "quantity": 500.000,
+            "isOptional": false,
+            "sortOrder": 1,
+            "note": null,
+            "proteinPercent": 12.8,
+            "isInherited": false
+          }
+        },
+        {
+          "change": "added",
+          "parent": null,
+          "variant": {
+            "lineId": "c6d50391-29cc-4c3d-80b1-06ce46c40739",
+            "ingredientId": "14ad3a67-e6f4-4d52-a2df-79933f4de510",
+            "ingredientName": "Water",
+            "categoryCode": "water",
+            "unitCode": "g",
+            "quantity": 350.000,
+            "isOptional": false,
+            "sortOrder": 2,
+            "note": null,
+            "proteinPercent": null,
+            "isInherited": false
+          }
+        },
+        {
+          "change": "added",
+          "parent": null,
+          "variant": {
+            "lineId": "2f6e56b8-87e6-4f9c-9621-931612424554",
+            "ingredientId": "9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+            "ingredientName": "Sea salt",
+            "categoryCode": "salt",
+            "unitCode": "g",
+            "quantity": 10.000,
+            "isOptional": false,
+            "sortOrder": 3,
+            "note": null,
+            "proteinPercent": null,
+            "isInherited": false
+          }
+        },
+        {
+          "change": "added",
+          "parent": null,
+          "variant": {
+            "lineId": "7cae272e-cbc0-4cbc-84f6-5f91092a0496",
+            "ingredientId": "b5d44e02-8459-4682-ade6-1d740eddba74",
+            "ingredientName": "Rye starter",
+            "categoryCode": "starter",
+            "unitCode": "g",
+            "quantity": 100.000,
+            "isOptional": false,
+            "sortOrder": 4,
+            "note": null,
+            "proteinPercent": null,
+            "isInherited": false
+          }
+        }
+      ],
+      "stages": [
+        {
+          "change": "removed",
+          "parent": {
+            "lineId": "6b86cc91-8207-4907-8992-89da1514d398",
+            "sortOrder": 1,
+            "name": "Mix",
+            "stageTypeCode": "mix",
+            "minDurationMinutes": 15,
+            "maxDurationMinutes": 20,
+            "activeMinutes": 15,
+            "proofMode": null,
+            "temperatureC": null,
+            "usesOven": false,
+            "usesMixer": true,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          },
+          "variant": null
+        },
+        {
+          "change": "removed",
+          "parent": {
+            "lineId": "03530bbf-a7a0-4111-aebb-accb36c0d377",
+            "sortOrder": 2,
+            "name": "Bulk fermentation",
+            "stageTypeCode": "bulk_fermentation",
+            "minDurationMinutes": 240,
+            "maxDurationMinutes": 300,
+            "activeMinutes": 0,
+            "proofMode": null,
+            "temperatureC": 24.0,
+            "usesOven": false,
+            "usesMixer": false,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          },
+          "variant": null
+        },
+        {
+          "change": "removed",
+          "parent": {
+            "lineId": "9dc286d1-4d39-450e-849a-99f0e5dba894",
+            "sortOrder": 3,
+            "name": "Shape",
+            "stageTypeCode": "shape",
+            "minDurationMinutes": 10,
+            "maxDurationMinutes": 15,
+            "activeMinutes": 10,
+            "proofMode": null,
+            "temperatureC": null,
+            "usesOven": false,
+            "usesMixer": false,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          },
+          "variant": null
+        },
+        {
+          "change": "removed",
+          "parent": {
+            "lineId": "a71225bd-60e2-4867-9252-ca5e723fa5c9",
+            "sortOrder": 4,
+            "name": "Cold proof",
+            "stageTypeCode": "proof",
+            "minDurationMinutes": 600,
+            "maxDurationMinutes": 720,
+            "activeMinutes": 0,
+            "proofMode": "cold",
+            "temperatureC": 4.0,
+            "usesOven": false,
+            "usesMixer": false,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          },
+          "variant": null
+        },
+        {
+          "change": "removed",
+          "parent": {
+            "lineId": "4fd17458-20ae-4b40-bfa8-5d6105d90b20",
+            "sortOrder": 5,
+            "name": "Bake",
+            "stageTypeCode": "bake",
+            "minDurationMinutes": 40,
+            "maxDurationMinutes": 45,
+            "activeMinutes": 0,
+            "proofMode": null,
+            "temperatureC": 240.0,
+            "usesOven": true,
+            "usesMixer": false,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          },
+          "variant": null
+        },
+        {
+          "change": "added",
+          "parent": null,
+          "variant": {
+            "lineId": "f26628ac-8498-449d-8076-5e330cbb99b9",
+            "sortOrder": 1,
+            "name": "Mix",
+            "stageTypeCode": "mix",
+            "minDurationMinutes": 15,
+            "maxDurationMinutes": 20,
+            "activeMinutes": 15,
+            "proofMode": null,
+            "temperatureC": null,
+            "usesOven": false,
+            "usesMixer": true,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          }
+        },
+        {
+          "change": "added",
+          "parent": null,
+          "variant": {
+            "lineId": "bb8cc430-554b-4cdd-b115-d45d756439a4",
+            "sortOrder": 2,
+            "name": "Bulk fermentation",
+            "stageTypeCode": "bulk_fermentation",
+            "minDurationMinutes": 300,
+            "maxDurationMinutes": 360,
+            "activeMinutes": 0,
+            "proofMode": null,
+            "temperatureC": 22.0,
+            "usesOven": false,
+            "usesMixer": false,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          }
+        },
+        {
+          "change": "added",
+          "parent": null,
+          "variant": {
+            "lineId": "b0a64d17-aae8-4d1d-b045-812301539fd5",
+            "sortOrder": 3,
+            "name": "Shape",
+            "stageTypeCode": "shape",
+            "minDurationMinutes": 10,
+            "maxDurationMinutes": 15,
+            "activeMinutes": 10,
+            "proofMode": null,
+            "temperatureC": null,
+            "usesOven": false,
+            "usesMixer": false,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          }
+        },
+        {
+          "change": "added",
+          "parent": null,
+          "variant": {
+            "lineId": "05a219e2-2975-4749-af35-5e7840f2f9a8",
+            "sortOrder": 4,
+            "name": "Cold proof",
+            "stageTypeCode": "proof",
+            "minDurationMinutes": 600,
+            "maxDurationMinutes": 720,
+            "activeMinutes": 0,
+            "proofMode": "cold",
+            "temperatureC": 4.0,
+            "usesOven": false,
+            "usesMixer": false,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          }
+        },
+        {
+          "change": "added",
+          "parent": null,
+          "variant": {
+            "lineId": "949f327d-8832-4c12-a8d4-5fcebd0ad0de",
+            "sortOrder": 5,
+            "name": "Bake",
+            "stageTypeCode": "bake",
+            "minDurationMinutes": 40,
+            "maxDurationMinutes": 45,
+            "activeMinutes": 0,
+            "proofMode": null,
+            "temperatureC": 240.0,
+            "usesOven": true,
+            "usesMixer": false,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          }
+        }
+      ]
+    }
+  },
+  {
+    "case": "not a variant",
+    "method": "GET",
+    "path": "/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/comparison",
+    "authenticated": true,
+    "status": 422,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/business-rule",
+      "title": "The request violates a business rule.",
+      "status": 422,
+      "detail": "Only a variant can be compared with its parent recipe.",
+      "instance": "/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/comparison",
+      "traceId": "00-239f3364a345fa82b94de53b0dacbd29-44a65cec1f8f32d2-02",
+      "correlationId": "0d4637649bf940d59d2d29d975a49cfb"
+    }
+  }
+]

@@ -1,0 +1,42 @@
+{
+  "type": [
+    "object",
+    "null"
+  ],
+  "properties": {
+    "batchId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "ownerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "bakeRecordId": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "uuid"
+    },
+    "routingKey": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "batchId",
+    "ownerId",
+    "bakeRecordId",
+    "occurredAt"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "BatchCompleted",
+  "description": "Body of the 'batch.completed' message on the 'oneloaf.events' topic exchange."
+}

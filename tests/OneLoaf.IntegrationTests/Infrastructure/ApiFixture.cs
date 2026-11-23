@@ -1,3 +1,4 @@
+using System.Buffers.Text;
 using System.Net.Http.Headers;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore;
@@ -96,16 +97,21 @@ public sealed class ApiFixture : IAsyncLifetime
     /// </summary>
     public HttpClient CreateClientAs(Guid userId, UserRole role = UserRole.User)
     {
+        var client = Api.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TokenFor(userId, role));
+        return client;
+    }
+
+    /// <summary>An access token of an existing user, signed with the test key.</summary>
+    public string TokenFor(Guid userId, UserRole role = UserRole.User)
+    {
         _issuer ??= new JwtTokenIssuer(Options.Create(new JwtIssuerOptions
         {
             Issuer = Issuer,
             Audience = Audience,
             SigningKeyPem = _rsa.ExportRSAPrivateKeyPem(),
         }), TimeProvider.System);
-        var token = _issuer.Issue(new TokenSubject(userId, $"{userId:N}@example.com", "Seed user", role));
-        var client = Api.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
-        return client;
+        return _issuer.Issue(new TokenSubject(userId, $"{userId:N}@example.com", "Seed user", role)).Token;
     }
 
     /// <summary>Creates another API instance, for example with a low rate limit.</summary>
@@ -183,6 +189,11 @@ public sealed class ApiFixture : IAsyncLifetime
 
     private NotificationFactory CreateNotification()
     {
+        // A real P-256 VAPID key pair (base64url), so the public key endpoint works; pushes go to the recording channel.
+        using var vapid = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+        var key = vapid.ExportParameters(includePrivateParameters: true);
+        var vapidPublicKey = Base64Url.EncodeToString([0x04, .. key.Q.X!, .. key.Q.Y!]);
+        var vapidPrivateKey = Base64Url.EncodeToString(key.D!);
         var factory = new NotificationFactory(new Dictionary<string, string?>(StringComparer.Ordinal)
         {
             ["ConnectionStrings:OneLoaf"] = AppConnectionString,
@@ -197,6 +208,9 @@ public sealed class ApiFixture : IAsyncLifetime
             ["RabbitMq:RetryDelaySeconds"] = "1",
             ["RabbitMq:MaxAttempts"] = "2",
             ["Notification:SchedulerIntervalSeconds"] = "3600",
+            ["Notification:VapidSubject"] = "mailto:tests@example.com",
+            ["Notification:VapidPublicKey"] = vapidPublicKey,
+            ["Notification:VapidPrivateKey"] = vapidPrivateKey,
             ["Serilog:MinimumLevel:Default"] = "Warning",
         });
         _assistants.Add(factory);

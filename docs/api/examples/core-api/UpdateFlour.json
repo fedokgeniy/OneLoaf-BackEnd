@@ -1,0 +1,27 @@
+[
+  {
+    "case": "typical",
+    "method": "PUT",
+    "path": "/api/v1/flours/6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Bread flour T550",
+      "flourTypeCode": "wheat",
+      "proteinPercent": 12.8,
+      "grind": "fine",
+      "notes": "Local mill"
+    },
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "name": "Bread flour T550",
+      "flourTypeCode": "wheat",
+      "proteinPercent": 12.8,
+      "grind": "fine",
+      "notes": "Local mill",
+      "createdAt": "2026-11-23T04:18:06.805251+00:00",
+      "updatedAt": "2026-11-23T04:18:06.86981+00:00"
+    }
+  }
+]

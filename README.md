@@ -18,6 +18,8 @@ GitHub Container Registry, Anthropic Claude API.
 
 ## Documentation
 
+- [API documentation](docs/api/README.md) - getting started, integration tutorial, reference of all endpoints with
+  examples, authentication, errors, architecture and cross-service contracts
 - [Database documentation](docs/db/README.md) - schema, migrations, tests, how to change the schema
 
 ## Getting started
@@ -26,10 +28,11 @@ Requires Docker and the .NET 10 SDK. Passwords and keys come from `.env`, which 
 
 ```bash
 cp .env.example .env                # set the passwords and the JWT keys (generation command inside)
-docker compose up -d --build        # PostgreSQL, migrator, RabbitMQ, Redis, Core API
+docker compose up -d --build        # PostgreSQL, migrator, RabbitMQ, Redis and the three services
 ```
 
-The Core API listens on `http://localhost:5080` (Swagger UI at `/swagger`, health at `/health/ready`).
+The Core API listens on `http://localhost:5080`, the AI Assistant on `5081`, Notification on `5082` (Swagger UI at
+`/swagger`, health at `/health/ready` on each). Production runs behind Caddy with `deploy/docker-compose.prod.yml`.
 Database only: `docker compose up -d db && docker compose run --rm migrator`; more options in
 [docs/db/README.md](docs/db/README.md#getting-started).
 
@@ -39,6 +42,7 @@ Tests (integration tests need a running Docker engine):
 dotnet test OneLoaf.slnx --settings coverlet.runsettings --collect:"XPlat Code Coverage"
 ```
 
-## Status: in development
+## Status
 
-The database is complete (submitted state tagged `db-submitted`). The services are being built.
+All three services are implemented (`/api/v1`, see the [changelog](docs/api/CHANGELOG.md)). The database submitted state is
+tagged `db-submitted`. Deployment to a server is prepared (`deploy/`) but not yet performed.

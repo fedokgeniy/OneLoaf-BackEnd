@@ -1,0 +1,55 @@
+[
+  {
+    "case": "not an administrator",
+    "method": "GET",
+    "path": "/api/v1/admin/reports",
+    "authenticated": true,
+    "status": 403,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/forbidden",
+      "title": "You are not allowed to perform this action.",
+      "status": 403,
+      "instance": "/api/v1/admin/reports",
+      "traceId": "00-dad0872c5b8f32b8401d39bf46af8f41-4adf5b9a6bd620f8-02",
+      "correlationId": "b783e21f23234d0694da831df811a468"
+    }
+  },
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/admin/reports?status=open&page=1&pageSize=20",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "items": [
+        {
+          "id": "cfb0c199-8d61-4e77-95a7-7f3baf283d1c",
+          "publishedRecipeId": "8ac80873-eeee-465c-bad8-4c6c8c07d2ac",
+          "publicationTitle": "White loaf with rye",
+          "commentId": null,
+          "commentBody": null,
+          "reason": "Quantities look wrong",
+          "status": "open",
+          "createdAt": "2026-11-23T04:18:04.473579+00:00",
+          "resolvedAt": null
+        },
+        {
+          "id": "405e7edc-05b1-4a63-b75c-22ec2e8fe956",
+          "publishedRecipeId": "a2a7f970-ae2b-4712-b5c1-04734e1314c7",
+          "publicationTitle": "Country sourdough",
+          "commentId": "961d5900-7415-4489-b217-8117676605c9",
+          "commentBody": "Baked it on Sunday, lovely crumb!",
+          "reason": "Off-topic advertising link",
+          "status": "open",
+          "createdAt": "2026-11-23T04:18:09.163903+00:00",
+          "resolvedAt": null
+        }
+      ],
+      "page": 1,
+      "pageSize": 20,
+      "totalCount": 2
+    }
+  }
+]

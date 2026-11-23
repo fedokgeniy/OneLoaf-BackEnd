@@ -1,0 +1,29 @@
+{
+  "type": [
+    "object",
+    "null"
+  ],
+  "properties": {
+    "userId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "routingKey": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "userId",
+    "occurredAt"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AccountDeleted",
+  "description": "Body of the 'account.deleted' message on the 'oneloaf.events' topic exchange."
+}

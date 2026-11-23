@@ -96,11 +96,11 @@ public sealed record BatchSummaryDto(
 /// <summary>Query of <c>GET /batches</c> (calendar).</summary>
 /// <param name="From">Planned start from (inclusive).</param>
 /// <param name="To">Planned start to (exclusive).</param>
-/// <param name="Status">Only this status.</param>
+/// <param name="Status">Only this status: planned, in_progress, done or cancelled.</param>
 /// <param name="Page">Page, from 1.</param>
 /// <param name="PageSize">Page size, 1-100.</param>
 public sealed record BatchListQuery(
-    DateTimeOffset? From = null, DateTimeOffset? To = null, BatchStatus? Status = null, int Page = 1,
+    DateTimeOffset? From = null, DateTimeOffset? To = null, string? Status = null, int Page = 1,
     int PageSize = Paging.DefaultPageSize);
 
 /// <summary>Body of the stage actions start/complete/skip (US-23).</summary>

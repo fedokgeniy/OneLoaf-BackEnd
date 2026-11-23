@@ -1,0 +1,52 @@
+# assistant: one typical request per operation, generated from the recorded examples.
+# Base URLs: https://<domain>/assistant (production), http://localhost:5081 (local)
+# Use with the VS Code REST Client or JetBrains HTTP Client; set @token to an access token from POST /api/v1/auth/login.
+@baseUrl = http://localhost:5081
+@token = <access token>
+
+### Analyse a finished bake
+POST {{baseUrl}}/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea/analysis
+Authorization: Bearer {{token}}
+
+### Today's assistant usage
+GET {{baseUrl}}/api/v1/usage/me
+Authorization: Bearer {{token}}
+
+### List conversations
+GET {{baseUrl}}/api/v1/conversations
+Authorization: Bearer {{token}}
+
+### Start a conversation
+POST {{baseUrl}}/api/v1/conversations
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": null
+}
+
+### Delete a conversation and its messages
+DELETE {{baseUrl}}/api/v1/conversations/8a75d663-8bbb-408b-ba17-062204e69b47
+Authorization: Bearer {{token}}
+
+### Messages of a conversation
+GET {{baseUrl}}/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/messages
+Authorization: Bearer {{token}}
+
+### Send a message to the assistant
+POST {{baseUrl}}/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/messages
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "content": "Plan 2 loaves of my Country sourdough for next Saturday morning."
+}
+
+### Confirm a batch proposal
+POST {{baseUrl}}/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/actions/fd033985-8f54-45eb-94a3-11f82c7f75ca/confirm
+Authorization: Bearer {{token}}
+
+### Decline a batch proposal
+POST {{baseUrl}}/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/actions/a292b2ea-6abf-4716-b05d-0945d2de06e4/decline
+Authorization: Bearer {{token}}
+

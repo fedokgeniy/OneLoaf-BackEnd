@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OneLoaf API reference</title>
+  <style>
+    body { margin: 0; font-family: system-ui, sans-serif; }
+    nav { display: flex; gap: 8px; padding: 12px 16px; border-bottom: 1px solid #ddd; background: #faf7f2; flex-wrap: wrap; }
+    nav strong { margin-right: 12px; align-self: center; }
+    nav button { border: 1px solid #c9b79c; background: #fff; border-radius: 6px; padding: 6px 12px; cursor: pointer; }
+    nav button[aria-pressed="true"] { background: #8a5a2b; color: #fff; border-color: #8a5a2b; }
+  </style>
+</head>
+<body>
+  <!-- Serve this folder over HTTP (e.g. npx http-server docs/api); browsers block file:// requests for the specs. -->
+  <nav aria-label="Services">
+    <strong>OneLoaf API</strong>
+    <button data-spec="reference/core-api.openapi.json" aria-pressed="true">Core API</button>
+    <button data-spec="reference/assistant.openapi.json" aria-pressed="false">AI Assistant</button>
+    <button data-spec="reference/notification.openapi.json" aria-pressed="false">Notification</button>
+  </nav>
+  <div id="redoc"></div>
+  <script src="https://cdn.jsdelivr.net/npm/redoc@2.5.0/bundles/redoc.standalone.js"></script>
+  <script>
+    const buttons = document.querySelectorAll('nav button');
+    function show(spec) {
+      buttons.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.spec === spec)));
+      Redoc.init(spec, { hideDownloadButton: false, expandResponses: '200,201', jsonSampleExpandLevel: 3 }, document.getElementById('redoc'));
+      history.replaceState(null, '', '#' + spec.split('/').pop().replace('.openapi.json', ''));
+    }
+    buttons.forEach(b => b.addEventListener('click', () => show(b.dataset.spec)));
+    const initial = [...buttons].find(b => location.hash && b.dataset.spec.includes(location.hash.slice(1)));
+    show((initial ?? buttons[0]).dataset.spec);
+  </script>
+</body>
+</html>

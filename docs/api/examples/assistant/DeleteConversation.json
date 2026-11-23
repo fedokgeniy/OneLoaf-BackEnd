@@ -1,0 +1,9 @@
+[
+  {
+    "case": "typical",
+    "method": "DELETE",
+    "path": "/api/v1/conversations/8a75d663-8bbb-408b-ba17-062204e69b47",
+    "authenticated": true,
+    "status": 204
+  }
+]

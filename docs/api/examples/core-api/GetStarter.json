@@ -1,0 +1,26 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/starters/841da49e-2392-4552-8e41-23efa6388d33",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "841da49e-2392-4552-8e41-23efa6388d33",
+      "name": "Rye mother",
+      "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "hydrationPercent": 100.0,
+      "feedingMode": "regular",
+      "feedingIntervalHours": 24,
+      "riseHours": 8.0,
+      "isActive": true,
+      "notes": null,
+      "lastFedAt": null,
+      "nextFeedingAt": null,
+      "expectedPeakAt": null,
+      "createdAt": "2026-11-23T04:18:07.92986+00:00",
+      "updatedAt": "2026-11-23T04:18:07.92986+00:00"
+    }
+  }
+]

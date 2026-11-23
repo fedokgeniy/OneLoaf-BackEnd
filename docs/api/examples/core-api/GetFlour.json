@@ -1,0 +1,37 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/flours/6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "name": "Bread flour T550",
+      "flourTypeCode": "wheat",
+      "proteinPercent": 12.5,
+      "grind": "fine",
+      "notes": null,
+      "createdAt": "2026-11-23T04:18:06.805251+00:00",
+      "updatedAt": "2026-11-23T04:18:06.805251+00:00"
+    }
+  },
+  {
+    "case": "not found or another user's",
+    "method": "GET",
+    "path": "/api/v1/flours/00000000-0000-4000-9999-000000000000",
+    "authenticated": true,
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "The flour was not found.",
+      "instance": "/api/v1/flours/00000000-0000-4000-9999-000000000000",
+      "traceId": "00-bde95ca6179392bfcda0d3201ebd3302-3af7ace7446f31ac-02",
+      "correlationId": "780b05b15d89462dabba3050aa134705"
+    }
+  }
+]

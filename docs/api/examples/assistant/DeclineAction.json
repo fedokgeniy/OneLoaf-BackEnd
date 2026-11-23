@@ -1,0 +1,9 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/actions/a292b2ea-6abf-4716-b05d-0945d2de06e4/decline",
+    "authenticated": true,
+    "status": 204
+  }
+]

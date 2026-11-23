@@ -1,0 +1,42 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/reference/units",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": [
+      {
+        "code": "g",
+        "name": "gram",
+        "dimension": "mass",
+        "factorToBase": 1.000000
+      },
+      {
+        "code": "kg",
+        "name": "kilogram",
+        "dimension": "mass",
+        "factorToBase": 1000.000000
+      },
+      {
+        "code": "ml",
+        "name": "millilitre",
+        "dimension": "volume",
+        "factorToBase": 1.000000
+      },
+      {
+        "code": "l",
+        "name": "litre",
+        "dimension": "volume",
+        "factorToBase": 1000.000000
+      },
+      {
+        "code": "pcs",
+        "name": "piece",
+        "dimension": "count",
+        "factorToBase": 1.000000
+      }
+    ]
+  }
+]

@@ -1,0 +1,78 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/reference/ingredient-categories",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": [
+      {
+        "code": "flour",
+        "name": "Flour",
+        "isFlour": true,
+        "isLiquid": false
+      },
+      {
+        "code": "water",
+        "name": "Water",
+        "isFlour": false,
+        "isLiquid": true
+      },
+      {
+        "code": "salt",
+        "name": "Salt",
+        "isFlour": false,
+        "isLiquid": false
+      },
+      {
+        "code": "starter",
+        "name": "Starter",
+        "isFlour": false,
+        "isLiquid": false
+      },
+      {
+        "code": "yeast",
+        "name": "Yeast",
+        "isFlour": false,
+        "isLiquid": false
+      },
+      {
+        "code": "sweetener",
+        "name": "Sweetener",
+        "isFlour": false,
+        "isLiquid": false
+      },
+      {
+        "code": "fat",
+        "name": "Fat",
+        "isFlour": false,
+        "isLiquid": false
+      },
+      {
+        "code": "dairy",
+        "name": "Dairy",
+        "isFlour": false,
+        "isLiquid": true
+      },
+      {
+        "code": "add_in",
+        "name": "Add-in (seeds, nuts, fruit)",
+        "isFlour": false,
+        "isLiquid": false
+      },
+      {
+        "code": "packaging",
+        "name": "Packaging",
+        "isFlour": false,
+        "isLiquid": false
+      },
+      {
+        "code": "other",
+        "name": "Other",
+        "isFlour": false,
+        "isLiquid": false
+      }
+    ]
+  }
+]

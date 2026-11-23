@@ -1,0 +1,9 @@
+[
+  {
+    "case": "typical",
+    "method": "DELETE",
+    "path": "/api/v1/starters/f65e64a7-4b08-455b-aa8f-5eb328a6da6e",
+    "authenticated": true,
+    "status": 204
+  }
+]

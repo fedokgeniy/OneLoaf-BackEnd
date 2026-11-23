@@ -1,0 +1,82 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/reference/stage-types",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": [
+      {
+        "code": "autolyse",
+        "name": "Autolyse",
+        "isFermentation": false,
+        "defaultUsesOven": false,
+        "defaultUsesMixer": false
+      },
+      {
+        "code": "mix",
+        "name": "Mixing",
+        "isFermentation": false,
+        "defaultUsesOven": false,
+        "defaultUsesMixer": true
+      },
+      {
+        "code": "bulk_fermentation",
+        "name": "Bulk fermentation",
+        "isFermentation": true,
+        "defaultUsesOven": false,
+        "defaultUsesMixer": false
+      },
+      {
+        "code": "fold",
+        "name": "Stretch and fold",
+        "isFermentation": true,
+        "defaultUsesOven": false,
+        "defaultUsesMixer": false
+      },
+      {
+        "code": "preshape",
+        "name": "Pre-shaping",
+        "isFermentation": false,
+        "defaultUsesOven": false,
+        "defaultUsesMixer": false
+      },
+      {
+        "code": "shape",
+        "name": "Shaping",
+        "isFermentation": false,
+        "defaultUsesOven": false,
+        "defaultUsesMixer": false
+      },
+      {
+        "code": "proof",
+        "name": "Proofing",
+        "isFermentation": true,
+        "defaultUsesOven": false,
+        "defaultUsesMixer": false
+      },
+      {
+        "code": "bake",
+        "name": "Baking",
+        "isFermentation": false,
+        "defaultUsesOven": true,
+        "defaultUsesMixer": false
+      },
+      {
+        "code": "cool",
+        "name": "Cooling",
+        "isFermentation": false,
+        "defaultUsesOven": false,
+        "defaultUsesMixer": false
+      },
+      {
+        "code": "other",
+        "name": "Other",
+        "isFermentation": false,
+        "defaultUsesOven": false,
+        "defaultUsesMixer": false
+      }
+    ]
+  }
+]

@@ -1,0 +1,65 @@
+[
+  {
+    "case": "typical",
+    "method": "PUT",
+    "path": "/api/v1/kitchen-settings",
+    "authenticated": true,
+    "requestBody": {
+      "ovenPowerKw": 2.5,
+      "ovenCapacityLoaves": 4,
+      "mixerBowlCapacityKg": 4.0,
+      "electricityTariffPerKwh": 0.25,
+      "packagingCostPerLoaf": 0.15,
+      "lossRatePercent": 10,
+      "laborRatePerHour": 12,
+      "currency": "EUR",
+      "timeZone": "Europe/Vilnius"
+    },
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "ovenPowerKw": 2.50,
+      "ovenCapacityLoaves": 4,
+      "mixerBowlCapacityKg": 4.00,
+      "electricityTariffPerKwh": 0.2500,
+      "packagingCostPerLoaf": 0.1500,
+      "lossRatePercent": 10.00,
+      "laborRatePerHour": 12.00,
+      "currency": "EUR",
+      "timeZone": "Europe/Vilnius",
+      "updatedAt": "2026-11-23T04:18:06.765233+00:00"
+    }
+  },
+  {
+    "case": "unknown time zone",
+    "method": "PUT",
+    "path": "/api/v1/kitchen-settings",
+    "authenticated": true,
+    "requestBody": {
+      "ovenPowerKw": 2.5,
+      "ovenCapacityLoaves": 4,
+      "mixerBowlCapacityKg": 4.0,
+      "electricityTariffPerKwh": 0.25,
+      "packagingCostPerLoaf": 0.15,
+      "lossRatePercent": 10,
+      "laborRatePerHour": 12,
+      "currency": "EUR",
+      "timeZone": "Mars/Olympus"
+    },
+    "status": 400,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/validation",
+      "title": "One or more validation errors occurred.",
+      "status": 400,
+      "instance": "/api/v1/kitchen-settings",
+      "errors": {
+        "timeZone": [
+          "'Time Zone' must be an IANA time zone, for example Europe/Vilnius."
+        ]
+      },
+      "traceId": "00-dbc67b4ef786fc9edc5763ca865d82b0-4dd9cb348affb037-02",
+      "correlationId": "39df8108e0df4678b1723517b51b279e"
+    }
+  }
+]

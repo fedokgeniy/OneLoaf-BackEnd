@@ -1,0 +1,117 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/ingredients/52323c40-349b-41b4-8318-1c0639ca9e1c/prices",
+    "authenticated": true,
+    "requestBody": {
+      "price": 1.20,
+      "perQuantity": 1000,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-24"
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "63150aa6-77a9-4cce-96fd-a0961aa1e522",
+      "price": 1.2000,
+      "perQuantity": 1000.000,
+      "unitPrice": 0.0012,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-24",
+      "changePercent": null
+    }
+  },
+  {
+    "case": "price change",
+    "method": "POST",
+    "path": "/api/v1/ingredients/52323c40-349b-41b4-8318-1c0639ca9e1c/prices",
+    "authenticated": true,
+    "requestBody": {
+      "price": 1.35,
+      "perQuantity": 1000,
+      "currency": "EUR",
+      "effectiveFrom": "2026-11-22"
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "636c99e9-9df0-4384-b1a1-585d89fb1ed7",
+      "price": 1.3500,
+      "perQuantity": 1000.000,
+      "unitPrice": 0.00135,
+      "currency": "EUR",
+      "effectiveFrom": "2026-11-22",
+      "changePercent": 12.5
+    }
+  },
+  {
+    "case": "other ingredient",
+    "method": "POST",
+    "path": "/api/v1/ingredients/14ad3a67-e6f4-4d52-a2df-79933f4de510/prices",
+    "authenticated": true,
+    "requestBody": {
+      "price": 0.01,
+      "perQuantity": 1000,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-24"
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "037d9b62-26e9-4b50-b3ad-c480e0e17a7b",
+      "price": 0.0100,
+      "perQuantity": 1000.000,
+      "unitPrice": 0.00001,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-24",
+      "changePercent": null
+    }
+  },
+  {
+    "case": "other ingredient",
+    "method": "POST",
+    "path": "/api/v1/ingredients/9e0e9353-f588-4eec-a4cc-e2260801cdc7/prices",
+    "authenticated": true,
+    "requestBody": {
+      "price": 0.80,
+      "perQuantity": 1000,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-24"
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "d4fb1048-4c64-47dc-9d82-c44aa222fa55",
+      "price": 0.8000,
+      "perQuantity": 1000.000,
+      "unitPrice": 0.0008,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-24",
+      "changePercent": null
+    }
+  },
+  {
+    "case": "other ingredient",
+    "method": "POST",
+    "path": "/api/v1/ingredients/b5d44e02-8459-4682-ade6-1d740eddba74/prices",
+    "authenticated": true,
+    "requestBody": {
+      "price": 0.50,
+      "perQuantity": 1000,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-24"
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "2798bca0-8008-4a49-ab31-9c5e5cbd0070",
+      "price": 0.5000,
+      "perQuantity": 1000.000,
+      "unitPrice": 0.0005,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-24",
+      "changePercent": null
+    }
+  }
+]

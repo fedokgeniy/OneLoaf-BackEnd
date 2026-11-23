@@ -1,0 +1,76 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/flours",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Bread flour T550",
+      "flourTypeCode": "wheat",
+      "proteinPercent": 12.5,
+      "grind": "fine",
+      "notes": null
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "name": "Bread flour T550",
+      "flourTypeCode": "wheat",
+      "proteinPercent": 12.5,
+      "grind": "fine",
+      "notes": null,
+      "createdAt": "2026-11-23T04:18:06.805251+00:00",
+      "updatedAt": "2026-11-23T04:18:06.805251+00:00"
+    }
+  },
+  {
+    "case": "name already used",
+    "method": "POST",
+    "path": "/api/v1/flours",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Bread flour T550",
+      "flourTypeCode": "wheat",
+      "proteinPercent": 12.5,
+      "grind": "fine",
+      "notes": null
+    },
+    "status": 409,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/conflict",
+      "title": "The request conflicts with existing data.",
+      "status": 409,
+      "detail": "A flour with this name already exists.",
+      "instance": "/api/v1/flours",
+      "traceId": "00-4d77d0436fd60cd844c354fd282656cc-eea2bdd716fad87e-02",
+      "correlationId": "1d7c0199c2164802b800024d321ecb9f"
+    }
+  },
+  {
+    "case": "second flour",
+    "method": "POST",
+    "path": "/api/v1/flours",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Spare spelt",
+      "flourTypeCode": "spelt",
+      "proteinPercent": 11,
+      "grind": null,
+      "notes": null
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "0b54adc1-4f33-4c0c-acb6-4b4c07f22055",
+      "name": "Spare spelt",
+      "flourTypeCode": "spelt",
+      "proteinPercent": 11.0,
+      "grind": null,
+      "notes": null,
+      "createdAt": "2026-11-23T04:18:06.875444+00:00",
+      "updatedAt": "2026-11-23T04:18:06.875444+00:00"
+    }
+  }
+]

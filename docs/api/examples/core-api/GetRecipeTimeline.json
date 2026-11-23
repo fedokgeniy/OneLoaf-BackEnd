@@ -1,0 +1,73 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/timeline?start=2026-11-25T08%3A00%3A00%2B02%3A00",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+      "start": "2026-11-25T08:00:00+02:00",
+      "stages": [
+        {
+          "lineId": "6b86cc91-8207-4907-8992-89da1514d398",
+          "sortOrder": 1,
+          "name": "Mix",
+          "stageTypeCode": "mix",
+          "minMinutes": 15,
+          "maxMinutes": 20,
+          "plannedStartAt": "2026-11-25T08:00:00+02:00",
+          "plannedEndMinAt": "2026-11-25T08:15:00+02:00",
+          "plannedEndMaxAt": "2026-11-25T08:20:00+02:00"
+        },
+        {
+          "lineId": "03530bbf-a7a0-4111-aebb-accb36c0d377",
+          "sortOrder": 2,
+          "name": "Bulk fermentation",
+          "stageTypeCode": "bulk_fermentation",
+          "minMinutes": 240,
+          "maxMinutes": 300,
+          "plannedStartAt": "2026-11-25T08:15:00+02:00",
+          "plannedEndMinAt": "2026-11-25T12:15:00+02:00",
+          "plannedEndMaxAt": "2026-11-25T13:20:00+02:00"
+        },
+        {
+          "lineId": "9dc286d1-4d39-450e-849a-99f0e5dba894",
+          "sortOrder": 3,
+          "name": "Shape",
+          "stageTypeCode": "shape",
+          "minMinutes": 10,
+          "maxMinutes": 15,
+          "plannedStartAt": "2026-11-25T12:15:00+02:00",
+          "plannedEndMinAt": "2026-11-25T12:25:00+02:00",
+          "plannedEndMaxAt": "2026-11-25T13:35:00+02:00"
+        },
+        {
+          "lineId": "a71225bd-60e2-4867-9252-ca5e723fa5c9",
+          "sortOrder": 4,
+          "name": "Cold proof",
+          "stageTypeCode": "proof",
+          "minMinutes": 600,
+          "maxMinutes": 720,
+          "plannedStartAt": "2026-11-25T12:25:00+02:00",
+          "plannedEndMinAt": "2026-11-25T22:25:00+02:00",
+          "plannedEndMaxAt": "2026-11-26T01:35:00+02:00"
+        },
+        {
+          "lineId": "4fd17458-20ae-4b40-bfa8-5d6105d90b20",
+          "sortOrder": 5,
+          "name": "Bake",
+          "stageTypeCode": "bake",
+          "minMinutes": 40,
+          "maxMinutes": 45,
+          "plannedStartAt": "2026-11-25T22:25:00+02:00",
+          "plannedEndMinAt": "2026-11-25T23:05:00+02:00",
+          "plannedEndMaxAt": "2026-11-26T02:20:00+02:00"
+        }
+      ],
+      "readyFrom": "2026-11-25T23:05:00+02:00",
+      "readyTo": "2026-11-26T02:20:00+02:00"
+    }
+  }
+]

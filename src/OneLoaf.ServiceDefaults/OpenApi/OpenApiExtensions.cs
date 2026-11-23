@@ -19,11 +19,22 @@ public static class OpenApiExtensions
                 {
                     Title = $"OneLoaf {serviceName} API",
                     Version = Routes.OpenApiDocumentName,
+                    Description = "Part of OneLoaf, a web application for managing bread recipes and planning home baking. " +
+                                  "Authenticate with a bearer token from POST /api/v1/auth/login of the Core API. " +
+                                  "Errors are RFC 9457 problem details (application/problem+json) with a correlationId; " +
+                                  "JSON uses camelCase and enums are snake_case strings. Guides: docs/api in the repository.",
+                    License = new OpenApiLicense { Name = "Proprietary (bachelor project)" },
                 };
+
+                // Resolved against the document URL (/openapi/v1.json or /core/openapi/v1.json behind the proxy), so
+                // "Try it out" calls the same service with or without the reverse proxy path prefix.
+                document.Servers = [new OpenApiServer { Url = "..", Description = "This service" }];
                 return Task.CompletedTask;
             });
             options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
             options.AddOperationTransformer<BearerSecuritySchemeTransformer>();
+            options.AddSchemaTransformer<XmlDocumentationTransformer>();
+            options.AddOperationTransformer<XmlDocumentationTransformer>();
         });
         return services;
     }

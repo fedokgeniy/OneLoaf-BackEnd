@@ -1,0 +1,22 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/ingredients/9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+      "name": "Salt",
+      "categoryCode": "salt",
+      "unitCode": "g",
+      "flourId": null,
+      "flourName": null,
+      "proteinPercent": null,
+      "currentPrice": null,
+      "createdAt": "2026-11-23T04:18:07.063126+00:00",
+      "updatedAt": "2026-11-23T04:18:07.063126+00:00"
+    }
+  }
+]

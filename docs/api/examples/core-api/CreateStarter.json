@@ -1,0 +1,64 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/starters",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Rye mother",
+      "hydrationPercent": 100,
+      "feedingMode": "regular",
+      "feedingIntervalHours": 24,
+      "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "riseHours": 8
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "841da49e-2392-4552-8e41-23efa6388d33",
+      "name": "Rye mother",
+      "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "hydrationPercent": 100.0,
+      "feedingMode": "regular",
+      "feedingIntervalHours": 24,
+      "riseHours": 8.0,
+      "isActive": true,
+      "notes": null,
+      "lastFedAt": null,
+      "nextFeedingAt": null,
+      "expectedPeakAt": null,
+      "createdAt": "2026-11-23T04:18:07.92986+00:00",
+      "updatedAt": "2026-11-23T04:18:07.92986+00:00"
+    }
+  },
+  {
+    "case": "fridge starter",
+    "method": "POST",
+    "path": "/api/v1/starters",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Fridge levain",
+      "hydrationPercent": 80,
+      "feedingMode": "fridge",
+      "feedingIntervalHours": 168
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "f65e64a7-4b08-455b-aa8f-5eb328a6da6e",
+      "name": "Fridge levain",
+      "flourId": null,
+      "hydrationPercent": 80.0,
+      "feedingMode": "fridge",
+      "feedingIntervalHours": 168,
+      "riseHours": null,
+      "isActive": true,
+      "notes": null,
+      "lastFedAt": null,
+      "nextFeedingAt": null,
+      "expectedPeakAt": null,
+      "createdAt": "2026-11-23T04:18:08.174824+00:00",
+      "updatedAt": "2026-11-23T04:18:08.174824+00:00"
+    }
+  }
+]

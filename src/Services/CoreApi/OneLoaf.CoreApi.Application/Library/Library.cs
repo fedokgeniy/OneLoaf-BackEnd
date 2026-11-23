@@ -7,6 +7,7 @@ using OneLoaf.CoreApi.Application.Recipes;
 using OneLoaf.Domain;
 using OneLoaf.SharedKernel.Exceptions;
 using OneLoaf.SharedKernel.Security;
+using OneLoaf.SharedKernel.Text;
 
 namespace OneLoaf.CoreApi.Application.Library;
 
@@ -102,10 +103,10 @@ public sealed record ResolveReportRequest(ModerationAction Action, string Reason
 public sealed record RemovePublicationRequest(string Reason);
 
 /// <summary>Query of <c>GET /admin/reports</c>.</summary>
-/// <param name="Status">Status filter; open by default.</param>
+/// <param name="Status">Status filter: open (default), resolved or rejected.</param>
 /// <param name="Page">Page, from 1.</param>
 /// <param name="PageSize">Page size, 1-100.</param>
-public sealed record ReportListQuery(ReportStatus Status = ReportStatus.Open, int Page = 1, int PageSize = Paging.DefaultPageSize);
+public sealed record ReportListQuery(string Status = "open", int Page = 1, int PageSize = Paging.DefaultPageSize);
 
 /// <summary>A content report for the moderator.</summary>
 /// <param name="Id">Report.</param>
@@ -237,7 +238,12 @@ public sealed class CommentListQueryValidator : AbstractValidator<CommentListQue
 public sealed class ReportListQueryValidator : AbstractValidator<ReportListQuery>
 {
     /// <summary>Creates the rules.</summary>
-    public ReportListQueryValidator() => this.AddPagingRules(x => x.Page, x => x.PageSize);
+    public ReportListQueryValidator()
+    {
+        this.AddPagingRules(x => x.Page, x => x.PageSize);
+        RuleFor(x => x.Status).Must(WireEnumNames.IsNullOrDefined<ReportStatus>)
+            .WithMessage($"status must be one of: {WireEnumNames.Values<ReportStatus>()}.");
+    }
 }
 
 /// <summary>Validates <see cref="CommentRequest"/>.</summary>

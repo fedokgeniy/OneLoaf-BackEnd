@@ -1,0 +1,48 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/recipes?search=country&page=1&pageSize=20",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "items": [
+        {
+          "id": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+          "title": "Country sourdough",
+          "parentRecipeId": null,
+          "yieldLoaves": 1,
+          "isArchived": false,
+          "updatedAt": "2026-11-23T04:18:07.351126+00:00"
+        }
+      ],
+      "page": 1,
+      "pageSize": 20,
+      "totalCount": 1
+    }
+  },
+  {
+    "case": "by flour protein",
+    "method": "GET",
+    "path": "/api/v1/recipes?minProteinPercent=12",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "items": [
+        {
+          "id": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+          "title": "Country sourdough",
+          "parentRecipeId": null,
+          "yieldLoaves": 1,
+          "isArchived": false,
+          "updatedAt": "2026-11-23T04:18:07.351126+00:00"
+        }
+      ],
+      "page": 1,
+      "pageSize": 20,
+      "totalCount": 1
+    }
+  }
+]

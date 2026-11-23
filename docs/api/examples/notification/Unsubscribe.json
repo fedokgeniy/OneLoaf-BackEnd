@@ -1,0 +1,26 @@
+[
+  {
+    "case": "typical",
+    "method": "DELETE",
+    "path": "/api/v1/push/subscriptions/56170868-7c60-4421-b3c5-ef04566ec4f5",
+    "authenticated": true,
+    "status": 204
+  },
+  {
+    "case": "not found or another user's",
+    "method": "DELETE",
+    "path": "/api/v1/push/subscriptions/56170868-7c60-4421-b3c5-ef04566ec4f5",
+    "authenticated": true,
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "Push subscription not found.",
+      "instance": "/api/v1/push/subscriptions/56170868-7c60-4421-b3c5-ef04566ec4f5",
+      "traceId": "00-20e144715b2c57f432dab71564a670a6-77eb69df4e41bd3f-02",
+      "correlationId": "25fbd65cf7774a5e959eb225d2fb8903"
+    }
+  }
+]

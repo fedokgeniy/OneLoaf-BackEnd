@@ -1,0 +1,9 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/recipes/e9af6e00-0768-4872-af7b-ca7321dd291a/unarchive",
+    "authenticated": true,
+    "status": 204
+  }
+]
