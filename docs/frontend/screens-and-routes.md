@@ -56,7 +56,7 @@ Components and states: `Components-States` board = the component library with al
 | US-02 Log in / out | M | `/login`, avatar menu, rail, sidebar | same message for wrong e-mail and wrong password (the API already returns one) |
 | US-03 Own data only | M | all | 404 from the API → `NotFoundPage`; never show ids from other users |
 | US-04 Delete account | S | `/settings` → Account | confirm dialog with password (`DELETE /me` body), then clear session |
-| US-05 Recipe CRUD | M | `/recipes`, editor | ingredients and stages as editable lists with add/remove/reorder (buttons + keyboard, no drag-only) |
+| US-05 Recipe CRUD | M | `/recipes`, editor | list: search (debounced), paging ("Show more recipes"), archived filter, filter kept in the address bar; cards show title, "Variant of …", loaves, last change, Archived badge (the list API has no photo, cost or hydration); editor: ingredients and stages as editable lists with add/remove/reorder (buttons + keyboard, no drag-only) |
 | US-06 Scale to N | M | recipe detail stepper | `GET /scaled?loaves=` |
 | US-07 Variant | M | detail → Create variant | list shows "Variant of …"; editor marks inherited rows |
 | US-08 Compare | S | `/recipes/{id}/compare` | "Changes only / All lines" segmented control |
@@ -93,7 +93,7 @@ Components and states: `Components-States` board = the component library with al
 | US-34 Batch from chat | M | `/assistant` | plan card + Confirm / Change |
 | US-35 Numbers from tools | M | `/assistant` | show `unverifiedNumbers` warning if the API returns any |
 | US-36 Analyse bake | M | `/history/{id}` → Ask assistant | 422 "add feedback first" → focus the comment field |
-| US-37 Search recipes / flour filter | S | `/assistant`, `/recipes` | |
+| US-37 Search recipes / flour filter | S | `/assistant`, `/recipes` | `/recipes`: "Minimum flour protein" segmented control (any, ≥ 11, ≥ 12, ≥ 13 %) → `minProteinPercent` |
 | US-38 Substitutions | S | `/assistant` | render `disclaimer` under the answer ("Informational only") |
 | US-39 Publish / unpublish | S | publish dialog, library detail (owner) | |
 | US-40 Browse catalog | S | `/library` | must work signed out: show a "Sign in to copy and comment" bar instead of the app navigation |

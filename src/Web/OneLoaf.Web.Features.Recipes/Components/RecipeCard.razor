@@ -1,0 +1,28 @@
+@* Recipe card (.ol-card): the whole card is one link to the recipe. Shows only what the list API returns. *@
+@using OneLoaf.Web.Features.Recipes.State
+@using OneLoaf.Web.Shared.Formatting
+
+<a class="ol-card ol-card--interactive" href="@($"recipes/{Model.Recipe.Id}")">
+    <div class="ol-card__body">
+        @if (Model.IsVariant)
+        {
+            <span class="ol-card__overline">@(Model.ParentTitle is { } parent ? $"Variant of {parent}" : "Variant")</span>
+        }
+        <h3 class="ol-card__title">@Model.Recipe.Title</h3>
+        <div class="ol-card__meta">
+            <span class="ol-num">@DisplayFormat.Loaves(Model.Recipe.YieldLoaves)</span>
+            <span>Updated <time datetime="@Model.Recipe.UpdatedAt.ToString("O")">@DisplayFormat.Date(Model.Recipe.UpdatedAt)</time></span>
+        </div>
+        @if (Model.Recipe.IsArchived)
+        {
+            <div class="ol-card__foot">
+                <span class="ol-badge ol-badge--neutral">Archived</span>
+            </div>
+        }
+    </div>
+</a>
+
+@code {
+    /// <summary>The card to show.</summary>
+    [Parameter, EditorRequired] public RecipeCardModel Model { get; set; } = default!;
+}

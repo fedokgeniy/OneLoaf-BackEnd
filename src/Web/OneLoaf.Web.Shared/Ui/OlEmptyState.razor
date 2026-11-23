@@ -1,0 +1,24 @@
+@* Empty state (.ol-empty): what is missing and the next action. *@
+<div class="ol-empty">
+    <span class="ol-empty__art"><OlIcon Name="Icon" Size="IconSize.Lg" /></span>
+    <h2 class="ol-empty__title">@Title</h2>
+    @if (!string.IsNullOrEmpty(Text))
+    {
+        <p class="ol-empty__text">@Text</p>
+    }
+    @Action
+</div>
+
+@code {
+    /// <summary>Heading, e.g. "No recipes yet".</summary>
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+
+    /// <summary>Explanation.</summary>
+    [Parameter] public string? Text { get; set; }
+
+    /// <summary>Icon above the heading.</summary>
+    [Parameter] public IconName Icon { get; set; } = IconName.Search;
+
+    /// <summary>The next action (button or link).</summary>
+    [Parameter] public RenderFragment? Action { get; set; }
+}

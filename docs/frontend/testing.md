@@ -65,6 +65,7 @@ $env:ONELOAF_E2E_WEB_ROOT = "$PWD/artifacts/web/wwwroot"; dotnet test tests/OneL
 |---|---|
 | `SignInJourneyTests.SignIn_RecordedLogin_ShowsShellAndSignsOut` at 360×640, 768×1024, 1440×900 | protected route redirects to `/login`; recorded login; exactly one main navigation (bottom bar / rail / sidebar) with `aria-current="page"` on Home; screenshot; Sign out clears the token and returns to `/login` |
 | `SignInJourneyTests.SignIn_WrongPassword_ShowsOneGenericMessage` | recorded 401 → one generic message in an alert, no redirect |
+| `RecipesJourneyTests.Recipes_RecordedList_ShowsCardsAndSearches` at 360×640, 768×1024, 1440×900 | recorded `ListRecipes` → card linked to the recipe; full-page screenshot; typing a search sends `search=` to the API and puts it in the address bar |
 
 ## 4. Accessibility and responsive checks
 

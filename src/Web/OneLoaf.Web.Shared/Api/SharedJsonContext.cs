@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using OneLoaf.Web.Shared.Contracts;
 using OneLoaf.Web.Shared.Contracts.Core;
 
 namespace OneLoaf.Web.Shared.Api;
@@ -12,4 +13,6 @@ namespace OneLoaf.Web.Shared.Api;
 [JsonSerializable(typeof(LoginRequest))]
 [JsonSerializable(typeof(LoginResponse))]
 [JsonSerializable(typeof(UserDto))]
+[JsonSerializable(typeof(RecipeSummaryDto))]
+[JsonSerializable(typeof(PagedResult<RecipeSummaryDto>))]
 internal sealed partial class SharedJsonContext : JsonSerializerContext;

@@ -1,0 +1,84 @@
+@page "/recipes"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Recipes.Components
+@using OneLoaf.Web.Features.Recipes.State
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.State
+
+<ShellTitle Text="Recipes" />
+
+<div class="ol-container recipes">
+    <div class="recipes__toolbar">
+        <h2 class="h2 recipes__heading">Recipes</h2>
+        <div class="ol-field recipes__search">
+            <label class="ol-visually-hidden" for="recipe-search">Search recipes</label>
+            <div class="ol-field__control">
+                <span class="recipes__search-icon"><OlIcon Name="IconName.Search" /></span>
+                <input id="recipe-search" class="ol-input recipes__search-input" type="search" placeholder="Search recipes"
+                       autocomplete="off" value="@_search" @oninput="OnSearchInput" />
+            </div>
+        </div>
+        <div class="recipes__new">
+            <OlButton Href="recipes/new" Icon="IconName.Plus">New recipe</OlButton>
+        </div>
+    </div>
+
+    <div class="recipes__filters">
+        <div class="recipes__chips" role="group" aria-label="Filters">
+            <OlChip Pressed="State.Value.VariantsOnly" PressedChanged="v => Dispatcher.Dispatch(new SetVariantsOnly(v))">Variants only</OlChip>
+            <OlChip Pressed="State.Value.Query.IncludeArchived" PressedChanged="OnArchivedChanged">Show archived</OlChip>
+        </div>
+        <OlSegmented TValue="decimal?" Label="Minimum flour protein" Options="ProteinOptions"
+                     Value="State.Value.Query.MinProteinPercent" ValueChanged="OnProteinChanged" />
+    </div>
+
+    <section class="recipes__results" aria-label="Recipe list" aria-busy="@(IsLoading ? "true" : "false")">
+        <p class="ol-visually-hidden" role="status">@Announcement</p>
+        @switch (State.Value.List)
+        {
+            case Loadable<RecipeList>.Failed { Error: var error }:
+                <OlAlert Kind="AlertKind.Danger" Title="The recipes could not be loaded." CorrelationId="@error.CorrelationId">
+                    <p>@error.Message</p>
+                    <OlButton Variant="ButtonVariant.Secondary" OnClick="Retry">Try again</OlButton>
+                </OlAlert>
+                break;
+            case { Value: null }:
+                <OlSkeleton Variant="SkeletonVariant.Card" Count="6" />
+                break;
+            default:
+                @if (Cards.Count == 0)
+                {
+                    @if (IsFiltered)
+                    {
+                        <OlEmptyState Title="No recipes match" Text="Try another search or clear the filters.">
+                            <Action><OlButton Variant="ButtonVariant.Secondary" OnClick="ClearFilters">Clear filters</OlButton></Action>
+                        </OlEmptyState>
+                    }
+                    else
+                    {
+                        <OlEmptyState Title="No recipes yet" Icon="IconName.Recipes"
+                                      Text="Write down your first recipe to see its cost, timeline and kneading plan.">
+                            <Action><OlButton Href="recipes/new" Icon="IconName.Plus">New recipe</OlButton></Action>
+                        </OlEmptyState>
+                    }
+                }
+                else
+                {
+                    <div class="ol-cards">
+                        @foreach (var card in Cards)
+                        {
+                            <RecipeCard @key="card.Recipe.Id" Model="card" />
+                        }
+                    </div>
+                    @if (State.Value.List.Value is { HasMore: true })
+                    {
+                        <div class="recipes__more">
+                            <OlButton Variant="ButtonVariant.Secondary" Loading="State.Value.LoadingMore"
+                                      OnClick="() => Dispatcher.Dispatch(new LoadMoreRecipes())">Show more recipes</OlButton>
+                        </div>
+                    }
+                }
+                break;
+        }
+    </section>
+</div>
