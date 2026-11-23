@@ -9,6 +9,7 @@ public sealed class AccountServiceTests
 {
     private readonly FakeUserRepository _users = new();
     private readonly FakePasswordHasher _hasher = new();
+    private readonly FakeEventPublisher _events = new();
 
     [Fact]
     public async Task GetMeAsync_ExistingUser_ReturnsOwnProfileOnly()
@@ -41,6 +42,8 @@ public sealed class AccountServiceTests
         await Service(anna.Id).DeleteMeAsync(new DeleteAccountRequest("secret-pass"), TestContext.Current.CancellationToken);
 
         Assert.Equal(boris.Id, Assert.Single(_users.Users).Id);
+        var deleted = Assert.IsType<OneLoaf.Messaging.Contracts.AccountDeleted>(Assert.Single(_events.Published));
+        Assert.Equal(anna.Id, deleted.UserId);
     }
 
     [Fact]
@@ -65,15 +68,15 @@ public sealed class AccountServiceTests
     {
         var anna = _users.Seed("anna@example.com", FakePasswordHasher.Prefix + "secret-pass");
         var repository = new DeletingBetweenCallsRepository(_users);
-        var service = new AccountService(repository, _hasher, new FakeCurrentUser(anna.Id),
-            NullLogger<AccountService>.Instance);
+        var service = new AccountService(repository, _hasher, new FakeCurrentUser(anna.Id), _events,
+            TimeProvider.System, NullLogger<AccountService>.Instance);
 
         await Assert.ThrowsAsync<NotFoundException>(() =>
             service.DeleteMeAsync(new DeleteAccountRequest("secret-pass"), TestContext.Current.CancellationToken));
     }
 
     private AccountService Service(Guid currentUserId) =>
-        new(_users, _hasher, new FakeCurrentUser(currentUserId), NullLogger<AccountService>.Instance);
+        new(_users, _hasher, new FakeCurrentUser(currentUserId), _events, TimeProvider.System, NullLogger<AccountService>.Instance);
 
     /// <summary>Simulates a second request deleting the account between the password check and the delete.</summary>
     private sealed class DeletingBetweenCallsRepository(FakeUserRepository inner) : IUserRepository

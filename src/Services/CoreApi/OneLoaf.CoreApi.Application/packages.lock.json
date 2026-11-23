@@ -35,6 +35,9 @@
       "oneloaf.domain": {
         "type": "Project"
       },
+      "oneloaf.messaging": {
+        "type": "Project"
+      },
       "oneloaf.sharedkernel": {
         "type": "Project"
       }

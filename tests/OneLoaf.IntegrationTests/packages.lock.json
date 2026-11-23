@@ -38,6 +38,15 @@
           "Testcontainers": "4.17.0"
         }
       },
+      "Testcontainers.RabbitMq": {
+        "type": "Direct",
+        "requested": "[4.17.0, )",
+        "resolved": "4.17.0",
+        "contentHash": "Zwv0VLdwDTVfu0BiWOnFtTsRi//8NyJXKgBa5SHXJ+j+FF1Qo6eEcS8bEns/5Enj2CGx4bICEiQlOjVEvUGOHg==",
+        "dependencies": {
+          "Testcontainers": "4.17.0"
+        }
+      },
       "xunit.runner.visualstudio": {
         "type": "Direct",
         "requested": "[4.0.1, )",
@@ -697,6 +706,11 @@
         "resolved": "6.0.1",
         "contentHash": "IQ4NXP/B3Ayzvw0rDQzVTYsCKyy0Jp9KI6aYcK7UnGVlR9+Awz++TIPCQtPYfLJfOpm8ajowMR09V7quD3sEHw=="
       },
+      "System.Threading.RateLimiting": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "7mu9v0QDv66ar3DpGSZHg9NuNcxDaaAcnMULuZlaTpP9+hwXhrxNGsF5GmLkSHxFdb5bBc1TzeujsRgTrPWi+Q=="
+      },
       "Testcontainers": {
         "type": "Transitive",
         "resolved": "4.17.0",
@@ -792,6 +806,7 @@
           "FluentValidation.DependencyInjectionExtensions": "[12.2.0, )",
           "Microsoft.Extensions.Logging.Abstractions": "[10.0.15, )",
           "OneLoaf.Domain": "[1.0.0, )",
+          "OneLoaf.Messaging": "[1.0.0, )",
           "OneLoaf.SharedKernel": "[1.0.0, )"
         }
       },
@@ -802,6 +817,7 @@
           "Microsoft.Extensions.Identity.Core": "[10.0.15, )",
           "OneLoaf.CoreApi.Application": "[1.0.0, )",
           "OneLoaf.Infrastructure": "[1.0.0, )",
+          "OneLoaf.Messaging.RabbitMq": "[1.0.0, )",
           "OneLoaf.ServiceDefaults": "[1.0.0, )"
         }
       },
@@ -814,6 +830,17 @@
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.15, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.4, )",
           "OneLoaf.Domain": "[1.0.0, )"
+        }
+      },
+      "oneloaf.messaging": {
+        "type": "Project"
+      },
+      "oneloaf.messaging.rabbitmq": {
+        "type": "Project",
+        "dependencies": {
+          "OneLoaf.Messaging": "[1.0.0, )",
+          "OneLoaf.ServiceDefaults": "[1.0.0, )",
+          "RabbitMQ.Client": "[7.2.2, )"
         }
       },
       "oneloaf.servicedefaults": {
@@ -1003,6 +1030,15 @@
         "contentHash": "CpkfBbVIHR6Jn8QrGwt7RtOEDyKOHL2rs9HL+5ckzvlsvQiJ5lHD/qvB7NqJuFZIvXnACSYB7AD0ycXITPQFPg==",
         "dependencies": {
           "OpenTelemetry.Api": "[1.21.0, 2.0.0)"
+        }
+      },
+      "RabbitMQ.Client": {
+        "type": "CentralTransitive",
+        "requested": "[7.2.2, )",
+        "resolved": "7.2.2",
+        "contentHash": "k4b6RnTXpLbsF96V93ooNYxgPMnoA2tEm24B6AXNJr1mG8wwNYdA1XJtgU66L5xqeGyveS7SJriRzlX3cbqQNA==",
+        "dependencies": {
+          "System.Threading.RateLimiting": "8.0.0"
         }
       },
       "Serilog.AspNetCore": {

@@ -9,6 +9,8 @@ using OneLoaf.Domain;
 using OneLoaf.Infrastructure.Persistence;
 using DotNet.Testcontainers.Builders;
 using Testcontainers.PostgreSql;
+using Testcontainers.RabbitMq;
+using RabbitMQ.Client;
 
 namespace OneLoaf.IntegrationTests.Infrastructure;
 
@@ -27,10 +29,14 @@ public sealed class ApiFixture : IAsyncLifetime
     private const string AppPassword = "app-test-password";
     private const string ReaderPassword = "reader-test-password";
     private const string MigrationsHistoryTable = "__ef_migrations_history";
+    private const string RabbitUser = "oneloaf";
+    private const string RabbitPassword = "rabbit-test-password";
 
     private readonly RSA _rsa = RSA.Create(2048);
     private readonly string _root;
     private readonly PostgreSqlContainer _postgres;
+    private readonly RabbitMqContainer _rabbitMq = new RabbitMqBuilder("rabbitmq:4-management-alpine")
+        .WithUsername(RabbitUser).WithPassword(RabbitPassword).Build();
     private readonly List<CoreApiFactory> _factories = [];
     private JwtTokenIssuer? _issuer;
 
@@ -58,7 +64,7 @@ public sealed class ApiFixture : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        await _postgres.StartAsync();
+        await Task.WhenAll(_postgres.StartAsync(), _rabbitMq.StartAsync());
 
         var options = new DbContextOptionsBuilder<OneLoafDbContext>()
             .UseNpgsql(ConnectionString("app_admin", AdminPassword),
@@ -109,6 +115,10 @@ public sealed class ApiFixture : IAsyncLifetime
             ["Jwt:SigningKeyPem"] = _rsa.ExportRSAPrivateKeyPem(),
             ["RateLimiting:Auth:PermitLimit"] = authPermitLimit.ToString(System.Globalization.CultureInfo.InvariantCulture),
             ["Serilog:MinimumLevel:Default"] = "Warning",
+            ["RabbitMq:Host"] = _rabbitMq.Hostname,
+            ["RabbitMq:Port"] = _rabbitMq.GetMappedPublicPort(RabbitMqBuilder.RabbitMqPort).ToString(System.Globalization.CultureInfo.InvariantCulture),
+            ["RabbitMq:UserName"] = RabbitUser,
+            ["RabbitMq:Password"] = RabbitPassword,
         });
         _factories.Add(factory);
         return factory;
@@ -130,9 +140,20 @@ public sealed class ApiFixture : IAsyncLifetime
         }
 
         await _postgres.DisposeAsync();
+        await _rabbitMq.DisposeAsync();
         _issuer?.Dispose();
         _rsa.Dispose();
     }
+
+    /// <summary>Opens a broker connection to observe published events.</summary>
+    public Task<IConnection> ConnectToBrokerAsync() =>
+        new ConnectionFactory
+        {
+            HostName = _rabbitMq.Hostname,
+            Port = _rabbitMq.GetMappedPublicPort(RabbitMqBuilder.RabbitMqPort),
+            UserName = RabbitUser,
+            Password = RabbitPassword,
+        }.CreateConnectionAsync();
 
     private string ConnectionString(string username, string password) =>
         new NpgsqlConnectionStringBuilder

@@ -23,4 +23,13 @@ public static class ApiTags
 
     /// <summary>Calculations of a recipe.</summary>
     public const string Calculator = "Calculator";
+
+    /// <summary>Batches and stages.</summary>
+    public const string Production = "Production";
+
+    /// <summary>Starters and feedings.</summary>
+    public const string Starters = "Starters";
+
+    /// <summary>Baking history.</summary>
+    public const string History = "History";
 }

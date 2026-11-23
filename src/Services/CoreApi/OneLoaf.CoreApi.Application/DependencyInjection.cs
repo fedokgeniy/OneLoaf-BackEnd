@@ -2,6 +2,9 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using OneLoaf.CoreApi.Application.Account;
 using OneLoaf.CoreApi.Application.Auth;
+using OneLoaf.CoreApi.Application.Batches;
+using OneLoaf.CoreApi.Application.History;
+using OneLoaf.CoreApi.Application.Starters;
 using OneLoaf.CoreApi.Application.Calculations;
 using OneLoaf.CoreApi.Application.Catalog;
 using OneLoaf.CoreApi.Application.Kitchen;
@@ -26,6 +29,9 @@ public static class DependencyInjection
         services.AddScoped<RecipeService>();
         services.AddScoped<CalculationService>();
         services.AddScoped<WarningsService>();
+        services.AddScoped<BatchService>();
+        services.AddScoped<StarterService>();
+        services.AddScoped<BakeRecordService>();
         services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>(ServiceLifetime.Singleton);
         return services;
     }
