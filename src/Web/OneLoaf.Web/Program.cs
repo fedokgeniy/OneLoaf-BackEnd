@@ -31,6 +31,7 @@ services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<JwtA
 services.AddScoped<SessionMonitor>();
 services.AddScoped<DeviceContext>();
 services.AddScoped<AccountApi>();
+services.AddScoped<ISettingsService, SettingsService>();
 
 services.AddRecipesFeature()
     .AddProductionFeature()

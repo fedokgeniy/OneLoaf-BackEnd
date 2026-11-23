@@ -1,0 +1,23 @@
+{
+  "name": "OneLoaf",
+  "short_name": "OneLoaf",
+  "description": "Recipes, costs, batches and an AI assistant for home bakers.",
+  "id": "/",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#faf7f2",
+  "theme_color": "#c4683a",
+  "categories": ["food", "lifestyle", "productivity"],
+  "icons": [
+    { "src": "app-icons/icon-192.png", "type": "image/png", "sizes": "192x192" },
+    { "src": "app-icons/icon-512.png", "type": "image/png", "sizes": "512x512" },
+    { "src": "app-icons/icon-maskable-512.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" },
+    { "src": "logos/heart-terra.svg", "type": "image/svg+xml", "sizes": "any" }
+  ],
+  "shortcuts": [
+    { "name": "New batch", "url": "./batches/new", "icons": [{ "src": "app-icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Assistant", "url": "./assistant", "icons": [{ "src": "app-icons/icon-192.png", "sizes": "192x192" }] }
+  ]
+}

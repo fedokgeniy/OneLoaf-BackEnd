@@ -86,6 +86,9 @@ public sealed class TokenStore(IJSRuntime js, TimeProvider time)
         {
             await js.InvokeVoidAsync("sessionStorage.removeItem", TokenKey);
             await js.InvokeVoidAsync("sessionStorage.removeItem", ExpiresKey);
+
+            // Recipe data the service worker cached for offline reading belongs to this user (index.html).
+            await js.InvokeVoidAsync("oneloafClearUserData");
         }
         catch (JSException)
         {

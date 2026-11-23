@@ -7,7 +7,13 @@
     <!-- Fingerprinted framework files in index.html (blazor.webassembly#[.{fingerprint}].js, import map), so the web
          server can cache _framework/ forever and never serve a stale runtime. -->
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
+    <!-- PWA (US-44): the publish writes the asset list the service worker caches for offline use. -->
+    <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ServiceWorker Include="wwwroot\service-worker.js" PublishedContent="wwwroot\service-worker.published.js" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" />

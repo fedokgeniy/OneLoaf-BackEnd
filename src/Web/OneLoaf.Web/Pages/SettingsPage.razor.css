@@ -1,0 +1,45 @@
+.settings {
+    display: grid;
+    gap: var(--space-4);
+    padding-block: var(--space-5);
+    max-width: 48rem;
+}
+
+.settings__section h2 {
+    margin: 0;
+}
+
+.settings__field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.settings__help {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--ink-muted);
+}
+
+.settings__account {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+}
+
+.settings__account dt {
+    color: var(--ink-muted);
+}
+
+.settings__account dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+.settings__exports,
+.settings__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}

@@ -29,6 +29,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="icon" type="image/svg+xml" href="logos/heart-terra.svg" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="apple-touch-icon" href="app-icons/apple-touch-icon.png" />
     <link rel="stylesheet" href="css/tokens.css" />
     <link rel="stylesheet" href="css/components.css" />
     <link rel="stylesheet" href="css/app.css" />
@@ -50,6 +52,17 @@
         <a class="ol-btn ol-btn--secondary" href="">Reload</a>
     </div>
     <script src="_framework/blazor.webassembly#[.{fingerprint}].js"></script>
+    <script>
+        // PWA (US-44): offline shell and push reminders. Sign out asks the worker to drop cached recipe data.
+        if ("serviceWorker" in navigator) {
+            navigator.serviceWorker.register("service-worker.js", { updateViaCache: "none" });
+        }
+        window.oneloafClearUserData = function () {
+            if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage("clear-user-data");
+            }
+        };
+    </script>
 </body>
 
 </html>
