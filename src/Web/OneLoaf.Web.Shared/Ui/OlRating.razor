@@ -1,0 +1,38 @@
+@* Rating 1–5 as a radio group (fieldset + legend): arrow keys move between the options as in any radio group; the
+   chosen value is announced as "4 of 5". "No rating" clears it. *@
+@inherits InputBase<int?>
+
+<fieldset class="ol-rating">
+    <legend class="ol-field__label">@Label</legend>
+    <div class="ol-rating__options">
+        @for (var i = 1; i <= 5; i++)
+        {
+            var value = i;
+            <label class="ol-rating__option @(CurrentValue >= value ? "is-filled" : null)">
+                <input type="radio" name="@_name" value="@value" checked="@(CurrentValue == value)" @onchange="() => CurrentValue = value"
+                       aria-label="@($"{value} of 5")" />
+                <span aria-hidden="true">@value</span>
+            </label>
+        }
+        <label class="ol-check ol-rating__none">
+            <input type="radio" name="@_name" value="" checked="@(CurrentValue is null)" @onchange="() => CurrentValue = null" />
+            <span>No rating</span>
+        </label>
+    </div>
+</fieldset>
+
+@code {
+    private readonly string _name = ElementIds.Next("rating");
+
+    /// <summary>Legend, e.g. "Rating".</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+
+    /// <inheritdoc />
+    protected override bool TryParseValueFromString(
+        string? value, out int? result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        result = int.TryParse(value, out var parsed) ? parsed : null;
+        validationErrorMessage = null;
+        return true;
+    }
+}

@@ -7,7 +7,7 @@
 <div class="ol-field">
     <label class="ol-field__label" for="@_id">@Label</label>
     <textarea id="@_id" class="ol-textarea" rows="@Rows" placeholder="@Placeholder" aria-invalid="@(_errors.Length > 0 ? "true" : null)"
-              aria-describedby="@(_errors.Length > 0 ? _id + "-error" : null)" @bind="CurrentValueAsString" @attributes="AdditionalAttributes"></textarea>
+              aria-describedby="@(_errors.Length > 0 ? _id + "-error" : null)" @bind="CurrentValueAsString" @attributes="AdditionalAttributes" @ref="_element"></textarea>
     @if (_errors.Length > 0)
     {
         <span id="@(_id + "-error")" class="ol-field__error">
@@ -20,6 +20,10 @@
 @code {
     private readonly string _id = ElementIds.Next("textarea");
     private string[] _errors = [];
+    private ElementReference _element;
+
+    /// <summary>Moves the keyboard focus to the text area (e.g. when the API asks for a comment first, US-36).</summary>
+    public ValueTask FocusAsync() => _element.FocusAsync();
 
     /// <summary>Label.</summary>
     [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;

@@ -1,0 +1,51 @@
+.ol-rating {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.ol-rating__options {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.ol-rating__option {
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: var(--target-min);
+    height: var(--target-min);
+    border: 2px solid var(--border-control);
+    border-radius: 50%;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.ol-rating__option input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.ol-rating__option:has(input:focus-visible) {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.ol-rating__option.is-filled {
+    background: var(--brand-terra);
+    border-color: var(--brand-terra);
+    color: var(--ink-on-primary);
+}
+
+.ol-rating__none {
+    margin-left: var(--space-2);
+    font-size: 0.875rem;
+}

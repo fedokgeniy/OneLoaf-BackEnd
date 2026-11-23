@@ -1,0 +1,189 @@
+@page "/history"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.History.Services
+@using OneLoaf.Web.Features.History.State
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+@inject IState<HistoryState> State
+@inject IDispatcher Dispatcher
+
+<ShellTitle Text="Baking history" />
+
+<div class="ol-container history">
+    <div class="history__filters">
+        <div class="history__chips" role="group" aria-label="Recipe">
+            <OlChip Pressed="Query.RecipeId is null" PressedChanged="_ => Apply(Query with { RecipeId = null })">All recipes</OlChip>
+            @foreach (var recipe in FilterRecipes)
+            {
+                <OlChip @key="recipe.RecipeId" Pressed="Query.RecipeId == recipe.RecipeId"
+                        PressedChanged="on => Apply(Query with { RecipeId = on ? recipe.RecipeId : null })">@recipe.RecipeTitle</OlChip>
+            }
+            <OlChip Pressed="Query.MinRating == 4" PressedChanged="on => Apply(Query with { MinRating = on ? 4 : null })">Rating 4+</OlChip>
+        </div>
+        <div class="history__dates">
+            <div class="ol-field">
+                <label class="ol-field__label" for="history-from">From</label>
+                <input id="history-from" class="ol-input" type="date" value="@Query.From?.ToString("yyyy-MM-dd")"
+                       @onchange="e => Apply(Query with { From = ParseDate(e.Value) })" />
+            </div>
+            <div class="ol-field">
+                <label class="ol-field__label" for="history-to">To</label>
+                <input id="history-to" class="ol-input" type="date" value="@Query.To?.ToString("yyyy-MM-dd")"
+                       @onchange="e => Apply(Query with { To = ParseDate(e.Value) })" />
+            </div>
+            @if (Query.IsFiltered)
+            {
+                <OlButton Variant="ButtonVariant.Ghost" OnClick="() => Apply(HistoryQuery.None)">Clear filters</OlButton>
+            }
+        </div>
+    </div>
+
+    <section class="history__results" aria-label="Bakes" aria-busy="@(State.Value.List is Loadable<HistoryList>.Loading ? "true" : "false")">
+        <p class="ol-visually-hidden" role="status">@(State.Value.List.Value is { } found ? $"{found.TotalCount} bakes" : null)</p>
+        @switch (State.Value.List)
+        {
+            case Loadable<HistoryList>.Failed { Error: var error }:
+                <OlAlert Kind="AlertKind.Danger" Title="The history could not be loaded." CorrelationId="@error.CorrelationId">
+                    <p>@error.Message</p>
+                    <OlButton Variant="ButtonVariant.Secondary" OnClick="() => Apply(Query)">Try again</OlButton>
+                </OlAlert>
+                break;
+            case { Value: null }:
+                <OlSkeleton Variant="SkeletonVariant.Card" Count="4" />
+                break;
+            case { Value: { Items.Count: 0 } }:
+                @if (Query.IsFiltered)
+                {
+                    <OlEmptyState Title="No bakes match" Text="Try another recipe or date range.">
+                        <Action><OlButton Variant="ButtonVariant.Secondary" OnClick="() => Apply(HistoryQuery.None)">Clear filters</OlButton></Action>
+                    </OlEmptyState>
+                }
+                else
+                {
+                    <OlEmptyState Title="No bakes yet" Icon="IconName.Batches"
+                                  Text="A bake record appears here when you complete a batch. Rate it to learn from every loaf.">
+                        <Action><OlButton Href="batches/new" Icon="IconName.Plus">New batch</OlButton></Action>
+                    </OlEmptyState>
+                }
+                break;
+            case { Value: { } list }:
+                <div class="history__summary">
+                    <OlStatTile Label="Bakes" Value="@list.TotalCount.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                Hint="@(Query.IsFiltered ? "matching the filter" : "in total")" />
+                </div>
+                <ul class="history__list">
+                    @foreach (var bake in list.Items)
+                    {
+                        <li @key="bake.Id">
+                            <a class="ol-card history__card" href="@($"history/{bake.Id}")">
+                                <span class="ol-card__body">
+                                    <span class="history__card-head">
+                                        <span class="ol-card__title">@string.Join(", ", bake.RecipeTitles)</span>
+                                        @if (bake.TotalCost is { } cost)
+                                        {
+                                            <span class="ol-num history__cost">@DisplayFormat.Money(cost, bake.Currency)</span>
+                                        }
+                                    </span>
+                                    <span class="history__meta">@BakedOn(bake.BakedOn) · @DisplayFormat.Loaves(bake.TotalLoaves)@(bake.PhotoCount > 0 ? $" · {bake.PhotoCount} photo{(bake.PhotoCount == 1 ? "" : "s")}" : null)</span>
+                                    <span class="history__badges">
+                                        @if (bake.Rating is { } rating)
+                                        {
+                                            <span class="ol-badge ol-badge--done">Rated @rating/5</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="ol-badge ol-badge--neutral">Not rated</span>
+                                        }
+                                        @if (bake.HasAnalysis)
+                                        {
+                                            <span class="ol-badge ol-badge--planned">Analysed</span>
+                                        }
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+                @if (list.HasMore)
+                {
+                    <div class="history__more">
+                        <OlButton Variant="ButtonVariant.Secondary" Loading="State.Value.LoadingMore"
+                                  OnClick="() => Dispatcher.Dispatch(new LoadMoreHistory())">Show more bakes</OlButton>
+                    </div>
+                }
+                break;
+        }
+    </section>
+
+    <section class="history__stats" aria-labelledby="history-stats-title">
+        <h2 class="h3" id="history-stats-title">By recipe</h2>
+        @switch (State.Value.Statistics)
+        {
+            case Loadable<IReadOnlyList<BakeStatisticsDto>>.Failed { Error: var statsError }:
+                <OlAlert Kind="AlertKind.Danger" CorrelationId="@statsError.CorrelationId">@statsError.Message</OlAlert>
+                break;
+            case { Value: null }:
+                <OlSkeleton Variant="SkeletonVariant.Row" Count="3" />
+                break;
+            case { Value: { Count: 0 } }:
+                <p class="history__help">Statistics appear after your first bake.</p>
+                break;
+            case { Value: { } stats }:
+                <div class="ol-table-wrap">
+                    <table class="ol-table ol-table--stack">
+                        <caption class="ol-visually-hidden">Bakes, loaves, average rating and cost per loaf by recipe</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Recipe</th>
+                                <th scope="col" class="ol-num">Bakes</th>
+                                <th scope="col" class="ol-num">Loaves</th>
+                                <th scope="col" class="ol-num">Avg rating</th>
+                                <th scope="col" class="ol-num">Cost / loaf</th>
+                                <th scope="col" class="ol-num">Last baked</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var row in stats)
+                            {
+                                <tr @key="row.RecipeId">
+                                    <td>@row.RecipeTitle</td>
+                                    <td class="ol-num" data-label="Bakes">@row.BakesCount</td>
+                                    <td class="ol-num" data-label="Loaves">@row.LoavesTotal</td>
+                                    <td class="ol-num" data-label="Avg rating">@(row.AvgRating is { } avg ? $"{DisplayFormat.Number(avg, 1)} ({row.RatedCount})" : "—")</td>
+                                    <td class="ol-num" data-label="Cost / loaf">@(row.AvgCostPerLoaf is { } perLoaf ? DisplayFormat.Money(perLoaf) : "—")</td>
+                                    <td class="ol-num" data-label="Last baked">@DisplayFormat.Date(row.LastBakedOn)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                break;
+        }
+    </section>
+</div>
+
+@code {
+    private HistoryQuery Query => State.Value.Query;
+
+    private IEnumerable<BakeStatisticsDto> FilterRecipes =>
+        State.Value.Statistics.Value?.Where(s => s.RecipeId is not null).Take(6) ?? [];
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (State.Value.List is Loadable<HistoryList>.NotAsked)
+        {
+            Dispatcher.Dispatch(new LoadHistory(Query));
+        }
+    }
+
+    private void Apply(HistoryQuery query) => Dispatcher.Dispatch(new LoadHistory(query));
+
+    private static DateOnly? ParseDate(object? value) =>
+        DateOnly.TryParseExact(value as string, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture,
+            System.Globalization.DateTimeStyles.None, out var date) ? date : null;
+
+    private static string BakedOn(DateOnly date) => date.ToString("ddd d MMM yyyy", System.Globalization.CultureInfo.InvariantCulture);
+}

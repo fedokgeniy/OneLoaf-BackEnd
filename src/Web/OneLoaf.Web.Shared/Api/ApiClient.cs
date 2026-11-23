@@ -43,6 +43,36 @@ public sealed partial class ApiClient(HttpClient http, ApiJsonOptions json, ILog
     public Task<ApiResult> PatchAsync<TBody>(string path, TBody body, CancellationToken ct = default) =>
         SendAsync(WithBody(HttpMethod.Patch, path, body), ct);
 
+    /// <summary>POST of a file as <c>multipart/form-data</c> (field <c>file</c>), returning a body (crumb photo, US-51).</summary>
+    public Task<ApiResult<T>> PostFileAsync<T>(string path, Stream file, string fileName, string contentType, CancellationToken ct = default)
+    {
+        var content = new MultipartFormDataContent();
+        var part = new StreamContent(file);
+        part.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
+        content.Add(part, "file", fileName);
+        return SendAsync<T>(new HttpRequestMessage(HttpMethod.Post, path) { Content = content }, ct);
+    }
+
+    /// <summary>GET of binary content with its media type (photos, CSV export); the bearer token is sent as for JSON.</summary>
+    public async Task<ApiResult<FileDownload>> DownloadAsync(string path, CancellationToken ct = default)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, path.TrimStart('/'));
+        var (response, error) = await TrySendAsync(request, ct);
+        using (response)
+        {
+            if (error is not null)
+            {
+                return ApiResult<FileDownload>.Fail(error);
+            }
+
+            var bytes = await response!.Content.ReadAsByteArrayAsync(ct);
+            return ApiResult<FileDownload>.Ok(new FileDownload(
+                bytes,
+                response.Content.Headers.ContentType?.MediaType ?? "application/octet-stream",
+                response.Content.Headers.ContentDisposition?.FileNameStar ?? response.Content.Headers.ContentDisposition?.FileName?.Trim('"')));
+        }
+    }
+
     /// <summary>DELETE, no response body.</summary>
     public Task<ApiResult> DeleteAsync(string path, CancellationToken ct = default) =>
         SendAsync(new HttpRequestMessage(HttpMethod.Delete, path), ct);
@@ -123,4 +153,14 @@ public sealed partial class ApiClient(HttpClient http, ApiJsonOptions json, ILog
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Response of {Path} could not be read: {Reason}")]
     private static partial void LogUnreadableBody(ILogger logger, string path, string reason);
+}
+
+/// <summary>Downloaded binary content.</summary>
+/// <param name="Content">Bytes.</param>
+/// <param name="ContentType">Media type, e.g. <c>image/png</c>.</param>
+/// <param name="FileName">File name from <c>Content-Disposition</c>, if any.</param>
+public sealed record FileDownload(byte[] Content, string ContentType, string? FileName)
+{
+    /// <summary>A <c>data:</c> URL for an <c>&lt;img&gt;</c>, so authenticated images need no token in the URL.</summary>
+    public string ToDataUrl() => $"data:{ContentType};base64,{Convert.ToBase64String(Content)}";
 }
