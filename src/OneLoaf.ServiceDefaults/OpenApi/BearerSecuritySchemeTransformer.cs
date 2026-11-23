@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.OpenApi;
 using Microsoft.OpenApi;
+using OneLoaf.ServiceDefaults.Security;
 
 namespace OneLoaf.ServiceDefaults.OpenApi;
 
@@ -13,6 +14,9 @@ public sealed class BearerSecuritySchemeTransformer : IOpenApiDocumentTransforme
 {
     /// <summary>Name of the security scheme in the document.</summary>
     public const string SchemeName = JwtBearerDefaults.AuthenticationScheme;
+
+    /// <summary>Appended to the description of operations that need the admin role.</summary>
+    public const string AdminNote = "Requires the admin role.";
 
     private const string BearerFormat = "JWT";
     private const string HttpScheme = "bearer";
@@ -43,7 +47,13 @@ public sealed class BearerSecuritySchemeTransformer : IOpenApiDocumentTransforme
         ArgumentNullException.ThrowIfNull(operation);
         ArgumentNullException.ThrowIfNull(context);
 
-        var isAnonymous = context.Description.ActionDescriptor.EndpointMetadata.OfType<IAllowAnonymous>().Any();
+        var metadata = context.Description.ActionDescriptor.EndpointMetadata;
+        var isAnonymous = metadata.OfType<IAllowAnonymous>().Any();
+        if (metadata.OfType<IAuthorizeData>().Any(a => a.Policy == Policies.Admin))
+        {
+            operation.Description = $"{operation.Description} {AdminNote}".Trim();
+        }
+
         if (!isAnonymous)
         {
             operation.Security ??= [];

@@ -9,6 +9,7 @@ using OneLoaf.CoreApi.Infrastructure.Caching;
 using OneLoaf.Domain;
 using OneLoaf.Domain.Entities;
 using OneLoaf.Infrastructure.Persistence;
+using OneLoaf.SharedKernel.Text;
 
 namespace OneLoaf.CoreApi.Infrastructure.Persistence;
 
@@ -169,7 +170,8 @@ public sealed class LibraryRepository(OneLoafDbContext db, HybridCache cache, Ca
     public async Task<PagedResult<ReportDto>> ListReportsAsync(ReportListQuery query, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(query);
-        var reports = db.ContentReports.AsNoTracking().Where(r => r.Status == query.Status);
+        var status = WireEnumNames.ParseOrNull<ReportStatus>(query.Status) ?? ReportStatus.Open;
+        var reports = db.ContentReports.AsNoTracking().Where(r => r.Status == status);
         var total = await reports.CountAsync(cancellationToken);
         var items = await reports
             .OrderBy(r => r.CreatedAt).ThenBy(r => r.Id)

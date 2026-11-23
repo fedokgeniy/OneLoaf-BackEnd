@@ -1,0 +1,698 @@
+# core-api: one typical request per operation, generated from the recorded examples.
+# Base URLs: https://<domain>/core (production behind Caddy), http://localhost:5080 (local)
+# Use with the VS Code REST Client or JetBrains HTTP Client; set @token to an access token from POST /api/v1/auth/login.
+@baseUrl = http://localhost:5080
+@token = <access token>
+
+### Data quality warnings
+GET {{baseUrl}}/api/v1/warnings
+Authorization: Bearer {{token}}
+
+### Publish a recipe to the library
+POST {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/publish
+Authorization: Bearer {{token}}
+
+### Suggest oven rounds
+POST {{baseUrl}}/api/v1/calculations/oven-loading
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+      "loaves": 3
+    },
+    {
+      "recipeId": "e9af6e00-0768-4872-af7b-ca7321dd291a",
+      "loaves": 2
+    }
+  ]
+}
+
+### Register a new account
+POST {{baseUrl}}/api/v1/auth/register
+Content-Type: application/json
+
+{
+  "email": "docs.baker.58152a7fa@example.com",
+  "password": "Rye-Bread-2026!",
+  "displayName": "Docs Baker"
+}
+
+### Log in and get an access token
+POST {{baseUrl}}/api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "docs.baker.58152a7fa@example.com",
+  "password": "Rye-Bread-2026!"
+}
+
+### Log out
+POST {{baseUrl}}/api/v1/auth/logout
+Authorization: Bearer {{token}}
+
+### Get the current user's profile
+GET {{baseUrl}}/api/v1/me
+Authorization: Bearer {{token}}
+
+### Delete the current account and all its data
+DELETE {{baseUrl}}/api/v1/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "password": "Rye-Bread-2026!"
+}
+
+### Units of measure
+GET {{baseUrl}}/api/v1/reference/units
+Authorization: Bearer {{token}}
+
+### Currencies
+GET {{baseUrl}}/api/v1/reference/currencies
+Authorization: Bearer {{token}}
+
+### Stage types
+GET {{baseUrl}}/api/v1/reference/stage-types
+Authorization: Bearer {{token}}
+
+### Ingredient categories
+GET {{baseUrl}}/api/v1/reference/ingredient-categories
+Authorization: Bearer {{token}}
+
+### Flour types
+GET {{baseUrl}}/api/v1/reference/flour-types
+Authorization: Bearer {{token}}
+
+### Get the kitchen settings
+GET {{baseUrl}}/api/v1/kitchen-settings
+Authorization: Bearer {{token}}
+
+### Replace the kitchen settings
+PUT {{baseUrl}}/api/v1/kitchen-settings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "ovenPowerKw": 2.5,
+  "ovenCapacityLoaves": 4,
+  "mixerBowlCapacityKg": 4.0,
+  "electricityTariffPerKwh": 0.25,
+  "packagingCostPerLoaf": 0.15,
+  "lossRatePercent": 10,
+  "laborRatePerHour": 12,
+  "currency": "EUR",
+  "timeZone": "Europe/Vilnius"
+}
+
+### List flours
+GET {{baseUrl}}/api/v1/flours?page=1&pageSize=20
+Authorization: Bearer {{token}}
+
+### Create a flour
+POST {{baseUrl}}/api/v1/flours
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Bread flour T550",
+  "flourTypeCode": "wheat",
+  "proteinPercent": 12.5,
+  "grind": "fine",
+  "notes": null
+}
+
+### Get a flour
+GET {{baseUrl}}/api/v1/flours/6ac54db1-125d-4e4c-8d62-bdc63be0bcd3
+Authorization: Bearer {{token}}
+
+### Replace a flour
+PUT {{baseUrl}}/api/v1/flours/6ac54db1-125d-4e4c-8d62-bdc63be0bcd3
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Bread flour T550",
+  "flourTypeCode": "wheat",
+  "proteinPercent": 12.8,
+  "grind": "fine",
+  "notes": "Local mill"
+}
+
+### Delete a flour
+DELETE {{baseUrl}}/api/v1/flours/0b54adc1-4f33-4c0c-acb6-4b4c07f22055
+Authorization: Bearer {{token}}
+
+### List ingredients with today's price
+GET {{baseUrl}}/api/v1/ingredients?category=flour&page=1&pageSize=20
+Authorization: Bearer {{token}}
+
+### Create an ingredient
+POST {{baseUrl}}/api/v1/ingredients
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Bread flour",
+  "categoryCode": "flour",
+  "unitCode": "g",
+  "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3"
+}
+
+### Get an ingredient
+GET {{baseUrl}}/api/v1/ingredients/9e0e9353-f588-4eec-a4cc-e2260801cdc7
+Authorization: Bearer {{token}}
+
+### Replace an ingredient
+PUT {{baseUrl}}/api/v1/ingredients/9e0e9353-f588-4eec-a4cc-e2260801cdc7
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Sea salt",
+  "categoryCode": "salt",
+  "unitCode": "g",
+  "flourId": null
+}
+
+### Delete an ingredient
+DELETE {{baseUrl}}/api/v1/ingredients/713def41-2884-4ff5-b003-861a786a0db2
+Authorization: Bearer {{token}}
+
+### Price history
+GET {{baseUrl}}/api/v1/ingredients/52323c40-349b-41b4-8318-1c0639ca9e1c/prices
+Authorization: Bearer {{token}}
+
+### Add a price with an effective date
+POST {{baseUrl}}/api/v1/ingredients/52323c40-349b-41b4-8318-1c0639ca9e1c/prices
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "price": 1.20,
+  "perQuantity": 1000,
+  "currency": "EUR",
+  "effectiveFrom": "2026-10-24"
+}
+
+### List recipes
+GET {{baseUrl}}/api/v1/recipes?search=country&page=1&pageSize=20
+Authorization: Bearer {{token}}
+
+### Create a recipe with ingredients and stages
+POST {{baseUrl}}/api/v1/recipes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Country sourdough",
+  "description": "Open crumb, crisp crust.",
+  "yieldLoaves": 1,
+  "loafWeightG": 900,
+  "notes": null,
+  "ingredients": [
+    {
+      "ingredientId": "52323c40-349b-41b4-8318-1c0639ca9e1c",
+      "quantity": 500
+    },
+    {
+      "ingredientId": "14ad3a67-e6f4-4d52-a2df-79933f4de510",
+      "quantity": 350
+    },
+    {
+      "ingredientId": "9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+      "quantity": 10
+    },
+    {
+      "ingredientId": "b5d44e02-8459-4682-ade6-1d740eddba74",
+      "quantity": 100
+    }
+  ],
+  "stages": [
+    {
+      "name": "Mix",
+      "stageTypeCode": "mix",
+      "minDurationMinutes": 15,
+      "maxDurationMinutes": 20,
+      "activeMinutes": 15
+    },
+    {
+      "name": "Bulk fermentation",
+      "stageTypeCode": "bulk_fermentation",
+      "minDurationMinutes": 240,
+      "maxDurationMinutes": 300,
+      "temperatureC": 24
+    },
+    {
+      "name": "Shape",
+      "stageTypeCode": "shape",
+      "minDurationMinutes": 10,
+      "maxDurationMinutes": 15,
+      "activeMinutes": 10
+    },
+    {
+      "name": "Cold proof",
+      "stageTypeCode": "proof",
+      "minDurationMinutes": 600,
+      "maxDurationMinutes": 720,
+      "proofMode": "cold",
+      "temperatureC": 4
+    },
+    {
+      "name": "Bake",
+      "stageTypeCode": "bake",
+      "minDurationMinutes": 40,
+      "maxDurationMinutes": 45,
+      "temperatureC": 240
+    }
+  ]
+}
+
+### Get the effective recipe
+GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4
+Authorization: Bearer {{token}}
+
+### Replace the content of a recipe
+PUT {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Country sourdough",
+  "description": "Open crumb, crisp crust.",
+  "yieldLoaves": 1,
+  "loafWeightG": 900,
+  "notes": "Feed the starter the evening before.",
+  "ingredients": [
+    {
+      "ingredientId": "52323c40-349b-41b4-8318-1c0639ca9e1c",
+      "quantity": 500
+    },
+    {
+      "ingredientId": "14ad3a67-e6f4-4d52-a2df-79933f4de510",
+      "quantity": 350
+    },
+    {
+      "ingredientId": "9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+      "quantity": 10
+    },
+    {
+      "ingredientId": "b5d44e02-8459-4682-ade6-1d740eddba74",
+      "quantity": 100
+    }
+  ],
+  "stages": [
+    {
+      "name": "Mix",
+      "stageTypeCode": "mix",
+      "minDurationMinutes": 15,
+      "maxDurationMinutes": 20,
+      "activeMinutes": 15
+    },
+    {
+      "name": "Bulk fermentation",
+      "stageTypeCode": "bulk_fermentation",
+      "minDurationMinutes": 240,
+      "maxDurationMinutes": 300,
+      "temperatureC": 24
+    },
+    {
+      "name": "Shape",
+      "stageTypeCode": "shape",
+      "minDurationMinutes": 10,
+      "maxDurationMinutes": 15,
+      "activeMinutes": 10
+    },
+    {
+      "name": "Cold proof",
+      "stageTypeCode": "proof",
+      "minDurationMinutes": 600,
+      "maxDurationMinutes": 720,
+      "proofMode": "cold",
+      "temperatureC": 4
+    },
+    {
+      "name": "Bake",
+      "stageTypeCode": "bake",
+      "minDurationMinutes": 40,
+      "maxDurationMinutes": 45,
+      "temperatureC": 240
+    }
+  ]
+}
+
+### Delete a recipe
+DELETE {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4
+Authorization: Bearer {{token}}
+
+### Archive a recipe
+POST {{baseUrl}}/api/v1/recipes/e9af6e00-0768-4872-af7b-ca7321dd291a/archive
+Authorization: Bearer {{token}}
+
+### Restore an archived recipe
+POST {{baseUrl}}/api/v1/recipes/e9af6e00-0768-4872-af7b-ca7321dd291a/unarchive
+Authorization: Bearer {{token}}
+
+### Create a variant
+POST {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/variants
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Country sourdough, longer bulk"
+}
+
+### Compare a variant with its parent
+GET {{baseUrl}}/api/v1/recipes/e9af6e00-0768-4872-af7b-ca7321dd291a/comparison
+Authorization: Bearer {{token}}
+
+### Scale to a number of loaves
+GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/scaled?loaves=3
+Authorization: Bearer {{token}}
+
+### Cost of N loaves on a price date
+GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/cost?loaves=3
+Authorization: Bearer {{token}}
+
+### Stage timeline and ready window for a start time
+GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/timeline?start=2026-11-25T08%3A00%3A00%2B02%3A00
+Authorization: Bearer {{token}}
+
+### Start window for a desired ready time
+GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/start-window?readyAt=2026-11-26T08%3A00%3A00%2B02%3A00
+Authorization: Bearer {{token}}
+
+### Dough weight, kneading cycles and starter amount
+GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/production-figures?loaves=3
+Authorization: Bearer {{token}}
+
+### Production calendar
+GET {{baseUrl}}/api/v1/batches?status=planned
+Authorization: Bearer {{token}}
+
+### Create a batch and build its plan
+POST {{baseUrl}}/api/v1/batches
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Weekend bake",
+  "plannedStartAt": "2026-11-25T08:00:00+02:00",
+  "source": "manual",
+  "items": [
+    {
+      "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+      "loaves": 3,
+      "starterId": "841da49e-2392-4552-8e41-23efa6388d33",
+      "starterReminderMinutes": 60
+    }
+  ]
+}
+
+### Plan a batch without saving it
+POST {{baseUrl}}/api/v1/batches/preview
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Weekend bake",
+  "plannedStartAt": "2026-11-25T08:00:00+02:00",
+  "source": "manual",
+  "items": [
+    {
+      "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+      "loaves": 3,
+      "starterId": "841da49e-2392-4552-8e41-23efa6388d33",
+      "starterReminderMinutes": 60
+    }
+  ]
+}
+
+### Get a batch with items and stages
+GET {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee
+Authorization: Bearer {{token}}
+
+### Re-plan a planned batch
+PUT {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Weekend bake",
+  "plannedStartAt": "2026-11-25T09:00:00+02:00",
+  "source": "manual",
+  "items": [
+    {
+      "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+      "loaves": 3,
+      "starterId": "841da49e-2392-4552-8e41-23efa6388d33",
+      "starterReminderMinutes": 60
+    }
+  ]
+}
+
+### Cancel a batch
+POST {{baseUrl}}/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/cancel
+Authorization: Bearer {{token}}
+
+### Complete a running batch
+POST {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee/complete
+Authorization: Bearer {{token}}
+
+### Merged kneads of the same dough
+GET {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee/kneading-plan
+Authorization: Bearer {{token}}
+
+### Start a stage now
+POST {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee/stages/e26b456e-2410-4e2b-b52f-d22e73b8d85b/start
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "actualTemperatureC": null,
+  "note": null
+}
+
+### Complete a running stage now
+POST {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee/stages/e26b456e-2410-4e2b-b52f-d22e73b8d85b/complete
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "actualTemperatureC": 24.5,
+  "note": null
+}
+
+### Skip a pending stage
+POST {{baseUrl}}/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/stages/39c6b892-4e57-4135-8ece-1e7da4667bec/skip
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "actualTemperatureC": null,
+  "note": "Baked without shaping, in a tin"
+}
+
+### Extend a stage by N minutes
+POST {{baseUrl}}/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/stages/fe3543ca-6643-40a9-9439-a52a7e7ecfa6/extend
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "minutes": 30
+}
+
+### Change the planned durations for this batch only
+PATCH {{baseUrl}}/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/stages/962748c3-fa60-4d21-b2a8-3cffbb46171e
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "plannedMinMinutes": 270,
+  "plannedMaxMinutes": 330
+}
+
+### Restore the durations of the recipe stage
+POST {{baseUrl}}/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/stages/962748c3-fa60-4d21-b2a8-3cffbb46171e/reset
+Authorization: Bearer {{token}}
+
+### List starters with their schedule
+GET {{baseUrl}}/api/v1/starters
+Authorization: Bearer {{token}}
+
+### Create a starter
+POST {{baseUrl}}/api/v1/starters
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Rye mother",
+  "hydrationPercent": 100,
+  "feedingMode": "regular",
+  "feedingIntervalHours": 24,
+  "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+  "riseHours": 8
+}
+
+### Get a starter
+GET {{baseUrl}}/api/v1/starters/841da49e-2392-4552-8e41-23efa6388d33
+Authorization: Bearer {{token}}
+
+### Replace a starter
+PUT {{baseUrl}}/api/v1/starters/841da49e-2392-4552-8e41-23efa6388d33
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Rye mother",
+  "hydrationPercent": 100,
+  "feedingMode": "regular",
+  "feedingIntervalHours": 12,
+  "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+  "riseHours": 8,
+  "notes": "Kitchen counter"
+}
+
+### Delete a starter
+DELETE {{baseUrl}}/api/v1/starters/f65e64a7-4b08-455b-aa8f-5eb328a6da6e
+Authorization: Bearer {{token}}
+
+### Feeding log, newest first
+GET {{baseUrl}}/api/v1/starters/841da49e-2392-4552-8e41-23efa6388d33/feedings
+Authorization: Bearer {{token}}
+
+### Record a feeding
+POST {{baseUrl}}/api/v1/starters/841da49e-2392-4552-8e41-23efa6388d33/feedings
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "fedAt": "2026-11-23T03:18:07.9871901+00:00",
+  "flourG": 50,
+  "waterG": 50,
+  "starterKeptG": 20,
+  "temperatureC": 24
+}
+
+### Baking history
+GET {{baseUrl}}/api/v1/bake-records?page=1&pageSize=20
+Authorization: Bearer {{token}}
+
+### Statistics per recipe
+GET {{baseUrl}}/api/v1/bake-records/statistics
+Authorization: Bearer {{token}}
+
+### Get a history record
+GET {{baseUrl}}/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea
+Authorization: Bearer {{token}}
+
+### Set rating and comment
+PATCH {{baseUrl}}/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "rating": 4,
+  "comment": "Good oven spring, crumb a bit tight."
+}
+
+### Planned vs actual stage times
+GET {{baseUrl}}/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea/stage-log
+Authorization: Bearer {{token}}
+
+### Store the assistant's analysis
+PUT {{baseUrl}}/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea/analysis
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "analysis": "Bulk fermentation ended early; give the dough more time next bake."
+}
+
+### Browse and search the library
+GET {{baseUrl}}/api/v1/library?search=sourdough&page=1&pageSize=20
+
+### A published recipe
+GET {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7
+
+### Comments of a published recipe
+GET {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/comments?page=1&pageSize=20
+Authorization: Bearer {{token}}
+
+### Comment a published recipe
+POST {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/comments
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "body": "Baked it on Sunday, lovely crumb!"
+}
+
+### Withdraw an own publication
+POST {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/unpublish
+Authorization: Bearer {{token}}
+
+### Remove an own comment
+DELETE {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/comments/961d5900-7415-4489-b217-8117676605c9
+Authorization: Bearer {{token}}
+
+### Set the own reaction
+PUT {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/reactions/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "reaction": "want_to_bake"
+}
+
+### Remove the own reaction
+DELETE {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/reactions/me
+Authorization: Bearer {{token}}
+
+### Copy a published recipe into the own workspace
+POST {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/copy
+Authorization: Bearer {{token}}
+
+### Report a publication or a comment
+POST {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/reports
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "reason": "Off-topic advertising link",
+  "commentId": "961d5900-7415-4489-b217-8117676605c9"
+}
+
+### Content reports
+GET {{baseUrl}}/api/v1/admin/reports?status=open&page=1&pageSize=20
+Authorization: Bearer {{token}}
+
+### Decide a report
+POST {{baseUrl}}/api/v1/admin/reports/405e7edc-05b1-4a63-b75c-22ec2e8fe956/resolve
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "action": "reject",
+  "reason": "The comment was already removed by its author."
+}
+
+### Remove a publication
+POST {{baseUrl}}/api/v1/admin/library/c3cc7934-aeeb-4233-86b0-0b3f056ad5a7/remove
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "reason": "Duplicate of an earlier publication."
+}
+
+### Own recipes as CSV
+GET {{baseUrl}}/api/v1/export/recipes.csv
+Authorization: Bearer {{token}}
+
+### Own bake records as CSV
+GET {{baseUrl}}/api/v1/export/bake-records.csv
+Authorization: Bearer {{token}}
+

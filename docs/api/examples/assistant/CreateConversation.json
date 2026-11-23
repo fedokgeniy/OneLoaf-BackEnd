@@ -1,0 +1,53 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/conversations",
+    "authenticated": true,
+    "requestBody": {
+      "title": null
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "fd6fbe82-c450-4169-a1e4-4ad5e5775132",
+      "title": null,
+      "createdAt": "2026-11-23T04:18:09.697561+00:00",
+      "updatedAt": "2026-11-23T04:18:09.697561+00:00"
+    }
+  },
+  {
+    "case": "with a title",
+    "method": "POST",
+    "path": "/api/v1/conversations",
+    "authenticated": true,
+    "requestBody": {
+      "title": "Rye questions"
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "8a75d663-8bbb-408b-ba17-062204e69b47",
+      "title": "Rye questions",
+      "createdAt": "2026-11-23T04:18:09.998015+00:00",
+      "updatedAt": "2026-11-23T04:18:09.998015+00:00"
+    }
+  },
+  {
+    "case": "for the outage example",
+    "method": "POST",
+    "path": "/api/v1/conversations",
+    "authenticated": true,
+    "requestBody": {
+      "title": null
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "6ae04026-5d3b-4ce7-be79-882ea4751704",
+      "title": null,
+      "createdAt": "2026-11-23T04:18:10.064862+00:00",
+      "updatedAt": "2026-11-23T04:18:10.064862+00:00"
+    }
+  }
+]

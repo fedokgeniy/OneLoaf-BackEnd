@@ -1,0 +1,44 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/reference/flour-types",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": [
+      {
+        "code": "wheat",
+        "name": "Wheat"
+      },
+      {
+        "code": "rye",
+        "name": "Rye"
+      },
+      {
+        "code": "spelt",
+        "name": "Spelt"
+      },
+      {
+        "code": "whole",
+        "name": "Whole grain (mixed)"
+      },
+      {
+        "code": "barley",
+        "name": "Barley"
+      },
+      {
+        "code": "oat",
+        "name": "Oat"
+      },
+      {
+        "code": "corn",
+        "name": "Corn"
+      },
+      {
+        "code": "other",
+        "name": "Other"
+      }
+    ]
+  }
+]

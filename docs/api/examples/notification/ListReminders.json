@@ -1,0 +1,40 @@
+[
+  {
+    "case": "without token",
+    "method": "GET",
+    "path": "/api/v1/reminders",
+    "authenticated": false,
+    "status": 401,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/unauthorized",
+      "title": "A valid bearer token is required.",
+      "status": 401,
+      "instance": "/api/v1/reminders",
+      "traceId": "00-4839249471cbdfd66a672f0d4a8beb33-8f8ae96b1db6fecf-02",
+      "correlationId": "887c4060526a4bbeb3d492d49c2e7b41"
+    }
+  },
+  {
+    "case": "upcoming",
+    "method": "GET",
+    "path": "/api/v1/reminders?status=scheduled&limit=20",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": [
+      {
+        "id": "1a9602d6-90bf-4c5b-9121-658a1279f6c7",
+        "kind": "starter_feeding",
+        "channel": "push",
+        "status": "scheduled",
+        "message": "Time to feed starter \"Rye mother\"",
+        "dueAt": "2026-11-23T15:18:07.98719+00:00",
+        "sentAt": null,
+        "attempts": 0,
+        "batchId": null,
+        "starterId": "841da49e-2392-4552-8e41-23efa6388d33"
+      }
+    ]
+  }
+]

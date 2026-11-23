@@ -1,0 +1,19 @@
+[
+  {
+    "case": "has variants",
+    "method": "DELETE",
+    "path": "/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4",
+    "authenticated": true,
+    "status": 409,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/conflict",
+      "title": "The request conflicts with existing data.",
+      "status": 409,
+      "detail": "The recipe has variants or is used in batches; archive it instead.",
+      "instance": "/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4",
+      "traceId": "00-527b525715a0b491b9e6b4c571591f16-28e1e5c9ba911b42-02",
+      "correlationId": "eb2461f3e02846dc85218aa0ce65db65"
+    }
+  }
+]

@@ -1,0 +1,265 @@
+{
+  "HttpValidationProblemDetails": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "title": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "status": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "format": "int32"
+      },
+      "detail": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "instance": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "errors": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "description": "Problem details of a 400 validation error; errors maps each invalid field (camelCase) to its messages."
+  },
+  "ProblemDetails": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "title": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "status": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "format": "int32"
+      },
+      "detail": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "instance": {
+        "type": [
+          "null",
+          "string"
+        ]
+      }
+    },
+    "description": "RFC 9457 problem details: type, title, status, detail, instance, plus correlationId and traceId for support. Retry-After is sent as a header with 429 and 503."
+  },
+  "PushKeys": {
+    "required": [
+      "p256dh",
+      "auth"
+    ],
+    "type": "object",
+    "properties": {
+      "p256dh": {
+        "type": "string",
+        "description": "Public key of the browser (base64url)."
+      },
+      "auth": {
+        "type": "string",
+        "description": "Authentication secret (base64url)."
+      }
+    },
+    "description": "Encryption keys."
+  },
+  "PushSubscriptionDto": {
+    "required": [
+      "id",
+      "endpoint",
+      "createdAt"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id.",
+        "format": "uuid"
+      },
+      "endpoint": {
+        "type": "string",
+        "description": "Push service URL."
+      },
+      "createdAt": {
+        "type": "string",
+        "description": "Creation time.",
+        "format": "date-time"
+      }
+    },
+    "description": "A stored push subscription."
+  },
+  "ReminderChannel": {
+    "enum": [
+      "push",
+      "email"
+    ],
+    "description": "Channel."
+  },
+  "ReminderDto": {
+    "required": [
+      "id",
+      "kind",
+      "channel",
+      "status",
+      "message",
+      "dueAt",
+      "sentAt",
+      "attempts",
+      "batchId",
+      "starterId"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Reminder.",
+        "format": "uuid"
+      },
+      "kind": {
+        "$ref": "#/components/schemas/ReminderKind"
+      },
+      "channel": {
+        "$ref": "#/components/schemas/ReminderChannel"
+      },
+      "status": {
+        "$ref": "#/components/schemas/ReminderStatus"
+      },
+      "message": {
+        "type": "string",
+        "description": "Text."
+      },
+      "dueAt": {
+        "type": "string",
+        "description": "Due time.",
+        "format": "date-time"
+      },
+      "sentAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Delivery time.",
+        "format": "date-time"
+      },
+      "attempts": {
+        "type": "integer",
+        "description": "Delivery attempts so far.",
+        "format": "int32"
+      },
+      "batchId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Batch, if any.",
+        "format": "uuid"
+      },
+      "starterId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Starter, if any.",
+        "format": "uuid"
+      }
+    },
+    "description": "A reminder in the baker's list."
+  },
+  "ReminderKind": {
+    "enum": [
+      "starter_feeding",
+      "before_kneading",
+      "stage_start"
+    ],
+    "description": "Kind."
+  },
+  "ReminderStatus": {
+    "enum": [
+      "scheduled",
+      "sent",
+      "cancelled",
+      "failed"
+    ],
+    "description": "Status."
+  },
+  "SubscribeRequest": {
+    "required": [
+      "endpoint",
+      "keys"
+    ],
+    "type": "object",
+    "properties": {
+      "endpoint": {
+        "type": "string",
+        "description": "Push service URL of the device."
+      },
+      "keys": {
+        "$ref": "#/components/schemas/PushKeys"
+      }
+    },
+    "description": "Body of POST /push/subscriptions."
+  },
+  "TestPushResponse": {
+    "required": [
+      "delivered"
+    ],
+    "type": "object",
+    "properties": {
+      "delivered": {
+        "type": "boolean",
+        "description": "At least one device accepted the notification."
+      }
+    },
+    "description": "Response of POST /push/test."
+  },
+  "VapidPublicKeyResponse": {
+    "required": [
+      "publicKey"
+    ],
+    "type": "object",
+    "properties": {
+      "publicKey": {
+        "type": "string",
+        "description": "VAPID public key (base64url) for applicationServerKey."
+      }
+    },
+    "description": "Response of GET /push/vapid-public-key."
+  }
+}

@@ -1,0 +1,30 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/actions/fd033985-8f54-45eb-94a3-11f82c7f75ca/confirm",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "batchId": "a8687a97-36f5-42cf-aba3-3b406ebd42e5"
+    }
+  },
+  {
+    "case": "already used",
+    "method": "POST",
+    "path": "/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/actions/fd033985-8f54-45eb-94a3-11f82c7f75ca/confirm",
+    "authenticated": true,
+    "status": 409,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/conflict",
+      "title": "The request conflicts with existing data.",
+      "status": 409,
+      "detail": "The proposal has expired or was already used.",
+      "instance": "/api/v1/conversations/fd6fbe82-c450-4169-a1e4-4ad5e5775132/actions/fd033985-8f54-45eb-94a3-11f82c7f75ca/confirm",
+      "traceId": "00-4f95999f6199c80c90bb87d3ac264d37-a672537fe4a3ef2f-02",
+      "correlationId": "6e99408c2b774a368385fbae64517c2f"
+    }
+  }
+]

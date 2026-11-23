@@ -1,0 +1,1042 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "OneLoaf assistant API",
+    "description": "Part of OneLoaf, a web application for managing bread recipes and planning home baking. Authenticate with a bearer token from POST /api/v1/auth/login of the Core API. Errors are RFC 9457 problem details (application/problem+json) with a correlationId; JSON uses camelCase and enums are snake_case strings. Guides: docs/api in the repository.",
+    "license": {
+      "name": "Proprietary (bachelor project)"
+    },
+    "version": "v1"
+  },
+  "servers": [
+    {
+      "url": "..",
+      "description": "This service"
+    }
+  ],
+  "paths": {
+    "/api/v1/bake-records/{bakeRecordId}/analysis": {
+      "post": {
+        "tags": [
+          "Insights"
+        ],
+        "summary": "Analyse a finished bake",
+        "description": "US-36. Probable causes from the planned vs actual stage log and the feedback; stored in the record. 422 without feedback, 503 when the model is unavailable (record unchanged).",
+        "operationId": "AnalyseBake",
+        "parameters": [
+          {
+            "name": "bakeRecordId",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AnalysisDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Unprocessable Entity",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/usage/me": {
+      "get": {
+        "tags": [
+          "Insights"
+        ],
+        "summary": "Today's assistant usage",
+        "description": "Requests and tokens against the daily limits.",
+        "operationId": "GetMyUsage",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsageDto"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/conversations": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "List conversations",
+        "description": "Newest first.",
+        "operationId": "ListConversations",
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConversationDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Start a conversation",
+        "description": "The first assistant answer says that it is an AI.",
+        "operationId": "CreateConversation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConversationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/conversations/{id}": {
+      "delete": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Delete a conversation and its messages",
+        "description": "Erasure of chat data.",
+        "operationId": "DeleteConversation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/conversations/{id}/messages": {
+      "get": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Messages of a conversation",
+        "description": "User and assistant messages; includeTools=true adds tool calls with their input and output (audit, US-35).",
+        "operationId": "ListMessages",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "IncludeTools",
+            "in": "query",
+            "description": "Include tool messages (audit).",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/MessageDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Send a message to the assistant",
+        "description": "US-34 - US-38. Tools call the Core API with your token; numbers come only from tool results (US-35). A batch proposal comes back as pendingAction and is saved only after confirmation.",
+        "operationId": "SendMessage",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChatReplyDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Service Unavailable",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/conversations/{id}/actions/{actionId}/confirm": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Confirm a batch proposal",
+        "description": "US-34. Saves the proposed batch in the Core API with source = assistant; 409 when expired or used.",
+        "operationId": "ConfirmAction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "actionId",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConfirmActionResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/conversations/{id}/actions/{actionId}/decline": {
+      "post": {
+        "tags": [
+          "Chat"
+        ],
+        "summary": "Decline a batch proposal",
+        "description": "Nothing is saved.",
+        "operationId": "DeclineAction",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "actionId",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AnalysisDto": {
+        "required": [
+          "bakeRecordId",
+          "analysis",
+          "unverifiedNumbers"
+        ],
+        "type": "object",
+        "properties": {
+          "bakeRecordId": {
+            "type": "string",
+            "description": "Record.",
+            "format": "uuid"
+          },
+          "analysis": {
+            "type": "string",
+            "description": "Text stored in the record."
+          },
+          "unverifiedNumbers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Numbers removed because no tool produced them."
+          }
+        },
+        "description": "Result of a bake analysis (US-36)."
+      },
+      "ChatReplyDto": {
+        "required": [
+          "message",
+          "pendingAction",
+          "toolCalls",
+          "disclaimer",
+          "unverifiedNumbers",
+          "usage"
+        ],
+        "type": "object",
+        "properties": {
+          "message": {
+            "$ref": "#/components/schemas/MessageDto"
+          },
+          "pendingAction": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PendingActionDto"
+              }
+            ]
+          },
+          "toolCalls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ToolCallDto"
+            },
+            "description": "Tools called in the turn."
+          },
+          "disclaimer": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Shown for general advice not based on the baker's data."
+          },
+          "unverifiedNumbers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Numbers removed because no tool produced them (should be empty)."
+          },
+          "usage": {
+            "$ref": "#/components/schemas/TurnUsageDto"
+          }
+        },
+        "description": "Reply of the assistant to one message (US-34 - US-38)."
+      },
+      "ChatRole": {
+        "enum": [
+          "user",
+          "assistant",
+          "tool"
+        ],
+        "description": "user, assistant or tool."
+      },
+      "ConfirmActionResponse": {
+        "required": [
+          "batchId"
+        ],
+        "type": "object",
+        "properties": {
+          "batchId": {
+            "type": "string",
+            "description": "The saved batch.",
+            "format": "uuid"
+          }
+        },
+        "description": "Result of confirming a proposal."
+      },
+      "ConversationDto": {
+        "required": [
+          "id",
+          "title",
+          "createdAt",
+          "updatedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id.",
+            "format": "uuid"
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Title (first words of the first question)."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Creation time.",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "Last activity.",
+            "format": "date-time"
+          }
+        },
+        "description": "A conversation in the list."
+      },
+      "CreateConversationRequest": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Optional title."
+          }
+        },
+        "description": "Body of POST /conversations."
+      },
+      "HttpValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "description": "Problem details of a 400 validation error; errors maps each invalid field (camelCase) to its messages."
+      },
+      "JsonElement": {
+        "description": "Tool input and output (audit view only)."
+      },
+      "MessageDto": {
+        "required": [
+          "id",
+          "role",
+          "content",
+          "toolName",
+          "toolPayload",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id.",
+            "format": "uuid"
+          },
+          "role": {
+            "$ref": "#/components/schemas/ChatRole"
+          },
+          "content": {
+            "type": "string",
+            "description": "Text (for a tool: a short summary)."
+          },
+          "toolName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Tool of a tool message."
+          },
+          "toolPayload": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/JsonElement"
+              }
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "Time.",
+            "format": "date-time"
+          }
+        },
+        "description": "A message of a conversation."
+      },
+      "PendingActionDto": {
+        "required": [
+          "actionId",
+          "kind",
+          "expiresAt",
+          "plan"
+        ],
+        "type": "object",
+        "properties": {
+          "actionId": {
+            "type": "string",
+            "description": "Id to confirm or decline.",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "description": "Kind of action (create_batch)."
+          },
+          "expiresAt": {
+            "type": "string",
+            "description": "After this time the proposal cannot be confirmed.",
+            "format": "date-time"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/JsonElement"
+          }
+        },
+        "description": "A batch proposal to confirm, if one was made."
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "description": "RFC 9457 problem details: type, title, status, detail, instance, plus correlationId and traceId for support. Retry-After is sent as a header with 429 and 503."
+      },
+      "SendMessageRequest": {
+        "required": [
+          "content"
+        ],
+        "type": "object",
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "The baker's message, up to 2000 characters."
+          }
+        },
+        "description": "Body of POST /conversations/{id}/messages."
+      },
+      "ToolCallDto": {
+        "required": [
+          "name",
+          "succeeded"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Tool name."
+          },
+          "succeeded": {
+            "type": "boolean",
+            "description": "The call succeeded."
+          }
+        },
+        "description": "A tool called in the turn."
+      },
+      "TurnUsageDto": {
+        "required": [
+          "inputTokens",
+          "outputTokens",
+          "costUsd"
+        ],
+        "type": "object",
+        "properties": {
+          "inputTokens": {
+            "type": "integer",
+            "description": "Input tokens.",
+            "format": "int32"
+          },
+          "outputTokens": {
+            "type": "integer",
+            "description": "Output tokens.",
+            "format": "int32"
+          },
+          "costUsd": {
+            "type": "number",
+            "description": "Cost in USD by the configured prices.",
+            "format": "double"
+          }
+        },
+        "description": "Tokens and cost."
+      },
+      "UsageDto": {
+        "required": [
+          "day",
+          "requests",
+          "requestLimit",
+          "tokens",
+          "tokenLimit",
+          "costUsd"
+        ],
+        "type": "object",
+        "properties": {
+          "day": {
+            "type": "string",
+            "description": "Day (UTC).",
+            "format": "date"
+          },
+          "requests": {
+            "type": "integer",
+            "description": "Messages sent today.",
+            "format": "int32"
+          },
+          "requestLimit": {
+            "type": "integer",
+            "description": "Messages per day.",
+            "format": "int32"
+          },
+          "tokens": {
+            "type": "integer",
+            "description": "Tokens used today.",
+            "format": "int64"
+          },
+          "tokenLimit": {
+            "type": "integer",
+            "description": "Tokens per day.",
+            "format": "int32"
+          },
+          "costUsd": {
+            "type": "number",
+            "description": "Cost today.",
+            "format": "double"
+          }
+        },
+        "description": "Today's usage of the current user against the limits."
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Access token issued by POST /api/v1/auth/login of the Core API.",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Insights"
+    },
+    {
+      "name": "Chat"
+    }
+  ]
+}

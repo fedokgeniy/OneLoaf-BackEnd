@@ -1,9 +1,11 @@
+using FluentValidation;
 using System.Diagnostics.Metrics;
 using Microsoft.Extensions.Logging;
 using OneLoaf.Domain;
 using OneLoaf.Messaging;
 using OneLoaf.Messaging.Contracts;
 using OneLoaf.SharedKernel.Security;
+using OneLoaf.SharedKernel.Text;
 
 namespace OneLoaf.Notification.Application.Reminders;
 
@@ -43,11 +45,11 @@ public sealed record ReminderDto(
     DateTimeOffset? SentAt, int Attempts, Guid? BatchId, Guid? StarterId);
 
 /// <summary>Query of <c>GET /reminders</c>.</summary>
-/// <param name="Status">Only this status.</param>
+/// <param name="Status">Only this status: scheduled, sent, cancelled or failed.</param>
 /// <param name="From">Due at or after.</param>
 /// <param name="To">Due before.</param>
 /// <param name="Limit">Most rows returned (1-200, default 50).</param>
-public sealed record ReminderListQuery(ReminderStatus? Status = null, DateTimeOffset? From = null, DateTimeOffset? To = null, int? Limit = null)
+public sealed record ReminderListQuery(string? Status = null, DateTimeOffset? From = null, DateTimeOffset? To = null, int? Limit = null)
 {
     /// <summary>Largest page.</summary>
     public const int MaxLimit = 200;
@@ -57,6 +59,18 @@ public sealed record ReminderListQuery(ReminderStatus? Status = null, DateTimeOf
 
     /// <summary>The limit clamped to 1-200.</summary>
     public int EffectiveLimit => Math.Clamp(Limit ?? DefaultLimit, 1, MaxLimit);
+}
+
+/// <summary>Validates <see cref="ReminderListQuery"/>.</summary>
+public sealed class ReminderListQueryValidator : AbstractValidator<ReminderListQuery>
+{
+    /// <summary>Creates the rules.</summary>
+    public ReminderListQueryValidator()
+    {
+        RuleFor(x => x.Status).Must(WireEnumNames.IsNullOrDefined<ReminderStatus>)
+            .WithMessage($"status must be one of: {WireEnumNames.Values<ReminderStatus>()}.");
+        RuleFor(x => x.Limit).InclusiveBetween(1, ReminderListQuery.MaxLimit);
+    }
 }
 
 /// <summary>The <c>reminders</c> table.</summary>

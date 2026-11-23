@@ -1,0 +1,26 @@
+[
+  {
+    "case": "not the author",
+    "method": "POST",
+    "path": "/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/unpublish",
+    "authenticated": true,
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "Publication not found.",
+      "instance": "/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/unpublish",
+      "traceId": "00-ca84fb67b7a7cfdae8e41a09eb6fe7f4-05b7b315450d24f8-02",
+      "correlationId": "9b17888517e8490eb2cf862c8b99f4bc"
+    }
+  },
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/unpublish",
+    "authenticated": true,
+    "status": 204
+  }
+]

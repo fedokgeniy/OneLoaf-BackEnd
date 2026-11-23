@@ -1,0 +1,32 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea/analysis",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "bakeRecordId": "c13eeb78-1208-4cbf-99fe-a587c002adea",
+      "analysis": "The rating is good. The tight crumb suggests the bulk fermentation was a little short for the room temperature; let the dough rise longer before shaping next time.",
+      "unverifiedNumbers": []
+    }
+  },
+  {
+    "case": "not found or another user's",
+    "method": "POST",
+    "path": "/api/v1/bake-records/00000000-0000-4000-9999-000000000000/analysis",
+    "authenticated": true,
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "The bake record was not found.",
+      "instance": "/api/v1/bake-records/00000000-0000-4000-9999-000000000000/analysis",
+      "traceId": "00-0619202aefdb2f1f19e4342550f20c67-e0b1ed9184d2b96f-02",
+      "correlationId": "bb745dddf6bf47ae9f27fb1a91cc07bb"
+    }
+  }
+]

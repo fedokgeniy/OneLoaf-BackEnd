@@ -16,6 +16,7 @@ on:
       - "Directory.Packages.props"
       - "global.json"
       - ".github/workflows/assistant.yml"
+      - "docs/api/reference/**"
   pull_request:
     paths:
       - "src/Services/Assistant/**"
@@ -30,6 +31,7 @@ on:
       - "Directory.Packages.props"
       - "global.json"
       - ".github/workflows/assistant.yml"
+      - "docs/api/reference/**"
   workflow_dispatch:
 
 permissions:

@@ -1,0 +1,89 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/auth/register",
+    "authenticated": false,
+    "requestBody": {
+      "email": "docs.baker.58152a7fa@example.com",
+      "password": "Rye-Bread-2026!",
+      "displayName": "Docs Baker"
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "userId": "fb6730bd-1f99-4903-b880-b682637be697"
+    }
+  },
+  {
+    "case": "e-mail already registered",
+    "method": "POST",
+    "path": "/api/v1/auth/register",
+    "authenticated": false,
+    "requestBody": {
+      "email": "docs.baker.58152a7fa@example.com",
+      "password": "Rye-Bread-2026!",
+      "displayName": "Docs Baker"
+    },
+    "status": 409,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/conflict",
+      "title": "The request conflicts with existing data.",
+      "status": 409,
+      "detail": "An account with this e-mail already exists.",
+      "instance": "/api/v1/auth/register",
+      "traceId": "00-6d63218bc500b890c24182b207be1ca8-fa2ec1df139b93f4-02",
+      "correlationId": "06f22176a78c4db69106d9e6c71d549b"
+    }
+  },
+  {
+    "case": "invalid fields",
+    "method": "POST",
+    "path": "/api/v1/auth/register",
+    "authenticated": false,
+    "requestBody": {
+      "email": "not-an-email",
+      "password": "short",
+      "displayName": ""
+    },
+    "status": 400,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/validation",
+      "title": "One or more validation errors occurred.",
+      "status": 400,
+      "instance": "/api/v1/auth/register",
+      "errors": {
+        "email": [
+          "'Email' is not a valid e-mail address."
+        ],
+        "password": [
+          "'Password' должно быть длиной от 8 до 128 символов. Количество введенных символов: 5."
+        ],
+        "displayName": [
+          "'Display Name' должно быть заполнено.",
+          "'Display Name' must not be blank."
+        ]
+      },
+      "traceId": "00-7f58eb1d6dcbaabf248c21fae728b0c0-1a4f6b04185c8da6-02",
+      "correlationId": "b839ee0e8b0942499830a0186587f712"
+    }
+  },
+  {
+    "case": "second account",
+    "method": "POST",
+    "path": "/api/v1/auth/register",
+    "authenticated": false,
+    "requestBody": {
+      "email": "leaving.3df41a25@example.com",
+      "password": "Rye-Bread-2026!",
+      "displayName": "Leaving Baker"
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "userId": "c1a76c6b-ee09-4397-86a8-f4e330b2b323"
+    }
+  }
+]

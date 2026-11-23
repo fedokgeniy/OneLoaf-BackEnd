@@ -1,0 +1,39 @@
+{
+  "type": [
+    "object",
+    "null"
+  ],
+  "properties": {
+    "reminderId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "ownerId": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "dueAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "routingKey": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "occurredAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "reminderId",
+    "ownerId",
+    "dueAt",
+    "occurredAt"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReminderDue",
+  "description": "Body of the 'reminder.due' message on the 'oneloaf.events' topic exchange."
+}

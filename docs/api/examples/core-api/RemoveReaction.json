@@ -1,0 +1,9 @@
+[
+  {
+    "case": "typical",
+    "method": "DELETE",
+    "path": "/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/reactions/me",
+    "authenticated": true,
+    "status": 204
+  }
+]

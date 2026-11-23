@@ -1,0 +1,4203 @@
+{
+  "BakeRecordDto": {
+    "required": [
+      "id",
+      "batchId",
+      "bakedOn",
+      "totalLoaves",
+      "totalCost",
+      "currency",
+      "rating",
+      "comment",
+      "assistantAnalysis",
+      "analysisAt",
+      "items",
+      "createdAt",
+      "updatedAt"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id.",
+        "format": "uuid"
+      },
+      "batchId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Batch.",
+        "format": "uuid"
+      },
+      "bakedOn": {
+        "type": "string",
+        "description": "Bake date.",
+        "format": "date"
+      },
+      "totalLoaves": {
+        "type": "integer",
+        "description": "Loaves.",
+        "format": "int32"
+      },
+      "totalCost": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Cost on the bake date.",
+        "format": "double"
+      },
+      "currency": {
+        "type": "string",
+        "description": "Currency."
+      },
+      "rating": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Rating 1-5.",
+        "format": "int16"
+      },
+      "comment": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Feedback of the baker."
+      },
+      "assistantAnalysis": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Analysis by the assistant."
+      },
+      "analysisAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Time of the analysis.",
+        "format": "date-time"
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BakeRecordItemDto"
+        },
+        "description": "Items."
+      },
+      "createdAt": {
+        "type": "string",
+        "description": "Creation time.",
+        "format": "date-time"
+      },
+      "updatedAt": {
+        "type": "string",
+        "description": "Last change.",
+        "format": "date-time"
+      }
+    },
+    "description": "History record created when a batch is completed (US-31, US-32, US-36)."
+  },
+  "BakeRecordItemDto": {
+    "required": [
+      "id",
+      "recipeId",
+      "recipeTitle",
+      "loaves",
+      "cost"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id.",
+        "format": "uuid"
+      },
+      "recipeId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Recipe; null when it was deleted.",
+        "format": "uuid"
+      },
+      "recipeTitle": {
+        "type": "string",
+        "description": "Recipe title at bake time."
+      },
+      "loaves": {
+        "type": "integer",
+        "description": "Loaves.",
+        "format": "int32"
+      },
+      "cost": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Cost on the bake date.",
+        "format": "double"
+      }
+    },
+    "description": "Item of a history record."
+  },
+  "BakeRecordSummaryDto": {
+    "required": [
+      "id",
+      "batchId",
+      "bakedOn",
+      "totalLoaves",
+      "totalCost",
+      "currency",
+      "rating",
+      "hasAnalysis",
+      "recipeTitles"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id.",
+        "format": "uuid"
+      },
+      "batchId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Batch the record was created from.",
+        "format": "uuid"
+      },
+      "bakedOn": {
+        "type": "string",
+        "description": "Bake date.",
+        "format": "date"
+      },
+      "totalLoaves": {
+        "type": "integer",
+        "description": "Loaves.",
+        "format": "int32"
+      },
+      "totalCost": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Cost on the bake date; null when prices were missing.",
+        "format": "double"
+      },
+      "currency": {
+        "type": "string",
+        "description": "Currency."
+      },
+      "rating": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Rating 1-5.",
+        "format": "int16"
+      },
+      "hasAnalysis": {
+        "type": "boolean",
+        "description": "The assistant analysed the result."
+      },
+      "recipeTitles": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Recipe titles of the items."
+      }
+    },
+    "description": "History record in a list (US-33)."
+  },
+  "BakeStatisticsDto": {
+    "required": [
+      "recipeId",
+      "recipeTitle",
+      "bakesCount",
+      "loavesTotal",
+      "avgRating",
+      "ratedCount",
+      "avgCostPerLoaf",
+      "firstBakedOn",
+      "lastBakedOn"
+    ],
+    "type": "object",
+    "properties": {
+      "recipeId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Recipe; null when it was deleted.",
+        "format": "uuid"
+      },
+      "recipeTitle": {
+        "type": "string",
+        "description": "Title."
+      },
+      "bakesCount": {
+        "type": "integer",
+        "description": "Number of bakes.",
+        "format": "int64"
+      },
+      "loavesTotal": {
+        "type": "integer",
+        "description": "Loaves.",
+        "format": "int64"
+      },
+      "avgRating": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Average rating.",
+        "format": "double"
+      },
+      "ratedCount": {
+        "type": "integer",
+        "description": "Number of rated bakes.",
+        "format": "int64"
+      },
+      "avgCostPerLoaf": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Average cost per loaf.",
+        "format": "double"
+      },
+      "firstBakedOn": {
+        "type": "string",
+        "description": "First bake.",
+        "format": "date"
+      },
+      "lastBakedOn": {
+        "type": "string",
+        "description": "Last bake.",
+        "format": "date"
+      }
+    },
+    "description": "Statistics per recipe (mv_bake_statistics)."
+  },
+  "BatchDto": {
+    "required": [
+      "id",
+      "name",
+      "status",
+      "source",
+      "plannedStartAt",
+      "plannedReadyFrom",
+      "plannedReadyTo",
+      "actualStartAt",
+      "completedAt",
+      "priceDate",
+      "totalCost",
+      "currency",
+      "notes",
+      "items",
+      "bakeRecordId"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Batch id (empty for a preview).",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "status": {
+        "$ref": "#/components/schemas/BatchStatus"
+      },
+      "source": {
+        "$ref": "#/components/schemas/BatchSource"
+      },
+      "plannedStartAt": {
+        "type": "string",
+        "description": "Planned start.",
+        "format": "date-time"
+      },
+      "plannedReadyFrom": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Start of the ready window.",
+        "format": "date-time"
+      },
+      "plannedReadyTo": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "End of the ready window.",
+        "format": "date-time"
+      },
+      "actualStartAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Actual start.",
+        "format": "date-time"
+      },
+      "completedAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Completion time.",
+        "format": "date-time"
+      },
+      "priceDate": {
+        "type": "string",
+        "description": "Price date of the planned cost.",
+        "format": "date"
+      },
+      "totalCost": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Planned cost; null when prices are missing.",
+        "format": "double"
+      },
+      "currency": {
+        "type": "string",
+        "description": "Currency."
+      },
+      "notes": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Notes."
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BatchItemDto"
+        },
+        "description": "Items with stages."
+      },
+      "bakeRecordId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "History record of a completed batch.",
+        "format": "uuid"
+      }
+    },
+    "description": "A production batch with its plan (US-20) and progress (US-23)."
+  },
+  "BatchItemDto": {
+    "required": [
+      "id",
+      "recipeId",
+      "recipeTitle",
+      "loaves",
+      "starterId",
+      "starterAmountG",
+      "kneadingCycles",
+      "starterReminderMinutes",
+      "sortOrder",
+      "stages"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Item id.",
+        "format": "uuid"
+      },
+      "recipeId": {
+        "type": "string",
+        "description": "Recipe.",
+        "format": "uuid"
+      },
+      "recipeTitle": {
+        "type": "string",
+        "description": "Recipe title."
+      },
+      "loaves": {
+        "type": "integer",
+        "description": "Loaves.",
+        "format": "int32"
+      },
+      "starterId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Starter.",
+        "format": "uuid"
+      },
+      "starterAmountG": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Starter to prepare, g.",
+        "format": "double"
+      },
+      "kneadingCycles": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Kneading cycles for the bowl; null when no bowl is set.",
+        "format": "int32"
+      },
+      "starterReminderMinutes": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Starter reminder before kneading, minutes.",
+        "format": "int32"
+      },
+      "sortOrder": {
+        "type": "integer",
+        "description": "Order.",
+        "format": "int32"
+      },
+      "stages": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BatchStageDto"
+        },
+        "description": "Stages in order."
+      }
+    },
+    "description": "Item of a batch with the figures computed by the plan."
+  },
+  "BatchItemRequest": {
+    "required": [
+      "recipeId",
+      "loaves"
+    ],
+    "type": "object",
+    "properties": {
+      "recipeId": {
+        "type": "string",
+        "description": "Recipe or variant of the user.",
+        "format": "uuid"
+      },
+      "loaves": {
+        "type": "integer",
+        "description": "Number of loaves, 1-1000.",
+        "format": "int32"
+      },
+      "starterId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Starter of the user.",
+        "format": "uuid"
+      },
+      "starterReminderMinutes": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Minutes before kneading to remind about the starter; null = no reminder.",
+        "format": "int32"
+      }
+    },
+    "description": "Item of a batch request: a recipe, a number of loaves and the starter to use."
+  },
+  "BatchRequest": {
+    "required": [
+      "name",
+      "plannedStartAt",
+      "items"
+    ],
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Batch name."
+      },
+      "plannedStartAt": {
+        "type": "string",
+        "description": "Planned start, ISO 8601 with offset.",
+        "format": "date-time"
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BatchItemRequest"
+        },
+        "description": "Items, at least one."
+      },
+      "priceDate": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Date of the prices for the planned cost; defaults to today in the kitchen time zone.",
+        "format": "date"
+      },
+      "notes": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Notes."
+      },
+      "source": {
+        "$ref": "#/components/schemas/BatchSource"
+      }
+    },
+    "description": "Body of POST /batches, POST /batches/preview and PUT /batches/{id} (US-20)."
+  },
+  "BatchSource": {
+    "enum": [
+      "manual",
+      "assistant"
+    ],
+    "description": "manual or assistant."
+  },
+  "BatchStageDto": {
+    "required": [
+      "id",
+      "sortOrder",
+      "name",
+      "stageTypeCode",
+      "plannedMinMinutes",
+      "plannedMaxMinutes",
+      "plannedStartAt",
+      "plannedEndMinAt",
+      "plannedEndMaxAt",
+      "actualStartAt",
+      "actualEndAt",
+      "status",
+      "extendedMinutes",
+      "isOverridden",
+      "actualTemperatureC",
+      "note"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Stage id.",
+        "format": "uuid"
+      },
+      "sortOrder": {
+        "type": "integer",
+        "description": "Order.",
+        "format": "int32"
+      },
+      "name": {
+        "type": "string",
+        "description": "Name at planning time."
+      },
+      "stageTypeCode": {
+        "type": "string",
+        "description": "Stage type."
+      },
+      "plannedMinMinutes": {
+        "type": "integer",
+        "description": "Planned minimum duration (may be changed for this batch).",
+        "format": "int32"
+      },
+      "plannedMaxMinutes": {
+        "type": "integer",
+        "description": "Planned maximum duration.",
+        "format": "int32"
+      },
+      "plannedStartAt": {
+        "type": "string",
+        "description": "Planned start.",
+        "format": "date-time"
+      },
+      "plannedEndMinAt": {
+        "type": "string",
+        "description": "Planned earliest end.",
+        "format": "date-time"
+      },
+      "plannedEndMaxAt": {
+        "type": "string",
+        "description": "Planned latest end.",
+        "format": "date-time"
+      },
+      "actualStartAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Actual start.",
+        "format": "date-time"
+      },
+      "actualEndAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Actual end.",
+        "format": "date-time"
+      },
+      "status": {
+        "$ref": "#/components/schemas/StageStatus"
+      },
+      "extendedMinutes": {
+        "type": "integer",
+        "description": "Minutes added with \"+30 min\".",
+        "format": "int32"
+      },
+      "isOverridden": {
+        "type": "boolean",
+        "description": "Durations changed for this batch only."
+      },
+      "actualTemperatureC": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Measured temperature.",
+        "format": "double"
+      },
+      "note": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Note of the baker."
+      }
+    },
+    "description": "Planned and actual data of a batch stage."
+  },
+  "BatchStatus": {
+    "enum": [
+      "planned",
+      "in_progress",
+      "done",
+      "cancelled"
+    ],
+    "description": "Status."
+  },
+  "BatchSummaryDto": {
+    "required": [
+      "id",
+      "name",
+      "status",
+      "plannedStartAt",
+      "plannedReadyFrom",
+      "plannedReadyTo",
+      "totalLoaves"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Batch id.",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "status": {
+        "$ref": "#/components/schemas/BatchStatus"
+      },
+      "plannedStartAt": {
+        "type": "string",
+        "description": "Planned start.",
+        "format": "date-time"
+      },
+      "plannedReadyFrom": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Start of the ready window.",
+        "format": "date-time"
+      },
+      "plannedReadyTo": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "End of the ready window.",
+        "format": "date-time"
+      },
+      "totalLoaves": {
+        "type": "integer",
+        "description": "Loaves over all items.",
+        "format": "int32"
+      }
+    },
+    "description": "Batch in the calendar (US-26)."
+  },
+  "ChangeKind": {
+    "enum": [
+      "unchanged",
+      "changed",
+      "added",
+      "removed"
+    ],
+    "description": "Kind of change."
+  },
+  "CommentDto": {
+    "required": [
+      "id",
+      "authorName",
+      "body",
+      "createdAt",
+      "editedAt",
+      "isMine"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Comment.",
+        "format": "uuid"
+      },
+      "authorName": {
+        "type": "string",
+        "description": "Display name of the author."
+      },
+      "body": {
+        "type": "string",
+        "description": "Text."
+      },
+      "createdAt": {
+        "type": "string",
+        "description": "Creation time.",
+        "format": "date-time"
+      },
+      "editedAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Last edit.",
+        "format": "date-time"
+      },
+      "isMine": {
+        "type": "boolean",
+        "description": "Written by the current user."
+      }
+    },
+    "description": "A comment."
+  },
+  "CommentRequest": {
+    "required": [
+      "body"
+    ],
+    "type": "object",
+    "properties": {
+      "body": {
+        "type": "string",
+        "description": "Text, 1-2000 characters."
+      }
+    },
+    "description": "Body of POST /library/{id}/comments."
+  },
+  "CompleteBatchResponse": {
+    "required": [
+      "bakeRecordId"
+    ],
+    "type": "object",
+    "properties": {
+      "bakeRecordId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "History record created by the database.",
+        "format": "uuid"
+      }
+    },
+    "description": "Result of POST /batches/{id}/complete (US-31)."
+  },
+  "CostBreakdownDto": {
+    "required": [
+      "recipeId",
+      "loaves",
+      "asOf",
+      "currency",
+      "isComplete",
+      "lines",
+      "total",
+      "missingPrices"
+    ],
+    "type": "object",
+    "properties": {
+      "recipeId": {
+        "type": "string",
+        "description": "Recipe.",
+        "format": "uuid"
+      },
+      "loaves": {
+        "type": "integer",
+        "description": "Loaves.",
+        "format": "int32"
+      },
+      "asOf": {
+        "type": "string",
+        "description": "Price date.",
+        "format": "date"
+      },
+      "currency": {
+        "type": "string",
+        "description": "Currency of the kitchen."
+      },
+      "isComplete": {
+        "type": "boolean",
+        "description": "False when some input is missing."
+      },
+      "lines": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CostLineDto"
+        },
+        "description": "Lines in order, ending with the total."
+      },
+      "total": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Total amount (sum of the rounded lines).",
+        "format": "double"
+      },
+      "missingPrices": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/MissingPriceDto"
+        },
+        "description": "Ingredients without a usable price."
+      }
+    },
+    "description": "Cost breakdown of N loaves (US-14, US-15, US-47 - US-49)."
+  },
+  "CostLineDto": {
+    "required": [
+      "lineNo",
+      "type",
+      "ingredientId",
+      "description",
+      "quantity",
+      "unit",
+      "unitPrice",
+      "amount",
+      "isComplete"
+    ],
+    "type": "object",
+    "properties": {
+      "lineNo": {
+        "type": "integer",
+        "description": "Line number.",
+        "format": "int32"
+      },
+      "type": {
+        "type": "string",
+        "description": "One of CostLineTypes."
+      },
+      "ingredientId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Ingredient of an ingredient line.",
+        "format": "uuid"
+      },
+      "description": {
+        "type": "string",
+        "description": "Description."
+      },
+      "quantity": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Quantity.",
+        "format": "double"
+      },
+      "unit": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Unit."
+      },
+      "unitPrice": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Price per unit.",
+        "format": "double"
+      },
+      "amount": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Amount; null when an input is missing.",
+        "format": "double"
+      },
+      "isComplete": {
+        "type": "boolean",
+        "description": "False when an input is missing."
+      }
+    },
+    "description": "Cost line in the response."
+  },
+  "CreateVariantRequest": {
+    "required": [
+      "title"
+    ],
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "description": "Title of the variant."
+      }
+    },
+    "description": "Body of POST /recipes/{id}/variants: a new variant inherits everything; change it with PUT."
+  },
+  "CurrencyDto": {
+    "required": [
+      "code",
+      "name",
+      "minorUnits"
+    ],
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string",
+        "description": "ISO 4217 code."
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "minorUnits": {
+        "type": "integer",
+        "description": "Digits after the decimal point.",
+        "format": "int32"
+      }
+    },
+    "description": "Currency."
+  },
+  "CurrentPriceDto": {
+    "required": [
+      "price",
+      "perQuantity",
+      "unitPrice",
+      "currency",
+      "effectiveFrom"
+    ],
+    "type": "object",
+    "properties": {
+      "price": {
+        "type": "number",
+        "description": "Price for PerQuantity units.",
+        "format": "double"
+      },
+      "perQuantity": {
+        "type": "number",
+        "description": "Quantity in the ingredient unit the price applies to.",
+        "format": "double"
+      },
+      "unitPrice": {
+        "type": "number",
+        "description": "Price of one unit.",
+        "format": "double"
+      },
+      "currency": {
+        "type": "string",
+        "description": "Currency code."
+      },
+      "effectiveFrom": {
+        "type": "string",
+        "description": "Date from which the price applies.",
+        "format": "date"
+      }
+    },
+    "description": "Price valid today; null = no price yet."
+  },
+  "DeleteAccountRequest": {
+    "required": [
+      "password"
+    ],
+    "type": "object",
+    "properties": {
+      "password": {
+        "type": "string",
+        "description": "Current password of the user."
+      }
+    },
+    "description": "Body of DELETE /me (US-04): the password confirms the deletion."
+  },
+  "ExtendStageRequest": {
+    "type": "object",
+    "properties": {
+      "minutes": {
+        "type": "integer",
+        "description": "Minutes to add, 1-1440.",
+        "format": "int32",
+        "default": 30
+      }
+    },
+    "description": "Body of POST .../extend (US-24)."
+  },
+  "FeedingDto": {
+    "required": [
+      "id",
+      "fedAt",
+      "flourG",
+      "waterG",
+      "starterKeptG",
+      "temperatureC",
+      "nextFeedingAt",
+      "expectedPeakAt",
+      "note"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id.",
+        "format": "uuid"
+      },
+      "fedAt": {
+        "type": "string",
+        "description": "Feeding time.",
+        "format": "date-time"
+      },
+      "flourG": {
+        "type": "number",
+        "description": "Flour, g.",
+        "format": "double"
+      },
+      "waterG": {
+        "type": "number",
+        "description": "Water, g.",
+        "format": "double"
+      },
+      "starterKeptG": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Starter kept, g.",
+        "format": "double"
+      },
+      "temperatureC": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Room temperature.",
+        "format": "double"
+      },
+      "nextFeedingAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Next feeding (US-28).",
+        "format": "date-time"
+      },
+      "expectedPeakAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Expected peak (US-30).",
+        "format": "date-time"
+      },
+      "note": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Note."
+      }
+    },
+    "description": "A feeding with the schedule computed by the database."
+  },
+  "FeedingMode": {
+    "enum": [
+      "regular",
+      "weekly",
+      "fridge"
+    ],
+    "description": "Mode."
+  },
+  "FeedingRequest": {
+    "required": [
+      "fedAt",
+      "flourG",
+      "waterG"
+    ],
+    "type": "object",
+    "properties": {
+      "fedAt": {
+        "type": "string",
+        "description": "Feeding time.",
+        "format": "date-time"
+      },
+      "flourG": {
+        "type": "number",
+        "description": "Flour, g.",
+        "format": "double"
+      },
+      "waterG": {
+        "type": "number",
+        "description": "Water, g.",
+        "format": "double"
+      },
+      "starterKeptG": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Starter kept, g.",
+        "format": "double"
+      },
+      "temperatureC": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Room temperature.",
+        "format": "double"
+      },
+      "note": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Note."
+      }
+    },
+    "description": "Body of POST /starters/{id}/feedings (US-28)."
+  },
+  "FlourDto": {
+    "required": [
+      "id",
+      "name",
+      "flourTypeCode",
+      "proteinPercent",
+      "grind",
+      "notes",
+      "createdAt",
+      "updatedAt"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id.",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string",
+        "description": "Name, unique within the user."
+      },
+      "flourTypeCode": {
+        "type": "string",
+        "description": "Grain type code."
+      },
+      "proteinPercent": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Protein, %.",
+        "format": "double"
+      },
+      "grind": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Grind."
+      },
+      "notes": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Notes."
+      },
+      "createdAt": {
+        "type": "string",
+        "description": "Creation time.",
+        "format": "date-time"
+      },
+      "updatedAt": {
+        "type": "string",
+        "description": "Last change.",
+        "format": "date-time"
+      }
+    },
+    "description": "Flour of the user's catalog (US-11)."
+  },
+  "FlourRequest": {
+    "required": [
+      "name",
+      "flourTypeCode",
+      "proteinPercent",
+      "grind",
+      "notes"
+    ],
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "flourTypeCode": {
+        "type": "string",
+        "description": "Grain type code."
+      },
+      "proteinPercent": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Protein, 0-100 %.",
+        "format": "double"
+      },
+      "grind": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Grind."
+      },
+      "notes": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Notes."
+      }
+    },
+    "description": "Body of POST/PUT /flours."
+  },
+  "FlourTypeDto": {
+    "required": [
+      "code",
+      "name"
+    ],
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string",
+        "description": "Code."
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      }
+    },
+    "description": "Flour (grain) type."
+  },
+  "HttpValidationProblemDetails": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "title": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "status": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "format": "int32"
+      },
+      "detail": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "instance": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "errors": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "description": "Problem details of a 400 validation error; errors maps each invalid field (camelCase) to its messages."
+  },
+  "IngredientCategoryDto": {
+    "required": [
+      "code",
+      "name",
+      "isFlour",
+      "isLiquid"
+    ],
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string",
+        "description": "Code."
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "isFlour": {
+        "type": "boolean",
+        "description": "Counted as flour."
+      },
+      "isLiquid": {
+        "type": "boolean",
+        "description": "Counted as liquid."
+      }
+    },
+    "description": "Ingredient category."
+  },
+  "IngredientComparisonDto": {
+    "required": [
+      "change",
+      "parent",
+      "variant"
+    ],
+    "type": "object",
+    "properties": {
+      "change": {
+        "$ref": "#/components/schemas/ChangeKind"
+      },
+      "parent": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "$ref": "#/components/schemas/RecipeIngredientDto"
+          }
+        ]
+      },
+      "variant": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "$ref": "#/components/schemas/RecipeIngredientDto"
+          }
+        ]
+      }
+    },
+    "description": "Compared ingredient line."
+  },
+  "IngredientDto": {
+    "required": [
+      "id",
+      "name",
+      "categoryCode",
+      "unitCode",
+      "flourId",
+      "flourName",
+      "proteinPercent",
+      "currentPrice",
+      "createdAt",
+      "updatedAt"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id.",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string",
+        "description": "Name, unique within the user."
+      },
+      "categoryCode": {
+        "type": "string",
+        "description": "Category code."
+      },
+      "unitCode": {
+        "type": "string",
+        "description": "Unit of recipe quantities and prices."
+      },
+      "flourId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Linked flour, if any.",
+        "format": "uuid"
+      },
+      "flourName": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Name of the linked flour."
+      },
+      "proteinPercent": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Protein of the linked flour.",
+        "format": "double"
+      },
+      "currentPrice": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "$ref": "#/components/schemas/CurrentPriceDto"
+          }
+        ]
+      },
+      "createdAt": {
+        "type": "string",
+        "description": "Creation time.",
+        "format": "date-time"
+      },
+      "updatedAt": {
+        "type": "string",
+        "description": "Last change.",
+        "format": "date-time"
+      }
+    },
+    "description": "Ingredient of the user's catalog (US-10)."
+  },
+  "IngredientRequest": {
+    "required": [
+      "name",
+      "categoryCode",
+      "unitCode",
+      "flourId"
+    ],
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "categoryCode": {
+        "type": "string",
+        "description": "Category code."
+      },
+      "unitCode": {
+        "type": "string",
+        "description": "Unit code."
+      },
+      "flourId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Flour of the user's catalog.",
+        "format": "uuid"
+      }
+    },
+    "description": "Body of POST/PUT /ingredients."
+  },
+  "JsonElement": {
+    "description": "Recipe at publication time: yield, ingredients (name, category, unit, quantity) and stages."
+  },
+  "KitchenSettingsDto": {
+    "required": [
+      "ovenPowerKw",
+      "ovenCapacityLoaves",
+      "mixerBowlCapacityKg",
+      "electricityTariffPerKwh",
+      "packagingCostPerLoaf",
+      "lossRatePercent",
+      "laborRatePerHour",
+      "currency",
+      "timeZone",
+      "updatedAt"
+    ],
+    "type": "object",
+    "properties": {
+      "ovenPowerKw": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Oven power, kW.",
+        "format": "double"
+      },
+      "ovenCapacityLoaves": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Loaves per oven load.",
+        "format": "int32"
+      },
+      "mixerBowlCapacityKg": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Mixer bowl capacity, kg.",
+        "format": "double"
+      },
+      "electricityTariffPerKwh": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Price of one kWh.",
+        "format": "double"
+      },
+      "packagingCostPerLoaf": {
+        "type": "number",
+        "description": "Packaging cost per loaf.",
+        "format": "double"
+      },
+      "lossRatePercent": {
+        "type": "number",
+        "description": "Loss rate, 0-100.",
+        "format": "double"
+      },
+      "laborRatePerHour": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Hourly rate of own work.",
+        "format": "double"
+      },
+      "currency": {
+        "type": "string",
+        "description": "Currency code."
+      },
+      "timeZone": {
+        "type": "string",
+        "description": "IANA time zone."
+      },
+      "updatedAt": {
+        "type": "string",
+        "description": "Time of the last change.",
+        "format": "date-time"
+      }
+    },
+    "description": "Kitchen settings as stored."
+  },
+  "KitchenSettingsRequest": {
+    "required": [
+      "ovenPowerKw",
+      "ovenCapacityLoaves",
+      "mixerBowlCapacityKg",
+      "electricityTariffPerKwh",
+      "packagingCostPerLoaf",
+      "lossRatePercent",
+      "laborRatePerHour",
+      "currency",
+      "timeZone"
+    ],
+    "type": "object",
+    "properties": {
+      "ovenPowerKw": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Oven power, kW.",
+        "format": "double"
+      },
+      "ovenCapacityLoaves": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Loaves per oven load.",
+        "format": "int32"
+      },
+      "mixerBowlCapacityKg": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Mixer bowl capacity, kg.",
+        "format": "double"
+      },
+      "electricityTariffPerKwh": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Price of one kWh.",
+        "format": "double"
+      },
+      "packagingCostPerLoaf": {
+        "type": "number",
+        "description": "Packaging cost per loaf.",
+        "format": "double"
+      },
+      "lossRatePercent": {
+        "type": "number",
+        "description": "Loss rate, 0-100.",
+        "format": "double"
+      },
+      "laborRatePerHour": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Hourly rate of own work; null = labor not counted.",
+        "format": "double"
+      },
+      "currency": {
+        "type": "string",
+        "description": "Currency code."
+      },
+      "timeZone": {
+        "type": "string",
+        "description": "IANA time zone."
+      }
+    },
+    "description": "Equipment and cost parameters of the current user (US-13, US-47 - US-49)."
+  },
+  "KneadingGroupDto": {
+    "required": [
+      "recipeId",
+      "recipeTitle",
+      "itemIds",
+      "loaves",
+      "doughWeightG",
+      "separateCycles",
+      "mergedCycles",
+      "explanation"
+    ],
+    "type": "object",
+    "properties": {
+      "recipeId": {
+        "type": "string",
+        "description": "Recipe (the dough).",
+        "format": "uuid"
+      },
+      "recipeTitle": {
+        "type": "string",
+        "description": "Recipe title."
+      },
+      "itemIds": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "description": "Items of the batch made from this dough."
+      },
+      "loaves": {
+        "type": "integer",
+        "description": "Loaves over these items.",
+        "format": "int32"
+      },
+      "doughWeightG": {
+        "type": "number",
+        "description": "Dough weight of all loaves, g.",
+        "format": "double"
+      },
+      "separateCycles": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Cycles when each item is kneaded on its own; null when no bowl is set.",
+        "format": "int32"
+      },
+      "mergedCycles": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Cycles when the dough is kneaded together; null when no bowl is set.",
+        "format": "int32"
+      },
+      "explanation": {
+        "type": "string",
+        "description": "Why the kneads can or cannot be merged."
+      }
+    },
+    "description": "Kneads of the same dough merged across items (US-22)."
+  },
+  "KneadingPlanDto": {
+    "required": [
+      "batchId",
+      "groups",
+      "totalSeparateCycles",
+      "totalMergedCycles"
+    ],
+    "type": "object",
+    "properties": {
+      "batchId": {
+        "type": "string",
+        "description": "Batch.",
+        "format": "uuid"
+      },
+      "groups": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/KneadingGroupDto"
+        },
+        "description": "One group per dough."
+      },
+      "totalSeparateCycles": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Cycles without merging.",
+        "format": "int32"
+      },
+      "totalMergedCycles": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Cycles with merging.",
+        "format": "int32"
+      }
+    },
+    "description": "Kneading plan of a batch (US-22)."
+  },
+  "LibraryItemDto": {
+    "required": [
+      "id",
+      "title",
+      "description",
+      "authorName",
+      "publishedAt",
+      "yieldLoaves",
+      "ingredientCount",
+      "stageCount",
+      "commentCount",
+      "reactionCount"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Publication.",
+        "format": "uuid"
+      },
+      "title": {
+        "type": "string",
+        "description": "Title."
+      },
+      "description": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Description."
+      },
+      "authorName": {
+        "type": "string",
+        "description": "Display name of the author."
+      },
+      "publishedAt": {
+        "type": "string",
+        "description": "Publication time.",
+        "format": "date-time"
+      },
+      "yieldLoaves": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Loaves of the recipe yield.",
+        "format": "int32"
+      },
+      "ingredientCount": {
+        "type": "integer",
+        "description": "Ingredients in the snapshot.",
+        "format": "int32"
+      },
+      "stageCount": {
+        "type": "integer",
+        "description": "Stages in the snapshot.",
+        "format": "int32"
+      },
+      "commentCount": {
+        "type": "integer",
+        "description": "Visible comments.",
+        "format": "int64"
+      },
+      "reactionCount": {
+        "type": "integer",
+        "description": "Reactions.",
+        "format": "int64"
+      }
+    },
+    "description": "A publication in the catalog (v_public_catalog)."
+  },
+  "LoginRequest": {
+    "required": [
+      "email",
+      "password"
+    ],
+    "type": "object",
+    "properties": {
+      "email": {
+        "type": "string",
+        "description": "Login e-mail."
+      },
+      "password": {
+        "type": "string",
+        "description": "Password."
+      }
+    },
+    "description": "Body of POST /auth/login (US-02)."
+  },
+  "LoginResponse": {
+    "required": [
+      "accessToken",
+      "expiresAt",
+      "user"
+    ],
+    "type": "object",
+    "properties": {
+      "accessToken": {
+        "type": "string",
+        "description": "Bearer token for the Authorization header."
+      },
+      "expiresAt": {
+        "type": "string",
+        "description": "Expiry time of the token.",
+        "format": "date-time"
+      },
+      "user": {
+        "$ref": "#/components/schemas/UserProfileDto"
+      }
+    },
+    "description": "Result of a successful login."
+  },
+  "MissingPriceDto": {
+    "required": [
+      "ingredientId",
+      "name"
+    ],
+    "type": "object",
+    "properties": {
+      "ingredientId": {
+        "type": "string",
+        "description": "Ingredient.",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      }
+    },
+    "description": "Ingredient without a usable price on the date (UC-01 alternative flow A4)."
+  },
+  "ModerationAction": {
+    "enum": [
+      "remove",
+      "reject"
+    ],
+    "description": "remove or reject."
+  },
+  "OvenLoadingItem": {
+    "required": [
+      "recipeId",
+      "loaves"
+    ],
+    "type": "object",
+    "properties": {
+      "recipeId": {
+        "type": "string",
+        "description": "Own recipe.",
+        "format": "uuid"
+      },
+      "loaves": {
+        "type": "integer",
+        "description": "Loaves, 1-1000.",
+        "format": "int32"
+      }
+    },
+    "description": "A recipe and the loaves to bake."
+  },
+  "OvenLoadingPlanDto": {
+    "required": [
+      "ovenCapacityLoaves",
+      "totalLoaves",
+      "rounds",
+      "totalOvenMinutes"
+    ],
+    "type": "object",
+    "properties": {
+      "ovenCapacityLoaves": {
+        "type": "integer",
+        "description": "Capacity from the kitchen settings.",
+        "format": "int32"
+      },
+      "totalLoaves": {
+        "type": "integer",
+        "description": "Loaves of all items.",
+        "format": "int32"
+      },
+      "rounds": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/OvenRoundDto"
+        },
+        "description": "Oven loads in order."
+      },
+      "totalOvenMinutes": {
+        "type": "integer",
+        "description": "Oven time of all rounds.",
+        "format": "int32"
+      }
+    },
+    "description": "Oven loading plan (US-19)."
+  },
+  "OvenLoadingRequest": {
+    "required": [
+      "items"
+    ],
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/OvenLoadingItem"
+        },
+        "description": "Recipes to bake, 1-20."
+      }
+    },
+    "description": "Body of POST /calculations/oven-loading."
+  },
+  "OvenRoundDto": {
+    "required": [
+      "round",
+      "loaves",
+      "bakeMinutes",
+      "startOffsetMinutes",
+      "items"
+    ],
+    "type": "object",
+    "properties": {
+      "round": {
+        "type": "integer",
+        "description": "Number, from 1.",
+        "format": "int32"
+      },
+      "loaves": {
+        "type": "integer",
+        "description": "Loaves in the oven.",
+        "format": "int32"
+      },
+      "bakeMinutes": {
+        "type": "integer",
+        "description": "Longest oven time of the recipes in the round.",
+        "format": "int32"
+      },
+      "startOffsetMinutes": {
+        "type": "integer",
+        "description": "Start of the round after the start of the first one (rounds follow each other).",
+        "format": "int32"
+      },
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/OvenRoundItemDto"
+        },
+        "description": "Recipes in the round."
+      }
+    },
+    "description": "One oven load."
+  },
+  "OvenRoundItemDto": {
+    "required": [
+      "recipeId",
+      "title",
+      "loaves"
+    ],
+    "type": "object",
+    "properties": {
+      "recipeId": {
+        "type": "string",
+        "description": "Recipe.",
+        "format": "uuid"
+      },
+      "title": {
+        "type": "string",
+        "description": "Title."
+      },
+      "loaves": {
+        "type": "integer",
+        "description": "Loaves in this round.",
+        "format": "int32"
+      }
+    },
+    "description": "Loaves of one recipe in a round."
+  },
+  "PagedResultOfBakeRecordSummaryDto": {
+    "required": [
+      "items",
+      "page",
+      "pageSize",
+      "totalCount"
+    ],
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BakeRecordSummaryDto"
+        },
+        "description": "Items of the page."
+      },
+      "page": {
+        "type": "integer",
+        "description": "1-based page number.",
+        "format": "int32"
+      },
+      "pageSize": {
+        "type": "integer",
+        "description": "Requested page size.",
+        "format": "int32"
+      },
+      "totalCount": {
+        "type": "integer",
+        "description": "Number of items over all pages.",
+        "format": "int32"
+      }
+    },
+    "description": "One page of a list: { items, page, pageSize, totalCount }."
+  },
+  "PagedResultOfBatchSummaryDto": {
+    "required": [
+      "items",
+      "page",
+      "pageSize",
+      "totalCount"
+    ],
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BatchSummaryDto"
+        },
+        "description": "Items of the page."
+      },
+      "page": {
+        "type": "integer",
+        "description": "1-based page number.",
+        "format": "int32"
+      },
+      "pageSize": {
+        "type": "integer",
+        "description": "Requested page size.",
+        "format": "int32"
+      },
+      "totalCount": {
+        "type": "integer",
+        "description": "Number of items over all pages.",
+        "format": "int32"
+      }
+    },
+    "description": "One page of a list: { items, page, pageSize, totalCount }."
+  },
+  "PagedResultOfCommentDto": {
+    "required": [
+      "items",
+      "page",
+      "pageSize",
+      "totalCount"
+    ],
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/CommentDto"
+        },
+        "description": "Items of the page."
+      },
+      "page": {
+        "type": "integer",
+        "description": "1-based page number.",
+        "format": "int32"
+      },
+      "pageSize": {
+        "type": "integer",
+        "description": "Requested page size.",
+        "format": "int32"
+      },
+      "totalCount": {
+        "type": "integer",
+        "description": "Number of items over all pages.",
+        "format": "int32"
+      }
+    },
+    "description": "One page of a list: { items, page, pageSize, totalCount }."
+  },
+  "PagedResultOfFeedingDto": {
+    "required": [
+      "items",
+      "page",
+      "pageSize",
+      "totalCount"
+    ],
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/FeedingDto"
+        },
+        "description": "Items of the page."
+      },
+      "page": {
+        "type": "integer",
+        "description": "1-based page number.",
+        "format": "int32"
+      },
+      "pageSize": {
+        "type": "integer",
+        "description": "Requested page size.",
+        "format": "int32"
+      },
+      "totalCount": {
+        "type": "integer",
+        "description": "Number of items over all pages.",
+        "format": "int32"
+      }
+    },
+    "description": "One page of a list: { items, page, pageSize, totalCount }."
+  },
+  "PagedResultOfFlourDto": {
+    "required": [
+      "items",
+      "page",
+      "pageSize",
+      "totalCount"
+    ],
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/FlourDto"
+        },
+        "description": "Items of the page."
+      },
+      "page": {
+        "type": "integer",
+        "description": "1-based page number.",
+        "format": "int32"
+      },
+      "pageSize": {
+        "type": "integer",
+        "description": "Requested page size.",
+        "format": "int32"
+      },
+      "totalCount": {
+        "type": "integer",
+        "description": "Number of items over all pages.",
+        "format": "int32"
+      }
+    },
+    "description": "One page of a list: { items, page, pageSize, totalCount }."
+  },
+  "PagedResultOfIngredientDto": {
+    "required": [
+      "items",
+      "page",
+      "pageSize",
+      "totalCount"
+    ],
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/IngredientDto"
+        },
+        "description": "Items of the page."
+      },
+      "page": {
+        "type": "integer",
+        "description": "1-based page number.",
+        "format": "int32"
+      },
+      "pageSize": {
+        "type": "integer",
+        "description": "Requested page size.",
+        "format": "int32"
+      },
+      "totalCount": {
+        "type": "integer",
+        "description": "Number of items over all pages.",
+        "format": "int32"
+      }
+    },
+    "description": "One page of a list: { items, page, pageSize, totalCount }."
+  },
+  "PagedResultOfLibraryItemDto": {
+    "required": [
+      "items",
+      "page",
+      "pageSize",
+      "totalCount"
+    ],
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/LibraryItemDto"
+        },
+        "description": "Items of the page."
+      },
+      "page": {
+        "type": "integer",
+        "description": "1-based page number.",
+        "format": "int32"
+      },
+      "pageSize": {
+        "type": "integer",
+        "description": "Requested page size.",
+        "format": "int32"
+      },
+      "totalCount": {
+        "type": "integer",
+        "description": "Number of items over all pages.",
+        "format": "int32"
+      }
+    },
+    "description": "One page of a list: { items, page, pageSize, totalCount }."
+  },
+  "PagedResultOfRecipeSummaryDto": {
+    "required": [
+      "items",
+      "page",
+      "pageSize",
+      "totalCount"
+    ],
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/RecipeSummaryDto"
+        },
+        "description": "Items of the page."
+      },
+      "page": {
+        "type": "integer",
+        "description": "1-based page number.",
+        "format": "int32"
+      },
+      "pageSize": {
+        "type": "integer",
+        "description": "Requested page size.",
+        "format": "int32"
+      },
+      "totalCount": {
+        "type": "integer",
+        "description": "Number of items over all pages.",
+        "format": "int32"
+      }
+    },
+    "description": "One page of a list: { items, page, pageSize, totalCount }."
+  },
+  "PagedResultOfReportDto": {
+    "required": [
+      "items",
+      "page",
+      "pageSize",
+      "totalCount"
+    ],
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ReportDto"
+        },
+        "description": "Items of the page."
+      },
+      "page": {
+        "type": "integer",
+        "description": "1-based page number.",
+        "format": "int32"
+      },
+      "pageSize": {
+        "type": "integer",
+        "description": "Requested page size.",
+        "format": "int32"
+      },
+      "totalCount": {
+        "type": "integer",
+        "description": "Number of items over all pages.",
+        "format": "int32"
+      }
+    },
+    "description": "One page of a list: { items, page, pageSize, totalCount }."
+  },
+  "PagedResultOfStarterDto": {
+    "required": [
+      "items",
+      "page",
+      "pageSize",
+      "totalCount"
+    ],
+    "type": "object",
+    "properties": {
+      "items": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/StarterDto"
+        },
+        "description": "Items of the page."
+      },
+      "page": {
+        "type": "integer",
+        "description": "1-based page number.",
+        "format": "int32"
+      },
+      "pageSize": {
+        "type": "integer",
+        "description": "Requested page size.",
+        "format": "int32"
+      },
+      "totalCount": {
+        "type": "integer",
+        "description": "Number of items over all pages.",
+        "format": "int32"
+      }
+    },
+    "description": "One page of a list: { items, page, pageSize, totalCount }."
+  },
+  "PriceDto": {
+    "required": [
+      "id",
+      "price",
+      "perQuantity",
+      "unitPrice",
+      "currency",
+      "effectiveFrom",
+      "changePercent"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id.",
+        "format": "uuid"
+      },
+      "price": {
+        "type": "number",
+        "description": "Price for PerQuantity units.",
+        "format": "double"
+      },
+      "perQuantity": {
+        "type": "number",
+        "description": "Quantity the price applies to.",
+        "format": "double"
+      },
+      "unitPrice": {
+        "type": "number",
+        "description": "Price of one unit.",
+        "format": "double"
+      },
+      "currency": {
+        "type": "string",
+        "description": "Currency code."
+      },
+      "effectiveFrom": {
+        "type": "string",
+        "description": "Date from which the price applies.",
+        "format": "date"
+      },
+      "changePercent": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Change of the unit price against the previous price in the same currency, %.",
+        "format": "double"
+      }
+    },
+    "description": "A row of the price history (US-12)."
+  },
+  "PriceRequest": {
+    "required": [
+      "price",
+      "perQuantity",
+      "currency",
+      "effectiveFrom"
+    ],
+    "type": "object",
+    "properties": {
+      "price": {
+        "type": "number",
+        "description": "Price, at least 0.",
+        "format": "double"
+      },
+      "perQuantity": {
+        "type": "number",
+        "description": "Quantity the price applies to, more than 0.",
+        "format": "double"
+      },
+      "currency": {
+        "type": "string",
+        "description": "Currency code."
+      },
+      "effectiveFrom": {
+        "type": "string",
+        "description": "Date from which the price applies.",
+        "format": "date"
+      }
+    },
+    "description": "Body of POST /ingredients/{id}/prices."
+  },
+  "ProblemDetails": {
+    "type": "object",
+    "properties": {
+      "type": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "title": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "status": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "format": "int32"
+      },
+      "detail": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "instance": {
+        "type": [
+          "null",
+          "string"
+        ]
+      }
+    },
+    "description": "RFC 9457 problem details: type, title, status, detail, instance, plus correlationId and traceId for support. Retry-After is sent as a header with 429 and 503."
+  },
+  "ProductionFiguresDto": {
+    "required": [
+      "recipeId",
+      "loaves",
+      "doughWeightG",
+      "kneadingCycles",
+      "starterAmountG"
+    ],
+    "type": "object",
+    "properties": {
+      "recipeId": {
+        "type": "string",
+        "description": "Recipe.",
+        "format": "uuid"
+      },
+      "loaves": {
+        "type": "integer",
+        "description": "Loaves.",
+        "format": "int32"
+      },
+      "doughWeightG": {
+        "type": "number",
+        "description": "Dough weight, g.",
+        "format": "double"
+      },
+      "kneadingCycles": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Kneading cycles; null when no bowl capacity is set.",
+        "format": "int32"
+      },
+      "starterAmountG": {
+        "type": "number",
+        "description": "Starter amount, g.",
+        "format": "double"
+      }
+    },
+    "description": "Production figures for N loaves (US-17, US-18)."
+  },
+  "ProofMode": {
+    "enum": [
+      "warm",
+      "cold",
+      null
+    ],
+    "description": "warm or cold (proof stages)."
+  },
+  "PublicationStatus": {
+    "enum": [
+      "published",
+      "unpublished",
+      "removed"
+    ],
+    "description": "published, unpublished (visible to the author only) or removed."
+  },
+  "PublishedRecipeDto": {
+    "required": [
+      "id",
+      "title",
+      "description",
+      "authorName",
+      "status",
+      "publishedAt",
+      "snapshot",
+      "commentCount",
+      "reactions",
+      "myReaction",
+      "isMine"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Publication.",
+        "format": "uuid"
+      },
+      "title": {
+        "type": "string",
+        "description": "Title."
+      },
+      "description": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Description."
+      },
+      "authorName": {
+        "type": "string",
+        "description": "Display name of the author."
+      },
+      "status": {
+        "$ref": "#/components/schemas/PublicationStatus"
+      },
+      "publishedAt": {
+        "type": "string",
+        "description": "Publication time.",
+        "format": "date-time"
+      },
+      "snapshot": {
+        "$ref": "#/components/schemas/JsonElement"
+      },
+      "commentCount": {
+        "type": "integer",
+        "description": "Visible comments.",
+        "format": "int64"
+      },
+      "reactions": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "description": "Count per reaction."
+      },
+      "myReaction": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "$ref": "#/components/schemas/ReactionType"
+          }
+        ]
+      },
+      "isMine": {
+        "type": "boolean",
+        "description": "The current user is the author."
+      }
+    },
+    "description": "A publication with its snapshot."
+  },
+  "PublishResponse": {
+    "required": [
+      "publishedRecipeId"
+    ],
+    "type": "object",
+    "properties": {
+      "publishedRecipeId": {
+        "type": "string",
+        "description": "The new publication.",
+        "format": "uuid"
+      }
+    },
+    "description": "Response of POST /recipes/{id}/publish."
+  },
+  "ReactionRequest": {
+    "required": [
+      "reaction"
+    ],
+    "type": "object",
+    "properties": {
+      "reaction": {
+        "$ref": "#/components/schemas/ReactionType"
+      }
+    },
+    "description": "Body of PUT /library/{id}/reactions/me."
+  },
+  "ReactionType": {
+    "enum": [
+      "like",
+      "love",
+      "want_to_bake",
+      null
+    ],
+    "description": "Reaction of the current user."
+  },
+  "RecipeComparisonDto": {
+    "required": [
+      "recipeId",
+      "parentRecipeId",
+      "changedFields",
+      "ingredients",
+      "stages"
+    ],
+    "type": "object",
+    "properties": {
+      "recipeId": {
+        "type": "string",
+        "description": "Variant.",
+        "format": "uuid"
+      },
+      "parentRecipeId": {
+        "type": "string",
+        "description": "Parent.",
+        "format": "uuid"
+      },
+      "changedFields": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "Changed scalar fields (camelCase names)."
+      },
+      "ingredients": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/IngredientComparisonDto"
+        },
+        "description": "Ingredient lines with their change."
+      },
+      "stages": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/StageComparisonDto"
+        },
+        "description": "Stages with their change."
+      }
+    },
+    "description": "Variant compared with its parent (US-08)."
+  },
+  "RecipeDto": {
+    "required": [
+      "id",
+      "parentRecipeId",
+      "title",
+      "description",
+      "yieldLoaves",
+      "loafWeightG",
+      "notes",
+      "isArchived",
+      "ingredients",
+      "stages",
+      "createdAt",
+      "updatedAt"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id.",
+        "format": "uuid"
+      },
+      "parentRecipeId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Parent of a variant.",
+        "format": "uuid"
+      },
+      "title": {
+        "type": "string",
+        "description": "Title."
+      },
+      "description": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Description."
+      },
+      "yieldLoaves": {
+        "type": "integer",
+        "description": "Loaves the quantities are written for.",
+        "format": "int32"
+      },
+      "loafWeightG": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Weight of one loaf, g.",
+        "format": "double"
+      },
+      "notes": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Notes."
+      },
+      "isArchived": {
+        "type": "boolean",
+        "description": "Archived."
+      },
+      "ingredients": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/RecipeIngredientDto"
+        },
+        "description": "Effective ingredient lines."
+      },
+      "stages": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/RecipeStageDto"
+        },
+        "description": "Effective stages."
+      },
+      "createdAt": {
+        "type": "string",
+        "description": "Creation time.",
+        "format": "date-time"
+      },
+      "updatedAt": {
+        "type": "string",
+        "description": "Last change.",
+        "format": "date-time"
+      }
+    },
+    "description": "Effective recipe (US-05, US-07): a variant is shown with the inherited content resolved."
+  },
+  "RecipeIngredientDto": {
+    "required": [
+      "lineId",
+      "ingredientId",
+      "ingredientName",
+      "categoryCode",
+      "unitCode",
+      "quantity",
+      "isOptional",
+      "sortOrder",
+      "note",
+      "proteinPercent",
+      "isInherited"
+    ],
+    "type": "object",
+    "properties": {
+      "lineId": {
+        "type": "string",
+        "description": "Id of the row that defines the line (send it back on update).",
+        "format": "uuid"
+      },
+      "ingredientId": {
+        "type": "string",
+        "description": "Ingredient.",
+        "format": "uuid"
+      },
+      "ingredientName": {
+        "type": "string",
+        "description": "Ingredient name."
+      },
+      "categoryCode": {
+        "type": "string",
+        "description": "Ingredient category."
+      },
+      "unitCode": {
+        "type": "string",
+        "description": "Unit of the quantity."
+      },
+      "quantity": {
+        "type": "number",
+        "description": "Quantity for the recipe yield.",
+        "format": "double"
+      },
+      "isOptional": {
+        "type": "boolean",
+        "description": "Not counted in cost and dough weight."
+      },
+      "sortOrder": {
+        "type": "integer",
+        "description": "Order.",
+        "format": "int32"
+      },
+      "note": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Note."
+      },
+      "proteinPercent": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Protein of the linked flour.",
+        "format": "double"
+      },
+      "isInherited": {
+        "type": "boolean",
+        "description": "Comes from a parent recipe."
+      }
+    },
+    "description": "Effective ingredient line: a variant shows inherited lines with IsInherited = true."
+  },
+  "RecipeIngredientInput": {
+    "required": [
+      "lineId",
+      "ingredientId",
+      "quantity"
+    ],
+    "type": "object",
+    "properties": {
+      "lineId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Id of an existing line (from GET) to keep it; null for a new line.",
+        "format": "uuid"
+      },
+      "ingredientId": {
+        "type": "string",
+        "description": "Ingredient of the user's catalog.",
+        "format": "uuid"
+      },
+      "quantity": {
+        "type": "number",
+        "description": "Quantity for the recipe yield.",
+        "format": "double"
+      },
+      "isOptional": {
+        "type": "boolean",
+        "description": "Optional ingredient.",
+        "default": false
+      },
+      "note": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Note."
+      },
+      "sortOrder": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Order; defaults to the position in the list.",
+        "format": "int32"
+      }
+    },
+    "description": "Ingredient line in a create/update request."
+  },
+  "RecipeRequest": {
+    "required": [
+      "title",
+      "description",
+      "yieldLoaves",
+      "loafWeightG",
+      "notes",
+      "ingredients",
+      "stages"
+    ],
+    "type": "object",
+    "properties": {
+      "title": {
+        "type": "string",
+        "description": "Title."
+      },
+      "description": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Description."
+      },
+      "yieldLoaves": {
+        "type": "integer",
+        "description": "Loaves the quantities are written for; a variant keeps the yield of its parent.",
+        "format": "int32"
+      },
+      "loafWeightG": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Weight of one loaf, g.",
+        "format": "double"
+      },
+      "notes": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Notes."
+      },
+      "ingredients": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/RecipeIngredientInput"
+        },
+        "description": "Ingredient lines."
+      },
+      "stages": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/RecipeStageInput"
+        },
+        "description": "Stages in order."
+      }
+    },
+    "description": "Body of POST /recipes and PUT /recipes/{id}: the full effective content."
+  },
+  "RecipeStageDto": {
+    "required": [
+      "lineId",
+      "sortOrder",
+      "name",
+      "stageTypeCode",
+      "minDurationMinutes",
+      "maxDurationMinutes",
+      "activeMinutes",
+      "proofMode",
+      "temperatureC",
+      "usesOven",
+      "usesMixer",
+      "isOptional",
+      "instructions",
+      "isInherited"
+    ],
+    "type": "object",
+    "properties": {
+      "lineId": {
+        "type": "string",
+        "description": "Id of the row that defines the stage.",
+        "format": "uuid"
+      },
+      "sortOrder": {
+        "type": "integer",
+        "description": "Order.",
+        "format": "int32"
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "stageTypeCode": {
+        "type": "string",
+        "description": "Stage type."
+      },
+      "minDurationMinutes": {
+        "type": "integer",
+        "description": "Minimum duration.",
+        "format": "int32"
+      },
+      "maxDurationMinutes": {
+        "type": "integer",
+        "description": "Maximum duration.",
+        "format": "int32"
+      },
+      "activeMinutes": {
+        "type": "integer",
+        "description": "Hands-on time.",
+        "format": "int32"
+      },
+      "proofMode": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "$ref": "#/components/schemas/ProofMode"
+          }
+        ]
+      },
+      "temperatureC": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Temperature.",
+        "format": "double"
+      },
+      "usesOven": {
+        "type": "boolean",
+        "description": "Uses the oven."
+      },
+      "usesMixer": {
+        "type": "boolean",
+        "description": "Uses the mixer."
+      },
+      "isOptional": {
+        "type": "boolean",
+        "description": "Optional stage."
+      },
+      "instructions": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Instructions."
+      },
+      "isInherited": {
+        "type": "boolean",
+        "description": "Comes from a parent recipe."
+      }
+    },
+    "description": "Effective stage."
+  },
+  "RecipeStageInput": {
+    "required": [
+      "lineId",
+      "name",
+      "stageTypeCode",
+      "minDurationMinutes",
+      "maxDurationMinutes"
+    ],
+    "type": "object",
+    "properties": {
+      "lineId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Id of an existing stage (from GET) to keep it; null for a new stage.",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "stageTypeCode": {
+        "type": "string",
+        "description": "Stage type."
+      },
+      "minDurationMinutes": {
+        "type": "integer",
+        "description": "Minimum duration.",
+        "format": "int32"
+      },
+      "maxDurationMinutes": {
+        "type": "integer",
+        "description": "Maximum duration.",
+        "format": "int32"
+      },
+      "activeMinutes": {
+        "type": "integer",
+        "description": "Hands-on time, not more than the maximum.",
+        "format": "int32",
+        "default": 0
+      },
+      "proofMode": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "$ref": "#/components/schemas/ProofMode"
+          }
+        ]
+      },
+      "temperatureC": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Temperature, -30..350.",
+        "format": "double"
+      },
+      "usesOven": {
+        "type": [
+          "null",
+          "boolean"
+        ],
+        "description": "Uses the oven; defaults to the stage type."
+      },
+      "usesMixer": {
+        "type": [
+          "null",
+          "boolean"
+        ],
+        "description": "Uses the mixer; defaults to the stage type."
+      },
+      "isOptional": {
+        "type": "boolean",
+        "description": "Optional stage.",
+        "default": false
+      },
+      "instructions": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Instructions."
+      },
+      "sortOrder": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Order; defaults to the position in the list.",
+        "format": "int32"
+      }
+    },
+    "description": "Stage in a create/update request."
+  },
+  "RecipeSummaryDto": {
+    "required": [
+      "id",
+      "title",
+      "parentRecipeId",
+      "yieldLoaves",
+      "isArchived",
+      "updatedAt"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id.",
+        "format": "uuid"
+      },
+      "title": {
+        "type": "string",
+        "description": "Title."
+      },
+      "parentRecipeId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Parent of a variant.",
+        "format": "uuid"
+      },
+      "yieldLoaves": {
+        "type": "integer",
+        "description": "Loaves the quantities are written for.",
+        "format": "int32"
+      },
+      "isArchived": {
+        "type": "boolean",
+        "description": "Hidden from the default list."
+      },
+      "updatedAt": {
+        "type": "string",
+        "description": "Last change.",
+        "format": "date-time"
+      }
+    },
+    "description": "Recipe in a list."
+  },
+  "RegisterRequest": {
+    "required": [
+      "email",
+      "password",
+      "displayName"
+    ],
+    "type": "object",
+    "properties": {
+      "email": {
+        "type": "string",
+        "description": "Login e-mail."
+      },
+      "password": {
+        "type": "string",
+        "description": "Password, 8-128 characters."
+      },
+      "displayName": {
+        "type": "string",
+        "description": "Name shown in the public library."
+      }
+    },
+    "description": "Body of POST /auth/register (US-01)."
+  },
+  "RegisterResponse": {
+    "required": [
+      "userId"
+    ],
+    "type": "object",
+    "properties": {
+      "userId": {
+        "type": "string",
+        "description": "Id of the new user.",
+        "format": "uuid"
+      }
+    },
+    "description": "Result of a registration."
+  },
+  "RemovePublicationRequest": {
+    "required": [
+      "reason"
+    ],
+    "type": "object",
+    "properties": {
+      "reason": {
+        "type": "string",
+        "description": "Reason shown on the removed publication."
+      }
+    },
+    "description": "Body of POST /admin/library/{id}/remove."
+  },
+  "ReportCreatedResponse": {
+    "required": [
+      "reportId"
+    ],
+    "type": "object",
+    "properties": {
+      "reportId": {
+        "type": "string",
+        "description": "The new report.",
+        "format": "uuid"
+      }
+    },
+    "description": "Response of POST /library/{id}/reports."
+  },
+  "ReportDto": {
+    "required": [
+      "id",
+      "publishedRecipeId",
+      "publicationTitle",
+      "commentId",
+      "commentBody",
+      "reason",
+      "status",
+      "createdAt",
+      "resolvedAt"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Report.",
+        "format": "uuid"
+      },
+      "publishedRecipeId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Reported publication (also set for a comment report).",
+        "format": "uuid"
+      },
+      "publicationTitle": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Title of the publication."
+      },
+      "commentId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Reported comment.",
+        "format": "uuid"
+      },
+      "commentBody": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Text of the reported comment."
+      },
+      "reason": {
+        "type": "string",
+        "description": "Reason given by the reporter."
+      },
+      "status": {
+        "$ref": "#/components/schemas/ReportStatus"
+      },
+      "createdAt": {
+        "type": "string",
+        "description": "Report time.",
+        "format": "date-time"
+      },
+      "resolvedAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Decision time.",
+        "format": "date-time"
+      }
+    },
+    "description": "A content report for the moderator."
+  },
+  "ReportRequest": {
+    "required": [
+      "reason"
+    ],
+    "type": "object",
+    "properties": {
+      "reason": {
+        "type": "string",
+        "description": "Why the content breaks the rules."
+      },
+      "commentId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "The reported comment; null reports the publication itself.",
+        "format": "uuid"
+      }
+    },
+    "description": "Body of POST /library/{id}/reports."
+  },
+  "ReportStatus": {
+    "enum": [
+      "open",
+      "resolved",
+      "rejected"
+    ],
+    "description": "open, resolved or rejected."
+  },
+  "ResolveReportRequest": {
+    "required": [
+      "action",
+      "reason"
+    ],
+    "type": "object",
+    "properties": {
+      "action": {
+        "$ref": "#/components/schemas/ModerationAction"
+      },
+      "reason": {
+        "type": "string",
+        "description": "Reason shown on a removed publication."
+      }
+    },
+    "description": "Body of POST /admin/reports/{id}/resolve."
+  },
+  "SaveAnalysisRequest": {
+    "required": [
+      "analysis"
+    ],
+    "type": "object",
+    "properties": {
+      "analysis": {
+        "type": "string",
+        "description": "Analysis text."
+      }
+    },
+    "description": "Body of PUT /bake-records/{id}/analysis (US-36, saved by the assistant)."
+  },
+  "ScaledIngredientDto": {
+    "required": [
+      "lineId",
+      "ingredientId",
+      "ingredientName",
+      "unitCode",
+      "quantity",
+      "isOptional"
+    ],
+    "type": "object",
+    "properties": {
+      "lineId": {
+        "type": "string",
+        "description": "Line id.",
+        "format": "uuid"
+      },
+      "ingredientId": {
+        "type": "string",
+        "description": "Ingredient.",
+        "format": "uuid"
+      },
+      "ingredientName": {
+        "type": "string",
+        "description": "Name."
+      },
+      "unitCode": {
+        "type": "string",
+        "description": "Unit."
+      },
+      "quantity": {
+        "type": "number",
+        "description": "Quantity for the requested loaves.",
+        "format": "double"
+      },
+      "isOptional": {
+        "type": "boolean",
+        "description": "Optional ingredient."
+      }
+    },
+    "description": "Scaled ingredient (US-06)."
+  },
+  "ScaledRecipeDto": {
+    "required": [
+      "recipeId",
+      "yieldLoaves",
+      "loaves",
+      "ingredients"
+    ],
+    "type": "object",
+    "properties": {
+      "recipeId": {
+        "type": "string",
+        "description": "Recipe.",
+        "format": "uuid"
+      },
+      "yieldLoaves": {
+        "type": "integer",
+        "description": "Loaves the recipe is written for.",
+        "format": "int32"
+      },
+      "loaves": {
+        "type": "integer",
+        "description": "Requested loaves.",
+        "format": "int32"
+      },
+      "ingredients": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/ScaledIngredientDto"
+        },
+        "description": "Scaled quantities."
+      }
+    },
+    "description": "Recipe scaled to a number of loaves (US-06)."
+  },
+  "StageActionRequest": {
+    "type": "object",
+    "properties": {
+      "actualTemperatureC": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Measured temperature.",
+        "format": "double"
+      },
+      "note": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Note."
+      }
+    },
+    "description": "Body of the stage actions start/complete/skip (US-23)."
+  },
+  "StageComparisonDto": {
+    "required": [
+      "change",
+      "parent",
+      "variant"
+    ],
+    "type": "object",
+    "properties": {
+      "change": {
+        "$ref": "#/components/schemas/ChangeKind"
+      },
+      "parent": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "$ref": "#/components/schemas/RecipeStageDto"
+          }
+        ]
+      },
+      "variant": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "$ref": "#/components/schemas/RecipeStageDto"
+          }
+        ]
+      }
+    },
+    "description": "Compared stage."
+  },
+  "StageDurationRequest": {
+    "required": [
+      "plannedMinMinutes",
+      "plannedMaxMinutes"
+    ],
+    "type": "object",
+    "properties": {
+      "plannedMinMinutes": {
+        "type": "integer",
+        "description": "Minimum duration.",
+        "format": "int32"
+      },
+      "plannedMaxMinutes": {
+        "type": "integer",
+        "description": "Maximum duration.",
+        "format": "int32"
+      }
+    },
+    "description": "Body of PATCH .../stages/{stageId} (US-21): durations for this batch only."
+  },
+  "StageLogEntryDto": {
+    "required": [
+      "batchItemId",
+      "recipeTitle",
+      "batchStageId",
+      "sortOrder",
+      "stageName",
+      "stageTypeCode",
+      "stageStatus",
+      "plannedStartAt",
+      "plannedEndMinAt",
+      "plannedEndMaxAt",
+      "actualStartAt",
+      "actualEndAt",
+      "extendedMinutes",
+      "actualTemperatureC",
+      "startDelayMinutes",
+      "plannedMinMinutes",
+      "plannedMaxMinutes",
+      "actualMinutes",
+      "deviationMinutes"
+    ],
+    "type": "object",
+    "properties": {
+      "batchItemId": {
+        "type": "string",
+        "description": "Batch item.",
+        "format": "uuid"
+      },
+      "recipeTitle": {
+        "type": "string",
+        "description": "Recipe title."
+      },
+      "batchStageId": {
+        "type": "string",
+        "description": "Stage.",
+        "format": "uuid"
+      },
+      "sortOrder": {
+        "type": "integer",
+        "description": "Order.",
+        "format": "int32"
+      },
+      "stageName": {
+        "type": "string",
+        "description": "Stage name."
+      },
+      "stageTypeCode": {
+        "type": "string",
+        "description": "Stage type."
+      },
+      "stageStatus": {
+        "$ref": "#/components/schemas/StageStatus"
+      },
+      "plannedStartAt": {
+        "type": "string",
+        "description": "Planned start.",
+        "format": "date-time"
+      },
+      "plannedEndMinAt": {
+        "type": "string",
+        "description": "Planned earliest end.",
+        "format": "date-time"
+      },
+      "plannedEndMaxAt": {
+        "type": "string",
+        "description": "Planned latest end.",
+        "format": "date-time"
+      },
+      "actualStartAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Actual start.",
+        "format": "date-time"
+      },
+      "actualEndAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Actual end.",
+        "format": "date-time"
+      },
+      "extendedMinutes": {
+        "type": "integer",
+        "description": "Extension, minutes.",
+        "format": "int32"
+      },
+      "actualTemperatureC": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Measured temperature.",
+        "format": "double"
+      },
+      "startDelayMinutes": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Actual start minus planned start, minutes.",
+        "format": "double"
+      },
+      "plannedMinMinutes": {
+        "type": "integer",
+        "description": "Planned minimum.",
+        "format": "int32"
+      },
+      "plannedMaxMinutes": {
+        "type": "integer",
+        "description": "Planned maximum.",
+        "format": "int32"
+      },
+      "actualMinutes": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Actual duration, minutes.",
+        "format": "int32"
+      },
+      "deviationMinutes": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Minutes outside the planned window (positive = longer).",
+        "format": "int32"
+      }
+    },
+    "description": "Planned vs actual times of a stage (v_batch_stage_log, US-36)."
+  },
+  "StageStatus": {
+    "enum": [
+      "pending",
+      "running",
+      "done",
+      "skipped"
+    ],
+    "description": "pending, running, done, skipped."
+  },
+  "StageTypeDto": {
+    "required": [
+      "code",
+      "name",
+      "isFermentation",
+      "defaultUsesOven",
+      "defaultUsesMixer"
+    ],
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string",
+        "description": "Code."
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "isFermentation": {
+        "type": "boolean",
+        "description": "Fermentation stage (proofing mode allowed)."
+      },
+      "defaultUsesOven": {
+        "type": "boolean",
+        "description": "Default of usesOven."
+      },
+      "defaultUsesMixer": {
+        "type": "boolean",
+        "description": "Default of usesMixer."
+      }
+    },
+    "description": "Stage type with the defaults used for new stages."
+  },
+  "StarterDto": {
+    "required": [
+      "id",
+      "name",
+      "flourId",
+      "hydrationPercent",
+      "feedingMode",
+      "feedingIntervalHours",
+      "riseHours",
+      "isActive",
+      "notes",
+      "lastFedAt",
+      "nextFeedingAt",
+      "expectedPeakAt",
+      "createdAt",
+      "updatedAt"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Id.",
+        "format": "uuid"
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "flourId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Flour.",
+        "format": "uuid"
+      },
+      "hydrationPercent": {
+        "type": "number",
+        "description": "Hydration, %.",
+        "format": "double"
+      },
+      "feedingMode": {
+        "$ref": "#/components/schemas/FeedingMode"
+      },
+      "feedingIntervalHours": {
+        "type": "integer",
+        "description": "Hours between feedings.",
+        "format": "int32"
+      },
+      "riseHours": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Hours to peak.",
+        "format": "double"
+      },
+      "isActive": {
+        "type": "boolean",
+        "description": "Active."
+      },
+      "notes": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Notes."
+      },
+      "lastFedAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Last feeding.",
+        "format": "date-time"
+      },
+      "nextFeedingAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Next feeding from the last feeding.",
+        "format": "date-time"
+      },
+      "expectedPeakAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Expected peak from the last feeding.",
+        "format": "date-time"
+      },
+      "createdAt": {
+        "type": "string",
+        "description": "Creation time.",
+        "format": "date-time"
+      },
+      "updatedAt": {
+        "type": "string",
+        "description": "Last change.",
+        "format": "date-time"
+      }
+    },
+    "description": "A starter with its schedule from the last feeding (US-27, US-28, US-30)."
+  },
+  "StarterRequest": {
+    "required": [
+      "name",
+      "hydrationPercent",
+      "feedingMode",
+      "feedingIntervalHours"
+    ],
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Name, unique within the user."
+      },
+      "hydrationPercent": {
+        "type": "number",
+        "description": "Hydration, %.",
+        "format": "double"
+      },
+      "feedingMode": {
+        "$ref": "#/components/schemas/FeedingMode"
+      },
+      "feedingIntervalHours": {
+        "type": "integer",
+        "description": "Hours between feedings.",
+        "format": "int32"
+      },
+      "flourId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Flour of the user's catalog.",
+        "format": "uuid"
+      },
+      "riseHours": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Hours from feeding to peak (US-30).",
+        "format": "double"
+      },
+      "isActive": {
+        "type": "boolean",
+        "description": "Reminders are created for active starters only.",
+        "default": true
+      },
+      "notes": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Notes."
+      }
+    },
+    "description": "Body of POST/PUT /starters (US-27)."
+  },
+  "StartWindowDto": {
+    "required": [
+      "recipeId",
+      "readyAt",
+      "startFrom",
+      "startTo"
+    ],
+    "type": "object",
+    "properties": {
+      "recipeId": {
+        "type": "string",
+        "description": "Recipe.",
+        "format": "uuid"
+      },
+      "readyAt": {
+        "type": "string",
+        "description": "Desired ready time.",
+        "format": "date-time"
+      },
+      "startFrom": {
+        "type": "string",
+        "description": "Earliest start (with the longest durations).",
+        "format": "date-time"
+      },
+      "startTo": {
+        "type": "string",
+        "description": "Latest start (with the shortest durations).",
+        "format": "date-time"
+      }
+    },
+    "description": "Start window for a desired ready time (US-52)."
+  },
+  "TimelineDto": {
+    "required": [
+      "recipeId",
+      "start",
+      "stages",
+      "readyFrom",
+      "readyTo"
+    ],
+    "type": "object",
+    "properties": {
+      "recipeId": {
+        "type": "string",
+        "description": "Recipe.",
+        "format": "uuid"
+      },
+      "start": {
+        "type": "string",
+        "description": "Start.",
+        "format": "date-time"
+      },
+      "stages": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/TimelineStageDto"
+        },
+        "description": "Stages with planned times."
+      },
+      "readyFrom": {
+        "type": "string",
+        "description": "Earliest ready time.",
+        "format": "date-time"
+      },
+      "readyTo": {
+        "type": "string",
+        "description": "Latest ready time.",
+        "format": "date-time"
+      }
+    },
+    "description": "Timeline of a recipe for a start time (US-16)."
+  },
+  "TimelineStageDto": {
+    "required": [
+      "lineId",
+      "sortOrder",
+      "name",
+      "stageTypeCode",
+      "minMinutes",
+      "maxMinutes",
+      "plannedStartAt",
+      "plannedEndMinAt",
+      "plannedEndMaxAt"
+    ],
+    "type": "object",
+    "properties": {
+      "lineId": {
+        "type": "string",
+        "description": "Stage line id.",
+        "format": "uuid"
+      },
+      "sortOrder": {
+        "type": "integer",
+        "description": "Order.",
+        "format": "int32"
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "stageTypeCode": {
+        "type": "string",
+        "description": "Stage type."
+      },
+      "minMinutes": {
+        "type": "integer",
+        "description": "Minimum duration.",
+        "format": "int32"
+      },
+      "maxMinutes": {
+        "type": "integer",
+        "description": "Maximum duration.",
+        "format": "int32"
+      },
+      "plannedStartAt": {
+        "type": "string",
+        "description": "Planned start (with the minimum durations of the previous stages).",
+        "format": "date-time"
+      },
+      "plannedEndMinAt": {
+        "type": "string",
+        "description": "Earliest end.",
+        "format": "date-time"
+      },
+      "plannedEndMaxAt": {
+        "type": "string",
+        "description": "Latest end.",
+        "format": "date-time"
+      }
+    },
+    "description": "A row of fn_recipe_timeline."
+  },
+  "UnitDto": {
+    "required": [
+      "code",
+      "name",
+      "dimension",
+      "factorToBase"
+    ],
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string",
+        "description": "Code, for example g."
+      },
+      "name": {
+        "type": "string",
+        "description": "Name."
+      },
+      "dimension": {
+        "type": "string",
+        "description": "mass, volume or count."
+      },
+      "factorToBase": {
+        "type": "number",
+        "description": "Base units (g, ml, pcs) in one unit.",
+        "format": "double"
+      }
+    },
+    "description": "Unit of measure."
+  },
+  "UpdateBakeRecordRequest": {
+    "required": [
+      "rating",
+      "comment"
+    ],
+    "type": "object",
+    "properties": {
+      "rating": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "description": "Rating 1-5, or null to clear.",
+        "format": "int16"
+      },
+      "comment": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Comment, or null to clear."
+      }
+    },
+    "description": "Body of PATCH /bake-records/{id} (US-32): sets the rating and the comment."
+  },
+  "UserProfileDto": {
+    "required": [
+      "id",
+      "email",
+      "displayName",
+      "role",
+      "createdAt",
+      "lastLoginAt"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "User id.",
+        "format": "uuid"
+      },
+      "email": {
+        "type": "string",
+        "description": "E-mail as entered at registration."
+      },
+      "displayName": {
+        "type": "string",
+        "description": "Name shown in the public library."
+      },
+      "role": {
+        "$ref": "#/components/schemas/UserRole"
+      },
+      "createdAt": {
+        "type": "string",
+        "description": "Registration time.",
+        "format": "date-time"
+      },
+      "lastLoginAt": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Time of the previous successful login, if any.",
+        "format": "date-time"
+      }
+    },
+    "description": "Profile of the user."
+  },
+  "UserRole": {
+    "enum": [
+      "user",
+      "admin"
+    ],
+    "description": "Role: user or admin."
+  },
+  "WarningDto": {
+    "required": [
+      "issueCode",
+      "entityType",
+      "entityId",
+      "details"
+    ],
+    "type": "object",
+    "properties": {
+      "issueCode": {
+        "type": "string",
+        "description": "Kind of issue, for example missing_price."
+      },
+      "entityType": {
+        "type": "string",
+        "description": "Kind of entity: ingredient, recipe, batch, starter."
+      },
+      "entityId": {
+        "type": "string",
+        "description": "Id of the entity.",
+        "format": "uuid"
+      },
+      "details": {
+        "type": "string",
+        "description": "Human-readable explanation."
+      }
+    },
+    "description": "A data quality issue of the user's workspace (missing price, empty recipe, overdue batch, ...)."
+  }
+}

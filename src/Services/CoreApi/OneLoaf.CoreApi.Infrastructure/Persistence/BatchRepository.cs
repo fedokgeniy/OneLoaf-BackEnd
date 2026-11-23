@@ -4,6 +4,7 @@ using OneLoaf.CoreApi.Application.Common;
 using OneLoaf.Domain;
 using OneLoaf.Domain.Entities;
 using OneLoaf.Infrastructure.Persistence;
+using OneLoaf.SharedKernel.Text;
 
 namespace OneLoaf.CoreApi.Infrastructure.Persistence;
 
@@ -30,7 +31,7 @@ public sealed class BatchRepository(OneLoafDbContext db) : IBatchRepository
             batches = batches.Where(b => b.PlannedStartAt < toUtc);
         }
 
-        if (query.Status is { } status)
+        if (WireEnumNames.ParseOrNull<BatchStatus>(query.Status) is { } status)
         {
             batches = batches.Where(b => b.Status == status);
         }

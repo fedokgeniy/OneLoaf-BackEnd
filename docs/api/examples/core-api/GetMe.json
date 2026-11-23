@@ -1,0 +1,34 @@
+[
+  {
+    "case": "without token",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "authenticated": false,
+    "status": 401,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/unauthorized",
+      "title": "A valid bearer token is required.",
+      "status": 401,
+      "instance": "/api/v1/me",
+      "traceId": "00-a8b13e6a00641f4f041f9fa23c92e21f-ce911c82edf73dcd-02",
+      "correlationId": "d094a924b0c74cfea571b0690182e536"
+    }
+  },
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/me",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "fb6730bd-1f99-4903-b880-b682637be697",
+      "email": "docs.baker.58152a7fa@example.com",
+      "displayName": "Docs Baker",
+      "role": "user",
+      "createdAt": "2026-11-23T04:18:06.224807+00:00",
+      "lastLoginAt": "2026-11-23T04:18:06.421922+00:00"
+    }
+  }
+]

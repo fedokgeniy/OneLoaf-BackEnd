@@ -79,7 +79,7 @@ public sealed class NotificationTests(ApiFixture fixture)
         Assert.Equal(HttpStatusCode.BadRequest, invalid.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, borisDelete.StatusCode);
         Assert.Equal(HttpStatusCode.NoContent, annaDelete.StatusCode);
-        Assert.Equal(HttpStatusCode.ServiceUnavailable, vapid.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, vapid.StatusCode);
     }
 
     [Fact]

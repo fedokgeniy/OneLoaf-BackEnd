@@ -31,7 +31,7 @@ public static class ModelConventions
                 var enumType = Nullable.GetUnderlyingType(property.ClrType) ?? property.ClrType;
                 if (enumType.IsEnum)
                 {
-                    var converterType = typeof(SnakeCaseEnumConverter<>).MakeGenericType(enumType);
+                    var converterType = typeof(WireEnumNamesConverter<>).MakeGenericType(enumType);
                     property.SetValueConverter((ValueConverter)Activator.CreateInstance(converterType)!);
                     property.SetMaxLength(32);
 
@@ -80,7 +80,7 @@ public static class ModelConventions
 }
 
 /// <summary>Stores an enum as snake_case text: StageType.BulkFermentation &lt;-&gt; 'bulk_fermentation'.</summary>
-public sealed class SnakeCaseEnumConverter<TEnum> : ValueConverter<TEnum, string> where TEnum : struct, Enum
+public sealed class WireEnumNamesConverter<TEnum> : ValueConverter<TEnum, string> where TEnum : struct, Enum
 {
     private static readonly Dictionary<TEnum, string> ToDb =
         Enum.GetValues<TEnum>().ToDictionary(v => v, v => ModelConventions.ToSnakeCase(v.ToString()));
@@ -88,5 +88,5 @@ public sealed class SnakeCaseEnumConverter<TEnum> : ValueConverter<TEnum, string
     private static readonly Dictionary<string, TEnum> FromDb =
         ToDb.ToDictionary(kv => kv.Value, kv => kv.Key);
 
-    public SnakeCaseEnumConverter() : base(v => ToDb[v], v => FromDb[v]) { }
+    public WireEnumNamesConverter() : base(v => ToDb[v], v => FromDb[v]) { }
 }

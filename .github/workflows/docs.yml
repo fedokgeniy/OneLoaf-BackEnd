@@ -1,0 +1,42 @@
+name: docs
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "docs/**"
+      - ".spectral.yaml"
+      - ".github/workflows/docs.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - ".spectral.yaml"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: OpenAPI lint and links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Spectral (OpenAPI rules and house conventions)
+        run: npx --yes @stoplight/spectral-cli@6.15.0 lint "docs/api/reference/*.openapi.json" --fail-severity=warn --format github-actions --format stylish
+
+      - name: Relative links in the documentation
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress --include-fragments=false "docs/**/*.md" README.md
+          fail: true

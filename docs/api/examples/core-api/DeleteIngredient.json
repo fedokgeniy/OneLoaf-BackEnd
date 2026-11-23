@@ -1,0 +1,26 @@
+[
+  {
+    "case": "typical",
+    "method": "DELETE",
+    "path": "/api/v1/ingredients/713def41-2884-4ff5-b003-861a786a0db2",
+    "authenticated": true,
+    "status": 204
+  },
+  {
+    "case": "used in a recipe",
+    "method": "DELETE",
+    "path": "/api/v1/ingredients/52323c40-349b-41b4-8318-1c0639ca9e1c",
+    "authenticated": true,
+    "status": 409,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/conflict",
+      "title": "The request conflicts with existing data.",
+      "status": 409,
+      "detail": "The ingredient is used in recipes and cannot be deleted.",
+      "instance": "/api/v1/ingredients/52323c40-349b-41b4-8318-1c0639ca9e1c",
+      "traceId": "00-48c09d86d1a6678fc1c9393fc845f3e0-00e118c34a213ec4-02",
+      "correlationId": "7e8fe1c561d747b5b53641e1ab62712e"
+    }
+  }
+]

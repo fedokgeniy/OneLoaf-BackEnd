@@ -1,0 +1,60 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/calculations/oven-loading",
+    "authenticated": true,
+    "requestBody": {
+      "items": [
+        {
+          "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+          "loaves": 3
+        },
+        {
+          "recipeId": "e9af6e00-0768-4872-af7b-ca7321dd291a",
+          "loaves": 2
+        }
+      ]
+    },
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "ovenCapacityLoaves": 4,
+      "totalLoaves": 5,
+      "rounds": [
+        {
+          "round": 1,
+          "loaves": 4,
+          "bakeMinutes": 45,
+          "startOffsetMinutes": 0,
+          "items": [
+            {
+              "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+              "title": "Country sourdough",
+              "loaves": 3
+            },
+            {
+              "recipeId": "e9af6e00-0768-4872-af7b-ca7321dd291a",
+              "title": "Country sourdough, longer bulk",
+              "loaves": 1
+            }
+          ]
+        },
+        {
+          "round": 2,
+          "loaves": 1,
+          "bakeMinutes": 45,
+          "startOffsetMinutes": 45,
+          "items": [
+            {
+              "recipeId": "e9af6e00-0768-4872-af7b-ca7321dd291a",
+              "title": "Country sourdough, longer bulk",
+              "loaves": 1
+            }
+          ]
+        }
+      ],
+      "totalOvenMinutes": 90
+    }
+  }
+]

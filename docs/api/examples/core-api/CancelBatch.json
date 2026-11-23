@@ -1,0 +1,26 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/cancel",
+    "authenticated": true,
+    "status": 204
+  },
+  {
+    "case": "not found or another user's",
+    "method": "POST",
+    "path": "/api/v1/batches/00000000-0000-4000-9999-000000000000/cancel",
+    "authenticated": true,
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "The batch was not found.",
+      "instance": "/api/v1/batches/00000000-0000-4000-9999-000000000000/cancel",
+      "traceId": "00-4ac601d0f3295d5e81d2b4603f2929f6-5e6c8022b3e7a1c3-02",
+      "correlationId": "799417fb87af4fd78e6c41a6d256e755"
+    }
+  }
+]

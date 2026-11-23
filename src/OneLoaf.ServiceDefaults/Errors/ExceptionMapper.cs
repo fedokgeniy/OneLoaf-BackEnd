@@ -91,9 +91,9 @@ public static class ExceptionMapper
             PostgresErrorCodes.UniqueViolation or PostgresErrorCodes.ForeignKeyViolation =>
                 Db(StatusCodes.Status409Conflict, ProblemTypes.Conflict, ConflictTitle, sqlState),
             PostgresErrorCodes.ObjectNotInPrerequisiteState =>
-                Db(StatusCodes.Status409Conflict, ProblemTypes.Conflict, StateConflictTitle, sqlState),
+                Db(StatusCodes.Status409Conflict, ProblemTypes.Conflict, StateConflictTitle, sqlState) with { Detail = RuleMessage(postgres) },
             PostgresErrorCodes.CheckViolation =>
-                Db(StatusCodes.Status422UnprocessableEntity, ProblemTypes.BusinessRule, BusinessRuleTitle, sqlState),
+                Db(StatusCodes.Status422UnprocessableEntity, ProblemTypes.BusinessRule, BusinessRuleTitle, sqlState) with { Detail = RuleMessage(postgres) },
             PostgresErrorCodes.IntegrityConstraintViolation =>
                 Db(StatusCodes.Status403Forbidden, ProblemTypes.Forbidden, ForbiddenTitle, sqlState),
             PostgresErrorCodes.InvalidParameterValue =>
@@ -103,6 +103,13 @@ public static class ExceptionMapper
             _ => Internal() with { SqlState = sqlState },
         };
     }
+
+    /// <summary>
+    /// The message of a rule raised by a database function or trigger (written for the user, no constraint name), or
+    /// null for a violated table constraint, whose name is not shown.
+    /// </summary>
+    private static string? RuleMessage(PostgresException postgres) =>
+        postgres.ConstraintName is null && !string.IsNullOrWhiteSpace(postgres.MessageText) ? postgres.MessageText : null;
 
     private static ProblemMapping ClientError(int status, string type, string title, Exception exception) =>
         new(status, type, title, exception.Message, LogLevel.Information);

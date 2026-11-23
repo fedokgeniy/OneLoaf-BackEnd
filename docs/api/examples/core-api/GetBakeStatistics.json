@@ -1,0 +1,23 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/bake-records/statistics",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": [
+      {
+        "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+        "recipeTitle": "Country sourdough",
+        "bakesCount": 1,
+        "loavesTotal": 3,
+        "avgRating": null,
+        "ratedCount": 0,
+        "avgCostPerLoaf": 2.98,
+        "firstBakedOn": "2026-11-23",
+        "lastBakedOn": "2026-11-23"
+      }
+    ]
+  }
+]

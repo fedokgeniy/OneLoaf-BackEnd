@@ -1,0 +1,32 @@
+[
+  {
+    "case": "wrong password",
+    "method": "DELETE",
+    "path": "/api/v1/me",
+    "authenticated": true,
+    "requestBody": {
+      "password": "Not-My-Password-1"
+    },
+    "status": 403,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/forbidden",
+      "title": "You are not allowed to perform this action.",
+      "status": 403,
+      "detail": "The password is incorrect.",
+      "instance": "/api/v1/me",
+      "traceId": "00-81d72d898833018bbf64215386ff2d48-5f9d632bfbe3864c-02",
+      "correlationId": "1da6f3be845a4ec49e943bdbfd7ec791"
+    }
+  },
+  {
+    "case": "typical",
+    "method": "DELETE",
+    "path": "/api/v1/me",
+    "authenticated": true,
+    "requestBody": {
+      "password": "Rye-Bread-2026!"
+    },
+    "status": 204
+  }
+]

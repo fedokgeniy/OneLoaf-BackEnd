@@ -1,0 +1,34 @@
+# notification: one typical request per operation, generated from the recorded examples.
+# Base URLs: https://<domain>/notify (production), http://localhost:5082 (local)
+# Use with the VS Code REST Client or JetBrains HTTP Client; set @token to an access token from POST /api/v1/auth/login.
+@baseUrl = http://localhost:5082
+@token = <access token>
+
+### Own reminders
+GET {{baseUrl}}/api/v1/reminders?status=scheduled&limit=20
+Authorization: Bearer {{token}}
+
+### VAPID public key
+GET {{baseUrl}}/api/v1/push/vapid-public-key
+
+### Register a device for notifications
+POST {{baseUrl}}/api/v1/push/subscriptions
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "endpoint": "https://fcm.googleapis.com/fcm/send/docs-e33c09bb373544dea85a84ee313832a7",
+  "keys": {
+    "p256dh": "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM",
+    "auth": "tBHItJI5svbpez7KI4CCXg"
+  }
+}
+
+### Remove a device
+DELETE {{baseUrl}}/api/v1/push/subscriptions/56170868-7c60-4421-b3c5-ef04566ec4f5
+Authorization: Bearer {{token}}
+
+### Send a test notification to own devices
+POST {{baseUrl}}/api/v1/push/test
+Authorization: Bearer {{token}}
+

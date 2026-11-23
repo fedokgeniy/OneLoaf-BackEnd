@@ -92,6 +92,8 @@ public static class Extensions
         ArgumentNullException.ThrowIfNull(options);
 
         options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+        // Numbers are JSON numbers only ("3" is rejected), so the contract and the OpenAPI types are unambiguous.
+        options.NumberHandling = JsonNumberHandling.Strict;
         options.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.SnakeCaseLower, allowIntegerValues: false));
     }
 }

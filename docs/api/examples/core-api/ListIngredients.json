@@ -1,0 +1,29 @@
+[
+  {
+    "case": "filter by category",
+    "method": "GET",
+    "path": "/api/v1/ingredients?category=flour&page=1&pageSize=20",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "items": [
+        {
+          "id": "52323c40-349b-41b4-8318-1c0639ca9e1c",
+          "name": "Bread flour",
+          "categoryCode": "flour",
+          "unitCode": "g",
+          "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+          "flourName": "Bread flour T550",
+          "proteinPercent": 12.8,
+          "currentPrice": null,
+          "createdAt": "2026-11-23T04:18:06.937121+00:00",
+          "updatedAt": "2026-11-23T04:18:06.937121+00:00"
+        }
+      ],
+      "page": 1,
+      "pageSize": 20,
+      "totalCount": 1
+    }
+  }
+]

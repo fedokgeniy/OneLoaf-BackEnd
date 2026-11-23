@@ -1,0 +1,32 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/reference/currencies",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": [
+      {
+        "code": "EUR",
+        "name": "Euro",
+        "minorUnits": 2
+      },
+      {
+        "code": "GBP",
+        "name": "Pound sterling",
+        "minorUnits": 2
+      },
+      {
+        "code": "PLN",
+        "name": "Polish zloty",
+        "minorUnits": 2
+      },
+      {
+        "code": "USD",
+        "name": "US dollar",
+        "minorUnits": 2
+      }
+    ]
+  }
+]

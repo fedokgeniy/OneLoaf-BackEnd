@@ -1,0 +1,12 @@
+[
+  {
+    "case": "typical",
+    "method": "PUT",
+    "path": "/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/reactions/me",
+    "authenticated": true,
+    "requestBody": {
+      "reaction": "want_to_bake"
+    },
+    "status": 204
+  }
+]
