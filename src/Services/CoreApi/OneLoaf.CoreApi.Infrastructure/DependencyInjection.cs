@@ -12,6 +12,7 @@ using OneLoaf.CoreApi.Application.Recipes;
 using OneLoaf.CoreApi.Application.Reference;
 using OneLoaf.CoreApi.Application.Warnings;
 using OneLoaf.CoreApi.Infrastructure.Auth;
+using OneLoaf.CoreApi.Infrastructure.Caching;
 using OneLoaf.CoreApi.Infrastructure.Persistence;
 using OneLoaf.Infrastructure;
 using OneLoaf.Messaging.RabbitMq;
@@ -47,12 +48,11 @@ public static class DependencyInjection
             .AddDbContextCheck<OneLoafDbContext>(DatabaseHealthCheckName, tags: [HealthTags.Ready]);
 
         services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IReferenceDataReader, ReferenceDataReader>();
         services.AddScoped<IKitchenSettingsRepository, KitchenSettingsRepository>();
         services.AddScoped<IFlourRepository, FlourRepository>();
         services.AddScoped<IIngredientRepository, IngredientRepository>();
         services.AddScoped<IRecipeRepository, RecipeRepository>();
-        services.AddScoped<IRecipeCalculations, RecipeCalculations>();
+        services.AddCoreApiCaching(configuration);
         services.AddScoped<IWarningsReader, WarningsReader>();
         services.AddScoped<IBatchRepository, BatchRepository>();
         services.AddScoped<IStarterRepository, StarterRepository>();

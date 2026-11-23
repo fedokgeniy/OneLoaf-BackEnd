@@ -25,9 +25,15 @@
     <Project Path="src/Services/Assistant/OneLoaf.Assistant.Application/OneLoaf.Assistant.Application.csproj" />
     <Project Path="src/Services/Assistant/OneLoaf.Assistant.Infrastructure/OneLoaf.Assistant.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Services/Notification/">
+    <Project Path="src/Services/Notification/OneLoaf.Notification/OneLoaf.Notification.csproj" />
+    <Project Path="src/Services/Notification/OneLoaf.Notification.Application/OneLoaf.Notification.Application.csproj" />
+    <Project Path="src/Services/Notification/OneLoaf.Notification.Infrastructure/OneLoaf.Notification.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/OneLoaf.ArchitectureTests/OneLoaf.ArchitectureTests.csproj" />
     <Project Path="tests/OneLoaf.Assistant.UnitTests/OneLoaf.Assistant.UnitTests.csproj" />
+    <Project Path="tests/OneLoaf.Notification.UnitTests/OneLoaf.Notification.UnitTests.csproj" />
     <Project Path="tests/OneLoaf.CoreApi.UnitTests/OneLoaf.CoreApi.UnitTests.csproj" />
     <Project Path="tests/OneLoaf.IntegrationTests/OneLoaf.IntegrationTests.csproj" />
   </Folder>

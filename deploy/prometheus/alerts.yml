@@ -1,0 +1,71 @@
+groups:
+  - name: oneloaf-services
+    rules:
+      - alert: ServiceDown
+        expr: up{job=~"core-api|assistant|notification"} == 0
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.job }} is down"
+          description: "Prometheus cannot scrape {{ $labels.job }} for 2 minutes."
+
+      - alert: HighErrorRate
+        expr: |
+          sum by (job) (rate(http_server_request_duration_seconds_count{http_response_status_code=~"5.."}[5m]))
+            / sum by (job) (rate(http_server_request_duration_seconds_count[5m])) > 0.05
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.job }}: more than 5 % of requests fail"
+          description: "5xx ratio is {{ $value | humanizePercentage }} over 5 minutes."
+
+      - alert: HighLatency
+        expr: |
+          histogram_quantile(0.95, sum by (job, le) (rate(http_server_request_duration_seconds_bucket{http_route!~"/health.*|/metrics"}[5m]))) > 1
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.job }}: p95 latency above 1 s"
+          description: "p95 is {{ $value | humanizeDuration }} for 10 minutes."
+
+  - name: oneloaf-business
+    rules:
+      - alert: ReminderFailures
+        expr: sum(increase(oneloaf_reminders_failed_total{reason!="no_target"}[15m])) > 0
+        labels: { severity: warning }
+        annotations:
+          summary: "Reminders could not be delivered"
+          description: "{{ $value }} reminders failed after all attempts in the last 15 minutes."
+
+      - alert: DeadLetterQueueNotEmpty
+        expr: rabbitmq_detailed_queue_messages{queue="oneloaf.dead-letter"} > 0
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "Messages in oneloaf.dead-letter"
+          description: "{{ $value }} messages failed every attempt; inspect them in the RabbitMQ management UI."
+
+      - alert: AiDailyCostHigh
+        expr: sum(increase(oneloaf_ai_cost_usd_total[24h])) > 0.5
+        labels: { severity: warning }
+        annotations:
+          summary: "Assistant cost above $0.50 in 24 h"
+          description: "Cost in the last 24 hours is ${{ $value | printf \"%.2f\" }}."
+
+  - name: oneloaf-infrastructure
+    rules:
+      - alert: PostgresDown
+        expr: pg_up == 0
+        for: 1m
+        labels: { severity: critical }
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "postgres-exporter cannot connect to the database."
+
+      - alert: DiskSpaceLow
+        expr: node_filesystem_avail_bytes{mountpoint="/",fstype!="tmpfs"} / node_filesystem_size_bytes{mountpoint="/",fstype!="tmpfs"} < 0.1
+        for: 10m
+        labels: { severity: warning }
+        annotations:
+          summary: "Less than 10 % disk space left"
+          description: "Root filesystem has {{ $value | humanizePercentage }} free."

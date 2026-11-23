@@ -1,6 +1,7 @@
 using OneLoaf.CoreApi.Application;
 using OneLoaf.CoreApi.Endpoints;
 using OneLoaf.CoreApi.Infrastructure;
+using OneLoaf.CoreApi.Infrastructure.Caching;
 using OneLoaf.CoreApi.RateLimiting;
 using OneLoaf.ServiceDefaults;
 using OneLoaf.ServiceDefaults.Constants;
@@ -23,6 +24,7 @@ var app = builder.Build();
 
 app.UseServiceDefaults();
 app.UseRateLimiter();
+app.UseCalculationCacheInvalidation();
 
 app.MapServiceDefaults();
 app.MapAuthEndpoints();

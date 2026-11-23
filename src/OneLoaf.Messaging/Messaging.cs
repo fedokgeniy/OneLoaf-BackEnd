@@ -62,3 +62,45 @@ public interface IEventPublisher
     /// </summary>
     Task PublishAsync(IntegrationEvent integrationEvent, CancellationToken cancellationToken);
 }
+
+/// <summary>Queue names; each consuming service owns its queues.</summary>
+public static class QueueNames
+{
+    /// <summary>Due reminders, consumed by the Notification dispatcher.</summary>
+    public const string NotificationReminders = "notification.reminders";
+
+    /// <summary>Batch events (planned, completed) for confirmation pushes.</summary>
+    public const string NotificationBatchEvents = "notification.batch-events";
+
+    /// <summary>Starter feedings for the "next feeding" push.</summary>
+    public const string NotificationStarterEvents = "notification.starter-events";
+
+    /// <summary>Messages that failed every attempt.</summary>
+    public const string DeadLetter = "oneloaf.dead-letter";
+
+    /// <summary>Delayed retry queue of a queue.</summary>
+    public static string Retry(string queue) => queue + ".retry";
+}
+
+/// <summary>Delivery details of a consumed message.</summary>
+/// <param name="MessageId">Id set by the publisher (stable across retries).</param>
+/// <param name="Attempt">Delivery attempt, starting at 1.</param>
+/// <param name="MaxAttempts">Attempts before the message goes to the dead-letter queue.</param>
+/// <param name="CorrelationId">Correlation id of the operation that published the event.</param>
+public sealed record MessageContext(string MessageId, int Attempt, int MaxAttempts, string? CorrelationId)
+{
+    /// <summary>This is the last attempt; a failure now dead-letters the message.</summary>
+    public bool IsLastAttempt => Attempt >= MaxAttempts;
+}
+
+/// <summary>
+/// Handles one event type. Throwing schedules a delayed retry; after the last attempt the message is dead-lettered.
+/// Handlers must be idempotent: a message can be delivered more than once.
+/// </summary>
+/// <typeparam name="TEvent">Event type.</typeparam>
+public interface IIntegrationEventConsumer<in TEvent>
+    where TEvent : IntegrationEvent
+{
+    /// <summary>Handles the event.</summary>
+    Task HandleAsync(TEvent integrationEvent, MessageContext context, CancellationToken cancellationToken);
+}

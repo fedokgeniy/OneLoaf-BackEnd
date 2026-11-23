@@ -1,4 +1,4 @@
-# Local environment: PostgreSQL 16 with the OneLoaf roles, the migrator, RabbitMQ, Redis, the Core API and the AI Assistant.
+# Local environment: PostgreSQL 16 with the OneLoaf roles, the migrator, RabbitMQ, Redis and the three services.
 # All passwords and keys come from .env (see .env.example); nothing secret is stored in this file.
 #
 #   cp .env.example .env              # fill in the passwords and the JWT keys
@@ -90,12 +90,15 @@ services:
       RabbitMq__Host: rabbitmq
       RabbitMq__UserName: ${RABBITMQ_DEFAULT_USER:-oneloaf}
       RabbitMq__Password: ${RABBITMQ_DEFAULT_PASS}
+      Redis__ConnectionString: "redis:6379,password=${REDIS_PASSWORD}"
     ports:
       - "${CORE_API_PORT:-5080}:8080"
     depends_on:
       db:
         condition: service_healthy
       rabbitmq:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       migrator:
         condition: service_completed_successfully
@@ -128,6 +131,41 @@ services:
         condition: service_healthy
       core-api:
         condition: service_started
+
+  notification:
+    build:
+      context: .
+      dockerfile: src/Services/Notification/OneLoaf.Notification/Dockerfile
+    image: oneloaf-notification:local
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__OneLoaf: "Host=db;Port=5432;Database=${ONELOAF_DB:-oneloaf};Username=oneloaf_app;Password=${ONELOAF_APP_PASSWORD}"
+      Jwt__Issuer: ${Jwt__Issuer}
+      Jwt__Audience: ${Jwt__Audience}
+      Jwt__PublicKeyPem: ${Jwt__PublicKeyPem}
+      Serilog__MinimumLevel__Default: ${Serilog__MinimumLevel__Default:-Information}
+      Redis__ConnectionString: "redis:6379,password=${REDIS_PASSWORD}"
+      RabbitMq__Host: rabbitmq
+      RabbitMq__UserName: ${RABBITMQ_DEFAULT_USER:-oneloaf}
+      RabbitMq__Password: ${RABBITMQ_DEFAULT_PASS}
+      Notification__VapidSubject: ${Notification__VapidSubject:-}
+      Notification__VapidPublicKey: ${Notification__VapidPublicKey:-}
+      Notification__VapidPrivateKey: ${Notification__VapidPrivateKey:-}
+      Smtp__Host: ${Smtp__Host:-}
+      Smtp__Port: ${Smtp__Port:-587}
+      Smtp__User: ${Smtp__User:-}
+      Smtp__Password: ${Smtp__Password:-}
+    ports:
+      - "${NOTIFICATION_PORT:-5082}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
 
 volumes:
   pgdata:

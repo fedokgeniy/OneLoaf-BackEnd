@@ -25,18 +25,22 @@ public sealed class LayerRulesTests
     private static readonly Assembly AssistantAssembly = typeof(Assistant.Endpoints.AssistantEntryPoint).Assembly;
     private static readonly Assembly AssistantApplicationAssembly = typeof(Assistant.Application.DependencyInjection).Assembly;
     private static readonly Assembly AssistantInfrastructureAssembly = typeof(Assistant.Infrastructure.DependencyInjection).Assembly;
+    private static readonly Assembly NotificationAssembly = typeof(Notification.Endpoints.NotificationEntryPoint).Assembly;
+    private static readonly Assembly NotificationApplicationAssembly = typeof(Notification.Application.DependencyInjection).Assembly;
+    private static readonly Assembly NotificationInfrastructureAssembly = typeof(Notification.Infrastructure.DependencyInjection).Assembly;
 
     /// <summary>Application assemblies of all services.</summary>
-    private static readonly Assembly[] ApplicationAssemblies = [CoreApiApplicationAssembly, AssistantApplicationAssembly];
+    private static readonly Assembly[] ApplicationAssemblies = [CoreApiApplicationAssembly, AssistantApplicationAssembly, NotificationApplicationAssembly];
 
     /// <summary>Presentation (web) assemblies of all services.</summary>
-    private static readonly Assembly[] PresentationAssemblies = [CoreApiAssembly, AssistantAssembly];
+    private static readonly Assembly[] PresentationAssemblies = [CoreApiAssembly, AssistantAssembly, NotificationAssembly];
 
     /// <summary>Assemblies of each service by service prefix.</summary>
     private static readonly Dictionary<string, Assembly[]> ServiceAssemblies = new(StringComparer.Ordinal)
     {
         ["OneLoaf.CoreApi"] = [CoreApiAssembly, CoreApiApplicationAssembly, CoreApiInfrastructureAssembly],
         ["OneLoaf.Assistant"] = [AssistantAssembly, AssistantApplicationAssembly, AssistantInfrastructureAssembly],
+        ["OneLoaf.Notification"] = [NotificationAssembly, NotificationApplicationAssembly, NotificationInfrastructureAssembly],
     };
 
     /// <summary>Prefixes of every service, also those not created yet, so a future cross-reference fails.</summary>
@@ -45,7 +49,8 @@ public sealed class LayerRulesTests
     private static readonly Architecture Architecture = new ArchLoader()
         .LoadAssemblies(DomainAssembly, SharedKernelAssembly, ServiceDefaultsAssembly, InfrastructureAssembly,
             CoreApiAssembly, CoreApiApplicationAssembly, CoreApiInfrastructureAssembly,
-            AssistantAssembly, AssistantApplicationAssembly, AssistantInfrastructureAssembly)
+            AssistantAssembly, AssistantApplicationAssembly, AssistantInfrastructureAssembly,
+            NotificationAssembly, NotificationApplicationAssembly, NotificationInfrastructureAssembly)
         .Build();
 
     /// <summary>Namespaces the Application layer must never use.</summary>
@@ -57,6 +62,9 @@ public sealed class LayerRulesTests
         "Npgsql",
         "StackExchange.Redis",
         "Anthropic",
+        "Lib.Net.Http.WebPush",
+        "MailKit",
+        "Microsoft.Extensions.Caching",
         "OneLoaf.Infrastructure",
         "OneLoaf.ServiceDefaults",
         "OneLoaf.Messaging.RabbitMq",

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.Metrics;
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -209,7 +210,7 @@ public sealed class RedisPendingActionStore(IConnectionMultiplexer redis) : IPen
 }
 
 /// <summary>Usage counters in Redis (daily per user, monthly global), stored as micro-dollars.</summary>
-public sealed class RedisUsageStore(IConnectionMultiplexer redis) : IUsageStore
+public sealed class RedisUsageStore(IConnectionMultiplexer redis, AssistantMetrics metrics) : IUsageStore
 {
     private const string Requests = "requests";
     private const string Tokens = "tokens";
@@ -235,6 +236,7 @@ public sealed class RedisUsageStore(IConnectionMultiplexer redis) : IUsageStore
         var db = redis.GetDatabase();
         var key = CacheKeys.DailyUsage(userId, day);
         var micro = (long)Math.Round(costUsd * Micro);
+        metrics.Turn(tokens, costUsd);
         await db.HashIncrementAsync(key, Requests);
         await db.HashIncrementAsync(key, Tokens, tokens);
         await db.HashIncrementAsync(key, CostMicro, micro);
@@ -246,6 +248,32 @@ public sealed class RedisUsageStore(IConnectionMultiplexer redis) : IUsageStore
 
     private static long ToLong(RedisValue value) =>
         value.IsNullOrEmpty ? 0 : long.Parse(value.ToString(), CultureInfo.InvariantCulture);
+}
+
+/// <summary>Counters of the assistant (<c>oneloaf.ai.requests</c>, <c>oneloaf.ai.tokens</c>, <c>oneloaf.ai.cost.usd</c>).</summary>
+public sealed class AssistantMetrics
+{
+    private readonly Counter<long> _requests;
+    private readonly Counter<long> _tokens;
+    private readonly Counter<double> _cost;
+
+    /// <summary>Creates the counters on the OneLoaf meter.</summary>
+    public AssistantMetrics(IMeterFactory meterFactory)
+    {
+        ArgumentNullException.ThrowIfNull(meterFactory);
+        var meter = meterFactory.Create(Meters.OneLoaf);
+        _requests = meter.CreateCounter<long>("oneloaf.ai.requests", description: "Assistant turns sent to Claude.");
+        _tokens = meter.CreateCounter<long>("oneloaf.ai.tokens", description: "Tokens billed by Claude.");
+        _cost = meter.CreateCounter<double>("oneloaf.ai.cost.usd", description: "Cost of the assistant by the configured prices.");
+    }
+
+    /// <summary>A finished turn.</summary>
+    public void Turn(long tokens, decimal costUsd)
+    {
+        _requests.Add(1);
+        _tokens.Add(tokens);
+        _cost.Add((double)costUsd);
+    }
 }
 
 /// <summary>Readiness check: Redis answers PING.</summary>
@@ -308,6 +336,7 @@ public static class DependencyInjection
             return ConnectionMultiplexer.Connect(redisOptions);
         });
         services.AddSingleton<IPendingActionStore, RedisPendingActionStore>();
+        services.AddSingleton<AssistantMetrics>();
         services.AddSingleton<IUsageStore, RedisUsageStore>();
 
         services.AddHealthChecks()

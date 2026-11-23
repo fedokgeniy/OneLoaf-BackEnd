@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Reminder scheduling and delivery, event notifications and push subscriptions.
+       Talks to the database, Redis, RabbitMQ and the delivery services only through ports. -->
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\OneLoaf.Domain\OneLoaf.Domain.csproj" />
+    <ProjectReference Include="..\..\..\OneLoaf.SharedKernel\OneLoaf.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\OneLoaf.Messaging\OneLoaf.Messaging.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+</Project>

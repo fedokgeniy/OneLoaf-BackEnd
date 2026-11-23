@@ -6,6 +6,7 @@ using OneLoaf.ServiceDefaults.Constants;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
+using Serilog.Sinks.Grafana.Loki;
 
 namespace OneLoaf.ServiceDefaults.Logging;
 
@@ -23,6 +24,9 @@ public static class LoggingExtensions
     /// <summary>Name of the log property with the environment name.</summary>
     public const string EnvironmentPropertyName = "Environment";
 
+    /// <summary>Configuration key of the Loki push URL (<c>Loki__Url</c>); logs go only to the console when empty.</summary>
+    public const string LokiUrlKey = "Loki:Url";
+
     /// <summary>Replaces the default logging with Serilog.</summary>
     public static IHostApplicationBuilder AddOneLoafLogging(this IHostApplicationBuilder builder, string serviceName)
     {
@@ -30,13 +34,27 @@ public static class LoggingExtensions
 
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddSingleton<UserIdEnricher>();
-        builder.Services.AddSerilog((services, configuration) => configuration
-            .ReadFrom.Configuration(builder.Configuration)
-            .Enrich.FromLogContext()
-            .Enrich.WithProperty(ServicePropertyName, serviceName)
-            .Enrich.WithProperty(EnvironmentPropertyName, builder.Environment.EnvironmentName)
-            .Enrich.With(services.GetRequiredService<UserIdEnricher>())
-            .WriteTo.Console(new RenderedCompactJsonFormatter()));
+        var lokiUrl = builder.Configuration[LokiUrlKey];
+        builder.Services.AddSerilog((services, configuration) =>
+        {
+            configuration
+                .ReadFrom.Configuration(builder.Configuration)
+                .Enrich.FromLogContext()
+                .Enrich.WithProperty(ServicePropertyName, serviceName)
+                .Enrich.WithProperty(EnvironmentPropertyName, builder.Environment.EnvironmentName)
+                .Enrich.With(services.GetRequiredService<UserIdEnricher>())
+                .WriteTo.Console(new RenderedCompactJsonFormatter());
+            if (!string.IsNullOrWhiteSpace(lokiUrl))
+            {
+                // Low-cardinality labels only; correlation id, user id and trace id stay in the JSON body.
+                configuration.WriteTo.GrafanaLoki(lokiUrl,
+                    [
+                        new LokiLabel { Key = "service", Value = serviceName },
+                        new LokiLabel { Key = "environment", Value = builder.Environment.EnvironmentName },
+                    ],
+                    propertiesAsLabels: ["level"]);
+            }
+        });
         return builder;
     }
 
