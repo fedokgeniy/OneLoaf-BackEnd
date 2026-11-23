@@ -61,4 +61,6 @@ ONELOAF_E2E_WEB_ROOT=artifacts/web/wwwroot dotnet test tests/OneLoaf.Web.E2ETest
 ## Status
 
 The web client and all three services are implemented (`/api/v1`, see the [changelog](docs/api/CHANGELOG.md)). The database submitted state is
-tagged `db-submitted`. Deployment to a server is prepared (`deploy/`) but not yet performed.
+tagged `db-submitted`. Deployment is automated (`.github/workflows/deploy.yml`, stack in `deploy/`): after a service
+workflow passes on `master`, its image is pulled on the server, migrations are applied and the health endpoints are
+checked.

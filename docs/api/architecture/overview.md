@@ -206,13 +206,15 @@ flowchart LR
         obs[prometheus · alertmanager · loki · grafana<br/>postgres-exporter · node-exporter]
         backup[db-backup<br/>daily pg_dump]
     end
-    ghcr --> vm
+    ghcr -->|deploy.yml: pull, migrate, up, smoke test| vm
     caddy2 --> core2 & asst2 & notif2
 ```
 
-Only Caddy publishes ports. Configuration is environment variables written from GitHub Environment secrets
+Only Caddy publishes ports. Configuration is environment variables written from the GitHub Environment secret
 (`deploy/docker-compose.prod.yml`). Each service has its own workflow with path filters, so a change to one service
-builds, tests and ships only that service; `security.yml` scans secrets, dependencies and images.
+builds, tests and ships only that service; `security.yml` scans secrets, dependencies and images. `deploy.yml` runs
+only after such a workflow has succeeded on `master`: it copies `deploy/` to the server over SSH, writes `.env`, pulls
+the images, runs the migrator, recreates the changed containers and checks `/` and `/health/ready` of every service.
 
 ## Observability
 

@@ -1,0 +1,85 @@
+name: deploy
+
+# Continuous deployment to the production VM. Runs after a service workflow has passed all its gates on master and
+# pushed its image to GHCR, so nothing is deployed from a failed build. Only the containers whose image changed are
+# recreated; the migrator applies pending migrations first.
+#
+# GitHub Environment "production":
+#   variables  DEPLOY_HOST, DEPLOY_USER, DEPLOY_PATH (e.g. /opt/oneloaf), DOMAIN
+#   secrets    DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS, PRODUCTION_ENV (the server's .env, see .env.example)
+# Until DEPLOY_HOST is set the job is skipped.
+
+on:
+  workflow_run:
+    workflows: [core-api, assistant, notification, web, database]
+    types: [completed]
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy to production
+    if: >
+      vars.DEPLOY_HOST != '' &&
+      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://${{ vars.DOMAIN }}
+    env:
+      TARGET: ${{ vars.DEPLOY_USER }}@${{ vars.DEPLOY_HOST }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: SSH key and known host
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+
+      - name: Copy the stack definition
+        run: |
+          ssh "$TARGET" "mkdir -p '$DEPLOY_PATH/db'"
+          rsync -az --delete --exclude backups --exclude .env --exclude db deploy/ "$TARGET:$DEPLOY_PATH/"
+          rsync -az --delete db/security "$TARGET:$DEPLOY_PATH/db/"
+
+      - name: Write .env from the environment secret
+        env:
+          PRODUCTION_ENV: ${{ secrets.PRODUCTION_ENV }}
+        run: printf '%s\n' "$PRODUCTION_ENV" | ssh "$TARGET" "umask 077 && cat > '$DEPLOY_PATH/.env'"
+
+      - name: Pull, migrate, start
+        env:
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          printf '%s\n' "$GHCR_TOKEN" | ssh "$TARGET" "docker login ghcr.io -u '$GHCR_USER' --password-stdin"
+          ssh "$TARGET" "cd '$DEPLOY_PATH' \
+            && docker compose -f docker-compose.prod.yml --profile migrate pull \
+            && docker compose -f docker-compose.prod.yml --profile migrate run --rm migrator \
+            && docker compose -f docker-compose.prod.yml up -d --remove-orphans \
+            && docker image prune -f \
+            && docker logout ghcr.io"
+
+      - name: Smoke test
+        env:
+          BASE_URL: https://${{ vars.DOMAIN }}
+        run: |
+          for path in / /core/health/ready /assistant/health/ready /notify/health/ready; do
+            curl --fail --silent --show-error --output /dev/null \
+              --retry 12 --retry-delay 10 --retry-all-errors "$BASE_URL$path"
+            echo "OK $path"
+          done

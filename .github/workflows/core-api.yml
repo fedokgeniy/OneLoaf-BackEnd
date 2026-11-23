@@ -71,6 +71,9 @@ jobs:
       - name: Build
         run: dotnet build OneLoaf.slnx --configuration Release --no-restore
 
+      - name: Format (whole solution)
+        run: dotnet format OneLoaf.slnx --verify-no-changes --no-restore
+
       - name: Vulnerable packages
         run: |
           dotnet list OneLoaf.slnx package --vulnerable --include-transitive | tee vulnerable.txt
