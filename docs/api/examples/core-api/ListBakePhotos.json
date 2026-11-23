@@ -1,0 +1,18 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": [
+      {
+        "id": "c3b9e25c-54c6-416b-af75-94f88ee6d076",
+        "contentType": "image/png",
+        "url": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos/c3b9e25c-54c6-416b-af75-94f88ee6d076",
+        "createdAt": "2026-11-23T10:08:56.274685+00:00"
+      }
+    ]
+  }
+]

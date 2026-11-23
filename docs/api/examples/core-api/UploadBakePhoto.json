@@ -1,0 +1,62 @@
+[
+  {
+    "case": "typical",
+    "method": "POST",
+    "path": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos",
+    "authenticated": true,
+    "requestBody": {
+      "multipart/form-data": {
+        "file": "<crumb.png, image/png, 29 bytes>"
+      }
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "c3b9e25c-54c6-416b-af75-94f88ee6d076",
+      "contentType": "image/png",
+      "url": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos/c3b9e25c-54c6-416b-af75-94f88ee6d076",
+      "createdAt": "2026-11-23T10:08:56.274685+00:00"
+    }
+  },
+  {
+    "case": "not an image",
+    "method": "POST",
+    "path": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos",
+    "authenticated": true,
+    "requestBody": {
+      "multipart/form-data": {
+        "file": "<notes.png, image/png, 10 bytes>"
+      }
+    },
+    "status": 422,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/business-rule",
+      "title": "The request violates a business rule.",
+      "status": 422,
+      "detail": "Only JPEG, PNG and WebP images are accepted.",
+      "instance": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos",
+      "traceId": "00-a76e069001402d483ba9e1f2197e5158-3d29e9e13a2eefd9-02",
+      "correlationId": "1d716a00ce084d8e8f4b2dfdeb3d9eef"
+    }
+  },
+  {
+    "case": "second photo",
+    "method": "POST",
+    "path": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos",
+    "authenticated": true,
+    "requestBody": {
+      "multipart/form-data": {
+        "file": "<crumb-2.png, image/png, 29 bytes>"
+      }
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "a689cec9-115f-40ea-97d3-ff234626b464",
+      "contentType": "image/png",
+      "url": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos/a689cec9-115f-40ea-97d3-ff234626b464",
+      "createdAt": "2026-11-23T10:08:56.32927+00:00"
+    }
+  }
+]

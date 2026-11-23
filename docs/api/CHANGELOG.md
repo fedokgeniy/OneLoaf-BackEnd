@@ -5,7 +5,18 @@ versions follow [semantic versioning](guides/versioning.md). Dates are UTC.
 
 ## [Unreleased]
 
-Nothing yet.
+### Added
+
+- **Save a batch as a variant** (US-25): `POST /batches/{id}/save-as-variant` creates a variant of the batch item's recipe
+  with the measured durations of finished stages and the changed or extended durations of the others; `422` when the
+  batch followed the recipe.
+- **Crumb photos** (US-51): upload (`multipart/form-data`, JPEG/PNG/WebP checked by file signature, up to 5 MB and 10 per
+  record), list, download and delete; bake records show their photos and the list shows `photoCount`. Files live on a
+  volume (`Storage__PhotosPath`), the database keeps the key.
+
+### Fixed
+
+- Security workflow: existing Trivy action tag, gitleaks allowlist for public example keys and placeholders.
 
 ## [1.0.0] — 2026-11-23
 

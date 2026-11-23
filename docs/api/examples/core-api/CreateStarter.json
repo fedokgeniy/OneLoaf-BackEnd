@@ -9,15 +9,15 @@
       "hydrationPercent": 100,
       "feedingMode": "regular",
       "feedingIntervalHours": 24,
-      "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "flourId": "091556f9-e047-41ba-a3c4-34037d3833f6",
       "riseHours": 8
     },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "841da49e-2392-4552-8e41-23efa6388d33",
+      "id": "1953c953-6626-48eb-bae0-29cc6d218d8b",
       "name": "Rye mother",
-      "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "flourId": "091556f9-e047-41ba-a3c4-34037d3833f6",
       "hydrationPercent": 100.0,
       "feedingMode": "regular",
       "feedingIntervalHours": 24,
@@ -27,8 +27,8 @@
       "lastFedAt": null,
       "nextFeedingAt": null,
       "expectedPeakAt": null,
-      "createdAt": "2026-11-23T04:18:07.92986+00:00",
-      "updatedAt": "2026-11-23T04:18:07.92986+00:00"
+      "createdAt": "2026-11-23T10:08:55.062935+00:00",
+      "updatedAt": "2026-11-23T10:08:55.062935+00:00"
     }
   },
   {
@@ -45,7 +45,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "f65e64a7-4b08-455b-aa8f-5eb328a6da6e",
+      "id": "13c17585-4d16-4f94-88e2-784848b531a7",
       "name": "Fridge levain",
       "flourId": null,
       "hydrationPercent": 80.0,
@@ -57,8 +57,8 @@
       "lastFedAt": null,
       "nextFeedingAt": null,
       "expectedPeakAt": null,
-      "createdAt": "2026-11-23T04:18:08.174824+00:00",
-      "updatedAt": "2026-11-23T04:18:08.174824+00:00"
+      "createdAt": "2026-11-23T10:08:55.317889+00:00",
+      "updatedAt": "2026-11-23T10:08:55.317889+00:00"
     }
   }
 ]

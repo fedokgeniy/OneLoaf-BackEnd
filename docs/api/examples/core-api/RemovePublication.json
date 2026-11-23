@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/admin/library/c3cc7934-aeeb-4233-86b0-0b3f056ad5a7/remove",
+    "path": "/api/v1/admin/library/da14aad8-7898-48ce-a855-7e14ac40e71f/remove",
     "authenticated": true,
     "requestBody": {
       "reason": "Duplicate of an earlier publication."

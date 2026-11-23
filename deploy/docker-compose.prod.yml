@@ -108,6 +108,9 @@ services:
       <<: *dotnet-env
       Jwt__SigningKeyPem: ${Jwt__SigningKeyPem}
       Jwt__AccessTokenMinutes: ${Jwt__AccessTokenMinutes:-60}
+      Storage__PhotosPath: /data/photos
+    volumes:
+      - photos:/data/photos
     depends_on:
       db: { condition: service_healthy }
       rabbitmq: { condition: service_healthy }
@@ -238,5 +241,6 @@ volumes:
   prometheusdata:
   lokidata:
   grafanadata:
+  photos:
   caddy-data:
   caddy-config:

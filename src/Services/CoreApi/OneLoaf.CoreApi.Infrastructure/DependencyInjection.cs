@@ -59,6 +59,9 @@ public static class DependencyInjection
         services.AddScoped<IStarterRepository, StarterRepository>();
         services.AddScoped<IBakeRecordRepository, BakeRecordRepository>();
         services.AddScoped<ILibraryRepository, LibraryRepository>();
+        services.AddScoped<IBakeRecordPhotoRepository, BakeRecordPhotoRepository>();
+        services.AddValidatedOptions<PhotoStorageOptions>(PhotoStorageOptions.SectionName);
+        services.AddSingleton<IPhotoStorage, LocalPhotoStorage>();
         services.AddScoped<Application.Export.IExportReader, ExportReader>();
         services.AddRabbitMqPublisher();
         services.AddSingleton<IPasswordHasher, PasswordHasherAdapter>();

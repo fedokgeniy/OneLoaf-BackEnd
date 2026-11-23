@@ -30,6 +30,9 @@ ENV ASPNETCORE_HTTP_PORTS=8080 \
     DOTNET_CLI_TELEMETRY_OPTOUT=1
 EXPOSE 8080
 
+# Crumb photos (US-51) live on a volume mounted here; the non-root user must own the directory.
+RUN mkdir -p /data/photos && chown "$APP_UID" /data/photos
+
 # Non-root user provided by the .NET images.
 USER $APP_UID
 

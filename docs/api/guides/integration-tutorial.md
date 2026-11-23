@@ -152,7 +152,9 @@ While baking, drive the stages: `POST /batches/{id}/stages/{stageId}/start`, `/c
 temperature and a note), `/extend` (`{ "minutes": 30 }` when the dough needs more time), `/skip` for a pending stage,
 or `PATCH` the planned durations of a pending stage. An action that does not fit the stage's state is `409`.
 Finally `POST /batches/{id}/complete` returns `{ "bakeRecordId": "…" }` — the history record with planned vs actual
-times. Rate it with `PATCH /bake-records/{id}` (`{ "rating": 4, "comment": "…" }`).
+times. Rate it with `PATCH /bake-records/{id}` (`{ "rating": 4, "comment": "…" }`), attach crumb photos with
+`POST /bake-records/{id}/photos` (multipart field `file`), and if the bake went better than the recipe, keep it:
+`POST /batches/{id}/save-as-variant` creates a variant with the durations you really used.
 
 ## Step 7 — Let the assistant plan the next bake
 
@@ -208,4 +210,4 @@ due time; a device the push service reports as gone is removed automatically.
 
 - [Concepts](concepts.md) — recipes, variants, batches, stages, reminders, library.
 - [Errors](errors.md) and [best practices](best-practices.md) — what to do with each status code.
-- [Endpoint reference](../reference/core-api.md) — all 83 Core API operations with examples.
+- [Endpoint reference](../reference/core-api.md) — all 88 Core API operations with examples.

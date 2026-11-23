@@ -9,7 +9,7 @@ GET {{baseUrl}}/api/v1/warnings
 Authorization: Bearer {{token}}
 
 ### Publish a recipe to the library
-POST {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/publish
+POST {{baseUrl}}/api/v1/recipes/b7727976-4ac5-4d7d-bad9-57aca1d6109d/publish
 Authorization: Bearer {{token}}
 
 ### Suggest oven rounds
@@ -20,11 +20,11 @@ Content-Type: application/json
 {
   "items": [
     {
-      "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+      "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
       "loaves": 3
     },
     {
-      "recipeId": "e9af6e00-0768-4872-af7b-ca7321dd291a",
+      "recipeId": "84d2f7ec-11fd-47ad-80e2-c6e97756155d",
       "loaves": 2
     }
   ]
@@ -35,7 +35,7 @@ POST {{baseUrl}}/api/v1/auth/register
 Content-Type: application/json
 
 {
-  "email": "docs.baker.58152a7fa@example.com",
+  "email": "docs.baker.f71fcafd8@example.com",
   "password": "Rye-Bread-2026!",
   "displayName": "Docs Baker"
 }
@@ -45,7 +45,7 @@ POST {{baseUrl}}/api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "docs.baker.58152a7fa@example.com",
+  "email": "docs.baker.f71fcafd8@example.com",
   "password": "Rye-Bread-2026!"
 }
 
@@ -125,11 +125,11 @@ Content-Type: application/json
 }
 
 ### Get a flour
-GET {{baseUrl}}/api/v1/flours/6ac54db1-125d-4e4c-8d62-bdc63be0bcd3
+GET {{baseUrl}}/api/v1/flours/091556f9-e047-41ba-a3c4-34037d3833f6
 Authorization: Bearer {{token}}
 
 ### Replace a flour
-PUT {{baseUrl}}/api/v1/flours/6ac54db1-125d-4e4c-8d62-bdc63be0bcd3
+PUT {{baseUrl}}/api/v1/flours/091556f9-e047-41ba-a3c4-34037d3833f6
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -142,7 +142,7 @@ Content-Type: application/json
 }
 
 ### Delete a flour
-DELETE {{baseUrl}}/api/v1/flours/0b54adc1-4f33-4c0c-acb6-4b4c07f22055
+DELETE {{baseUrl}}/api/v1/flours/7e8001c3-2003-48d4-9193-3981ffabb4e4
 Authorization: Bearer {{token}}
 
 ### List ingredients with today's price
@@ -158,15 +158,15 @@ Content-Type: application/json
   "name": "Bread flour",
   "categoryCode": "flour",
   "unitCode": "g",
-  "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3"
+  "flourId": "091556f9-e047-41ba-a3c4-34037d3833f6"
 }
 
 ### Get an ingredient
-GET {{baseUrl}}/api/v1/ingredients/9e0e9353-f588-4eec-a4cc-e2260801cdc7
+GET {{baseUrl}}/api/v1/ingredients/180012fa-8da7-4292-baae-b071aea57ec4
 Authorization: Bearer {{token}}
 
 ### Replace an ingredient
-PUT {{baseUrl}}/api/v1/ingredients/9e0e9353-f588-4eec-a4cc-e2260801cdc7
+PUT {{baseUrl}}/api/v1/ingredients/180012fa-8da7-4292-baae-b071aea57ec4
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -178,15 +178,15 @@ Content-Type: application/json
 }
 
 ### Delete an ingredient
-DELETE {{baseUrl}}/api/v1/ingredients/713def41-2884-4ff5-b003-861a786a0db2
+DELETE {{baseUrl}}/api/v1/ingredients/77a86713-a6ae-4c6e-8303-64f2abea4439
 Authorization: Bearer {{token}}
 
 ### Price history
-GET {{baseUrl}}/api/v1/ingredients/52323c40-349b-41b4-8318-1c0639ca9e1c/prices
+GET {{baseUrl}}/api/v1/ingredients/f2a4c8d9-547a-4da7-bf63-07f14c020a27/prices
 Authorization: Bearer {{token}}
 
 ### Add a price with an effective date
-POST {{baseUrl}}/api/v1/ingredients/52323c40-349b-41b4-8318-1c0639ca9e1c/prices
+POST {{baseUrl}}/api/v1/ingredients/f2a4c8d9-547a-4da7-bf63-07f14c020a27/prices
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -214,19 +214,19 @@ Content-Type: application/json
   "notes": null,
   "ingredients": [
     {
-      "ingredientId": "52323c40-349b-41b4-8318-1c0639ca9e1c",
+      "ingredientId": "f2a4c8d9-547a-4da7-bf63-07f14c020a27",
       "quantity": 500
     },
     {
-      "ingredientId": "14ad3a67-e6f4-4d52-a2df-79933f4de510",
+      "ingredientId": "c988c3b7-4463-4474-895b-255438fb664d",
       "quantity": 350
     },
     {
-      "ingredientId": "9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+      "ingredientId": "180012fa-8da7-4292-baae-b071aea57ec4",
       "quantity": 10
     },
     {
-      "ingredientId": "b5d44e02-8459-4682-ade6-1d740eddba74",
+      "ingredientId": "9de3b3a4-f7ea-4bb2-9563-88df35b267d3",
       "quantity": 100
     }
   ],
@@ -271,11 +271,11 @@ Content-Type: application/json
 }
 
 ### Get the effective recipe
-GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4
+GET {{baseUrl}}/api/v1/recipes/b7727976-4ac5-4d7d-bad9-57aca1d6109d
 Authorization: Bearer {{token}}
 
 ### Replace the content of a recipe
-PUT {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4
+PUT {{baseUrl}}/api/v1/recipes/b7727976-4ac5-4d7d-bad9-57aca1d6109d
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -287,19 +287,19 @@ Content-Type: application/json
   "notes": "Feed the starter the evening before.",
   "ingredients": [
     {
-      "ingredientId": "52323c40-349b-41b4-8318-1c0639ca9e1c",
+      "ingredientId": "f2a4c8d9-547a-4da7-bf63-07f14c020a27",
       "quantity": 500
     },
     {
-      "ingredientId": "14ad3a67-e6f4-4d52-a2df-79933f4de510",
+      "ingredientId": "c988c3b7-4463-4474-895b-255438fb664d",
       "quantity": 350
     },
     {
-      "ingredientId": "9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+      "ingredientId": "180012fa-8da7-4292-baae-b071aea57ec4",
       "quantity": 10
     },
     {
-      "ingredientId": "b5d44e02-8459-4682-ade6-1d740eddba74",
+      "ingredientId": "9de3b3a4-f7ea-4bb2-9563-88df35b267d3",
       "quantity": 100
     }
   ],
@@ -344,19 +344,19 @@ Content-Type: application/json
 }
 
 ### Delete a recipe
-DELETE {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4
+DELETE {{baseUrl}}/api/v1/recipes/b7727976-4ac5-4d7d-bad9-57aca1d6109d
 Authorization: Bearer {{token}}
 
 ### Archive a recipe
-POST {{baseUrl}}/api/v1/recipes/e9af6e00-0768-4872-af7b-ca7321dd291a/archive
+POST {{baseUrl}}/api/v1/recipes/84d2f7ec-11fd-47ad-80e2-c6e97756155d/archive
 Authorization: Bearer {{token}}
 
 ### Restore an archived recipe
-POST {{baseUrl}}/api/v1/recipes/e9af6e00-0768-4872-af7b-ca7321dd291a/unarchive
+POST {{baseUrl}}/api/v1/recipes/84d2f7ec-11fd-47ad-80e2-c6e97756155d/unarchive
 Authorization: Bearer {{token}}
 
 ### Create a variant
-POST {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/variants
+POST {{baseUrl}}/api/v1/recipes/b7727976-4ac5-4d7d-bad9-57aca1d6109d/variants
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -365,27 +365,27 @@ Content-Type: application/json
 }
 
 ### Compare a variant with its parent
-GET {{baseUrl}}/api/v1/recipes/e9af6e00-0768-4872-af7b-ca7321dd291a/comparison
+GET {{baseUrl}}/api/v1/recipes/84d2f7ec-11fd-47ad-80e2-c6e97756155d/comparison
 Authorization: Bearer {{token}}
 
 ### Scale to a number of loaves
-GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/scaled?loaves=3
+GET {{baseUrl}}/api/v1/recipes/b7727976-4ac5-4d7d-bad9-57aca1d6109d/scaled?loaves=3
 Authorization: Bearer {{token}}
 
 ### Cost of N loaves on a price date
-GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/cost?loaves=3
+GET {{baseUrl}}/api/v1/recipes/b7727976-4ac5-4d7d-bad9-57aca1d6109d/cost?loaves=3
 Authorization: Bearer {{token}}
 
 ### Stage timeline and ready window for a start time
-GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/timeline?start=2026-11-25T08%3A00%3A00%2B02%3A00
+GET {{baseUrl}}/api/v1/recipes/b7727976-4ac5-4d7d-bad9-57aca1d6109d/timeline?start=2026-11-25T08%3A00%3A00%2B02%3A00
 Authorization: Bearer {{token}}
 
 ### Start window for a desired ready time
-GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/start-window?readyAt=2026-11-26T08%3A00%3A00%2B02%3A00
+GET {{baseUrl}}/api/v1/recipes/b7727976-4ac5-4d7d-bad9-57aca1d6109d/start-window?readyAt=2026-11-26T08%3A00%3A00%2B02%3A00
 Authorization: Bearer {{token}}
 
 ### Dough weight, kneading cycles and starter amount
-GET {{baseUrl}}/api/v1/recipes/c91d8602-89d5-455b-a921-78e6f97a9dc4/production-figures?loaves=3
+GET {{baseUrl}}/api/v1/recipes/b7727976-4ac5-4d7d-bad9-57aca1d6109d/production-figures?loaves=3
 Authorization: Bearer {{token}}
 
 ### Production calendar
@@ -403,9 +403,9 @@ Content-Type: application/json
   "source": "manual",
   "items": [
     {
-      "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+      "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
       "loaves": 3,
-      "starterId": "841da49e-2392-4552-8e41-23efa6388d33",
+      "starterId": "1953c953-6626-48eb-bae0-29cc6d218d8b",
       "starterReminderMinutes": 60
     }
   ]
@@ -422,20 +422,20 @@ Content-Type: application/json
   "source": "manual",
   "items": [
     {
-      "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+      "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
       "loaves": 3,
-      "starterId": "841da49e-2392-4552-8e41-23efa6388d33",
+      "starterId": "1953c953-6626-48eb-bae0-29cc6d218d8b",
       "starterReminderMinutes": 60
     }
   ]
 }
 
 ### Get a batch with items and stages
-GET {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee
+GET {{baseUrl}}/api/v1/batches/dcab64b0-9720-4f19-997d-b3bcd2492ddc
 Authorization: Bearer {{token}}
 
 ### Re-plan a planned batch
-PUT {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee
+PUT {{baseUrl}}/api/v1/batches/dcab64b0-9720-4f19-997d-b3bcd2492ddc
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -445,28 +445,38 @@ Content-Type: application/json
   "source": "manual",
   "items": [
     {
-      "recipeId": "c91d8602-89d5-455b-a921-78e6f97a9dc4",
+      "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
       "loaves": 3,
-      "starterId": "841da49e-2392-4552-8e41-23efa6388d33",
+      "starterId": "1953c953-6626-48eb-bae0-29cc6d218d8b",
       "starterReminderMinutes": 60
     }
   ]
 }
 
 ### Cancel a batch
-POST {{baseUrl}}/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/cancel
+POST {{baseUrl}}/api/v1/batches/ea723662-db8b-4789-9a4e-78a43c4c2f4c/cancel
 Authorization: Bearer {{token}}
 
 ### Complete a running batch
-POST {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee/complete
+POST {{baseUrl}}/api/v1/batches/dcab64b0-9720-4f19-997d-b3bcd2492ddc/complete
 Authorization: Bearer {{token}}
 
+### Save how the batch was baked as a recipe variant
+POST {{baseUrl}}/api/v1/batches/dcab64b0-9720-4f19-997d-b3bcd2492ddc/save-as-variant
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "itemId": null,
+  "title": "Country sourdough, as baked"
+}
+
 ### Merged kneads of the same dough
-GET {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee/kneading-plan
+GET {{baseUrl}}/api/v1/batches/dcab64b0-9720-4f19-997d-b3bcd2492ddc/kneading-plan
 Authorization: Bearer {{token}}
 
 ### Start a stage now
-POST {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee/stages/e26b456e-2410-4e2b-b52f-d22e73b8d85b/start
+POST {{baseUrl}}/api/v1/batches/dcab64b0-9720-4f19-997d-b3bcd2492ddc/stages/b6531aa5-ff40-43a4-8dc6-a434586816b0/start
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -476,7 +486,7 @@ Content-Type: application/json
 }
 
 ### Complete a running stage now
-POST {{baseUrl}}/api/v1/batches/9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee/stages/e26b456e-2410-4e2b-b52f-d22e73b8d85b/complete
+POST {{baseUrl}}/api/v1/batches/dcab64b0-9720-4f19-997d-b3bcd2492ddc/stages/b6531aa5-ff40-43a4-8dc6-a434586816b0/complete
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -486,7 +496,7 @@ Content-Type: application/json
 }
 
 ### Skip a pending stage
-POST {{baseUrl}}/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/stages/39c6b892-4e57-4135-8ece-1e7da4667bec/skip
+POST {{baseUrl}}/api/v1/batches/5635b892-0e3d-4618-ae90-f780c2d648c9/stages/3f93e2aa-fb92-48fa-ab57-10ff7d679c24/skip
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -496,7 +506,7 @@ Content-Type: application/json
 }
 
 ### Extend a stage by N minutes
-POST {{baseUrl}}/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/stages/fe3543ca-6643-40a9-9439-a52a7e7ecfa6/extend
+POST {{baseUrl}}/api/v1/batches/5635b892-0e3d-4618-ae90-f780c2d648c9/stages/9a415737-bdd7-4a86-ad97-c978ff823502/extend
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -505,7 +515,7 @@ Content-Type: application/json
 }
 
 ### Change the planned durations for this batch only
-PATCH {{baseUrl}}/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/stages/962748c3-fa60-4d21-b2a8-3cffbb46171e
+PATCH {{baseUrl}}/api/v1/batches/5635b892-0e3d-4618-ae90-f780c2d648c9/stages/675fc545-1ea7-4edc-aa4d-effc7fa03c2e
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -515,7 +525,7 @@ Content-Type: application/json
 }
 
 ### Restore the durations of the recipe stage
-POST {{baseUrl}}/api/v1/batches/82f594b5-e006-44db-b0ae-aa51b7efad74/stages/962748c3-fa60-4d21-b2a8-3cffbb46171e/reset
+POST {{baseUrl}}/api/v1/batches/5635b892-0e3d-4618-ae90-f780c2d648c9/stages/675fc545-1ea7-4edc-aa4d-effc7fa03c2e/reset
 Authorization: Bearer {{token}}
 
 ### List starters with their schedule
@@ -532,16 +542,16 @@ Content-Type: application/json
   "hydrationPercent": 100,
   "feedingMode": "regular",
   "feedingIntervalHours": 24,
-  "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+  "flourId": "091556f9-e047-41ba-a3c4-34037d3833f6",
   "riseHours": 8
 }
 
 ### Get a starter
-GET {{baseUrl}}/api/v1/starters/841da49e-2392-4552-8e41-23efa6388d33
+GET {{baseUrl}}/api/v1/starters/1953c953-6626-48eb-bae0-29cc6d218d8b
 Authorization: Bearer {{token}}
 
 ### Replace a starter
-PUT {{baseUrl}}/api/v1/starters/841da49e-2392-4552-8e41-23efa6388d33
+PUT {{baseUrl}}/api/v1/starters/1953c953-6626-48eb-bae0-29cc6d218d8b
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -550,26 +560,26 @@ Content-Type: application/json
   "hydrationPercent": 100,
   "feedingMode": "regular",
   "feedingIntervalHours": 12,
-  "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+  "flourId": "091556f9-e047-41ba-a3c4-34037d3833f6",
   "riseHours": 8,
   "notes": "Kitchen counter"
 }
 
 ### Delete a starter
-DELETE {{baseUrl}}/api/v1/starters/f65e64a7-4b08-455b-aa8f-5eb328a6da6e
+DELETE {{baseUrl}}/api/v1/starters/13c17585-4d16-4f94-88e2-784848b531a7
 Authorization: Bearer {{token}}
 
 ### Feeding log, newest first
-GET {{baseUrl}}/api/v1/starters/841da49e-2392-4552-8e41-23efa6388d33/feedings
+GET {{baseUrl}}/api/v1/starters/1953c953-6626-48eb-bae0-29cc6d218d8b/feedings
 Authorization: Bearer {{token}}
 
 ### Record a feeding
-POST {{baseUrl}}/api/v1/starters/841da49e-2392-4552-8e41-23efa6388d33/feedings
+POST {{baseUrl}}/api/v1/starters/1953c953-6626-48eb-bae0-29cc6d218d8b/feedings
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "fedAt": "2026-11-23T03:18:07.9871901+00:00",
+  "fedAt": "2026-11-23T09:08:55.1282749+00:00",
   "flourG": 50,
   "waterG": 50,
   "starterKeptG": 20,
@@ -585,11 +595,11 @@ GET {{baseUrl}}/api/v1/bake-records/statistics
 Authorization: Bearer {{token}}
 
 ### Get a history record
-GET {{baseUrl}}/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea
+GET {{baseUrl}}/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7
 Authorization: Bearer {{token}}
 
 ### Set rating and comment
-PATCH {{baseUrl}}/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea
+PATCH {{baseUrl}}/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -599,11 +609,34 @@ Content-Type: application/json
 }
 
 ### Planned vs actual stage times
-GET {{baseUrl}}/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea/stage-log
+GET {{baseUrl}}/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/stage-log
+Authorization: Bearer {{token}}
+
+### Upload a crumb photo
+POST {{baseUrl}}/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "multipart/form-data": {
+    "file": "<crumb.png, image/png, 29 bytes>"
+  }
+}
+
+### Crumb photos of a bake record
+GET {{baseUrl}}/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos
+Authorization: Bearer {{token}}
+
+### The image of a crumb photo
+GET {{baseUrl}}/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos/c3b9e25c-54c6-416b-af75-94f88ee6d076
+Authorization: Bearer {{token}}
+
+### Delete a crumb photo
+DELETE {{baseUrl}}/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/photos/a689cec9-115f-40ea-97d3-ff234626b464
 Authorization: Bearer {{token}}
 
 ### Store the assistant's analysis
-PUT {{baseUrl}}/api/v1/bake-records/c13eeb78-1208-4cbf-99fe-a587c002adea/analysis
+PUT {{baseUrl}}/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7/analysis
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -615,14 +648,14 @@ Content-Type: application/json
 GET {{baseUrl}}/api/v1/library?search=sourdough&page=1&pageSize=20
 
 ### A published recipe
-GET {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7
+GET {{baseUrl}}/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b
 
 ### Comments of a published recipe
-GET {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/comments?page=1&pageSize=20
+GET {{baseUrl}}/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b/comments?page=1&pageSize=20
 Authorization: Bearer {{token}}
 
 ### Comment a published recipe
-POST {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/comments
+POST {{baseUrl}}/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b/comments
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -631,15 +664,15 @@ Content-Type: application/json
 }
 
 ### Withdraw an own publication
-POST {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/unpublish
+POST {{baseUrl}}/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b/unpublish
 Authorization: Bearer {{token}}
 
 ### Remove an own comment
-DELETE {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/comments/961d5900-7415-4489-b217-8117676605c9
+DELETE {{baseUrl}}/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b/comments/ea66e340-7535-417b-a5d7-5300ca943955
 Authorization: Bearer {{token}}
 
 ### Set the own reaction
-PUT {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/reactions/me
+PUT {{baseUrl}}/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b/reactions/me
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -648,21 +681,21 @@ Content-Type: application/json
 }
 
 ### Remove the own reaction
-DELETE {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/reactions/me
+DELETE {{baseUrl}}/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b/reactions/me
 Authorization: Bearer {{token}}
 
 ### Copy a published recipe into the own workspace
-POST {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/copy
+POST {{baseUrl}}/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b/copy
 Authorization: Bearer {{token}}
 
 ### Report a publication or a comment
-POST {{baseUrl}}/api/v1/library/a2a7f970-ae2b-4712-b5c1-04734e1314c7/reports
+POST {{baseUrl}}/api/v1/library/759a09b2-2096-4353-aa28-15ce7277b41b/reports
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
   "reason": "Off-topic advertising link",
-  "commentId": "961d5900-7415-4489-b217-8117676605c9"
+  "commentId": "ea66e340-7535-417b-a5d7-5300ca943955"
 }
 
 ### Content reports
@@ -670,7 +703,7 @@ GET {{baseUrl}}/api/v1/admin/reports?status=open&page=1&pageSize=20
 Authorization: Bearer {{token}}
 
 ### Decide a report
-POST {{baseUrl}}/api/v1/admin/reports/405e7edc-05b1-4a63-b75c-22ec2e8fe956/resolve
+POST {{baseUrl}}/api/v1/admin/reports/9be8067b-cd0b-4c61-ad75-6ba60dcda180/resolve
 Authorization: Bearer {{token}}
 Content-Type: application/json
 
@@ -680,7 +713,7 @@ Content-Type: application/json
 }
 
 ### Remove a publication
-POST {{baseUrl}}/api/v1/admin/library/c3cc7934-aeeb-4233-86b0-0b3f056ad5a7/remove
+POST {{baseUrl}}/api/v1/admin/library/da14aad8-7898-48ce-a855-7e14ac40e71f/remove
 Authorization: Bearer {{token}}
 Content-Type: application/json
 

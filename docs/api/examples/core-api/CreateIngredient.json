@@ -8,21 +8,21 @@
       "name": "Bread flour",
       "categoryCode": "flour",
       "unitCode": "g",
-      "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3"
+      "flourId": "091556f9-e047-41ba-a3c4-34037d3833f6"
     },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "52323c40-349b-41b4-8318-1c0639ca9e1c",
+      "id": "f2a4c8d9-547a-4da7-bf63-07f14c020a27",
       "name": "Bread flour",
       "categoryCode": "flour",
       "unitCode": "g",
-      "flourId": "6ac54db1-125d-4e4c-8d62-bdc63be0bcd3",
+      "flourId": "091556f9-e047-41ba-a3c4-34037d3833f6",
       "flourName": "Bread flour T550",
       "proteinPercent": 12.8,
       "currentPrice": null,
-      "createdAt": "2026-11-23T04:18:06.937121+00:00",
-      "updatedAt": "2026-11-23T04:18:06.937121+00:00"
+      "createdAt": "2026-11-23T10:08:53.921546+00:00",
+      "updatedAt": "2026-11-23T10:08:53.921546+00:00"
     }
   },
   {
@@ -39,7 +39,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "14ad3a67-e6f4-4d52-a2df-79933f4de510",
+      "id": "c988c3b7-4463-4474-895b-255438fb664d",
       "name": "Water",
       "categoryCode": "water",
       "unitCode": "g",
@@ -47,8 +47,8 @@
       "flourName": null,
       "proteinPercent": null,
       "currentPrice": null,
-      "createdAt": "2026-11-23T04:18:07.056041+00:00",
-      "updatedAt": "2026-11-23T04:18:07.056041+00:00"
+      "createdAt": "2026-11-23T10:08:54.051536+00:00",
+      "updatedAt": "2026-11-23T10:08:54.051536+00:00"
     }
   },
   {
@@ -65,7 +65,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "9e0e9353-f588-4eec-a4cc-e2260801cdc7",
+      "id": "180012fa-8da7-4292-baae-b071aea57ec4",
       "name": "Salt",
       "categoryCode": "salt",
       "unitCode": "g",
@@ -73,8 +73,8 @@
       "flourName": null,
       "proteinPercent": null,
       "currentPrice": null,
-      "createdAt": "2026-11-23T04:18:07.063126+00:00",
-      "updatedAt": "2026-11-23T04:18:07.063126+00:00"
+      "createdAt": "2026-11-23T10:08:54.062006+00:00",
+      "updatedAt": "2026-11-23T10:08:54.062006+00:00"
     }
   },
   {
@@ -91,7 +91,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "b5d44e02-8459-4682-ade6-1d740eddba74",
+      "id": "9de3b3a4-f7ea-4bb2-9563-88df35b267d3",
       "name": "Rye starter",
       "categoryCode": "starter",
       "unitCode": "g",
@@ -99,8 +99,8 @@
       "flourName": null,
       "proteinPercent": null,
       "currentPrice": null,
-      "createdAt": "2026-11-23T04:18:07.076077+00:00",
-      "updatedAt": "2026-11-23T04:18:07.076077+00:00"
+      "createdAt": "2026-11-23T10:08:54.07945+00:00",
+      "updatedAt": "2026-11-23T10:08:54.07945+00:00"
     }
   },
   {
@@ -126,8 +126,8 @@
           "Unknown unit 'spoon'."
         ]
       },
-      "traceId": "00-ceae749fd7f48e3bdeec6ae7187dfe05-b06a374ca96e8b8b-02",
-      "correlationId": "ee1d69f5fde04762b8fa5e8d447358b2"
+      "traceId": "00-2faf562a3b2dd13d7ca03b380aaad0e8-c952884d3d16484f-02",
+      "correlationId": "e34e1ef61c2243178933b828b8cb9604"
     }
   },
   {
@@ -144,7 +144,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "713def41-2884-4ff5-b003-861a786a0db2",
+      "id": "77a86713-a6ae-4c6e-8303-64f2abea4439",
       "name": "Sesame",
       "categoryCode": "add_in",
       "unitCode": "g",
@@ -152,8 +152,8 @@
       "flourName": null,
       "proteinPercent": null,
       "currentPrice": null,
-      "createdAt": "2026-11-23T04:18:07.188492+00:00",
-      "updatedAt": "2026-11-23T04:18:07.188492+00:00"
+      "createdAt": "2026-11-23T10:08:54.231425+00:00",
+      "updatedAt": "2026-11-23T10:08:54.231425+00:00"
     }
   }
 ]

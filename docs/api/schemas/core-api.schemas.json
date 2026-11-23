@@ -13,7 +13,8 @@
       "analysisAt",
       "items",
       "createdAt",
-      "updatedAt"
+      "updatedAt",
+      "photos"
     ],
     "type": "object",
     "properties": {
@@ -98,6 +99,13 @@
         "type": "string",
         "description": "Last change.",
         "format": "date-time"
+      },
+      "photos": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/BakeRecordPhotoDto"
+        },
+        "description": "Crumb photos, oldest first (US-51)."
       }
     },
     "description": "History record created when a batch is completed (US-31, US-32, US-36)."
@@ -144,6 +152,36 @@
       }
     },
     "description": "Item of a history record."
+  },
+  "BakeRecordPhotoDto": {
+    "required": [
+      "id",
+      "contentType",
+      "url",
+      "createdAt"
+    ],
+    "type": "object",
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "Photo.",
+        "format": "uuid"
+      },
+      "contentType": {
+        "type": "string",
+        "description": "image/jpeg, image/png or image/webp."
+      },
+      "url": {
+        "type": "string",
+        "description": "Relative URL of the image (needs the bearer token)."
+      },
+      "createdAt": {
+        "type": "string",
+        "description": "Upload time.",
+        "format": "date-time"
+      }
+    },
+    "description": "A crumb photo of a bake record (US-51)."
   },
   "BakeRecordSummaryDto": {
     "required": [
@@ -212,6 +250,12 @@
           "type": "string"
         },
         "description": "Recipe titles of the items."
+      },
+      "photoCount": {
+        "type": "integer",
+        "description": "Crumb photos of the record (US-51).",
+        "format": "int32",
+        "default": 0
       }
     },
     "description": "History record in a list (US-33)."
@@ -1357,6 +1401,10 @@
       }
     },
     "description": "Problem details of a 400 validation error; errors maps each invalid field (camelCase) to its messages."
+  },
+  "IFormFile": {
+    "type": "string",
+    "format": "binary"
   },
   "IngredientCategoryDto": {
     "required": [
@@ -3446,6 +3494,47 @@
     },
     "description": "Body of PUT /bake-records/{id}/analysis (US-36, saved by the assistant)."
   },
+  "SaveAsVariantRequest": {
+    "type": "object",
+    "properties": {
+      "itemId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Batch item whose recipe gets the variant; the first item when omitted.",
+        "format": "uuid"
+      },
+      "title": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Title of the new variant; \"recipe title (batch name)\" when omitted."
+      }
+    },
+    "description": "Body of POST /batches/{id}/save-as-variant."
+  },
+  "SaveAsVariantResponse": {
+    "required": [
+      "recipe",
+      "changes"
+    ],
+    "type": "object",
+    "properties": {
+      "recipe": {
+        "$ref": "#/components/schemas/RecipeDto"
+      },
+      "changes": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/StageChangeDto"
+        },
+        "description": "Stages that differ from the parent recipe."
+      }
+    },
+    "description": "Result of saving a batch as a variant (US-25)."
+  },
   "ScaledIngredientDto": {
     "required": [
       "lineId",
@@ -3541,6 +3630,48 @@
       }
     },
     "description": "Body of the stage actions start/complete/skip (US-23)."
+  },
+  "StageChangeDto": {
+    "required": [
+      "name",
+      "recipeMinMinutes",
+      "recipeMaxMinutes",
+      "variantMinMinutes",
+      "variantMaxMinutes",
+      "source"
+    ],
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "description": "Stage name."
+      },
+      "recipeMinMinutes": {
+        "type": "integer",
+        "description": "Minimum in the recipe.",
+        "format": "int32"
+      },
+      "recipeMaxMinutes": {
+        "type": "integer",
+        "description": "Maximum in the recipe.",
+        "format": "int32"
+      },
+      "variantMinMinutes": {
+        "type": "integer",
+        "description": "Minimum in the new variant.",
+        "format": "int32"
+      },
+      "variantMaxMinutes": {
+        "type": "integer",
+        "description": "Maximum in the new variant.",
+        "format": "int32"
+      },
+      "source": {
+        "type": "string",
+        "description": "actual (measured start to end) or planned (durations changed or extended in the batch)."
+      }
+    },
+    "description": "A stage whose duration changed in the variant."
   },
   "StageComparisonDto": {
     "required": [
@@ -3966,6 +4097,10 @@
       }
     },
     "description": "Start window for a desired ready time (US-52)."
+  },
+  "Stream": {
+    "type": "string",
+    "format": "binary"
   },
   "TimelineDto": {
     "required": [

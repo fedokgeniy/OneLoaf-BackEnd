@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using OneLoaf.CoreApi.Application.Batches;
 using OneLoaf.CoreApi.Application.History;
 using OneLoaf.CoreApi.Application.Starters;
@@ -10,6 +11,9 @@ namespace OneLoaf.CoreApi.Endpoints;
 /// <summary>Batches and stages, starters and feedings, baking history (US-20 - US-33, US-36).</summary>
 public static class ProductionEndpoints
 {
+    // Multipart boundaries and headers around the image.
+    private const long PhotoUploadOverheadBytes = 64 * 1024;
+
     /// <summary>Route of the batches.</summary>
     public const string BatchesRoute = Routes.ApiV1 + "/batches";
 
@@ -64,6 +68,11 @@ public static class ProductionEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status409Conflict)
             .WithName("CompleteBatch").WithSummary("Complete a running batch")
             .WithDescription("US-31. The database creates the history record with the cost on the bake date.");
+        batches.MapPost("/{id:guid}/save-as-variant", SaveAsVariantAsync).WithValidation<SaveAsVariantRequest>()
+            .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+            .WithName("SaveBatchAsVariant").WithSummary("Save how the batch was baked as a recipe variant")
+            .WithDescription("US-25. Finished stages take their measured duration, changed or extended stages their batch durations; " +
+                             "everything else is inherited. 422 when the batch followed the recipe.");
         batches.MapGet("/{id:guid}/kneading-plan", async (Guid id, BatchService s, CancellationToken ct) =>
                 TypedResults.Ok(await s.GetKneadingPlanAsync(id, ct)))
             .ProducesProblem(StatusCodes.Status404NotFound)
@@ -153,6 +162,24 @@ public static class ProductionEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithName("GetStageLog").WithSummary("Planned vs actual stage times")
             .WithDescription("US-36. Start delays and deviations from the planned windows (v_batch_stage_log).");
+        records.MapPost("/{id:guid}/photos", UploadPhotoAsync)
+            .DisableAntiforgery()
+            .Accepts<IFormFile>("multipart/form-data")
+            .WithMetadata(new RequestSizeLimitAttribute(PhotoLimits.MaxBytes + PhotoUploadOverheadBytes))
+            .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+            .WithName("UploadBakePhoto").WithSummary("Upload a crumb photo")
+            .WithDescription("US-51. multipart/form-data with the image in the field 'file'; JPEG, PNG or WebP (checked by content), " +
+                             "up to 5 MB, at most 10 per record.");
+        records.MapGet("/{id:guid}/photos", async (Guid id, BakeRecordPhotoService s, CancellationToken ct) => TypedResults.Ok(await s.ListAsync(id, ct)))
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithName("ListBakePhotos").WithSummary("Crumb photos of a bake record").WithDescription("US-51. Oldest first.");
+        records.MapGet("/{id:guid}/photos/{photoId:guid}", DownloadPhotoAsync)
+            .Produces<Stream>(StatusCodes.Status200OK, "image/jpeg", "image/png", "image/webp")
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithName("GetBakePhoto").WithSummary("The image of a crumb photo").WithDescription("US-51. Only the owner of the record.");
+        records.MapDelete("/{id:guid}/photos/{photoId:guid}", DeletePhotoAsync)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithName("DeleteBakePhoto").WithSummary("Delete a crumb photo").WithDescription("US-51.");
         records.MapPut("/{id:guid}/analysis", async (Guid id, SaveAnalysisRequest request, BakeRecordService s, CancellationToken ct) =>
                 TypedResults.Ok(await s.SaveAnalysisAsync(id, request, ct)))
             .WithValidation<SaveAnalysisRequest>().ProducesProblem(StatusCodes.Status404NotFound)
@@ -188,5 +215,32 @@ public static class ProductionEndpoints
     {
         var feeding = await starters.AddFeedingAsync(id, request, ct);
         return TypedResults.Created($"{StartersRoute}/{id}/feedings", feeding);
+    }
+
+    private static async Task<Created<SaveAsVariantResponse>> SaveAsVariantAsync(
+        Guid id, SaveAsVariantRequest request, BatchVariantService variants, CancellationToken ct)
+    {
+        var result = await variants.SaveAsync(id, request, ct);
+        return TypedResults.Created($"{RecipeEndpoints.GroupRoute}/{result.Recipe.Id}", result);
+    }
+
+    private static async Task<Created<BakeRecordPhotoDto>> UploadPhotoAsync(
+        Guid id, IFormFile file, BakeRecordPhotoService photos, CancellationToken ct)
+    {
+        await using var content = file.OpenReadStream();
+        var photo = await photos.UploadAsync(id, content, file.Length, ct);
+        return TypedResults.Created(photo.Url, photo);
+    }
+
+    private static async Task<FileStreamHttpResult> DownloadPhotoAsync(Guid id, Guid photoId, BakeRecordPhotoService photos, CancellationToken ct)
+    {
+        var photo = await photos.OpenAsync(id, photoId, ct);
+        return TypedResults.Stream(photo.Content, photo.ContentType);
+    }
+
+    private static async Task<NoContent> DeletePhotoAsync(Guid id, Guid photoId, BakeRecordPhotoService photos, CancellationToken ct)
+    {
+        await photos.DeleteAsync(id, photoId, ct);
+        return TypedResults.NoContent();
     }
 }

@@ -6,6 +6,6 @@
     "authenticated": true,
     "status": 200,
     "responseContentType": "text/csv",
-    "responseBody": "title,is_variant,yield_loaves,loaf_weight_g,ingredient_lines,stage_lines,is_archived,created_at,updated_at\r\nCountry sourdough,false,1,900.0,4,5,false,2026-11-23T04:18:07.3511260+00:00,2026-11-23T04:18:07.6158780+00:00\r\n\"Country sourdough, longer bulk\",true,1,,8,10,false,2026-11-23T04:18:07.6379230+00:00,2026-11-23T04:18:07.8709750+00:00\r\n"
+    "responseBody": "title,is_variant,yield_loaves,loaf_weight_g,ingredient_lines,stage_lines,is_archived,created_at,updated_at\r\nCountry sourdough,false,1,900.0,4,5,false,2026-11-23T10:08:54.4098320+00:00,2026-11-23T10:08:54.7051900+00:00\r\n\"Country sourdough, as baked\",true,1,,0,5,false,2026-11-23T10:08:55.8842170+00:00,2026-11-23T10:08:55.8842170+00:00\r\n\"Country sourdough, longer bulk\",true,1,,8,10,false,2026-11-23T10:08:54.7309860+00:00,2026-11-23T10:08:54.9983140+00:00\r\n"
   }
 ]

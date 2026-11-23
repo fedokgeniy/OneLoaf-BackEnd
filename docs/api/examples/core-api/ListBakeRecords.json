@@ -9,8 +9,8 @@
     "responseBody": {
       "items": [
         {
-          "id": "c13eeb78-1208-4cbf-99fe-a587c002adea",
-          "batchId": "9cf7e8b3-4ad2-4d02-bf1a-12ba408e71ee",
+          "id": "cb026621-c131-4daa-b02c-23ce49686fa7",
+          "batchId": "dcab64b0-9720-4f19-997d-b3bcd2492ddc",
           "bakedOn": "2026-11-23",
           "totalLoaves": 3,
           "totalCost": 8.94,
@@ -19,7 +19,8 @@
           "hasAnalysis": false,
           "recipeTitles": [
             "Country sourdough"
-          ]
+          ],
+          "photoCount": 0
         }
       ],
       "page": 1,
