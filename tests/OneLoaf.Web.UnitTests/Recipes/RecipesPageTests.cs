@@ -86,5 +86,15 @@ public sealed class RecipesPageTests : BunitContext
             LastQuery = query;
             return Task.FromResult(Result);
         }
+
+        public Task<ApiResult<RecipeDto>> GetAsync(Guid id, CancellationToken ct = default) => throw new NotSupportedException();
+
+        public Task<ApiResult<ScaledRecipeDto>> ScaleAsync(Guid id, int loaves, CancellationToken ct = default) => throw new NotSupportedException();
+
+        public Task<ApiResult<CostBreakdownDto>> GetCostAsync(Guid id, int loaves, DateOnly? asOf, CancellationToken ct = default) => throw new NotSupportedException();
+
+        public Task<ApiResult<ProductionFiguresDto>> GetProductionFiguresAsync(Guid id, int loaves, CancellationToken ct = default) => throw new NotSupportedException();
+
+        public Task<ApiResult<TimelineDto>> GetTimelineAsync(Guid id, DateTimeOffset start, CancellationToken ct = default) => throw new NotSupportedException();
     }
 }

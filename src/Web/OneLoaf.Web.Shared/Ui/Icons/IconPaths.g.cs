@@ -24,6 +24,7 @@ internal static class IconPaths
         IconName.Library => """<path d="M2 5h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2zM22 5h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/>""",
         IconName.Logout => """<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>""",
         IconName.Menu => """<path d="M4 6h16M4 12h16M4 18h16"/>""",
+        IconName.Minus => """<path d="M5 12h14"/>""",
         IconName.Monitor => """<rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/>""",
         IconName.Moon => """<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>""",
         IconName.Play => """<path d="M7 5v14l11-7z"/>""",

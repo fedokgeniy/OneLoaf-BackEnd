@@ -1,0 +1,67 @@
+@* Number field with − / + buttons (.ol-field + .ol-num), as the Loaves field of the calculator boards. The value is
+   clamped to Min..Max; typing commits on change. *@
+<div class="ol-field">
+    <label class="ol-field__label" for="@_id">@Label</label>
+    <div class="ol-stepper">
+        <OlIconButton Icon="IconName.Minus" Label="@DecreaseLabel" Disabled="@(Value <= Min)" OnClick="() => SetAsync(Value - Step)"
+                      class="ol-stepper__btn" />
+        <input id="@_id" class="ol-input ol-num ol-stepper__input" type="number" inputmode="numeric" min="@Min" max="@Max"
+               step="@Step" value="@Value" @onchange="OnChangeAsync" aria-describedby="@(Help is null ? null : _id + "-help")" />
+        <OlIconButton Icon="IconName.Plus" Label="@IncreaseLabel" Disabled="@(Value >= Max)" OnClick="() => SetAsync(Value + Step)"
+                      class="ol-stepper__btn" />
+    </div>
+    @if (Help is not null)
+    {
+        <span id="@(_id + "-help")" class="ol-field__help">@Help</span>
+    }
+</div>
+
+@code {
+    private readonly string _id = ElementIds.Next("stepper");
+
+    /// <summary>Visible label.</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+
+    /// <summary>Current value.</summary>
+    [Parameter] public int Value { get; set; }
+
+    /// <summary>Raised with the new value.</summary>
+    [Parameter] public EventCallback<int> ValueChanged { get; set; }
+
+    /// <summary>Smallest value.</summary>
+    [Parameter] public int Min { get; set; }
+
+    /// <summary>Largest value.</summary>
+    [Parameter] public int Max { get; set; } = int.MaxValue;
+
+    /// <summary>Step of the buttons.</summary>
+    [Parameter] public int Step { get; set; } = 1;
+
+    /// <summary>Accessible name of the − button, e.g. "Fewer loaves".</summary>
+    [Parameter] public string DecreaseLabel { get; set; } = "Decrease";
+
+    /// <summary>Accessible name of the + button, e.g. "More loaves".</summary>
+    [Parameter] public string IncreaseLabel { get; set; } = "Increase";
+
+    /// <summary>Help text.</summary>
+    [Parameter] public string? Help { get; set; }
+
+    private Task OnChangeAsync(ChangeEventArgs e) =>
+        int.TryParse(e.Value?.ToString(), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var typed)
+            ? SetAsync(typed)
+            : SetAsync(Value);
+
+    private async Task SetAsync(int value)
+    {
+        var clamped = Math.Clamp(value, Min, Max);
+        if (clamped != Value)
+        {
+            await ValueChanged.InvokeAsync(clamped);
+        }
+        else
+        {
+            // Re-render so an out-of-range or empty entry snaps back to the current value.
+            StateHasChanged();
+        }
+    }
+}

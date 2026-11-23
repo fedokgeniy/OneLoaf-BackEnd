@@ -1,7 +1,7 @@
 @* Button of the design system (.ol-btn). Renders <a> when Href is set. Loading keeps the label for screen readers. *@
 @if (Href is not null)
 {
-    <a class="@CssClass" href="@Href" @attributes="AdditionalAttributes">
+    <a href="@Href" @attributes="AdditionalAttributes" class="@CssClass">
         @if (Icon is { } icon)
         {
             <OlIcon Name="icon" />
@@ -11,8 +11,8 @@
 }
 else
 {
-    <button type="@Type" class="@CssClass" disabled="@Disabled" aria-busy="@(Loading ? "true" : null)"
-            aria-disabled="@(Loading ? "true" : null)" @onclick="HandleClick" @attributes="AdditionalAttributes">
+    <button type="@Type" disabled="@Disabled" aria-busy="@(Loading ? "true" : null)"
+            aria-disabled="@(Loading ? "true" : null)" @onclick="HandleClick" @attributes="AdditionalAttributes" class="@CssClass">
         @if (Icon is { } icon)
         {
             <OlIcon Name="icon" />
@@ -52,7 +52,7 @@ else
     /// <summary>Label.</summary>
     [Parameter] public RenderFragment? ChildContent { get; set; }
 
-    /// <summary>Other attributes (aria-*, data-*).</summary>
+    /// <summary>Other attributes (aria-*, data-*); a <c>class</c> is added to the button classes.</summary>
     [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
 
     private string CssClass
@@ -60,6 +60,7 @@ else
         get
         {
             var css = "ol-btn ol-btn--" + Variant.ToString().ToLowerInvariant();
+            if (AdditionalAttributes?.TryGetValue("class", out var extra) == true) css += " " + extra;
             if (Large) css += " ol-btn--lg";
             if (Block) css += " ol-btn--block";
             if (Loading) css += " is-loading";

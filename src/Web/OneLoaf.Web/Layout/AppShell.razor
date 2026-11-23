@@ -49,10 +49,12 @@
     <div class="app-shell__body">
         <OlTopBar Class="app-shell__topbar" TitleClass="app-shell__title">
             <Leading>
-                <span class="ol-show-compact"><a class="app-shell__brand-link" href=""><BrandMark Class="brand--sm" /></a></span>
+                <SectionOutlet SectionName="@PageTitleSection.Back" />
+                <span class="ol-show-compact app-shell__compact-brand"><a class="app-shell__brand-link" href=""><BrandMark Class="brand--sm" /></a></span>
             </Leading>
             <Title><SectionOutlet SectionName="@PageTitleSection.Name" /></Title>
             <Actions>
+                <div class="app-shell__page-actions"><SectionOutlet SectionName="@PageTitleSection.Actions" /></div>
                 <div class="app-shell__account">
                     <OlIconButton Icon="IconName.User" Label="Profile and settings" aria-expanded="@(_menuOpen ? "true" : "false")"
                                   aria-controls="account-menu" OnClick="ToggleMenu" />

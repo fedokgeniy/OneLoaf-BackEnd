@@ -1,0 +1,146 @@
+@page "/recipes/{Id:guid}"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Recipes.Components
+@using OneLoaf.Web.Features.Recipes.State
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+
+@switch (State.Value.Recipe)
+{
+    case Loadable<RecipeDto>.Failed { Error: var error }:
+        <ShellTitle Text="Recipe" BackHref="recipes" BackLabel="Back to recipes" />
+        <div class="ol-container recipe">
+            @if (error.Kind == ApiErrorKind.NotFound)
+            {
+                <OlEmptyState Title="Recipe not found" Text="This recipe does not exist or is not yours.">
+                    <Action><OlButton Href="recipes">Back to recipes</OlButton></Action>
+                </OlEmptyState>
+            }
+            else
+            {
+                <OlAlert Kind="AlertKind.Danger" Title="The recipe could not be loaded." CorrelationId="@error.CorrelationId">
+                    <p>@error.Message</p>
+                    <OlButton Variant="ButtonVariant.Secondary" OnClick="Reload">Try again</OlButton>
+                </OlAlert>
+            }
+        </div>
+        break;
+    case { Value: null }:
+        <ShellTitle Text="Recipe" BackHref="recipes" BackLabel="Back to recipes" />
+        <div class="ol-container recipe" aria-busy="true">
+            <OlSkeleton Variant="SkeletonVariant.Stat" Count="4" />
+            <OlSkeleton Variant="SkeletonVariant.Row" Count="6" />
+        </div>
+        break;
+    case { Value: { } recipe }:
+        <ShellTitle Text="@recipe.Title" BackHref="recipes" BackLabel="Back to recipes">
+            <Actions>
+                <OlButton Href="@($"batches/new?recipeId={recipe.Id}")" Icon="IconName.Batches" class="app-hide-compact">Plan a batch</OlButton>
+                <a class="ol-icon-btn" href="@($"recipes/{recipe.Id}/edit")" aria-label="Edit recipe"><OlIcon Name="IconName.Edit" /></a>
+            </Actions>
+        </ShellTitle>
+        <div class="ol-container recipe">
+            <div class="recipe__badges">
+                @if (recipe.ParentRecipeId is { } parent)
+                {
+                    <a class="ol-badge ol-badge--neutral recipe__parent" href="@($"recipes/{parent}")">Variant · open original</a>
+                }
+                @foreach (var flour in Flours(recipe))
+                {
+                    <span class="ol-badge ol-badge--neutral">@flour.IngredientName · @DisplayFormat.Percent(flour.ProteinPercent!.Value) protein</span>
+                }
+                @switch (State.Value.Cost)
+                {
+                    case Loadable<CostBreakdownDto>.Loaded { Data.IsComplete: true }:
+                        <span class="ol-badge ol-badge--done">Cost complete</span>
+                        break;
+                    case Loadable<CostBreakdownDto>.Loaded { Data: var cost }:
+                        <span class="ol-badge ol-badge--running">@MissingText(cost)</span>
+                        break;
+                }
+                @if (recipe.IsArchived)
+                {
+                    <span class="ol-badge ol-badge--neutral">Archived</span>
+                }
+            </div>
+            @if (!string.IsNullOrWhiteSpace(recipe.Description))
+            {
+                <p class="recipe__description">@recipe.Description</p>
+            }
+
+            <OlTabs Label="Recipe sections" Tabs="Tabs" ActiveId="@_tab" ActiveIdChanged="t => _tab = t" IdPrefix="recipe" Class="recipe__tabs" />
+
+            <div class="recipe__layout">
+                <div class="recipe__column">
+                    <section class="@PanelClass("ingredients")" id="recipe-panel-ingredients" role="tabpanel" aria-labelledby="recipe-tab-ingredients">
+                        <h2 class="h3 recipe__heading">Ingredients</h2>
+                        <RecipeIngredients Recipe="recipe" Scaled="State.Value.Scaled" Loaves="State.Value.Loaves" />
+                    </section>
+                    <section class="@PanelClass("stages")" id="recipe-panel-stages" role="tabpanel" aria-labelledby="recipe-tab-stages">
+                        <h2 class="h3 recipe__heading">Stages</h2>
+                        <RecipeStages Stages="recipe.Stages" />
+                    </section>
+                </div>
+                <div class="recipe__column">
+                    <section class="@PanelClass("cost")" id="recipe-panel-cost" role="tabpanel" aria-labelledby="recipe-tab-cost">
+                        <h2 class="h3 recipe__heading">Calculator</h2>
+                        <div class="recipe__inputs">
+                            <OlNumberStepper Label="Loaves" Value="State.Value.Loaves" Min="RecipeDetailState.MinLoaves" Max="RecipeDetailState.MaxLoaves"
+                                             DecreaseLabel="Fewer loaves" IncreaseLabel="More loaves"
+                                             ValueChanged="n => Dispatcher.Dispatch(new ChangeLoaves(n))" />
+                            <div class="ol-field">
+                                <label class="ol-field__label" for="recipe-as-of">Prices as of</label>
+                                <div class="ol-field__control">
+                                    <input id="recipe-as-of" class="ol-input" type="date" value="@AsOfValue" @onchange="OnAsOfChanged" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ol-stats" aria-live="polite" aria-busy="@(IsCalculating ? "true" : "false")">
+                            <OlStatTile Label="Total cost" Loading="@(State.Value.Cost.Value is null && State.Value.Cost is not Loadable<CostBreakdownDto>.Failed)"
+                                        Value="@TotalText" Hint="@DisplayFormat.Loaves(State.Value.Loaves)" Error="@ErrorOf(State.Value.Cost)" />
+                            <OlStatTile Label="Dough" Loading="@(State.Value.Figures.Value is null && State.Value.Figures is not Loadable<ProductionFiguresDto>.Failed)"
+                                        Value="@(Figures is { } f ? DisplayFormat.Grams(f.DoughWeightG) : null)" Error="@ErrorOf(State.Value.Figures)" />
+                            <OlStatTile Label="Kneading" Loading="@(State.Value.Figures.Value is null && State.Value.Figures is not Loadable<ProductionFiguresDto>.Failed)"
+                                        Value="@KneadingText" Hint="@(Figures is { KneadingCycles: null } ? "set the mixer bowl in Kitchen" : null)" Error="@ErrorOf(State.Value.Figures)" />
+                            <OlStatTile Label="Starter" Loading="@(State.Value.Figures.Value is null && State.Value.Figures is not Loadable<ProductionFiguresDto>.Failed)"
+                                        Value="@(Figures is { } s ? DisplayFormat.Grams(s.StarterAmountG) : null)" Error="@ErrorOf(State.Value.Figures)" />
+                            <OlStatTile Label="Ready" Loading="@(State.Value.Timeline.Value is null && State.Value.Timeline is not Loadable<TimelineDto>.Failed)"
+                                        Value="@ReadyText" Hint="@(Timeline is { } t ? $"start {DisplayFormat.Time(t.Start)}" : null)" Error="@ErrorOf(State.Value.Timeline)" />
+                        </div>
+                        @switch (State.Value.Cost)
+                        {
+                            case Loadable<CostBreakdownDto>.Failed { Error: var costError }:
+                                <OlAlert Kind="@(costError.Kind == ApiErrorKind.BusinessRule ? AlertKind.Warning : AlertKind.Danger)"
+                                         Title="The cost could not be calculated." CorrelationId="@costError.CorrelationId">
+                                    <p>@costError.Message</p>
+                                    @if (costError.Kind == ApiErrorKind.BusinessRule)
+                                    {
+                                        <OlLink Href="settings/kitchen">Open kitchen settings</OlLink>
+                                    }
+                                </OlAlert>
+                                break;
+                            case { Value: { } cost }:
+                                <CostTable Cost="cost" />
+                                break;
+                            default:
+                                <OlSkeleton Variant="SkeletonVariant.Row" Count="5" />
+                                break;
+                        }
+                    </section>
+                    <section class="@PanelClass("timeline")" id="recipe-panel-timeline" role="tabpanel" aria-labelledby="recipe-tab-timeline">
+                        <h2 class="h3 recipe__heading">Timeline</h2>
+                        <div class="ol-field recipe__start">
+                            <label class="ol-field__label" for="recipe-start">Start at</label>
+                            <div class="ol-field__control">
+                                <input id="recipe-start" class="ol-input" type="datetime-local" value="@StartValue" @onchange="OnStartChanged" />
+                            </div>
+                        </div>
+                        <RecipeTimeline Timeline="State.Value.Timeline" />
+                    </section>
+                </div>
+            </div>
+        </div>
+        break;
+}

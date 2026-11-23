@@ -57,17 +57,17 @@ Components and states: `Components-States` board = the component library with al
 | US-03 Own data only | M | all | 404 from the API → `NotFoundPage`; never show ids from other users |
 | US-04 Delete account | S | `/settings` → Account | confirm dialog with password (`DELETE /me` body), then clear session |
 | US-05 Recipe CRUD | M | `/recipes`, editor | list: search (debounced), paging ("Show more recipes"), archived filter, filter kept in the address bar; cards show title, "Variant of …", loaves, last change, Archived badge (the list API has no photo, cost or hydration); editor: ingredients and stages as editable lists with add/remove/reorder (buttons + keyboard, no drag-only) |
-| US-06 Scale to N | M | recipe detail stepper | `GET /scaled?loaves=` |
+| US-06 Scale to N | M | recipe detail stepper | `GET /scaled?loaves=`; stepping is debounced (300 ms), 1–1000 loaves as the cost endpoint accepts |
 | US-07 Variant | M | detail → Create variant | list shows "Variant of …"; editor marks inherited rows |
 | US-08 Compare | S | `/recipes/{id}/compare` | "Changes only / All lines" segmented control |
 | US-09 Optional, proof mode + °C | S | editor stage row | chips Warm/Cold + temperature field |
 | US-10 Ingredients + units | M | `/ingredients`, editor | unit select from `/reference/units` |
-| US-11 Flour catalog | S | `/ingredients` detail, recipe header | protein % shown in the recipe header and card meta ("· 12.5 % protein") |
+| US-11 Flour catalog | S | `/ingredients` detail, recipe header | protein % shown in the recipe header ("Bread flour · 12.8 % protein"); the list API has no protein, so cards do not show it |
 | US-12 Price history | M | `/ingredients` detail | 409 duplicate date → field error |
 | US-13 Kitchen | M | `/settings/kitchen` | oven, mixer (bowl capacity), cost settings |
-| US-14 Cost | M | detail → Cost tab | lines exactly as returned; total = API total (do not sum in the client) |
+| US-14 Cost | M | detail → Cost tab | lines exactly as returned, including the API's `total` line; total tile = API `total`; incomplete cost lists `missingPrices` with a link to Ingredients |
 | US-15 Prices as of | M | detail → "Prices as of" date | `asOf` param |
-| US-16 Timeline + ready window | M | detail → Timeline tab, stats | |
+| US-16 Timeline + ready window | M | detail → Timeline tab, stats | "Start at" (default: next full hour) → `GET /timeline?start=`; Ready tile shows `readyFrom–readyTo` with "next day" |
 | US-17 Kneading cycles | M | detail stats | |
 | US-18 Starter amount | M | detail stats, new batch | |
 | US-47 Packaging | M | cost table line | |

@@ -38,6 +38,8 @@ public enum IconName
     Logout,
     /// <summary>icons/menu.svg</summary>
     Menu,
+    /// <summary>icons/minus.svg</summary>
+    Minus,
     /// <summary>icons/monitor.svg</summary>
     Monitor,
     /// <summary>icons/moon.svg</summary>

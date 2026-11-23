@@ -1,0 +1,80 @@
+.recipe {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-block: var(--space-5);
+}
+
+.recipe__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.recipe__parent {
+    text-decoration: none;
+}
+
+.recipe__description {
+    margin: 0;
+    color: var(--ink-muted);
+    max-width: var(--reading-max);
+}
+
+.recipe__layout,
+.recipe__column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.recipe__panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+}
+
+.recipe__heading {
+    margin: 0;
+}
+
+.recipe__inputs {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: var(--space-4);
+}
+
+.recipe__start {
+    max-width: 18rem;
+}
+
+/* Phones and tablets: one section per tab; the tab names the section, so its heading is for screen readers. */
+@media (max-width: 63.99em) {
+    .recipe__panel--inactive {
+        display: none;
+    }
+
+    .recipe__heading {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+    }
+}
+
+/* Desktop: recipe on the left, calculator and timeline on the right; no tabs (Calculator-Desktop). */
+@media (min-width: 64em) {
+    ::deep .recipe__tabs {
+        display: none;
+    }
+
+    .recipe__layout {
+        display: grid;
+        grid-template-columns: minmax(18rem, 2fr) 3fr;
+        align-items: start;
+    }
+}

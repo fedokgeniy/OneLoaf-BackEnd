@@ -1,0 +1,36 @@
+@* Planned stage times from the chosen start (GET /timeline, US-16): start and the end window of every stage. *@
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+
+@switch (Timeline)
+{
+    case Loadable<TimelineDto>.Failed { Error: var error }:
+        <OlAlert Kind="AlertKind.Danger" Title="The timeline could not be planned." CorrelationId="@error.CorrelationId">@error.Message</OlAlert>
+        break;
+    case { Value: { } timeline }:
+        <ol class="timeline">
+            @foreach (var stage in timeline.Stages)
+            {
+                <li class="timeline__stage" @key="stage.LineId">
+                    <span class="timeline__time ol-num">@DisplayFormat.Time(stage.PlannedStartAt)</span>
+                    <span class="timeline__name">@stage.Name</span>
+                    <span class="timeline__end ol-num">ends @DisplayFormat.TimeWindow(stage.PlannedEndMinAt, stage.PlannedEndMaxAt, timeline.Start)</span>
+                </li>
+            }
+            <li class="timeline__stage timeline__stage--ready">
+                <span class="timeline__time ol-num">@DisplayFormat.Time(timeline.ReadyFrom)</span>
+                <span class="timeline__name">Ready</span>
+                <span class="timeline__end ol-num">@DisplayFormat.TimeWindow(timeline.ReadyFrom, timeline.ReadyTo, timeline.Start)</span>
+            </li>
+        </ol>
+        break;
+    default:
+        <OlSkeleton Variant="SkeletonVariant.Row" Count="5" />
+        break;
+}
+
+@code {
+    /// <summary>The timeline.</summary>
+    [Parameter, EditorRequired] public Loadable<TimelineDto> Timeline { get; set; } = Loadable<TimelineDto>.Idle;
+}

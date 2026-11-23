@@ -38,3 +38,15 @@ public abstract record Loadable<T>
     /// <summary>Starts a reload that keeps the current value visible.</summary>
     public Loadable<T> Reload() => new Loading(Value);
 }
+
+/// <summary>Conversions between <see cref="ApiResult{T}"/> and <see cref="Loadable{T}"/>.</summary>
+public static class LoadableExtensions
+{
+    /// <summary>Success → <see cref="Loadable{T}.Loaded"/>, failure → <see cref="Loadable{T}.Failed"/>.</summary>
+    public static Loadable<T> ToLoadable<T>(this ApiResult<T> result) => result switch
+    {
+        ApiResult<T>.Success { Value: var value } => new Loadable<T>.Loaded(value),
+        ApiResult<T>.Failure { Error: var error } => new Loadable<T>.Failed(error),
+        _ => throw new ArgumentOutOfRangeException(nameof(result)),
+    };
+}

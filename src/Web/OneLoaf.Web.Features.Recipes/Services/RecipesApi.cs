@@ -22,6 +22,21 @@ public interface IRecipesApi
 {
     /// <summary><c>GET recipes</c>: one page of the caller's recipes.</summary>
     Task<ApiResult<PagedResult<RecipeSummaryDto>>> ListAsync(RecipeQuery query, int page, CancellationToken ct = default);
+
+    /// <summary><c>GET recipes/{id}</c>: the recipe with ingredients and stages; 404 when missing or not the caller's.</summary>
+    Task<ApiResult<RecipeDto>> GetAsync(Guid id, CancellationToken ct = default);
+
+    /// <summary><c>GET recipes/{id}/scaled?loaves=</c> (US-06).</summary>
+    Task<ApiResult<ScaledRecipeDto>> ScaleAsync(Guid id, int loaves, CancellationToken ct = default);
+
+    /// <summary><c>GET recipes/{id}/cost?loaves=&amp;asOf=</c> (US-14, US-15).</summary>
+    Task<ApiResult<CostBreakdownDto>> GetCostAsync(Guid id, int loaves, DateOnly? asOf, CancellationToken ct = default);
+
+    /// <summary><c>GET recipes/{id}/production-figures?loaves=</c> (US-17, US-18).</summary>
+    Task<ApiResult<ProductionFiguresDto>> GetProductionFiguresAsync(Guid id, int loaves, CancellationToken ct = default);
+
+    /// <summary><c>GET recipes/{id}/timeline?start=</c> (US-16).</summary>
+    Task<ApiResult<TimelineDto>> GetTimelineAsync(Guid id, DateTimeOffset start, CancellationToken ct = default);
 }
 
 /// <inheritdoc />
@@ -42,4 +57,24 @@ public sealed class RecipesApi(ApiClientFactory api) : IRecipesApi
             ("pageSize", PageSize));
         return api.Core.GetAsync<PagedResult<RecipeSummaryDto>>(url, ct);
     }
+
+    /// <inheritdoc />
+    public Task<ApiResult<RecipeDto>> GetAsync(Guid id, CancellationToken ct = default) =>
+        api.Core.GetAsync<RecipeDto>($"api/v1/recipes/{id}", ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<ScaledRecipeDto>> ScaleAsync(Guid id, int loaves, CancellationToken ct = default) =>
+        api.Core.GetAsync<ScaledRecipeDto>(Url.Build($"api/v1/recipes/{id}/scaled", ("loaves", loaves)), ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<CostBreakdownDto>> GetCostAsync(Guid id, int loaves, DateOnly? asOf, CancellationToken ct = default) =>
+        api.Core.GetAsync<CostBreakdownDto>(Url.Build($"api/v1/recipes/{id}/cost", ("loaves", loaves), ("asOf", asOf)), ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<ProductionFiguresDto>> GetProductionFiguresAsync(Guid id, int loaves, CancellationToken ct = default) =>
+        api.Core.GetAsync<ProductionFiguresDto>(Url.Build($"api/v1/recipes/{id}/production-figures", ("loaves", loaves)), ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<TimelineDto>> GetTimelineAsync(Guid id, DateTimeOffset start, CancellationToken ct = default) =>
+        api.Core.GetAsync<TimelineDto>(Url.Build($"api/v1/recipes/{id}/timeline", ("start", start)), ct);
 }

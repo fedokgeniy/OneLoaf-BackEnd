@@ -15,4 +15,9 @@ namespace OneLoaf.Web.Shared.Api;
 [JsonSerializable(typeof(UserDto))]
 [JsonSerializable(typeof(RecipeSummaryDto))]
 [JsonSerializable(typeof(PagedResult<RecipeSummaryDto>))]
+[JsonSerializable(typeof(RecipeDto))]
+[JsonSerializable(typeof(ScaledRecipeDto))]
+[JsonSerializable(typeof(CostBreakdownDto))]
+[JsonSerializable(typeof(ProductionFiguresDto))]
+[JsonSerializable(typeof(TimelineDto))]
 internal sealed partial class SharedJsonContext : JsonSerializerContext;

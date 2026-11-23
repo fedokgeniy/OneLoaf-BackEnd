@@ -1,0 +1,57 @@
+@* Cost table (US-14, US-47–49): every line exactly as the API returns it, in its order, including electricity,
+   packaging, labor, loss and the closing total. Nothing is added up here. Stacked rows on phones (.ol-table--stack). *@
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+
+@if (!Cost.IsComplete)
+{
+    <OlAlert Kind="AlertKind.Warning" Title="Cost incomplete">
+        @if (Cost.MissingPrices.Count > 0)
+        {
+            <p class="cost__missing">No price on @DisplayFormat.Date(Cost.AsOf) for: @string.Join(", ", Cost.MissingPrices.Select(p => p.Name)).</p>
+        }
+        <OlLink Href="ingredients">Add prices</OlLink>
+    </OlAlert>
+}
+<div class="ol-table-wrap">
+    <table class="ol-table ol-table--stack">
+        <caption class="ol-visually-hidden">Cost for @DisplayFormat.Loaves(Cost.Loaves), prices as of @DisplayFormat.Date(Cost.AsOf), in @Cost.Currency</caption>
+        <thead>
+            <tr>
+                <th scope="col">Line</th>
+                <th scope="col" class="ol-num">Quantity</th>
+                <th scope="col" class="ol-num">Unit price</th>
+                <th scope="col" class="ol-num">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var line in Cost.Lines)
+            {
+                var isTotal = line.Type == CostLineTypes.Total;
+                <tr class="@RowClass(line, isTotal)" @key="line.LineNo">
+                    <td>@line.Description</td>
+                    <td class="ol-num" data-label="Quantity">@(line.Quantity is { } q && !isTotal ? DisplayFormat.Quantity(q, line.Unit) : isTotal ? DisplayFormat.Loaves(Cost.Loaves) : "—")</td>
+                    <td class="ol-num" data-label="Unit price">@(line.UnitPrice is { } p && !isTotal ? DisplayFormat.UnitPrice(p, line.Unit) : "—")</td>
+                    <td class="ol-num" data-label="Amount">
+                        @if (line.Amount is { } amount)
+                        {
+                            @DisplayFormat.Money(amount, isTotal ? Cost.Currency : null)
+                        }
+                        else
+                        {
+                            <span>price missing</span>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    /// <summary>The cost breakdown from <c>GET /recipes/{id}/cost</c>.</summary>
+    [Parameter, EditorRequired] public CostBreakdownDto Cost { get; set; } = default!;
+
+    private static string? RowClass(CostLineDto line, bool isTotal) =>
+        isTotal ? "is-total" : line.IsComplete ? null : "is-missing";
+}

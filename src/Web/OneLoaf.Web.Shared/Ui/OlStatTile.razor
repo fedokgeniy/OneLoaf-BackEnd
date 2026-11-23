@@ -1,0 +1,40 @@
+@* Stat tile (.ol-stat): label, value and hint. While Loading it shows a skeleton line; Error shows a short dash with
+   the reason for screen readers. *@
+<div class="ol-stat">
+    <span class="ol-stat__label">@Label</span>
+    @if (Loading)
+    {
+        <span class="ol-skeleton ol-stat__skeleton" aria-hidden="true"></span>
+        <span class="ol-visually-hidden">Loading</span>
+    }
+    else if (Error is not null)
+    {
+        <span class="ol-stat__value" aria-hidden="true">—</span>
+        <span class="ol-stat__hint">@Error</span>
+    }
+    else
+    {
+        <span class="ol-stat__value">@Value</span>
+        @if (!string.IsNullOrEmpty(Hint))
+        {
+            <span class="ol-stat__hint">@Hint</span>
+        }
+    }
+</div>
+
+@code {
+    /// <summary>Label, e.g. "Total cost".</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+
+    /// <summary>Formatted value from the API.</summary>
+    [Parameter] public string? Value { get; set; }
+
+    /// <summary>Small text under the value.</summary>
+    [Parameter] public string? Hint { get; set; }
+
+    /// <summary>The value is being loaded.</summary>
+    [Parameter] public bool Loading { get; set; }
+
+    /// <summary>Why the value is not available.</summary>
+    [Parameter] public string? Error { get; set; }
+}

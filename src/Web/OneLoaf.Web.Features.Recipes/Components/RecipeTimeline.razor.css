@@ -1,0 +1,38 @@
+.timeline {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    background: var(--surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.timeline__stage {
+    display: grid;
+    grid-template-columns: 4rem 1fr;
+    gap: 0 var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--border-hairline);
+}
+
+.timeline__stage:first-child {
+    border-top: 0;
+}
+
+.timeline__stage--ready {
+    background: var(--surface-sunken);
+    font-weight: 600;
+}
+
+.timeline__time {
+    grid-row: span 2;
+    font-weight: 600;
+}
+
+.timeline__end {
+    font-size: 0.875rem;
+    color: var(--ink-muted);
+}

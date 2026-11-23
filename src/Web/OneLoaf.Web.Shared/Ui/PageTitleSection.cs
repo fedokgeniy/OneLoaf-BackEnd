@@ -1,8 +1,14 @@
 namespace OneLoaf.Web.Shared.Ui;
 
-/// <summary>Section through which a page puts its title into the shell's top bar.</summary>
+/// <summary>Sections through which a page fills the shell's top bar (title, back link, actions).</summary>
 public static class PageTitleSection
 {
-    /// <summary>Section name used by <see cref="ShellTitle"/> and the app shell.</summary>
+    /// <summary>Page title.</summary>
     public const string Name = "page-title";
+
+    /// <summary>Back link before the title.</summary>
+    public const string Back = "page-back";
+
+    /// <summary>Page actions before the profile button.</summary>
+    public const string Actions = "page-actions";
 }

@@ -20,6 +20,11 @@ public sealed class RecordedExamplesTests
         ["core-api/Login"] = typeof(LoginResponse),
         ["core-api/GetMe"] = typeof(UserDto),
         ["core-api/ListRecipes"] = typeof(PagedResult<RecipeSummaryDto>),
+        ["core-api/GetRecipe"] = typeof(RecipeDto),
+        ["core-api/ScaleRecipe"] = typeof(ScaledRecipeDto),
+        ["core-api/GetRecipeCost"] = typeof(CostBreakdownDto),
+        ["core-api/GetProductionFigures"] = typeof(ProductionFiguresDto),
+        ["core-api/GetRecipeTimeline"] = typeof(TimelineDto),
     };
 
     private static readonly JsonSerializerOptions Strict = new(new ApiJsonOptions([SharedJsonContext.Default]).Options)

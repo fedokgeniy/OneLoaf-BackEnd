@@ -41,6 +41,26 @@
     }
 }
 
+/* A page with a back link (detail pages) shows back + title instead of the brand on phones (Calculator-Phone). */
+@media (max-width: 37.49em) {
+    .app-shell__body:has(.app-back) .app-shell__compact-brand {
+        display: none;
+    }
+
+    .app-shell__body:has(.app-back) ::deep .app-shell__title {
+        position: static;
+        width: auto;
+        height: auto;
+        clip: auto;
+    }
+}
+
+.app-shell__page-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
 @media (orientation: landscape) and (max-height: 30em) and (max-width: 63.99em) {
     ::deep .app-shell__title {
         position: static;

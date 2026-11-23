@@ -1,6 +1,5 @@
 @* Icon-only button (.ol-icon-btn), 44px target; Label is required and becomes aria-label. *@
-<button type="button" class="@(Danger ? "ol-icon-btn ol-icon-btn--danger" : "ol-icon-btn")" aria-label="@Label"
-        disabled="@Disabled" @onclick="OnClick" @attributes="AdditionalAttributes">
+<button type="button" aria-label="@Label" disabled="@Disabled" @onclick="OnClick" @attributes="AdditionalAttributes" class="@CssClass">
     <OlIcon Name="Icon" />
 </button>
 
@@ -20,6 +19,10 @@
     /// <summary>Click handler.</summary>
     [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
 
-    /// <summary>Other attributes (aria-expanded, aria-controls, …).</summary>
+    /// <summary>Other attributes (aria-expanded, aria-controls, …); a <c>class</c> is added to the button classes.</summary>
     [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass =>
+        (Danger ? "ol-icon-btn ol-icon-btn--danger" : "ol-icon-btn")
+        + (AdditionalAttributes?.TryGetValue("class", out var extra) == true ? " " + extra : string.Empty);
 }
