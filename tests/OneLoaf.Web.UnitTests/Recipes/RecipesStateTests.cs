@@ -81,22 +81,16 @@ public sealed class RecipesStateTests
 
     private static RecipeList List(params RecipeSummaryDto[] items) => new([.. items], 1, items.Length, false);
 
-    private sealed class StubApi(ApiError? error = null) : IRecipesApi
+    private sealed class StubApi(ApiError? error = null) : RecipesApiStub
     {
-        public Task<ApiResult<PagedResult<RecipeSummaryDto>>> ListAsync(RecipeQuery query, int page, CancellationToken ct = default) =>
+        public override Task<ApiResult<PagedResult<RecipeSummaryDto>>> ListAsync(RecipeQuery query, int page, CancellationToken ct = default) =>
             Task.FromResult(error is null
                 ? ApiResult<PagedResult<RecipeSummaryDto>>.Ok(new PagedResult<RecipeSummaryDto>([Country], page, 20, 1))
                 : ApiResult<PagedResult<RecipeSummaryDto>>.Fail(error));
 
-        public Task<ApiResult<RecipeDto>> GetAsync(Guid id, CancellationToken ct = default) => throw new NotSupportedException();
 
-        public Task<ApiResult<ScaledRecipeDto>> ScaleAsync(Guid id, int loaves, CancellationToken ct = default) => throw new NotSupportedException();
 
-        public Task<ApiResult<CostBreakdownDto>> GetCostAsync(Guid id, int loaves, DateOnly? asOf, CancellationToken ct = default) => throw new NotSupportedException();
 
-        public Task<ApiResult<ProductionFiguresDto>> GetProductionFiguresAsync(Guid id, int loaves, CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<TimelineDto>> GetTimelineAsync(Guid id, DateTimeOffset start, CancellationToken ct = default) => throw new NotSupportedException();
     }
 
     private sealed class StubState(RecipesState value) : IState<RecipesState>

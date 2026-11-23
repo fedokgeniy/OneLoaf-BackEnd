@@ -90,12 +90,66 @@ public sealed class ServerValidation : ComponentBase, IDisposable
 
     private void OnValidationRequested(object? sender, ValidationRequestedEventArgs e) => _store?.Clear();
 
-    /// <summary>Maps a top-level camelCase path (<c>displayName</c>) to the model property (<c>DisplayName</c>).</summary>
-    private FieldIdentifier? FieldFor(string path)
+    /// <summary>
+    /// Maps a camelCase JSON path to a field of the form model: <c>displayName</c> → <c>DisplayName</c>,
+    /// <c>stages[0].maxDurationMinutes</c> → <c>Stages[0].MaxDurationMinutes</c> (the request lists and the form lists
+    /// keep the same order). Returns null when the path does not exist on the form.
+    /// </summary>
+    internal static FieldIdentifier? FieldFor(object model, string path)
     {
-        var model = _context!.Model;
-        var property = model.GetType().GetProperties()
-            .FirstOrDefault(p => string.Equals(p.Name, path, StringComparison.OrdinalIgnoreCase));
-        return property is null ? null : new FieldIdentifier(model, property.Name);
+        var segments = path.Split('.');
+        object current = model;
+        for (var i = 0; i < segments.Length; i++)
+        {
+            var segment = segments[i];
+            int? index = null;
+            var bracket = segment.IndexOf('[', StringComparison.Ordinal);
+            if (bracket > 0 && segment.EndsWith(']') && int.TryParse(segment[(bracket + 1)..^1], out var parsed))
+            {
+                index = parsed;
+                segment = segment[..bracket];
+            }
+
+            var property = current.GetType().GetProperties()
+                .FirstOrDefault(p => string.Equals(p.Name, segment, StringComparison.OrdinalIgnoreCase));
+            if (property is null)
+            {
+                return null;
+            }
+
+            var last = i == segments.Length - 1;
+            if (index is null)
+            {
+                if (last)
+                {
+                    return new FieldIdentifier(current, property.Name);
+                }
+
+                current = property.GetValue(current)!;
+                if (current is null)
+                {
+                    return null;
+                }
+
+                continue;
+            }
+
+            if (property.GetValue(current) is not System.Collections.IList list || index >= list.Count || list[index.Value] is not { } item)
+            {
+                return null;
+            }
+
+            if (last)
+            {
+                // "ingredients[2]" without a member: the message belongs to the row; shown with the list property.
+                return new FieldIdentifier(current, property.Name);
+            }
+
+            current = item;
+        }
+
+        return null;
     }
+
+    private FieldIdentifier? FieldFor(string path) => FieldFor(_context!.Model, path);
 }

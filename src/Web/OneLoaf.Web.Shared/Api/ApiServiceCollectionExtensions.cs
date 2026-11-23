@@ -47,6 +47,7 @@ public static class ApiServiceCollectionExtensions
         }
 
         services.AddScoped<ApiClientFactory>();
+        services.AddScoped<Reference.IReferenceApi, Reference.ReferenceApi>();
         return services;
     }
 

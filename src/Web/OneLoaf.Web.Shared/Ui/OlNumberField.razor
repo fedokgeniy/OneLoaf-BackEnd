@@ -1,0 +1,92 @@
+@* Number field (.ol-field + .ol-num) for int / decimal values, nullable or not. Parses culture-invariant ("12.5"),
+   accepts a comma as decimal separator too; messages and aria wiring as OlTextField. *@
+@typeparam TValue
+@inherits InputBase<TValue>
+@{
+    _errors = EditContext is null ? [] : EditContext.GetValidationMessages(FieldIdentifier).ToArray();
+}
+
+<div class="ol-field">
+    <label class="@(HideLabel ? "ol-visually-hidden" : "ol-field__label")" for="@_id">@Label</label>
+    <div class="ol-field__control">
+        <input id="@_id" class="@(string.IsNullOrEmpty(Suffix) ? "ol-input ol-num" : "ol-input ol-input--suffixed ol-num")"
+               type="text" inputmode="@(IsInteger ? "numeric" : "decimal")" placeholder="@Placeholder"
+               aria-invalid="@(_errors.Length > 0 ? "true" : null)" aria-describedby="@DescribedBy"
+               @bind="CurrentValueAsString" @attributes="AdditionalAttributes" />
+        @if (!string.IsNullOrEmpty(Suffix))
+        {
+            <span class="ol-field__suffix" aria-hidden="true">@Suffix</span>
+        }
+    </div>
+    @if (!string.IsNullOrEmpty(Help))
+    {
+        <span id="@(_id + "-help")" class="ol-field__help">@Help</span>
+    }
+    @if (_errors.Length > 0)
+    {
+        <span id="@(_id + "-error")" class="ol-field__error">
+            <OlIcon Name="IconName.Alert" Size="IconSize.Sm" />
+            <span>@string.Join(" ", _errors)</span>
+        </span>
+    }
+</div>
+
+@code {
+    private static readonly Type Underlying = Nullable.GetUnderlyingType(typeof(TValue)) ?? typeof(TValue);
+    private readonly string _id = ElementIds.Next("number");
+    private string[] _errors = [];
+
+    /// <summary>Label (always present; <see cref="HideLabel"/> keeps it for screen readers only, e.g. in a table row).</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+
+    /// <summary>Label read by screen readers only.</summary>
+    [Parameter] public bool HideLabel { get; set; }
+
+    /// <summary>Unit inside the field (g, min, °C).</summary>
+    [Parameter] public string? Suffix { get; set; }
+
+    /// <summary>Help text.</summary>
+    [Parameter] public string? Help { get; set; }
+
+    /// <summary>Placeholder.</summary>
+    [Parameter] public string? Placeholder { get; set; }
+
+    private static bool IsInteger => Underlying == typeof(int) || Underlying == typeof(long);
+
+    private string? DescribedBy
+    {
+        get
+        {
+            var ids = new List<string>(2);
+            if (!string.IsNullOrEmpty(Help)) ids.Add(_id + "-help");
+            if (_errors.Length > 0) ids.Add(_id + "-error");
+            return ids.Count == 0 ? null : string.Join(' ', ids);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override string? FormatValueAsString(TValue? value) =>
+        value is IFormattable f ? f.ToString(null, System.Globalization.CultureInfo.InvariantCulture) : null;
+
+    /// <inheritdoc />
+    protected override bool TryParseValueFromString(
+        string? value, out TValue result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        var text = value?.Trim().Replace(',', '.').Replace(" ", string.Empty, StringComparison.Ordinal).Replace(" ", string.Empty, StringComparison.Ordinal);
+        if (string.IsNullOrEmpty(text) && Nullable.GetUnderlyingType(typeof(TValue)) is not null)
+        {
+            result = default!;
+            validationErrorMessage = null;
+            return true;
+        }
+
+        if (BindConverter.TryConvertTo(text, System.Globalization.CultureInfo.InvariantCulture, out result!))
+        {
+            validationErrorMessage = null;
+            return true;
+        }
+
+        validationErrorMessage = IsInteger ? $"{Label}: enter a whole number." : $"{Label}: enter a number.";
+        return false;
+    }
+}

@@ -37,6 +37,24 @@ public interface IRecipesApi
 
     /// <summary><c>GET recipes/{id}/timeline?start=</c> (US-16).</summary>
     Task<ApiResult<TimelineDto>> GetTimelineAsync(Guid id, DateTimeOffset start, CancellationToken ct = default);
+
+    /// <summary><c>POST recipes</c> (US-05): 201 with the recipe, 400 field errors.</summary>
+    Task<ApiResult<RecipeDto>> CreateAsync(RecipeRequest request, CancellationToken ct = default);
+
+    /// <summary><c>PUT recipes/{id}</c>: 200, 400, 404, 422 (a rule of a variant).</summary>
+    Task<ApiResult<RecipeDto>> UpdateAsync(Guid id, RecipeRequest request, CancellationToken ct = default);
+
+    /// <summary><c>DELETE recipes/{id}</c>: 204, 409 when it has variants or batches (archive instead).</summary>
+    Task<ApiResult> DeleteAsync(Guid id, CancellationToken ct = default);
+
+    /// <summary><c>POST recipes/{id}/archive</c> or <c>/unarchive</c>.</summary>
+    Task<ApiResult> SetArchivedAsync(Guid id, bool archived, CancellationToken ct = default);
+
+    /// <summary><c>POST recipes/{id}/variants</c> (US-07).</summary>
+    Task<ApiResult<RecipeDto>> CreateVariantAsync(Guid id, CreateVariantRequest request, CancellationToken ct = default);
+
+    /// <summary><c>GET recipes/{id}/comparison</c> (US-08): 422 when the recipe is not a variant.</summary>
+    Task<ApiResult<RecipeComparisonDto>> CompareAsync(Guid id, CancellationToken ct = default);
 }
 
 /// <inheritdoc />
@@ -77,4 +95,28 @@ public sealed class RecipesApi(ApiClientFactory api) : IRecipesApi
     /// <inheritdoc />
     public Task<ApiResult<TimelineDto>> GetTimelineAsync(Guid id, DateTimeOffset start, CancellationToken ct = default) =>
         api.Core.GetAsync<TimelineDto>(Url.Build($"api/v1/recipes/{id}/timeline", ("start", start)), ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<RecipeDto>> CreateAsync(RecipeRequest request, CancellationToken ct = default) =>
+        api.Core.PostAsync<RecipeRequest, RecipeDto>("api/v1/recipes", request, ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<RecipeDto>> UpdateAsync(Guid id, RecipeRequest request, CancellationToken ct = default) =>
+        api.Core.PutAsync<RecipeRequest, RecipeDto>($"api/v1/recipes/{id}", request, ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult> DeleteAsync(Guid id, CancellationToken ct = default) =>
+        api.Core.DeleteAsync($"api/v1/recipes/{id}", ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult> SetArchivedAsync(Guid id, bool archived, CancellationToken ct = default) =>
+        api.Core.PostAsync($"api/v1/recipes/{id}/{(archived ? "archive" : "unarchive")}", ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<RecipeDto>> CreateVariantAsync(Guid id, CreateVariantRequest request, CancellationToken ct = default) =>
+        api.Core.PostAsync<CreateVariantRequest, RecipeDto>($"api/v1/recipes/{id}/variants", request, ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<RecipeComparisonDto>> CompareAsync(Guid id, CancellationToken ct = default) =>
+        api.Core.GetAsync<RecipeComparisonDto>($"api/v1/recipes/{id}/comparison", ct);
 }

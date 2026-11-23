@@ -18,10 +18,14 @@ public enum IconName
     Check,
     /// <summary>icons/check-circle.svg</summary>
     CheckCircle,
+    /// <summary>icons/chevron-down.svg</summary>
+    ChevronDown,
     /// <summary>icons/chevron-left.svg</summary>
     ChevronLeft,
     /// <summary>icons/chevron-right.svg</summary>
     ChevronRight,
+    /// <summary>icons/chevron-up.svg</summary>
+    ChevronUp,
     /// <summary>icons/close.svg</summary>
     Close,
     /// <summary>icons/edit.svg</summary>

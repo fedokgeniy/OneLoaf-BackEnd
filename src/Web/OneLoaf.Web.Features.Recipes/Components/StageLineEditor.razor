@@ -1,0 +1,104 @@
+@* One stage of the recipe editor: name, type, min/max minutes; "More" shows hands-on time (US-49), warm/cold proof and
+   temperature (US-9), oven/mixer use, optional flag and instructions. Reordering by buttons. *@
+@using OneLoaf.Web.Features.Recipes.Models
+@using OneLoaf.Web.Shared.Contracts.Core
+
+<li class="line line--stage">
+    <span class="ol-stage__marker line__marker" aria-hidden="true">@(Index + 1)</span>
+    <div class="line__fields line__fields--stage">
+        <OlTextField Label="@($"Stage {Index + 1} name")" @bind-Value="Line.Name" />
+        <OlSelect Label="Type" Options="Options" Placeholder="Choose a type" Value="@Line.StageTypeCode"
+                  ValueChanged="OnTypeChanged" ValueExpression="() => Line.StageTypeCode" />
+        <OlNumberField TValue="int?" Label="Min" Suffix="min" @bind-Value="Line.MinDurationMinutes" />
+        <OlNumberField TValue="int?" Label="Max" Suffix="min" @bind-Value="Line.MaxDurationMinutes" />
+    </div>
+    <div class="line__actions">
+        <OlIconButton Icon="IconName.ChevronUp" Label="@($"Move {Name} up")" Disabled="@(Index == 0)" OnClick="OnMoveUp" />
+        <OlIconButton Icon="IconName.ChevronDown" Label="@($"Move {Name} down")" Disabled="@(Index == Count - 1)" OnClick="OnMoveDown" />
+        <OlIconButton Icon="IconName.Trash" Label="@($"Remove {Name}")" Danger="true" OnClick="OnRemove" />
+    </div>
+    <div class="line__more">
+        <button type="button" class="ol-btn ol-btn--ghost line__toggle" aria-expanded="@(Line.Expanded ? "true" : "false")"
+                aria-controls="@_moreId" @onclick="() => Line.Expanded = !Line.Expanded">
+            <OlIcon Name="@(Line.Expanded ? IconName.ChevronUp : IconName.ChevronDown)" Size="IconSize.Sm" />
+            @(Line.Expanded ? "Fewer details" : "More details")
+        </button>
+        @if (Line.IsInherited)
+        {
+            <span class="ol-badge ol-badge--neutral">Inherited</span>
+        }
+        <div id="@_moreId" class="line__details" hidden="@(!Line.Expanded)">
+            <OlNumberField TValue="int" Label="Hands-on" Suffix="min" Help="For the labor cost." @bind-Value="Line.ActiveMinutes" />
+            <OlNumberField TValue="decimal?" Label="Temperature" Suffix="°C" @bind-Value="Line.TemperatureC" />
+            <div class="line__proof">
+                <span class="ol-field__label" id="@(_moreId + "-proof")">Proof</span>
+                <OlSegmented TValue="string" Label="Proof mode" Options="ProofOptions" Value="@(Line.ProofMode ?? string.Empty)"
+                             ValueChanged="v => Line.ProofMode = v.Length == 0 ? null : v" />
+            </div>
+            <div class="line__checks">
+                <OlCheckbox @bind-Value="Line.UsesOven">Uses the oven</OlCheckbox>
+                <OlCheckbox @bind-Value="Line.UsesMixer">Uses the mixer</OlCheckbox>
+                <OlCheckbox @bind-Value="Line.IsOptional">Optional stage</OlCheckbox>
+            </div>
+            <OlTextArea Label="Instructions" Rows="2" @bind-Value="Line.Instructions" />
+        </div>
+    </div>
+</li>
+
+@code {
+    private static readonly IReadOnlyList<SegmentOption<string>> ProofOptions =
+    [
+        new(string.Empty, "None"),
+        new("warm", "Warm"),
+        new("cold", "Cold"),
+    ];
+
+    private readonly string _moreId = $"stage-more-{Guid.NewGuid():N}";
+
+    /// <summary>The stage being edited.</summary>
+    [Parameter, EditorRequired] public StageLineForm Line { get; set; } = default!;
+
+    /// <summary>Position in the list.</summary>
+    [Parameter] public int Index { get; set; }
+
+    /// <summary>Number of stages.</summary>
+    [Parameter] public int Count { get; set; }
+
+    /// <summary>Stage types from the reference data.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<StageTypeDto> StageTypes { get; set; } = [];
+
+    /// <summary>Options built once by the page.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<SelectOption> Options { get; set; } = [];
+
+    /// <summary>Move up.</summary>
+    [Parameter] public EventCallback OnMoveUp { get; set; }
+
+    /// <summary>Move down.</summary>
+    [Parameter] public EventCallback OnMoveDown { get; set; }
+
+    /// <summary>Remove.</summary>
+    [Parameter] public EventCallback OnRemove { get; set; }
+
+    private string Name => string.IsNullOrWhiteSpace(Line.Name) ? $"stage {Index + 1}" : Line.Name;
+
+    /// <summary>A new type fills an empty name and the oven/mixer defaults of the type.</summary>
+    private void OnTypeChanged(string? code)
+    {
+        Line.StageTypeCode = code;
+        if (StageTypes.FirstOrDefault(t => t.Code == code) is not { } type)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(Line.Name))
+        {
+            Line.Name = type.Name;
+        }
+
+        if (Line.LineId is null)
+        {
+            Line.UsesOven = type.DefaultUsesOven;
+            Line.UsesMixer = type.DefaultUsesMixer;
+        }
+    }
+}

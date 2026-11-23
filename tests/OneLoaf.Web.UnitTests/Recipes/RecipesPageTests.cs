@@ -75,26 +75,20 @@ public sealed class RecipesPageTests : BunitContext
     private static ApiResult<PagedResult<RecipeSummaryDto>> Page(params RecipeSummaryDto[] items) =>
         ApiResult<PagedResult<RecipeSummaryDto>>.Ok(new PagedResult<RecipeSummaryDto>(items, 1, 20, items.Length));
 
-    private sealed class FakeRecipesApi : IRecipesApi
+    private sealed class FakeRecipesApi : RecipesApiStub
     {
         public ApiResult<PagedResult<RecipeSummaryDto>> Result { get; set; } = Page();
 
         public RecipeQuery? LastQuery { get; private set; }
 
-        public Task<ApiResult<PagedResult<RecipeSummaryDto>>> ListAsync(RecipeQuery query, int page, CancellationToken ct = default)
+        public override Task<ApiResult<PagedResult<RecipeSummaryDto>>> ListAsync(RecipeQuery query, int page, CancellationToken ct = default)
         {
             LastQuery = query;
             return Task.FromResult(Result);
         }
 
-        public Task<ApiResult<RecipeDto>> GetAsync(Guid id, CancellationToken ct = default) => throw new NotSupportedException();
 
-        public Task<ApiResult<ScaledRecipeDto>> ScaleAsync(Guid id, int loaves, CancellationToken ct = default) => throw new NotSupportedException();
 
-        public Task<ApiResult<CostBreakdownDto>> GetCostAsync(Guid id, int loaves, DateOnly? asOf, CancellationToken ct = default) => throw new NotSupportedException();
 
-        public Task<ApiResult<ProductionFiguresDto>> GetProductionFiguresAsync(Guid id, int loaves, CancellationToken ct = default) => throw new NotSupportedException();
-
-        public Task<ApiResult<TimelineDto>> GetTimelineAsync(Guid id, DateTimeOffset start, CancellationToken ct = default) => throw new NotSupportedException();
     }
 }

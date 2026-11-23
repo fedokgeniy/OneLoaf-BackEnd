@@ -11,6 +11,7 @@ public static class RecipesFeature
     {
         ArgumentNullException.ThrowIfNull(services);
         services.AddScoped<IRecipesApi, RecipesApi>();
+        services.AddScoped<ICatalogApi, CatalogApi>();
         return services;
     }
 }

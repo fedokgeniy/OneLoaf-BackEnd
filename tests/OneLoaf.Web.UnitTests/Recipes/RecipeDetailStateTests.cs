@@ -73,24 +73,22 @@ public sealed class RecipeDetailStateTests
 
     private static Loadable<T> Failed<T>() => new Loadable<T>.Failed(ApiError.FromStatus(500));
 
-    private sealed class StubApi : IRecipesApi
+    private sealed class StubApi : RecipesApiStub
     {
-        public Task<ApiResult<PagedResult<RecipeSummaryDto>>> ListAsync(RecipeQuery query, int page, CancellationToken ct = default) =>
-            throw new NotSupportedException();
 
-        public Task<ApiResult<RecipeDto>> GetAsync(Guid id, CancellationToken ct = default) =>
+        public override Task<ApiResult<RecipeDto>> GetAsync(Guid id, CancellationToken ct = default) =>
             Task.FromResult(ApiResult<RecipeDto>.Ok(Recipe(3)));
 
-        public Task<ApiResult<ScaledRecipeDto>> ScaleAsync(Guid id, int loaves, CancellationToken ct = default) =>
+        public override Task<ApiResult<ScaledRecipeDto>> ScaleAsync(Guid id, int loaves, CancellationToken ct = default) =>
             Task.FromResult(ApiResult<ScaledRecipeDto>.Ok(new ScaledRecipeDto(id, 1, loaves, [])));
 
-        public Task<ApiResult<CostBreakdownDto>> GetCostAsync(Guid id, int loaves, DateOnly? asOf, CancellationToken ct = default) =>
+        public override Task<ApiResult<CostBreakdownDto>> GetCostAsync(Guid id, int loaves, DateOnly? asOf, CancellationToken ct = default) =>
             Task.FromResult(ApiResult<CostBreakdownDto>.Ok(new CostBreakdownDto(id, loaves, new DateOnly(2026, 11, 23), "EUR", true, [], 6.05m, [])));
 
-        public Task<ApiResult<ProductionFiguresDto>> GetProductionFiguresAsync(Guid id, int loaves, CancellationToken ct = default) =>
+        public override Task<ApiResult<ProductionFiguresDto>> GetProductionFiguresAsync(Guid id, int loaves, CancellationToken ct = default) =>
             Task.FromResult(ApiResult<ProductionFiguresDto>.Ok(new ProductionFiguresDto(id, loaves, 2880m, 1, 300m)));
 
-        public Task<ApiResult<TimelineDto>> GetTimelineAsync(Guid id, DateTimeOffset start, CancellationToken ct = default) =>
+        public override Task<ApiResult<TimelineDto>> GetTimelineAsync(Guid id, DateTimeOffset start, CancellationToken ct = default) =>
             Task.FromResult(ApiResult<TimelineDto>.Ok(new TimelineDto(id, start, [], start, start)));
     }
 

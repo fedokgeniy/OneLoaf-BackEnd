@@ -80,16 +80,13 @@ public sealed class RecipeDetailPageTests : BunitContext
         cut.WaitForAssertion(() => Assert.Contains("Recipe not found", cut.Find(".ol-empty").TextContent));
     }
 
-    private sealed class DetailApi : IRecipesApi
+    private sealed class DetailApi : RecipesApiStub
     {
         public bool Missing { get; set; }
 
         public List<int> CostRequests { get; } = [];
 
-        public Task<ApiResult<PagedResult<RecipeSummaryDto>>> ListAsync(RecipeQuery query, int page, CancellationToken ct = default) =>
-            throw new NotSupportedException();
-
-        public Task<ApiResult<RecipeDto>> GetAsync(Guid id, CancellationToken ct = default) =>
+        public override Task<ApiResult<RecipeDto>> GetAsync(Guid id, CancellationToken ct = default) =>
             Task.FromResult(Missing
                 ? ApiResult<RecipeDto>.Fail(ApiError.FromStatus(404))
                 : ApiResult<RecipeDto>.Ok(new RecipeDto(id, null, "Country sourdough", "Open crumb.", 1, 900m, null, false,
@@ -100,21 +97,21 @@ public sealed class RecipeDetailPageTests : BunitContext
                     ],
                     DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch)));
 
-        public Task<ApiResult<ScaledRecipeDto>> ScaleAsync(Guid id, int loaves, CancellationToken ct = default) =>
+        public override Task<ApiResult<ScaledRecipeDto>> ScaleAsync(Guid id, int loaves, CancellationToken ct = default) =>
             Task.FromResult(ApiResult<ScaledRecipeDto>.Ok(new ScaledRecipeDto(id, 1, loaves,
                 [new ScaledIngredientDto(Guid.NewGuid(), Guid.NewGuid(), "Bread flour", "g", 1500m, false)])));
 
-        public Task<ApiResult<CostBreakdownDto>> GetCostAsync(Guid id, int loaves, DateOnly? asOf, CancellationToken ct = default)
+        public override Task<ApiResult<CostBreakdownDto>> GetCostAsync(Guid id, int loaves, DateOnly? asOf, CancellationToken ct = default)
         {
             CostRequests.Add(loaves);
             return Task.FromResult(ApiResult<CostBreakdownDto>.Ok(new CostBreakdownDto(id, loaves, new DateOnly(2026, 11, 23), "EUR", true,
                 [new CostLineDto(1, "total", null, "Total", loaves, "loaves", null, 6.05m, true)], 6.05m, [])));
         }
 
-        public Task<ApiResult<ProductionFiguresDto>> GetProductionFiguresAsync(Guid id, int loaves, CancellationToken ct = default) =>
+        public override Task<ApiResult<ProductionFiguresDto>> GetProductionFiguresAsync(Guid id, int loaves, CancellationToken ct = default) =>
             Task.FromResult(ApiResult<ProductionFiguresDto>.Ok(new ProductionFiguresDto(id, loaves, 2880m, 1, 300m)));
 
-        public Task<ApiResult<TimelineDto>> GetTimelineAsync(Guid id, DateTimeOffset start, CancellationToken ct = default) =>
+        public override Task<ApiResult<TimelineDto>> GetTimelineAsync(Guid id, DateTimeOffset start, CancellationToken ct = default) =>
             Task.FromResult(ApiResult<TimelineDto>.Ok(new TimelineDto(id, start,
                 [new TimelineStageDto(Guid.NewGuid(), 1, "Bulk fermentation", "bulk_fermentation", 240, 300, start, start.AddHours(4), start.AddHours(5))],
                 start.AddHours(15), start.AddHours(18))));
