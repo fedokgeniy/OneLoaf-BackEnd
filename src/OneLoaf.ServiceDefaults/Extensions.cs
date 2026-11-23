@@ -1,11 +1,12 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Http.Json;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using OneLoaf.ServiceDefaults.Correlation;
+using OneLoaf.ServiceDefaults.Cors;
 using OneLoaf.ServiceDefaults.Errors;
 using OneLoaf.ServiceDefaults.Health;
 using OneLoaf.ServiceDefaults.Logging;
@@ -36,6 +37,7 @@ public static class Extensions
 
         var services = builder.Services;
         services.AddCorrelationId();
+        services.AddOneLoafCors(builder.Configuration);
         services.AddOneLoafErrorHandling();
         services.Configure<JsonOptions>(options => ConfigureJson(options.SerializerOptions));
         services.AddOneLoafOpenApi(serviceName);
@@ -56,7 +58,7 @@ public static class Extensions
 
     /// <summary>
     /// Adds the middleware in the required order: forwarded headers (client IP) → correlation id (so every later log
-    /// has it) → request logging →
+    /// has it) → CORS (preflight answered before authentication; headers also on 401/429) → request logging →
     /// exception handler → status code pages (empty 401/404 become ProblemDetails) → Swagger UI (public static files)
     /// → authentication → authorization.
     /// </summary>
@@ -66,6 +68,7 @@ public static class Extensions
 
         app.UseForwardedHeaders();
         app.UseMiddleware<CorrelationIdMiddleware>();
+        app.UseCors();
         app.UseOneLoafRequestLogging();
         app.UseExceptionHandler();
         app.UseStatusCodePages();
