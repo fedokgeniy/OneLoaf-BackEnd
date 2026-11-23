@@ -1,0 +1,114 @@
+name: database
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "src/OneLoaf.Domain/**"
+      - "src/OneLoaf.Infrastructure/**"
+      - "src/OneLoaf.DbMigrator/**"
+      - "db/**"
+      - "scripts/verify.sh"
+      - "tools/**"
+      - "docs/db/data-dictionary.md"
+      - "docs/db/logical-schema.md"
+      - "Directory.Build.props"
+      - "Directory.Packages.props"
+      - "global.json"
+      - "dotnet-tools.json"
+      - ".github/workflows/database.yml"
+  pull_request:
+    paths:
+      - "src/OneLoaf.Domain/**"
+      - "src/OneLoaf.Infrastructure/**"
+      - "src/OneLoaf.DbMigrator/**"
+      - "db/**"
+      - "scripts/verify.sh"
+      - "tools/**"
+      - "docs/db/data-dictionary.md"
+      - "docs/db/logical-schema.md"
+      - "Directory.Build.props"
+      - "Directory.Packages.props"
+      - "global.json"
+      - "dotnet-tools.json"
+      - ".github/workflows/database.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: database-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_NOLOGO: "1"
+
+jobs:
+  verify:
+    name: Migrations, schema.sql, tests, docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: PostgreSQL 16 client and Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends postgresql-client-16 graphviz
+
+      - name: Passwords for this run
+        run: |
+          for name in PG_SUPERUSER_PASSWORD ONELOAF_ADMIN_PASSWORD ONELOAF_APP_PASSWORD ONELOAF_READER_PASSWORD; do
+            value=$(openssl rand -hex 24)
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+
+      - name: Start PostgreSQL 16
+        run: |
+          docker run -d --name pg -e POSTGRES_PASSWORD="$PG_SUPERUSER_PASSWORD" -p 127.0.0.1:5432:5432 postgres:16-alpine
+          until docker exec pg pg_isready -h 127.0.0.1 -U postgres -q; do sleep 2; done
+
+      - name: Verify
+        env:
+          VOLUME: "1"
+        run: bash scripts/verify.sh
+
+  migrator-image:
+    name: Migrator image to GHCR
+    needs: verify
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Image name
+        id: image
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/oneloaf-migrator" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: src/OneLoaf.DbMigrator/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.image.outputs.name }}:${{ github.sha }}
+            ${{ steps.image.outputs.name }}:latest
+          cache-from: type=gha,scope=migrator
+          cache-to: type=gha,scope=migrator,mode=max
