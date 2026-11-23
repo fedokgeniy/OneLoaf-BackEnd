@@ -9,7 +9,7 @@ using OneLoaf.SharedKernel.Exceptions;
 
 namespace OneLoaf.CoreApi.UnitTests.ServiceDefaults;
 
-/// <summary>One test per row of the mapping table in api-design.md §4.</summary>
+/// <summary>One test per row of the exception mapping table.</summary>
 public sealed class ExceptionMapperTests
 {
     public static TheoryData<string, int, string> SqlStateRows => new()

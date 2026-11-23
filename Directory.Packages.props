@@ -1,5 +1,5 @@
 <Project>
-  <!-- Central package versions. Only packages allowed by docs/backend/decisions.md ADR-007. -->
+  <!-- Central package versions. Only open-source packages without commercial licensing. -->
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>

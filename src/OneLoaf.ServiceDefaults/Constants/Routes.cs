@@ -3,7 +3,7 @@ namespace OneLoaf.ServiceDefaults.Constants;
 /// <summary>Infrastructure routes mapped by <c>MapServiceDefaults</c> in every service.</summary>
 public static class Routes
 {
-    /// <summary>Base path of the business endpoints of every service (api-design.md §1).</summary>
+    /// <summary>Base path of the business endpoints of every service.</summary>
     public const string ApiV1 = "/api/v1";
 
     /// <summary>Liveness: the process is running. Used by the Docker HEALTHCHECK.</summary>

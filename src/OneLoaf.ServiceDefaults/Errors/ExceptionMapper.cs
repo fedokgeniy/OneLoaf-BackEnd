@@ -8,7 +8,7 @@ using OneLoaf.SharedKernel.Exceptions;
 namespace OneLoaf.ServiceDefaults.Errors;
 
 /// <summary>
-/// Maps exceptions to HTTP responses as specified in api-design.md §4 and integrity-and-transactions.md §5.
+/// Maps exceptions to HTTP responses (database errors by SQLSTATE).
 /// Pure function: unit tested for every row of the table.
 /// </summary>
 public static class ExceptionMapper
@@ -78,7 +78,7 @@ public static class ExceptionMapper
 
     /// <summary>
     /// SQLSTATE → HTTP. The database message is not returned: it may contain constraint names or values of other
-    /// rows. Friendly per-constraint titles can be added later by constraint name (api-design.md §4).
+    /// rows.
     /// </summary>
     private static ProblemMapping MapPostgres(PostgresException postgres)
     {

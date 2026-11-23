@@ -9,7 +9,7 @@ using Microsoft.Net.Http.Headers;
 namespace OneLoaf.ServiceDefaults.Errors;
 
 /// <summary>
-/// Global error handling (requirement M7): every unhandled exception becomes <c>application/problem+json</c>
+/// Global error handling: every unhandled exception becomes <c>application/problem+json</c>
 /// according to <see cref="ExceptionMapper"/>. Correlation id and instance are added by the ProblemDetails
 /// customization, so framework-generated problems (401, 404) look the same.
 /// </summary>

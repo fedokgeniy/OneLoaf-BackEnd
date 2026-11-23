@@ -1,5 +1,5 @@
 <Project>
-  <!-- Shared settings of every project in the repository (architecture.md §3, testing.md §5). -->
+  <!-- Shared settings of every project in the repository. -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -12,7 +12,7 @@
     <InvariantGlobalization>true</InvariantGlobalization>
     <!-- CI restores with the locked mode option, so the lock files must be committed. -->
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-    <!-- Vulnerable packages fail the build (requirement C2). -->
+    <!-- Vulnerable packages fail the build. -->
     <NuGetAudit>true</NuGetAudit>
     <NuGetAuditMode>all</NuGetAuditMode>
     <NuGetAuditLevel>low</NuGetAuditLevel>
@@ -21,10 +21,10 @@
   <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('Tests'))">
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <!-- Test method names follow MethodName_Condition_ExpectedResult (testing.md §1). -->
+    <!-- Test method names follow MethodName_Condition_ExpectedResult. -->
     <NoWarn>$(NoWarn);CA1707</NoWarn>
     <!-- Run through VSTest (xunit.runner.visualstudio) so that coverlet.collector and
-         dotnet test with the XPlat Code Coverage collector keep working (testing.md §2). -->
+         dotnet test with the XPlat Code Coverage collector keep working. -->
     <UseMicrosoftTestingPlatformRunner>false</UseMicrosoftTestingPlatformRunner>
     <TestingPlatformDotnetTestSupport>false</TestingPlatformDotnetTestSupport>
     <IsTestingPlatformApplication>false</IsTestingPlatformApplication>

@@ -23,7 +23,7 @@ public sealed class JwtIssuerOptions
     [Required]
     public string SigningKeyPem { get; set; } = string.Empty;
 
-    /// <summary>Lifetime of an access token (architecture.md §4: 60 minutes).</summary>
+    /// <summary>Lifetime of an access token, minutes.</summary>
     [Range(5, 1440)]
     public int AccessTokenMinutes { get; set; } = 60;
 }

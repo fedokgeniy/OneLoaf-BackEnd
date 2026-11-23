@@ -5,7 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 namespace OneLoaf.ServiceDefaults.Security;
 
 /// <summary>
-/// The RSA public key used to validate access tokens (RS256, ADR-006). Singleton: owns and disposes the
+/// The RSA public key used to validate access tokens (RS256). Singleton: owns and disposes the
 /// <see cref="RSA"/> instance.
 /// </summary>
 public sealed class JwtValidationKey : IDisposable

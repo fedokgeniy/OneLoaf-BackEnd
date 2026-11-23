@@ -9,7 +9,7 @@ using OneLoaf.ServiceDefaults.Security;
 namespace OneLoaf.CoreApi.Infrastructure.Auth;
 
 /// <summary>
-/// Issues RS256 access tokens with <see cref="JsonWebTokenHandler"/> (ADR-006; no custom token format).
+/// Issues RS256 access tokens with <see cref="JsonWebTokenHandler"/> (no custom token format).
 /// Singleton: owns the RSA private key.
 /// </summary>
 public sealed class JwtTokenIssuer : IAccessTokenIssuer, IDisposable

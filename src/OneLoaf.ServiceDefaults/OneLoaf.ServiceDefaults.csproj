@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Cross-cutting code shared by every web service (architecture.md §3): logging, correlation id, errors,
+  <!-- Cross-cutting code shared by every web service: logging, correlation id, errors,
        OpenAPI, health, telemetry, JWT validation. -->
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

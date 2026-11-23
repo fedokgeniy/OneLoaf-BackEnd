@@ -2,7 +2,7 @@ namespace OneLoaf.SharedKernel.Security;
 
 /// <summary>
 /// The user of the current request, taken from the validated JWT (claim <c>sub</c>), never from the request body
-/// (CLAUDE.md rule 3). Every query of workspace data filters by <see cref="Id"/>.
+/// Every query of workspace data filters by <see cref="Id"/>.
 /// </summary>
 public interface ICurrentUser
 {

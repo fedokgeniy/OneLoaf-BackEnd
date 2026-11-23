@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <!-- Contracts shared by the Application layers and OneLoaf.ServiceDefaults. Depends on nothing (architecture.md §2). -->
+  <!-- Contracts shared by the Application layers and OneLoaf.ServiceDefaults. Depends on nothing. -->
   <PropertyGroup>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>

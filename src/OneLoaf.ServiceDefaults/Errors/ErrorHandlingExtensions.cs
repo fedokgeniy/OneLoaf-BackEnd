@@ -7,7 +7,7 @@ namespace OneLoaf.ServiceDefaults.Errors;
 /// <summary>Registration of ProblemDetails and the global exception handler.</summary>
 public static class ErrorHandlingExtensions
 {
-    /// <summary>Extension with the correlation id in every problem response (api-design.md §2).</summary>
+    /// <summary>Extension with the correlation id in every problem response.</summary>
     public const string CorrelationIdExtension = "correlationId";
 
     /// <summary>Adds ProblemDetails (RFC 9457) with instance and correlation id, and <see cref="GlobalExceptionHandler"/>.</summary>

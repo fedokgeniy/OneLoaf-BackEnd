@@ -1,6 +1,6 @@
 namespace OneLoaf.ServiceDefaults.Errors;
 
-/// <summary><c>type</c> URIs of the problem details returned by OneLoaf (api-design.md §2).</summary>
+/// <summary><c>type</c> URIs of the problem details returned by OneLoaf.</summary>
 public static class ProblemTypes
 {
     /// <summary>Common prefix of all problem types.</summary>

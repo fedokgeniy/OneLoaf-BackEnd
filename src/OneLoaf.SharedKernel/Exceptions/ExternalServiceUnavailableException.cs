@@ -1,7 +1,7 @@
 namespace OneLoaf.SharedKernel.Exceptions;
 
 /// <summary>
-/// A dependency (Claude API, Core API called from the Assistant) is unavailable or timed out (UC-01 A3).
+/// A dependency (Claude API, Core API called from the Assistant) is unavailable or timed out.
 /// Mapped to 503 with a <c>Retry-After</c> header.
 /// </summary>
 public class ExternalServiceUnavailableException : Exception

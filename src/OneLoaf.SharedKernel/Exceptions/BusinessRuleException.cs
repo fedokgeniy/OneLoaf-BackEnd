@@ -1,6 +1,6 @@
 namespace OneLoaf.SharedKernel.Exceptions;
 
-/// <summary>A business rule is violated (for example UC-02 A1: no feedback to analyse). Mapped to 422.</summary>
+/// <summary>A business rule is violated (for example: a bake without feedback cannot be analysed). Mapped to 422.</summary>
 public class BusinessRuleException : Exception
 {
     /// <summary>Client-safe message used when none is given.</summary>

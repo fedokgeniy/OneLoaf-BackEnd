@@ -24,7 +24,7 @@ public sealed record LoginRequest(string Email, string Password);
 /// <param name="User">Profile of the user.</param>
 public sealed record LoginResponse(string AccessToken, DateTimeOffset ExpiresAt, UserProfileDto User);
 
-/// <summary>Password hashing (implemented with ASP.NET Core Identity <c>PasswordHasher</c>, ADR-006).</summary>
+/// <summary>Password hashing (implemented with ASP.NET Core Identity <c>PasswordHasher</c>).</summary>
 public interface IPasswordHasher
 {
     /// <summary>Hashes a password into the Identity v3 format accepted by <c>fn_is_strong_password_hash</c>.</summary>
@@ -47,7 +47,7 @@ public enum PasswordCheck
     SuccessRehashNeeded,
 }
 
-/// <summary>Issues access tokens (RS256 JWT, architecture.md §4).</summary>
+/// <summary>Issues access tokens (RS256 JWT).</summary>
 public interface IAccessTokenIssuer
 {
     /// <summary>Creates a token for the user.</summary>

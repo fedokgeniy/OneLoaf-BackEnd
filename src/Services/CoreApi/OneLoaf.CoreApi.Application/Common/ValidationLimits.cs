@@ -9,7 +9,7 @@ public static class ValidationLimits
     /// <summary>Same pattern as <c>ck_users_email_format</c>, so a valid request never fails in the database.</summary>
     public const string EmailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
 
-    /// <summary>Minimum password length (NFR-04).</summary>
+    /// <summary>Minimum password length.</summary>
     public const int PasswordMinLength = 8;
 
     /// <summary>Upper bound that keeps hashing cost predictable.</summary>

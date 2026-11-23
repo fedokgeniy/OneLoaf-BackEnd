@@ -5,7 +5,7 @@ using OneLoaf.ServiceDefaults.Constants;
 
 namespace OneLoaf.ServiceDefaults.OpenApi;
 
-/// <summary>OpenAPI document (Microsoft.AspNetCore.OpenApi) and Swagger UI of a service (requirement M6, US-45).</summary>
+/// <summary>OpenAPI document (Microsoft.AspNetCore.OpenApi) and Swagger UI of a service (US-45).</summary>
 public static class OpenApiExtensions
 {
     /// <summary>Registers the OpenAPI document with service info and the bearer scheme.</summary>
