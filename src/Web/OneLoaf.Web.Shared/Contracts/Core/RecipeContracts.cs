@@ -121,3 +121,6 @@ public sealed record TimelineStageDto(
     DateTimeOffset PlannedStartAt,
     DateTimeOffset PlannedEndMinAt,
     DateTimeOffset PlannedEndMaxAt);
+
+/// <summary>When to start so the recipe is ready at <see cref="ReadyAt"/> (<c>GET /recipes/{id}/start-window</c>, US-52).</summary>
+public sealed record StartWindowDto(Guid RecipeId, DateTimeOffset ReadyAt, DateTimeOffset StartFrom, DateTimeOffset StartTo);

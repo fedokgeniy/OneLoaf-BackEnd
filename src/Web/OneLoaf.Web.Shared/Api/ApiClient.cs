@@ -31,6 +31,14 @@ public sealed partial class ApiClient(HttpClient http, ApiJsonOptions json, ILog
     public Task<ApiResult<T>> PutAsync<TBody, T>(string path, TBody body, CancellationToken ct = default) =>
         SendAsync<T>(WithBody(HttpMethod.Put, path, body), ct);
 
+    /// <summary>POST without a request body, returning a body (e.g. complete a batch).</summary>
+    public Task<ApiResult<T>> PostEmptyAsync<T>(string path, CancellationToken ct = default) =>
+        SendAsync<T>(new HttpRequestMessage(HttpMethod.Post, path), ct);
+
+    /// <summary>PATCH with a body, returning a body.</summary>
+    public Task<ApiResult<T>> PatchAsync<TBody, T>(string path, TBody body, CancellationToken ct = default) =>
+        SendAsync<T>(WithBody(HttpMethod.Patch, path, body), ct);
+
     /// <summary>PATCH with a body, no response body.</summary>
     public Task<ApiResult> PatchAsync<TBody>(string path, TBody body, CancellationToken ct = default) =>
         SendAsync(WithBody(HttpMethod.Patch, path, body), ct);

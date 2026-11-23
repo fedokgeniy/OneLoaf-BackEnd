@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using OneLoaf.Web.Shared.Contracts;
 using OneLoaf.Web.Shared.Contracts.Core;
+using OneLoaf.Web.Shared.Contracts.Notification;
 
 namespace OneLoaf.Web.Shared.Api;
 
@@ -20,6 +21,7 @@ namespace OneLoaf.Web.Shared.Api;
 [JsonSerializable(typeof(CostBreakdownDto))]
 [JsonSerializable(typeof(ProductionFiguresDto))]
 [JsonSerializable(typeof(TimelineDto))]
+[JsonSerializable(typeof(StartWindowDto))]
 [JsonSerializable(typeof(RecipeRequest))]
 [JsonSerializable(typeof(CreateVariantRequest))]
 [JsonSerializable(typeof(RecipeComparisonDto))]
@@ -38,4 +40,25 @@ namespace OneLoaf.Web.Shared.Api;
 [JsonSerializable(typeof(IReadOnlyList<WarningDto>))]
 [JsonSerializable(typeof(KitchenSettingsDto))]
 [JsonSerializable(typeof(KitchenSettingsRequest))]
+[JsonSerializable(typeof(PagedResult<BatchSummaryDto>))]
+[JsonSerializable(typeof(BatchRequest))]
+[JsonSerializable(typeof(BatchDto))]
+[JsonSerializable(typeof(CompleteBatchResponse))]
+[JsonSerializable(typeof(SaveAsVariantRequest))]
+[JsonSerializable(typeof(SaveAsVariantResponse))]
+[JsonSerializable(typeof(KneadingPlanDto))]
+[JsonSerializable(typeof(StageActionRequest))]
+[JsonSerializable(typeof(ExtendStageRequest))]
+[JsonSerializable(typeof(StageDurationRequest))]
+[JsonSerializable(typeof(PagedResult<StarterDto>))]
+[JsonSerializable(typeof(StarterDto))]
+[JsonSerializable(typeof(StarterRequest))]
+[JsonSerializable(typeof(PagedResult<FeedingDto>))]
+[JsonSerializable(typeof(FeedingDto))]
+[JsonSerializable(typeof(FeedingRequest))]
+[JsonSerializable(typeof(IReadOnlyList<ReminderDto>))]
+[JsonSerializable(typeof(VapidPublicKeyResponse))]
+[JsonSerializable(typeof(SubscribeRequest))]
+[JsonSerializable(typeof(PushSubscriptionDto))]
+[JsonSerializable(typeof(TestPushResponse))]
 internal sealed partial class SharedJsonContext : JsonSerializerContext;

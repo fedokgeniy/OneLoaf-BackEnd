@@ -1,0 +1,61 @@
+@* Validation messages of one field (.ol-field__error) for controls that are not form inputs, e.g. OlNumberStepper;
+   server errors mapped by ServerValidation appear here too. *@
+@implements IDisposable
+
+@if (_messages.Length > 0)
+{
+    <span class="ol-field__error" id="@Id">
+        <OlIcon Name="IconName.Alert" Size="IconSize.Sm" />
+        <span>@string.Join(" ", _messages)</span>
+    </span>
+}
+
+@code {
+    private EditContext? _subscribed;
+    private string[] _messages = [];
+
+    [CascadingParameter] private EditContext? EditContext { get; set; }
+
+    /// <summary>Object that owns the field (the form model or a list row).</summary>
+    [Parameter, EditorRequired] public object Model { get; set; } = default!;
+
+    /// <summary>Property name, e.g. <c>nameof(BatchItemForm.Loaves)</c>.</summary>
+    [Parameter, EditorRequired] public string Field { get; set; } = string.Empty;
+
+    /// <summary>Element id for aria-describedby.</summary>
+    [Parameter] public string? Id { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(_subscribed, EditContext))
+        {
+            Dispose();
+            _subscribed = EditContext;
+            if (_subscribed is not null)
+            {
+                _subscribed.OnValidationStateChanged += OnStateChanged;
+            }
+        }
+
+        Refresh();
+    }
+
+    /// <inheritdoc />
+    public void Dispose()
+    {
+        if (_subscribed is not null)
+        {
+            _subscribed.OnValidationStateChanged -= OnStateChanged;
+        }
+    }
+
+    private void OnStateChanged(object? sender, ValidationStateChangedEventArgs e)
+    {
+        Refresh();
+        StateHasChanged();
+    }
+
+    private void Refresh() =>
+        _messages = EditContext is null ? [] : EditContext.GetValidationMessages(new FieldIdentifier(Model, Field)).ToArray();
+}

@@ -47,3 +47,17 @@
   .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .form-grid__end { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
 }
+
+/* New batch (NewBatch-* boards): the form, and the live preview beside it on desktop. */
+.new-batch { display: grid; grid-template-columns: 1fr; gap: var(--space-5); padding-block: var(--space-5); margin: 0 auto; }
+.new-batch__form { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+.new-batch__mode { display: flex; flex-direction: column; gap: var(--space-2); }
+.new-batch__item-head { display: flex; align-items: flex-end; gap: var(--space-2); }
+.new-batch__item-head > .ol-field { flex: 1; }
+.new-batch__remind { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.new-batch__item { list-style: none; }
+.new-batch__preview { gap: var(--space-4); }
+@media (min-width: 64em) {
+  .new-batch { grid-template-columns: minmax(0, 3fr) minmax(18rem, 2fr); align-items: start; }
+  .new-batch__preview { position: sticky; top: calc(var(--topbar-height) + var(--space-5)); }
+}

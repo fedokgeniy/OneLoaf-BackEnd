@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using OneLoaf.Web.Shared.Api;
 using OneLoaf.Web.Shared.Contracts;
 using OneLoaf.Web.Shared.Contracts.Core;
+using OneLoaf.Web.Shared.Contracts.Notification;
 
 namespace OneLoaf.Web.UnitTests.Contracts;
 
@@ -25,6 +26,7 @@ public sealed class RecordedExamplesTests
         ["core-api/GetRecipeCost"] = typeof(CostBreakdownDto),
         ["core-api/GetProductionFigures"] = typeof(ProductionFiguresDto),
         ["core-api/GetRecipeTimeline"] = typeof(TimelineDto),
+        ["core-api/GetRecipeStartWindow"] = typeof(StartWindowDto),
         ["core-api/CreateRecipe"] = typeof(RecipeDto),
         ["core-api/UpdateRecipe"] = typeof(RecipeDto),
         ["core-api/CreateVariant"] = typeof(RecipeDto),
@@ -43,6 +45,30 @@ public sealed class RecordedExamplesTests
         ["core-api/GetWarnings"] = typeof(IReadOnlyList<WarningDto>),
         ["core-api/GetKitchenSettings"] = typeof(KitchenSettingsDto),
         ["core-api/UpdateKitchenSettings"] = typeof(KitchenSettingsDto),
+        ["core-api/ListBatches"] = typeof(PagedResult<BatchSummaryDto>),
+        ["core-api/CreateBatch"] = typeof(BatchDto),
+        ["core-api/PreviewBatch"] = typeof(BatchDto),
+        ["core-api/GetBatch"] = typeof(BatchDto),
+        ["core-api/ReplanBatch"] = typeof(BatchDto),
+        ["core-api/CompleteBatch"] = typeof(CompleteBatchResponse),
+        ["core-api/SaveBatchAsVariant"] = typeof(SaveAsVariantResponse),
+        ["core-api/GetKneadingPlan"] = typeof(KneadingPlanDto),
+        ["core-api/StartStage"] = typeof(BatchDto),
+        ["core-api/CompleteStage"] = typeof(BatchDto),
+        ["core-api/SkipStage"] = typeof(BatchDto),
+        ["core-api/ExtendStage"] = typeof(BatchDto),
+        ["core-api/ChangeStageDurations"] = typeof(BatchDto),
+        ["core-api/ResetStage"] = typeof(BatchDto),
+        ["core-api/ListStarters"] = typeof(PagedResult<StarterDto>),
+        ["core-api/CreateStarter"] = typeof(StarterDto),
+        ["core-api/GetStarter"] = typeof(StarterDto),
+        ["core-api/UpdateStarter"] = typeof(StarterDto),
+        ["core-api/ListFeedings"] = typeof(PagedResult<FeedingDto>),
+        ["core-api/AddFeeding"] = typeof(FeedingDto),
+        ["notification/ListReminders"] = typeof(IReadOnlyList<ReminderDto>),
+        ["notification/GetVapidPublicKey"] = typeof(VapidPublicKeyResponse),
+        ["notification/Subscribe"] = typeof(PushSubscriptionDto),
+        ["notification/SendTestPush"] = typeof(TestPushResponse),
     };
 
     private static readonly JsonSerializerOptions Strict = new(new ApiJsonOptions([SharedJsonContext.Default]).Options)

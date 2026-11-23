@@ -1,0 +1,23 @@
+@* On/off switch (.ol-switch): a checkbox with role="switch"; the label states what is switched. *@
+@inherits InputBase<bool>
+
+<label class="ol-switch">
+    <input type="checkbox" role="switch" checked="@CurrentValue" @onchange="OnChange" @attributes="AdditionalAttributes" />
+    <span>@ChildContent</span>
+</label>
+
+@code {
+    /// <summary>Label.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private void OnChange(ChangeEventArgs e) => CurrentValue = e.Value is true || (e.Value is string s && bool.TryParse(s, out var b) && b);
+
+    /// <inheritdoc />
+    protected override bool TryParseValueFromString(
+        string? value, out bool result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        result = bool.TryParse(value, out var parsed) && parsed;
+        validationErrorMessage = null;
+        return true;
+    }
+}
