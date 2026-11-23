@@ -3,6 +3,7 @@ using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using OneLoaf.Web.Shared.Api;
 using OneLoaf.Web.Shared.Contracts;
+using OneLoaf.Web.Shared.Contracts.Assistant;
 using OneLoaf.Web.Shared.Contracts.Core;
 using OneLoaf.Web.Shared.Contracts.Notification;
 
@@ -69,6 +70,21 @@ public sealed class RecordedExamplesTests
         ["notification/GetVapidPublicKey"] = typeof(VapidPublicKeyResponse),
         ["notification/Subscribe"] = typeof(PushSubscriptionDto),
         ["notification/SendTestPush"] = typeof(TestPushResponse),
+        ["core-api/ListBakeRecords"] = typeof(PagedResult<BakeRecordSummaryDto>),
+        ["core-api/GetBakeStatistics"] = typeof(IReadOnlyList<BakeStatisticsDto>),
+        ["core-api/GetBakeRecord"] = typeof(BakeRecordDto),
+        ["core-api/RateBake"] = typeof(BakeRecordDto),
+        ["core-api/GetStageLog"] = typeof(IReadOnlyList<StageLogEntryDto>),
+        ["core-api/UploadBakePhoto"] = typeof(BakeRecordPhotoDto),
+        ["core-api/ListBakePhotos"] = typeof(IReadOnlyList<BakeRecordPhotoDto>),
+        ["core-api/SaveBakeAnalysis"] = typeof(BakeRecordDto),
+        ["assistant/AnalyseBake"] = typeof(AnalysisDto),
+        ["assistant/GetMyUsage"] = typeof(UsageDto),
+        ["assistant/ListConversations"] = typeof(IReadOnlyList<ConversationDto>),
+        ["assistant/CreateConversation"] = typeof(ConversationDto),
+        ["assistant/ListMessages"] = typeof(IReadOnlyList<MessageDto>),
+        ["assistant/SendMessage"] = typeof(ChatReplyDto),
+        ["assistant/ConfirmAction"] = typeof(ConfirmActionResponse),
     };
 
     private static readonly JsonSerializerOptions Strict = new(new ApiJsonOptions([SharedJsonContext.Default]).Options)

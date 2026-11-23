@@ -1,21 +1,165 @@
 @page "/"
 @attribute [Authorize]
 @inherits FluxorComponent
+@using System.Globalization
+@using OneLoaf.Web.Home
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
 @inject IState<SessionState> Session
+@inject IState<HomeState> State
 @inject IState<DisplayState> Display
 @inject IDispatcher Dispatcher
+@inject TimeProvider Time
 
 <ShellTitle Text="Home" />
 
 <div class="ol-container home">
     <section class="home__welcome" aria-labelledby="home-greeting">
         <h2 id="home-greeting" class="h2 home__greeting">Hello, @(Session.Value.User?.DisplayName ?? "baker")</h2>
-        <p class="home__lead">Your active batch, starters and recent bakes will be shown here.</p>
         <div class="home__actions">
-            <OlButton Href="recipes" Icon="IconName.Recipes">Open recipes</OlButton>
-            <OlButton Href="batches/new" Variant="ButtonVariant.Secondary" Icon="IconName.Plus">New batch</OlButton>
+            <OlButton Href="batches/new" Icon="IconName.Plus">New batch</OlButton>
+            <OlButton Href="recipes" Variant="ButtonVariant.Secondary" Icon="IconName.Recipes">Recipes</OlButton>
         </div>
     </section>
+
+    @switch (State.Value.Data)
+    {
+        case Loadable<HomeData>.Failed { Error: var error }:
+            <OlAlert Kind="AlertKind.Danger" Title="Home could not be loaded." CorrelationId="@error.CorrelationId">
+                <p>@error.Message</p>
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => Dispatcher.Dispatch(new LoadHome())">Try again</OlButton>
+            </OlAlert>
+            break;
+        case { Value: { } data }:
+            <div class="home__grid">
+                <section class="home__card home__card--batch" aria-labelledby="home-batch">
+                    <h2 class="title home__card-title" id="home-batch">@(data.Active is not null ? "Baking now" : "Next batch")</h2>
+                    @if (data.Active is { } active)
+                    {
+                        var stages = active.Items.SelectMany(i => i.Stages).OrderBy(s => s.PlannedStartAt).ToList();
+                        var current = stages.FirstOrDefault(s => s.Status == StageStatuses.Running) ?? stages.FirstOrDefault(s => s.Status == StageStatuses.Pending);
+                        var finished = stages.Count(s => s.Status is StageStatuses.Done or StageStatuses.Skipped);
+                        <p class="home__batch-name">@active.Name · @DisplayFormat.Loaves(active.Items.Sum(i => i.Loaves))</p>
+                        @if (current is not null)
+                        {
+                            <p class="home__batch-stage">
+                                <span class="ol-badge @(current.Status == StageStatuses.Running ? "ol-badge--running" : "ol-badge--planned")">@(current.Status == StageStatuses.Running ? "Running" : "Next")</span>
+                                @current.Name · stage @(stages.IndexOf(current) + 1) of @stages.Count
+                            </p>
+                        }
+                        <div class="home__progress" role="progressbar" aria-label="Batch progress" aria-valuemin="0" aria-valuemax="@stages.Count" aria-valuenow="@finished">
+                            @* Width is the share of finished stages: a computed value that cannot be a class. *@
+                            <div class="home__progress-bar" style="width: @(stages.Count == 0 ? "0%" : string.Create(CultureInfo.InvariantCulture, $"{finished * 100 / stages.Count}%"))"></div>
+                        </div>
+                        @if (active.PlannedReadyFrom is { } from && active.PlannedReadyTo is { } to)
+                        {
+                            <p class="home__muted">Ready @DisplayFormat.TimeWindow(from, to, active.PlannedStartAt)</p>
+                        }
+                        <OlButton Href="@($"batches/{active.Id}")" Variant="ButtonVariant.Secondary">Open batch</OlButton>
+                    }
+                    else if (data.Next is { } next)
+                    {
+                        <p class="home__batch-name">@next.Name · @DisplayFormat.Loaves(next.TotalLoaves)</p>
+                        <p class="home__muted">Starts @When(next.PlannedStartAt)</p>
+                        <OlButton Href="@($"batches/{next.Id}")" Variant="ButtonVariant.Secondary">Open batch</OlButton>
+                    }
+                    else
+                    {
+                        <p class="home__muted">Nothing is planned. Plan a batch to see its stages and reminders here.</p>
+                        <OlButton Href="batches/new" Icon="IconName.Plus">Plan a batch</OlButton>
+                    }
+                </section>
+
+                <section class="home__card" aria-labelledby="home-starters">
+                    <h2 class="title home__card-title" id="home-starters">Starters</h2>
+                    @if (data.Starters.Count == 0)
+                    {
+                        <p class="home__muted">No active starter.</p>
+                        <OlLink Href="starters/new">Add a starter</OlLink>
+                    }
+                    else
+                    {
+                        <ul class="home__list">
+                            @foreach (var starter in data.Starters)
+                            {
+                                <li class="home__row" @key="starter.Id">
+                                    <span class="home__row-main">
+                                        <span class="home__row-title">@starter.Name</span>
+                                        <span class="home__muted">
+                                            @(starter.NextFeedingAt is { } feed ? $"Feed {When(feed)}" : "Not fed yet")
+                                            @(starter.ExpectedPeakAt is { } peak ? $" · peak {When(peak)}" : null)
+                                        </span>
+                                    </span>
+                                    @if (starter.NextFeedingAt is { } due && due < Time.GetUtcNow())
+                                    {
+                                        <span class="ol-badge ol-badge--overdue">Due</span>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                        <OlLink Href="starters">Log a feeding</OlLink>
+                    }
+                </section>
+
+                <section class="home__card" aria-labelledby="home-reminders">
+                    <h2 class="title home__card-title" id="home-reminders">Next 24 hours</h2>
+                    @if (data.Reminders is null)
+                    {
+                        <p class="home__muted">Reminders are not available right now.</p>
+                    }
+                    else if (data.Reminders.Count == 0)
+                    {
+                        <p class="home__muted">No reminders.</p>
+                    }
+                    else
+                    {
+                        <ul class="home__list">
+                            @foreach (var reminder in data.Reminders)
+                            {
+                                <li class="home__row" @key="reminder.Id">
+                                    <OlIcon Name="IconName.Bell" Size="IconSize.Sm" />
+                                    <span class="home__row-main">
+                                        <span class="home__row-title">@reminder.Message</span>
+                                        <span class="home__muted">@When(reminder.DueAt)</span>
+                                    </span>
+                                </li>
+                            }
+                        </ul>
+                    }
+                </section>
+
+                <section class="home__card" aria-labelledby="home-bakes">
+                    <h2 class="title home__card-title" id="home-bakes">Recent bakes</h2>
+                    @if (data.RecentBakes.Count == 0)
+                    {
+                        <p class="home__muted">Completed batches appear here to rate and compare.</p>
+                    }
+                    else
+                    {
+                        <ul class="home__list">
+                            @foreach (var bake in data.RecentBakes)
+                            {
+                                <li @key="bake.Id">
+                                    <a class="home__row home__row--link" href="@($"history/{bake.Id}")">
+                                        <span class="home__row-main">
+                                            <span class="home__row-title">@string.Join(", ", bake.RecipeTitles)</span>
+                                            <span class="home__muted">@DisplayFormat.Date(bake.BakedOn) · @DisplayFormat.Loaves(bake.TotalLoaves)</span>
+                                        </span>
+                                        <span class="home__rating">@(bake.Rating is { } rating ? $"{rating}/5" : "Rate it")</span>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                        <OlLink Href="history">All bakes</OlLink>
+                    }
+                </section>
+            </div>
+            break;
+        default:
+            <div aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Stat" Count="4" /></div>
+            break;
+    }
 
     <section class="home__card" aria-labelledby="home-display">
         <h2 id="home-display" class="title home__card-title">Appearance</h2>
@@ -31,4 +175,22 @@
         new(ThemePreference.Light, "Light", IconName.Sun),
         new(ThemePreference.Dark, "Dark", IconName.Moon),
     ];
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        if (State.Value.Data is not Loadable<HomeData>.Loading)
+        {
+            Dispatcher.Dispatch(new LoadHome());
+        }
+    }
+
+    private string When(DateTimeOffset moment)
+    {
+        var local = moment.ToLocalTime();
+        var today = Time.GetLocalNow().Date;
+        var day = local.Date == today ? "today" : local.Date == today.AddDays(1) ? "tomorrow" : local.ToString("ddd d MMM", CultureInfo.InvariantCulture);
+        return $"{day} {local.ToString("HH:mm", CultureInfo.InvariantCulture)}";
+    }
 }

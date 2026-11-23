@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using OneLoaf.Web.Shared.Contracts;
+using OneLoaf.Web.Shared.Contracts.Assistant;
 using OneLoaf.Web.Shared.Contracts.Core;
 using OneLoaf.Web.Shared.Contracts.Notification;
 
@@ -61,4 +62,20 @@ namespace OneLoaf.Web.Shared.Api;
 [JsonSerializable(typeof(SubscribeRequest))]
 [JsonSerializable(typeof(PushSubscriptionDto))]
 [JsonSerializable(typeof(TestPushResponse))]
+[JsonSerializable(typeof(PagedResult<BakeRecordSummaryDto>))]
+[JsonSerializable(typeof(IReadOnlyList<BakeStatisticsDto>))]
+[JsonSerializable(typeof(BakeRecordDto))]
+[JsonSerializable(typeof(UpdateBakeRecordRequest))]
+[JsonSerializable(typeof(IReadOnlyList<StageLogEntryDto>))]
+[JsonSerializable(typeof(BakeRecordPhotoDto))]
+[JsonSerializable(typeof(IReadOnlyList<BakeRecordPhotoDto>))]
+[JsonSerializable(typeof(AnalysisDto))]
+[JsonSerializable(typeof(UsageDto))]
+[JsonSerializable(typeof(IReadOnlyList<ConversationDto>))]
+[JsonSerializable(typeof(ConversationDto))]
+[JsonSerializable(typeof(CreateConversationRequest))]
+[JsonSerializable(typeof(IReadOnlyList<MessageDto>))]
+[JsonSerializable(typeof(SendMessageRequest))]
+[JsonSerializable(typeof(ChatReplyDto))]
+[JsonSerializable(typeof(ConfirmActionResponse))]
 internal sealed partial class SharedJsonContext : JsonSerializerContext;
