@@ -19,6 +19,8 @@ on:
       - "global.json"
       - ".github/workflows/notification.yml"
       - "docs/api/reference/**"
+      - "!src/Web/**"
+      - "!tests/OneLoaf.Web.*/**"
   pull_request:
     paths:
       - "src/Services/Notification/**"
@@ -36,6 +38,8 @@ on:
       - "global.json"
       - ".github/workflows/notification.yml"
       - "docs/api/reference/**"
+      - "!src/Web/**"
+      - "!tests/OneLoaf.Web.*/**"
   workflow_dispatch:
 
 permissions:

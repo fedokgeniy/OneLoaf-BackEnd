@@ -18,6 +18,8 @@ on:
       - "!tests/OneLoaf.Assistant.UnitTests/**"
       - "!src/Services/Notification/**"
       - "!tests/OneLoaf.Notification.UnitTests/**"
+      - "!src/Web/**"
+      - "!tests/OneLoaf.Web.*/**"
   pull_request:
     paths:
       - "src/**"
@@ -34,6 +36,8 @@ on:
       - "!tests/OneLoaf.Assistant.UnitTests/**"
       - "!src/Services/Notification/**"
       - "!tests/OneLoaf.Notification.UnitTests/**"
+      - "!src/Web/**"
+      - "!tests/OneLoaf.Web.*/**"
   workflow_dispatch:
 
 permissions:
