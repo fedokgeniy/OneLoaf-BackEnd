@@ -184,7 +184,7 @@ services:
     image: oneloaf-web:local
     profiles: [web]
     ports:
-      - "${WEB_PORT:-8090}:80"
+      - "${WEB_PORT:-8090}:8080"
 
 volumes:
   pgdata:

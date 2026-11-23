@@ -32,6 +32,15 @@ $utf8 = [System.Text.UTF8Encoding]::new($false)
 # Desired content of every target file: path -> text. Built first, then written or compared.
 $targets = [ordered]@{}
 
+# Ordinal sort by base name: Sort-Object is culture-sensitive and orders "check" / "check-circle" differently on
+# Windows and Linux, which would make the generated enum differ between machines.
+function Get-SortedSvg([string] $directory) {
+    $files = [System.IO.FileInfo[]]@(Get-ChildItem $directory -Filter '*.svg')
+    $keys = [string[]]@($files | ForEach-Object { $_.BaseName })
+    [Array]::Sort($keys, $files, [StringComparer]::Ordinal)
+    return $files
+}
+
 function Read-Text([string] $path) {
     ([System.IO.File]::ReadAllText($path, $utf8)) -replace "`r`n", "`n"
 }
@@ -41,7 +50,7 @@ foreach ($css in 'tokens.css', 'components.css') {
 }
 
 foreach ($folder in 'icons', 'logos') {
-    foreach ($svg in Get-ChildItem (Join-Path $source $folder) -Filter '*.svg' | Sort-Object Name) {
+    foreach ($svg in Get-SortedSvg (Join-Path $source $folder)) {
         $targets[(Join-Path $wwwroot "$folder/$($svg.Name)")] = Read-Text $svg.FullName
     }
 }
@@ -50,7 +59,7 @@ function ConvertTo-PascalCase([string] $kebab) {
     (($kebab -split '-') | ForEach-Object { $_.Substring(0, 1).ToUpperInvariant() + $_.Substring(1) }) -join ''
 }
 
-$icons = Get-ChildItem (Join-Path $source 'icons') -Filter '*.svg' | Sort-Object Name
+$icons = Get-SortedSvg (Join-Path $source 'icons')
 $enumMembers = [System.Text.StringBuilder]::new()
 $switchArms = [System.Text.StringBuilder]::new()
 foreach ($icon in $icons) {
