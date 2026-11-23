@@ -38,3 +38,4 @@ coveragereport/
 CLAUDE.md
 .claude/
 docs/backend/
+docs/frontend-internal/
