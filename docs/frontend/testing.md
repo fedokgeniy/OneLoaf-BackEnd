@@ -19,7 +19,7 @@ Coverage gate for `OneLoaf.Web.Shared` and feature libraries: **70 %** lines (sa
 | `OlTextFieldTests` | `OlTextField` | label is linked to the input; error state sets `aria-invalid` + `aria-describedby`; suffix renders; two-way binding updates the model |
 | `CostTableTests` | `CostTable` (Recipes) | renders every line returned by the API in order incl. electricity, packaging, loss, labor; shows the API total (not a client sum); "cost incomplete" warning lists missing prices; stacked rows on compact |
 | `StageItemTests` | `OlStageItem` | upcoming → Start; running → Complete + "+30 min"; done → no actions; callbacks fire with the stage id; status word present (not colour only) |
-| `PlanCardTests` | `PlanCard` (Assistant) | renders amounts, ready window and cost from `BatchDto`; Confirm and Change raise callbacks; expired action disables Confirm; disclaimer shown |
+| `AssistantTests` | `PlanCard`, `AssistantPage` (Assistant) | the card shows start, loaves, starter amount, kneading cycles, ready window and total cost from the mapped `BatchDto`; Confirm raises its callback; a reply with a proposal saves nothing until Confirm, then the card links to `/batches/{id}` and `BatchCreated` is dispatched; 503 keeps the draft and offers the manual form; the recorded `SendMessage` plan maps to a batch |
 | `NewBatchFormTests` | `NewBatchPage` form | required fields, loaves 1–100, at least one recipe; server `errors["items[0].loaves"]` appears under the right field; submit disabled while saving |
 | `LoginPageTests` | `LoginPage` | 401 shows one generic message; success dispatches `LoggedIn` and navigates to `returnUrl` |
 
@@ -43,7 +43,7 @@ adds/renames a field or the client mistyped one. Also asserts that every operati
 | Test | Journey | Checks |
 |---|---|---|
 | `RecipeCostJourneyTests` | open `/login` → sign in → Recipes list → open "Country sourdough" → set loaves to 3 → Cost tab | API called with `loaves=3`; total equals the recorded `total`; electricity/packaging/loss lines visible; no axe violations on the page; screenshot at 360×640 and 1440×900 |
-| `AssistantPlanJourneyTests` | signed in → Assistant → send the request → plan card → Confirm | confirm endpoint called once; toast "Batch saved" with link; navigating to the link opens `/batches/{id}` |
+| `HistoryAssistantScreensTests` | signed in → History → bake record → Assistant → send the request → plan card → Confirm | the confirm endpoint is not called before Confirm and is called once after it; the card says "Saved as a batch." with a link to the batch; screenshots at 360×640 and 1440×900 |
 | `FullStackSmokeTests` (trait `FullStack`, optional) | real compose stack: register → kitchen → ingredient + price → recipe → cost | end-to-end wiring, CORS/Caddy routing |
 
 Route mocks: a `RecordedApi` helper loads `docs/api/examples/<service>/<OperationId>.json` and registers
@@ -67,6 +67,9 @@ $env:ONELOAF_E2E_WEB_ROOT = "$PWD/artifacts/web/wwwroot"; dotnet test tests/OneL
 | `SignInJourneyTests.SignIn_WrongPassword_ShowsOneGenericMessage` | recorded 401 → one generic message in an alert, no redirect |
 | `RecipeCostJourneyTests.RecipeCost_ThreeLoaves_ShowsRecordedTotalAndLines` at 360×640, 768×1024, 1440×900 | list → "Country sourdough" → loaves 3 → the cost request carries `loaves=3`; the total tile shows the recorded `total`; electricity, packaging and loss lines visible; full-page screenshot |
 | `RecipesJourneyTests.Recipes_RecordedList_ShowsCardsAndSearches` at 360×640, 768×1024, 1440×900 | recorded `ListRecipes` → card linked to the recipe; full-page screenshot; typing a search sends `search=` to the API and puts it in the address bar |
+| `CatalogScreensTests` at 360×640 and 1440×900 | ingredients with price history, kitchen settings and variant comparison render from recorded answers; full-page screenshots |
+| `ProductionScreensTests.ProductionScreens_RecordedData_Render` at 360×640 and 1440×900 | Home, new batch with the API preview, batch page, week calendar and starters render from recorded answers; full-page screenshots |
+| `HistoryAssistantScreensTests.HistoryAndAssistant_RecordedData_PlanIsSavedOnlyOnConfirm` at 360×640 and 1440×900 | history list with statistics, bake record with the rating group and stage log, assistant plan card; Confirm is the only call that saves the batch |
 
 ## 4. Accessibility and responsive checks
 

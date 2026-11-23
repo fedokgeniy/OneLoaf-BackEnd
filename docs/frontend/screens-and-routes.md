@@ -86,13 +86,13 @@ Components and states: `Components-States` board = the component library with al
 | US-28 Feeding + next | M | `/starters` log feeding sheet | |
 | US-29 Reminders | M | new batch checkbox, starter form, settings → push subscription | Web Push permission asked only after a user gesture |
 | US-30 Expected peak | S | starter card | |
-| US-31 Auto record | M | history list after batch complete | |
-| US-32 Rating + comment | M | `/history/{id}` | 1–5 star radio group (keyboard accessible) |
-| US-33 Filter history | C | `/history` chips + filters | |
-| US-51 Crumb photo | C | `/history/{id}` | upload with preview |
-| US-34 Batch from chat | M | `/assistant` | plan card + Confirm / Change |
+| US-31 Auto record | M | history list after batch complete | completing a batch resets the history list and statistics, so the new record appears on the next visit |
+| US-32 Rating + comment | M | `/history/{id}` | 1–5 radio group in a fieldset (arrow keys, "4 of 5" labels) plus *No rating*; `PATCH` with null clears a value |
+| US-33 Filter history | C | `/history` chips + filters | recipe chips from `/bake-records/statistics`, *Rating 4+* chip (`minRating=4`), *From* / *To* dates; per-recipe statistics table; paging ("Show more bakes") |
+| US-51 Crumb photo | C | `/history/{id}` | JPEG / PNG / WebP up to 5 MB (checked before upload, 422 from the API shown inline); photos are fetched with the bearer token and shown as data URLs; delete per photo |
+| US-34 Batch from chat | M | `/assistant` | plan card + Confirm / Decline; 409 marks the proposal expired; after Confirm a toast links to `/batches/{id}` and the batch lists reload |
 | US-35 Numbers from tools | M | `/assistant` | show `unverifiedNumbers` warning if the API returns any |
-| US-36 Analyse bake | M | `/history/{id}` → Ask assistant | 422 "add feedback first" → focus the comment field |
+| US-36 Analyse bake | M | `/history/{id}` → Ask the assistant | 422 shows the API `detail` and focuses the comment field; 429 / 503 inline; the analysis is stored by the assistant and shown with "Informational only" |
 | US-37 Search recipes / flour filter | S | `/assistant`, `/recipes` | `/recipes`: "Minimum flour protein" segmented control (any, ≥ 11, ≥ 12, ≥ 13 %) → `minProteinPercent` |
 | US-38 Substitutions | S | `/assistant` | render `disclaimer` under the answer ("Informational only") |
 | US-39 Publish / unpublish | S | publish dialog, library detail (owner) | |
