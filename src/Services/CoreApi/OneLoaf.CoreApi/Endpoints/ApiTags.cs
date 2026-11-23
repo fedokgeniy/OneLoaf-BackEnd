@@ -32,4 +32,10 @@ public static class ApiTags
 
     /// <summary>Baking history.</summary>
     public const string History = "History";
+
+    /// <summary>Shared recipe library.</summary>
+    public const string Library = "Library";
+
+    /// <summary>Moderation of the library.</summary>
+    public const string Moderation = "Moderation";
 }

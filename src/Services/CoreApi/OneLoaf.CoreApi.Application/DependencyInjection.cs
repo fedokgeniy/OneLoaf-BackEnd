@@ -27,6 +27,10 @@ public static class DependencyInjection
         services.AddScoped<FlourService>();
         services.AddScoped<IngredientService>();
         services.AddScoped<RecipeService>();
+        services.AddScoped<Library.LibraryService>();
+        services.AddScoped<Library.ModerationService>();
+        services.AddScoped<Calculations.OvenLoadingService>();
+        services.AddScoped<Export.ExportService>();
         services.AddScoped<CalculationService>();
         services.AddScoped<WarningsService>();
         services.AddScoped<BatchService>();
