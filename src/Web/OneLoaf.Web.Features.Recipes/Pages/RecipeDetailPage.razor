@@ -1,6 +1,7 @@
 @page "/recipes/{Id:guid}"
 @inherits FluxorComponent
 @using OneLoaf.Web.Features.Recipes.Components
+@using OneLoaf.Web.Features.Recipes.Models
 @using OneLoaf.Web.Features.Recipes.State
 @using OneLoaf.Web.Shared.Api
 @using OneLoaf.Web.Shared.Contracts.Core
@@ -69,6 +70,13 @@
             {
                 <p class="recipe__description">@recipe.Description</p>
             }
+            <div class="recipe__actions">
+                <OlButton Variant="ButtonVariant.Secondary" Icon="IconName.Plus" OnClick="() => OpenVariantDialog(recipe)">Create variant</OlButton>
+                @if (recipe.ParentRecipeId is not null)
+                {
+                    <OlButton Variant="ButtonVariant.Ghost" Href="@($"recipes/{recipe.Id}/compare")">Compare with original</OlButton>
+                }
+            </div>
 
             <OlTabs Label="Recipe sections" Tabs="Tabs" ActiveId="@_tab" ActiveIdChanged="t => _tab = t" IdPrefix="recipe" Class="recipe__tabs" />
 
@@ -142,5 +150,25 @@
                 </div>
             </div>
         </div>
+        <OlDialog Open="_variantForm is not null" Title="Create a variant" OnClose="() => _variantForm = null">
+            <ChildContent>
+                @if (_variantForm is not null)
+                {
+                    <EditForm id="variant-form" Model="_variantForm" OnValidSubmit="() => CreateVariant(recipe)" class="recipe__variant-form" novalidate>
+                        <DataAnnotationsValidator />
+                        <p class="recipe__variant-help">The variant starts as a copy of “@recipe.Title”. Only what you change is stored; the rest follows the original.</p>
+                        <OlTextField Label="Title of the variant" @bind-Value="_variantForm.Title" />
+                        @if (_variantError is not null)
+                        {
+                            <OlAlert Kind="AlertKind.Danger" CorrelationId="@_variantError.CorrelationId">@_variantError.Message</OlAlert>
+                        }
+                    </EditForm>
+                }
+            </ChildContent>
+            <Footer>
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _variantForm = null">Cancel</OlButton>
+                <OlButton Type="submit" form="variant-form" Loading="@Editor.Value.Busy">Create variant</OlButton>
+            </Footer>
+        </OlDialog>
         break;
 }

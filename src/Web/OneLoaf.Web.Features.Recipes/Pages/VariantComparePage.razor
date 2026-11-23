@@ -1,0 +1,125 @@
+@page "/recipes/{Id:guid}/compare"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Recipes.Components
+@using OneLoaf.Web.Features.Recipes.State
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+@inject IState<VariantCompareState> State
+@inject IDispatcher Dispatcher
+
+<ShellTitle Text="Compare with original" BackHref="@($"recipes/{Id}")" BackLabel="Back to the variant">
+    <Actions>
+        <OlButton Variant="ButtonVariant.Secondary" Href="@($"recipes/{Id}/edit")" class="app-hide-compact">Edit variant</OlButton>
+    </Actions>
+</ShellTitle>
+
+<div class="ol-container compare">
+    @switch (State.Value.Data)
+    {
+        case Loadable<VariantComparison>.Failed { Error: var error }:
+            @if (error.Kind == ApiErrorKind.BusinessRule)
+            {
+                <OlEmptyState Title="Not a variant" Text="@error.Message" Icon="IconName.Recipes">
+                    <Action><OlButton Href="@($"recipes/{Id}")">Back to the recipe</OlButton></Action>
+                </OlEmptyState>
+            }
+            else
+            {
+                <OlAlert Kind="AlertKind.Danger" Title="The comparison could not be loaded." CorrelationId="@error.CorrelationId">
+                    <p>@error.Message</p>
+                    <OlButton Variant="ButtonVariant.Secondary" OnClick="() => Dispatcher.Dispatch(new LoadComparison(Id))">Try again</OlButton>
+                </OlAlert>
+            }
+            break;
+        case { Value: { } data }:
+            var comparison = data.Comparison;
+            var changes = comparison.ChangedFields.Count + comparison.Ingredients.Count(l => l.Change != "unchanged") + comparison.Stages.Count(s => s.Change != "unchanged");
+            <header class="compare__head">
+                <span class="ol-card__overline">Variant of @data.ParentTitle</span>
+                <h2 class="h2 compare__title">@data.VariantTitle</h2>
+                <span class="ol-card__meta">@(changes == 1 ? "1 change" : $"{changes} changes")@(comparison.ChangedFields.Count > 0 ? $" · fields: {string.Join(", ", comparison.ChangedFields)}" : null)</span>
+            </header>
+            <OlSegmented TValue="bool" Label="Lines shown" Options="ShowOptions" Value="_changesOnly" ValueChanged="v => _changesOnly = v" />
+
+            <section class="compare__section" aria-labelledby="compare-ingredients">
+                <h3 class="h3 compare__heading" id="compare-ingredients">Ingredients</h3>
+                <div class="ol-table-wrap">
+                    <table class="ol-table ol-table--stack">
+                        <thead>
+                            <tr>
+                                <th scope="col">Line</th>
+                                <th scope="col" class="ol-num">@data.ParentTitle</th>
+                                <th scope="col" class="ol-num">@data.VariantTitle (variant)</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var line in comparison.Ingredients.Where(l => !_changesOnly || l.Change != "unchanged"))
+                            {
+                                <tr>
+                                    <td>@((line.Variant ?? line.Parent)!.IngredientName)</td>
+                                    <td class="ol-num" data-label="@data.ParentTitle">@(line.Parent is { } p ? DisplayFormat.Quantity(p.Quantity, p.UnitCode) : "—")</td>
+                                    <td class="ol-num" data-label="Variant">@(line.Variant is { } v ? DisplayFormat.Quantity(v.Quantity, v.UnitCode) : "—")</td>
+                                    <td data-label="Status"><ChangeBadge Change="@line.Change" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="compare__section" aria-labelledby="compare-stages">
+                <h3 class="h3 compare__heading" id="compare-stages">Stages</h3>
+                <div class="ol-table-wrap">
+                    <table class="ol-table ol-table--stack">
+                        <thead>
+                            <tr>
+                                <th scope="col">Stage</th>
+                                <th scope="col" class="ol-num">@data.ParentTitle</th>
+                                <th scope="col" class="ol-num">@data.VariantTitle (variant)</th>
+                                <th scope="col">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var stage in comparison.Stages.Where(s => !_changesOnly || s.Change != "unchanged"))
+                            {
+                                <tr>
+                                    <td>@((stage.Variant ?? stage.Parent)!.Name)</td>
+                                    <td class="ol-num" data-label="@data.ParentTitle">@(stage.Parent is { } p ? DisplayFormat.DurationRange(p.MinDurationMinutes, p.MaxDurationMinutes) : "—")</td>
+                                    <td class="ol-num" data-label="Variant">@(stage.Variant is { } v ? DisplayFormat.DurationRange(v.MinDurationMinutes, v.MaxDurationMinutes) : "—")</td>
+                                    <td data-label="Status"><ChangeBadge Change="@stage.Change" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            @if (_changesOnly && changes == comparison.ChangedFields.Count)
+            {
+                <p class="compare__same">The ingredients and stages are the same as in the original.</p>
+            }
+            break;
+        default:
+            <div aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Row" Count="8" /></div>
+            break;
+    }
+</div>
+
+@code {
+    private static readonly IReadOnlyList<SegmentOption<bool>> ShowOptions = [new(true, "Changes only"), new(false, "All lines")];
+    private bool _changesOnly = true;
+
+    /// <summary>Variant id.</summary>
+    [Parameter] public Guid Id { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        if (State.Value.RecipeId != Id || State.Value.Data is Loadable<VariantComparison>.NotAsked)
+        {
+            Dispatcher.Dispatch(new LoadComparison(Id));
+        }
+    }
+}

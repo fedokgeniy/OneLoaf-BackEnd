@@ -1,6 +1,7 @@
 using System.Globalization;
 using Fluxor;
 using Microsoft.AspNetCore.Components;
+using OneLoaf.Web.Features.Recipes.Models;
 using OneLoaf.Web.Features.Recipes.State;
 using OneLoaf.Web.Shared.Api;
 using OneLoaf.Web.Shared.Contracts.Core;
@@ -26,6 +27,8 @@ public sealed partial class RecipeDetailPage
     ];
 
     private string _tab = "cost";
+    private VariantForm? _variantForm;
+    private ApiError? _variantError;
 
     [Inject]
     private IState<RecipeDetailState> State { get; set; } = default!;
@@ -35,6 +38,9 @@ public sealed partial class RecipeDetailPage
 
     [Inject]
     private TimeProvider Time { get; set; } = default!;
+
+    [Inject]
+    private IState<RecipeEditorState> Editor { get; set; } = default!;
 
     /// <summary>Recipe id from the route.</summary>
     [Parameter]
@@ -70,6 +76,14 @@ public sealed partial class RecipeDetailPage
         State.Value.TimelineStart?.ToLocalTime().ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture) ?? string.Empty;
 
     /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<RecipeSaveFailed>(a => _variantError = a.Error);
+        SubscribeToAction<RecipeSaved>(_ => _variantForm = null);
+    }
+
+    /// <inheritdoc />
     protected override void OnParametersSet()
     {
         if (State.Value.RecipeId != Id || State.Value.Recipe is Loadable<RecipeDto>.NotAsked)
@@ -100,6 +114,23 @@ public sealed partial class RecipeDetailPage
 
     /// <summary>Panels outside the selected tab are hidden on phones and tablets only (CSS shows all on desktop).</summary>
     private string PanelClass(string tab) => tab == _tab ? "recipe__panel" : "recipe__panel recipe__panel--inactive";
+
+    private void OpenVariantDialog(RecipeDto recipe)
+    {
+        _variantError = null;
+        _variantForm = new VariantForm { Title = $"{recipe.Title} (variant)" };
+    }
+
+    private void CreateVariant(RecipeDto recipe)
+    {
+        if (Editor.Value.Busy || _variantForm?.Title is not { } title)
+        {
+            return;
+        }
+
+        _variantError = null;
+        Dispatcher.Dispatch(new CreateVariant(recipe.Id, title));
+    }
 
     private void Reload() => Dispatcher.Dispatch(new OpenRecipe(Id, State.Value.TimelineStart ?? NextFullHour()));
 

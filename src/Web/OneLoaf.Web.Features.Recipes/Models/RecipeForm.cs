@@ -219,3 +219,13 @@ public sealed class StageLineForm : IValidatableObject
         }
     }
 }
+
+/// <summary>Title of a new variant (US-07).</summary>
+public sealed class VariantForm
+{
+    /// <summary>Title.</summary>
+    [Required(ErrorMessage = "Enter a title.")]
+    [StringLength(200, ErrorMessage = "Use at most 200 characters.")]
+    [RegularExpression(@".*\S.*", ErrorMessage = "Enter a title.")]
+    public string? Title { get; set; }
+}

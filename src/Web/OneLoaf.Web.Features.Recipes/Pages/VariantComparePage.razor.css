@@ -1,0 +1,28 @@
+.compare {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-block: var(--space-5);
+}
+
+.compare__head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.compare__title,
+.compare__heading {
+    margin: 0;
+}
+
+.compare__section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.compare__same {
+    margin: 0;
+    color: var(--ink-muted);
+}
