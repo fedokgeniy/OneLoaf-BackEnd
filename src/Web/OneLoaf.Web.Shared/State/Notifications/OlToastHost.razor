@@ -1,0 +1,15 @@
+@* Global toast region connected to the Notifications slice (this is why it lives in State, not in the dumb Ui kit).
+   Shows the oldest toast; the next one appears when it is closed or times out, so toasts never overlap. *@
+@namespace OneLoaf.Web.Shared.State.Notifications
+@inherits FluxorComponent
+@inject IState<NotificationsState> State
+@inject IDispatcher Dispatcher
+
+<div class="ol-toast-region" aria-live="polite" aria-atomic="true">
+    @if (State.Value.Toasts.FirstOrDefault() is { } toast)
+    {
+        <OlToast @key="toast.Id" Message="@toast.Message" IsError="@(toast.Kind == ToastKind.Error)"
+                 CorrelationId="@toast.CorrelationId" ActionText="@toast.ActionText" ActionHref="@toast.ActionHref"
+                 OnDismiss="() => Dispatcher.Dispatch(new DismissToast(toast.Id))" />
+    }
+</div>

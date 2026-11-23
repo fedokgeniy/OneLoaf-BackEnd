@@ -1,0 +1,14 @@
+@page "/not-found"
+@attribute [AllowAnonymous]
+@layout MainLayout
+
+<ShellTitle Text="Not found" />
+
+<div class="ol-container">
+    <div class="ol-empty">
+        <OlIcon Name="IconName.Search" Size="IconSize.Lg" />
+        <h2 class="ol-empty__title">Page not found</h2>
+        <p class="ol-empty__text">This page does not exist, or the item is not yours.</p>
+        <OlButton Href="">Go to Home</OlButton>
+    </div>
+</div>

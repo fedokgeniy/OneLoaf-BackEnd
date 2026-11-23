@@ -1,0 +1,23 @@
+.brand {
+    display: inline-flex;
+    align-items: center;
+    font: 600 2rem/1 var(--font-display);
+    white-space: nowrap;
+}
+
+.brand__heart {
+    width: 0.53em;
+    height: 0.47em;
+    margin: 0 0.03em;
+    position: relative;
+    top: -0.03em;
+    fill: var(--brand-terra);
+}
+
+.brand__heart--on-dark {
+    fill: var(--brand-blush);
+}
+
+.brand--sm {
+    font-size: 1.375rem;
+}

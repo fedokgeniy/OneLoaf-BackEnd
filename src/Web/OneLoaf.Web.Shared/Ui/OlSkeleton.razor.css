@@ -1,0 +1,54 @@
+.ol-skeleton-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.ol-skeleton-group--card {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 18rem), 1fr));
+    gap: var(--space-4);
+}
+
+.ol-skeleton-group--stat {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+    gap: var(--space-3);
+}
+
+.ol-skeleton-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding-bottom: var(--space-4);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.ol-skeleton-card .ol-skeleton--line {
+    margin-inline: var(--space-5);
+}
+
+.ol-skeleton--line {
+    height: 1rem;
+}
+
+.ol-skeleton--short {
+    width: 60%;
+}
+
+.ol-skeleton--media {
+    aspect-ratio: 3 / 2;
+    border-radius: 0;
+}
+
+.ol-skeleton--stat {
+    height: 5.5rem;
+    border-radius: var(--radius-lg);
+}
+
+.ol-skeleton--row {
+    height: var(--target-min);
+}

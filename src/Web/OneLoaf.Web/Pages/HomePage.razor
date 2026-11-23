@@ -1,0 +1,34 @@
+@page "/"
+@attribute [Authorize]
+@inherits FluxorComponent
+@inject IState<SessionState> Session
+@inject IState<DisplayState> Display
+@inject IDispatcher Dispatcher
+
+<ShellTitle Text="Home" />
+
+<div class="ol-container home">
+    <section class="home__welcome" aria-labelledby="home-greeting">
+        <h2 id="home-greeting" class="h2 home__greeting">Hello, @(Session.Value.User?.DisplayName ?? "baker")</h2>
+        <p class="home__lead">Your active batch, starters and recent bakes will be shown here.</p>
+        <div class="home__actions">
+            <OlButton Href="recipes" Icon="IconName.Recipes">Open recipes</OlButton>
+            <OlButton Href="batches/new" Variant="ButtonVariant.Secondary" Icon="IconName.Plus">New batch</OlButton>
+        </div>
+    </section>
+
+    <section class="home__card" aria-labelledby="home-display">
+        <h2 id="home-display" class="title home__card-title">Appearance</h2>
+        <OlSegmented TValue="ThemePreference" Label="Theme" Fill="true" Options="ThemeOptions" Value="Display.Value.Preferences.Theme"
+                     ValueChanged="theme => Dispatcher.Dispatch(new SetTheme(theme))" />
+    </section>
+</div>
+
+@code {
+    private static readonly IReadOnlyList<SegmentOption<ThemePreference>> ThemeOptions =
+    [
+        new(ThemePreference.System, "System", IconName.Monitor),
+        new(ThemePreference.Light, "Light", IconName.Sun),
+        new(ThemePreference.Dark, "Dark", IconName.Moon),
+    ];
+}

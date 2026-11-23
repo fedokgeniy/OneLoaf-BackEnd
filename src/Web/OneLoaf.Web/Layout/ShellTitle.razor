@@ -1,0 +1,8 @@
+@* Page title: the browser tab ("Recipes · OneLoaf") and the top bar heading of the shell. *@
+<PageTitle>@Text · OneLoaf</PageTitle>
+<SectionContent SectionName="@PageTitleSection.Name">@Text</SectionContent>
+
+@code {
+    /// <summary>Title of the page.</summary>
+    [Parameter, EditorRequired] public string Text { get; set; } = string.Empty;
+}

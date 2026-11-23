@@ -1,0 +1,11 @@
+@* Sends an anonymous visitor of a protected route to /login?returnUrl=<current path>. *@
+@inject NavigationManager Navigation
+
+@code {
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        var current = "/" + Navigation.ToBaseRelativePath(Navigation.Uri);
+        Navigation.NavigateTo(ReturnUrl.LoginUrl(current), replace: true);
+    }
+}

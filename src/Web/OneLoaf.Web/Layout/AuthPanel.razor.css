@@ -1,0 +1,118 @@
+.auth {
+    min-height: 100dvh;
+    display: flex;
+}
+
+/* Phone: no pitch panel; brand, heading and form fill the screen. */
+.auth__pitch {
+    display: none;
+}
+
+.auth__side {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    padding: var(--space-7) var(--space-5) var(--space-6);
+}
+
+.auth__card {
+    width: 100%;
+    max-width: 26rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.auth__title {
+    margin: 0;
+}
+
+.auth__lead {
+    margin: var(--space-2) 0 0;
+    color: var(--ink-muted);
+}
+
+/* Tablet: the form in a centred card (Login-Tablet). */
+@media (min-width: 37.5em) {
+    .auth__side {
+        align-items: center;
+        padding: var(--space-7);
+    }
+
+    .auth__card {
+        max-width: 30rem;
+        padding: 2.5rem;
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-card);
+    }
+}
+
+/* Desktop: espresso pitch panel + form column (Login-Desktop). */
+@media (min-width: 64em) {
+    .auth__pitch {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: var(--space-8);
+        background: var(--brand-espresso);
+        color: var(--espresso-ink);
+    }
+
+    .auth__side {
+        flex: 0 0 35rem;
+        padding: var(--space-8);
+    }
+
+    .auth__card {
+        max-width: 26rem;
+        padding: 0;
+        background: none;
+        box-shadow: none;
+    }
+
+    .auth__brand {
+        display: none;
+    }
+}
+
+.auth__pitch-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+    max-width: 34rem;
+}
+
+.auth__headline {
+    margin: 0;
+    color: var(--espresso-ink);
+}
+
+.auth__points {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.auth__point {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--espresso-muted);
+    font-size: 1.0625rem;
+}
+
+.auth__point-icon {
+    display: flex;
+    color: var(--brand-blush);
+}
+
+.auth__footnote {
+    margin: 0;
+    color: var(--espresso-muted);
+    font-size: 0.875rem;
+}

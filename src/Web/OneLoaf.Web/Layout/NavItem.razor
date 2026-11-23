@@ -1,0 +1,37 @@
+@* One navigation link (.ol-nav__item) with aria-current="page" for the current section. *@
+@implements IDisposable
+@inject NavigationManager Navigation
+
+<a class="ol-nav__item" href="@Destination.Href" aria-current="@(IsCurrent ? "page" : null)">
+    <OlIcon Name="Destination.Icon" />
+    <span class="ol-nav__label">@Destination.Text</span>
+</a>
+
+@code {
+    /// <summary>Where the link goes.</summary>
+    [Parameter, EditorRequired] public NavDestination Destination { get; set; } = NavDestinations.Home;
+
+    private bool IsCurrent => IsCurrentPath(Navigation.ToBaseRelativePath(Navigation.Uri), Destination.Href);
+
+    /// <summary>Home matches only "/"; other items match their route and everything below it.</summary>
+    internal static bool IsCurrentPath(string relativeUri, string href)
+    {
+        var path = relativeUri.Split('?', '#')[0].TrimEnd('/');
+        if (href.Length == 0)
+        {
+            return path.Length == 0;
+        }
+
+        // "settings" must not light up for "settings/kitchen", which has its own entry where it is shown.
+        return string.Equals(path, href, StringComparison.OrdinalIgnoreCase)
+            || (path.StartsWith(href + "/", StringComparison.OrdinalIgnoreCase) && href != NavDestinations.Settings.Href);
+    }
+
+    /// <inheritdoc />
+    protected override void OnInitialized() => Navigation.LocationChanged += OnLocationChanged;
+
+    /// <inheritdoc />
+    public void Dispose() => Navigation.LocationChanged -= OnLocationChanged;
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e) => InvokeAsync(StateHasChanged);
+}

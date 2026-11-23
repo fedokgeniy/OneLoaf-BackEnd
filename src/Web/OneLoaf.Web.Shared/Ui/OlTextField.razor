@@ -1,0 +1,90 @@
+@* Text field of the design system (.ol-field). Works inside an EditForm: validation messages of the bound field
+   (client DataAnnotations or server errors via ServerValidation) appear under the input and are linked with
+   aria-describedby; aria-invalid is set while there is a message. *@
+@inherits InputBase<string?>
+@{
+    // Read on every render: InputBase re-renders when the validation state of the EditContext changes.
+    _errors = EditContext is null ? [] : EditContext.GetValidationMessages(FieldIdentifier).ToArray();
+}
+
+<div class="ol-field">
+    <label class="ol-field__label" for="@_id">@Label</label>
+    <div class="ol-field__control">
+        <input id="@_id" class="@InputCss" type="@Type" placeholder="@Placeholder" inputmode="@InputMode"
+               autocomplete="@AutoComplete" aria-invalid="@(HasErrors ? "true" : null)" aria-describedby="@DescribedBy"
+               @bind="CurrentValueAsString"
+               @attributes="AdditionalAttributes" />
+        @if (!string.IsNullOrEmpty(Suffix))
+        {
+            <span class="ol-field__suffix" aria-hidden="true">@Suffix</span>
+        }
+    </div>
+    @if (!string.IsNullOrEmpty(Help))
+    {
+        <span id="@HelpId" class="ol-field__help">@Help</span>
+    }
+    @if (HasErrors)
+    {
+        <span id="@ErrorId" class="ol-field__error">
+            <OlIcon Name="IconName.Alert" Size="IconSize.Sm" />
+            <span>@string.Join(" ", _errors)</span>
+        </span>
+    }
+</div>
+
+@code {
+    private readonly string _id = ElementIds.Next("field");
+    private string[] _errors = [];
+
+    /// <summary>Visible label (required for accessibility).</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+
+    /// <summary>Input type: text, email, password, search, tel, url.</summary>
+    [Parameter] public string Type { get; set; } = "text";
+
+    /// <summary>Help text under the field.</summary>
+    [Parameter] public string? Help { get; set; }
+
+    /// <summary>Unit shown inside the field on the right (g, %, min).</summary>
+    [Parameter] public string? Suffix { get; set; }
+
+    /// <summary>Placeholder (an example, never the label).</summary>
+    [Parameter] public string? Placeholder { get; set; }
+
+    /// <summary>Virtual keyboard hint (numeric, decimal, email).</summary>
+    [Parameter] public string? InputMode { get; set; }
+
+    /// <summary>Autocomplete token (email, current-password, new-password, name).</summary>
+    [Parameter] public string? AutoComplete { get; set; }
+
+    /// <summary>Id of the input element (for tests and error summaries).</summary>
+    public string InputId => _id;
+
+    private string HelpId => _id + "-help";
+
+    private string ErrorId => _id + "-error";
+
+    private bool HasErrors => _errors.Length > 0;
+
+    private string InputCss => string.IsNullOrEmpty(Suffix) ? "ol-input" : "ol-input ol-input--suffixed";
+
+    private string? DescribedBy
+    {
+        get
+        {
+            var ids = new List<string>(2);
+            if (!string.IsNullOrEmpty(Help)) ids.Add(HelpId);
+            if (HasErrors) ids.Add(ErrorId);
+            return ids.Count == 0 ? null : string.Join(' ', ids);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override bool TryParseValueFromString(
+        string? value, out string? result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        result = value;
+        validationErrorMessage = null;
+        return true;
+    }
+}

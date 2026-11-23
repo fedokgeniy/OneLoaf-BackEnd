@@ -30,11 +30,22 @@
     <Project Path="src/Services/Notification/OneLoaf.Notification.Application/OneLoaf.Notification.Application.csproj" />
     <Project Path="src/Services/Notification/OneLoaf.Notification.Infrastructure/OneLoaf.Notification.Infrastructure.csproj" />
   </Folder>
+  <Folder Name="/src/Web/">
+    <Project Path="src/Web/OneLoaf.Web/OneLoaf.Web.csproj" />
+    <Project Path="src/Web/OneLoaf.Web.Shared/OneLoaf.Web.Shared.csproj" />
+    <Project Path="src/Web/OneLoaf.Web.Features.Recipes/OneLoaf.Web.Features.Recipes.csproj" />
+    <Project Path="src/Web/OneLoaf.Web.Features.Production/OneLoaf.Web.Features.Production.csproj" />
+    <Project Path="src/Web/OneLoaf.Web.Features.History/OneLoaf.Web.Features.History.csproj" />
+    <Project Path="src/Web/OneLoaf.Web.Features.Assistant/OneLoaf.Web.Features.Assistant.csproj" />
+    <Project Path="src/Web/OneLoaf.Web.Features.Library/OneLoaf.Web.Features.Library.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/OneLoaf.ArchitectureTests/OneLoaf.ArchitectureTests.csproj" />
     <Project Path="tests/OneLoaf.Assistant.UnitTests/OneLoaf.Assistant.UnitTests.csproj" />
     <Project Path="tests/OneLoaf.Notification.UnitTests/OneLoaf.Notification.UnitTests.csproj" />
     <Project Path="tests/OneLoaf.CoreApi.UnitTests/OneLoaf.CoreApi.UnitTests.csproj" />
     <Project Path="tests/OneLoaf.IntegrationTests/OneLoaf.IntegrationTests.csproj" />
+    <Project Path="tests/OneLoaf.Web.UnitTests/OneLoaf.Web.UnitTests.csproj" />
+    <Project Path="tests/OneLoaf.Web.E2ETests/OneLoaf.Web.E2ETests.csproj" />
   </Folder>
 </Solution>

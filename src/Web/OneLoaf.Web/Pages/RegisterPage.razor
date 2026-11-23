@@ -1,0 +1,95 @@
+@page "/register"
+@layout AuthLayout
+@attribute [AllowAnonymous]
+@inherits FluxorComponent
+@inject IState<SessionState> Session
+@inject IDispatcher Dispatcher
+@inject NavigationManager Navigation
+
+<PageTitle>Create account · OneLoaf</PageTitle>
+
+<AuthPanel Title="Create your workspace" Lead="Recipes, prices and batches — private to you."
+           Headline="Your bakery, in one place." Points="Points" Footnote="Free for home bakers during the pilot.">
+    <EditForm Model="_form" OnValidSubmit="Submit" class="auth-form" novalidate>
+        <DataAnnotationsValidator />
+        <ServerValidation @ref="_server" />
+        <div aria-live="polite">
+            @if (_alert is { } alert)
+            {
+                <OlAlert Kind="AlertKind.Danger" CorrelationId="@alert.CorrelationId">@alert.Text</OlAlert>
+            }
+        </div>
+        <OlTextField Label="Display name" AutoComplete="nickname" Placeholder="How others see you in the library"
+                     @bind-Value="_form.DisplayName" />
+        <OlTextField Label="E-mail" Type="email" AutoComplete="email" Placeholder="you@example.com"
+                     @bind-Value="_form.Email" />
+        <OlTextField Label="Password" Type="password" AutoComplete="new-password" Help="At least 8 characters."
+                     @bind-Value="_form.Password" />
+        <OlCheckbox @bind-Value="_form.AcceptTerms">
+            I accept the terms and the privacy notice. Chat messages are sent to an AI provider to answer them.
+        </OlCheckbox>
+        <OlButton Type="submit" Large="true" Block="true" Loading="Busy">Create account</OlButton>
+        <p class="auth-form__alt">Already have an account? <OlLink Href="@LoginHref">Sign in</OlLink></p>
+    </EditForm>
+</AuthPanel>
+
+@code {
+    private static readonly IReadOnlyList<(IconName, string)> Points =
+    [
+        (IconName.Recipes, "Recipes with variants and price history"),
+        (IconName.Batches, "Planned vs actual times for every stage"),
+        (IconName.Bell, "Starter feeding reminders"),
+        (IconName.Assistant, "An AI assistant that uses your own data"),
+    ];
+
+    private readonly RegisterForm _form = new();
+    private ServerValidation? _server;
+    private (string Text, string? CorrelationId)? _alert;
+
+    /// <summary>Local path to open after the account is created and signed in.</summary>
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnTo { get; set; }
+
+    private bool Busy => Session.Value.Status == SessionStatus.Busy;
+
+    private string LoginHref => string.IsNullOrEmpty(ReturnTo) ? "login" : $"login?returnUrl={Uri.EscapeDataString(ReturnTo)}";
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<LoggedIn>(_ => Navigation.NavigateTo(ReturnUrl.Sanitize(ReturnTo)));
+        SubscribeToAction<RegisterFailed>(a => ShowError(a.Error));
+        // Registration succeeded but the automatic sign-in failed (e.g. rate limit): say so and offer the sign-in page.
+        SubscribeToAction<LoginFailed>(a => _alert = ($"Your account was created, but signing in failed: {a.Error.Message}", a.Error.CorrelationId));
+    }
+
+    private void Submit()
+    {
+        if (Busy)
+        {
+            return;
+        }
+
+        _alert = null;
+        Dispatcher.Dispatch(new Register(_form.DisplayName!, _form.Email!, _form.Password!));
+    }
+
+    private void ShowError(ApiError error)
+    {
+        switch (error.Kind)
+        {
+            case ApiErrorKind.Validation:
+                var unmatched = _server!.Display(error.FieldErrors);
+                _alert = unmatched.Count > 0 ? (string.Join(" ", unmatched), null) : null;
+                break;
+            case ApiErrorKind.Conflict:
+                _server!.DisplayFor(nameof(RegisterForm.Email), error.Message);
+                _alert = null;
+                break;
+            default:
+                _alert = (error.Message, error.CorrelationId);
+                break;
+        }
+    }
+}

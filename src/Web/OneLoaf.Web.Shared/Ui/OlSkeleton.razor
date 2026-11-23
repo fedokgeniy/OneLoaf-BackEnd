@@ -1,0 +1,33 @@
+@* Loading placeholder (.ol-skeleton). Hidden from assistive technology: the container sets aria-busy="true". *@
+<div class="ol-skeleton-group ol-skeleton-group--@Variant.ToString().ToLowerInvariant()" aria-hidden="true">
+    @for (var i = 0; i < Count; i++)
+    {
+        @switch (Variant)
+        {
+            case SkeletonVariant.Card:
+                <div class="ol-skeleton-card">
+                    <div class="ol-skeleton ol-skeleton--media"></div>
+                    <div class="ol-skeleton ol-skeleton--line"></div>
+                    <div class="ol-skeleton ol-skeleton--line ol-skeleton--short"></div>
+                </div>
+                break;
+            case SkeletonVariant.Stat:
+                <div class="ol-skeleton ol-skeleton--stat"></div>
+                break;
+            case SkeletonVariant.Row:
+                <div class="ol-skeleton ol-skeleton--row"></div>
+                break;
+            default:
+                <div class="ol-skeleton ol-skeleton--line @(i == Count - 1 && Count > 1 ? "ol-skeleton--short" : null)"></div>
+                break;
+        }
+    }
+</div>
+
+@code {
+    /// <summary>Shape of the placeholder.</summary>
+    [Parameter] public SkeletonVariant Variant { get; set; } = SkeletonVariant.Text;
+
+    /// <summary>How many placeholders.</summary>
+    [Parameter] public int Count { get; set; } = 3;
+}
