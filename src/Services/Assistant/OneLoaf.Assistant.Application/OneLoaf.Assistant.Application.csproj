@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Chat logic of the AI Assistant: conversation loop, tools, number verification, budget, pending actions.
+       Talks to Claude, the Core API, the database and Redis only through ports. -->
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\OneLoaf.Domain\OneLoaf.Domain.csproj" />
+    <ProjectReference Include="..\..\..\OneLoaf.SharedKernel\OneLoaf.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Prompts\*.md" LogicalName="Prompts.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+</Project>

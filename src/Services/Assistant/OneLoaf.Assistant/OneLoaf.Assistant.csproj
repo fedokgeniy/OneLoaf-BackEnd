@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <UserSecretsId>4c6b9e1e-2f3a-4d0b-9a8e-7a1f2b3c4d5e</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OneLoaf.Assistant.Application\OneLoaf.Assistant.Application.csproj" />
+    <ProjectReference Include="..\OneLoaf.Assistant.Infrastructure\OneLoaf.Assistant.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\OneLoaf.ServiceDefaults\OneLoaf.ServiceDefaults.csproj" />
+  </ItemGroup>
+
+</Project>

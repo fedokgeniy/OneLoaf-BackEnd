@@ -92,6 +92,15 @@ public sealed class ExceptionMapperTests
     }
 
     [Fact]
+    public void Map_TooManyRequestsException_Returns429WithRetryAfter()
+    {
+        var mapping = ExceptionMapper.Map(new TooManyRequestsException("Daily limit reached.", TimeSpan.FromHours(2)), requestAborted: false);
+
+        AssertMapping(mapping, StatusCodes.Status429TooManyRequests, ProblemTypes.TooManyRequests, LogLevel.Information);
+        Assert.Equal(TimeSpan.FromHours(2), mapping.RetryAfter);
+    }
+
+    [Fact]
     public void Map_ExternalServiceUnavailableExceptionWithoutDelay_UsesDefaultRetryAfter()
     {
         var mapping = ExceptionMapper.Map(new ExternalServiceUnavailableException(), requestAborted: false);

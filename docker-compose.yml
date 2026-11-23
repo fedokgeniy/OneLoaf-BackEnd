@@ -1,4 +1,4 @@
-# Local environment: PostgreSQL 16 with the OneLoaf roles, the migrator, RabbitMQ, Redis and the Core API.
+# Local environment: PostgreSQL 16 with the OneLoaf roles, the migrator, RabbitMQ, Redis, the Core API and the AI Assistant.
 # All passwords and keys come from .env (see .env.example); nothing secret is stored in this file.
 #
 #   cp .env.example .env              # fill in the passwords and the JWT keys
@@ -99,6 +99,35 @@ services:
         condition: service_healthy
       migrator:
         condition: service_completed_successfully
+
+  assistant:
+    build:
+      context: .
+      dockerfile: src/Services/Assistant/OneLoaf.Assistant/Dockerfile
+    image: oneloaf-assistant:local
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__OneLoaf: "Host=db;Port=5432;Database=${ONELOAF_DB:-oneloaf};Username=oneloaf_app;Password=${ONELOAF_APP_PASSWORD}"
+      Jwt__Issuer: ${Jwt__Issuer}
+      Jwt__Audience: ${Jwt__Audience}
+      Jwt__PublicKeyPem: ${Jwt__PublicKeyPem}
+      Serilog__MinimumLevel__Default: ${Serilog__MinimumLevel__Default:-Information}
+      Redis__ConnectionString: "redis:6379,password=${REDIS_PASSWORD}"
+      Anthropic__ApiKey: ${Anthropic__ApiKey:-}
+      Anthropic__Model: ${Anthropic__Model:-claude-haiku-4-5}
+      Anthropic__MaxTokens: ${Anthropic__MaxTokens:-1024}
+      Anthropic__TimeoutSeconds: ${Anthropic__TimeoutSeconds:-30}
+      Assistant__CoreApiBaseUrl: http://core-api:8080
+      Assistant__DailyRequestLimit: ${Assistant__DailyRequestLimit:-50}
+      Assistant__DailyTokenLimit: ${Assistant__DailyTokenLimit:-200000}
+      Assistant__MonthlyBudgetUsd: ${Assistant__MonthlyBudgetUsd:-4.5}
+    ports:
+      - "${ASSISTANT_PORT:-5081}:8080"
+    depends_on:
+      redis:
+        condition: service_healthy
+      core-api:
+        condition: service_started
 
 volumes:
   pgdata:

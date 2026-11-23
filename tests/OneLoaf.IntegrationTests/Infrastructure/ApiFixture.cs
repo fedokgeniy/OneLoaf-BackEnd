@@ -10,6 +10,8 @@ using OneLoaf.Infrastructure.Persistence;
 using DotNet.Testcontainers.Builders;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
+using Testcontainers.Redis;
+using OneLoaf.Assistant.Application.Claude;
 using RabbitMQ.Client;
 
 namespace OneLoaf.IntegrationTests.Infrastructure;
@@ -35,6 +37,8 @@ public sealed class ApiFixture : IAsyncLifetime
     private readonly RSA _rsa = RSA.Create(2048);
     private readonly string _root;
     private readonly PostgreSqlContainer _postgres;
+    private readonly RedisContainer _redis = new RedisBuilder("redis:8-alpine").Build();
+    private readonly List<IAsyncDisposable> _assistants = [];
     private readonly RabbitMqContainer _rabbitMq = new RabbitMqBuilder("rabbitmq:4-management-alpine")
         .WithUsername(RabbitUser).WithPassword(RabbitPassword).Build();
     private readonly List<CoreApiFactory> _factories = [];
@@ -64,7 +68,7 @@ public sealed class ApiFixture : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        await Task.WhenAll(_postgres.StartAsync(), _rabbitMq.StartAsync());
+        await Task.WhenAll(_postgres.StartAsync(), _rabbitMq.StartAsync(), _redis.StartAsync());
 
         var options = new DbContextOptionsBuilder<OneLoafDbContext>()
             .UseNpgsql(ConnectionString("app_admin", AdminPassword),
@@ -141,8 +145,32 @@ public sealed class ApiFixture : IAsyncLifetime
 
         await _postgres.DisposeAsync();
         await _rabbitMq.DisposeAsync();
+        foreach (var assistant in _assistants)
+        {
+            await assistant.DisposeAsync();
+        }
+
+        await _redis.DisposeAsync();
         _issuer?.Dispose();
         _rsa.Dispose();
+    }
+
+    /// <summary>The AI Assistant in-process, with a scripted Claude and the in-process Core API behind it.</summary>
+    public AssistantFactory CreateAssistant(IClaudeClient claude)
+    {
+        var factory = new AssistantFactory(new Dictionary<string, string?>(StringComparer.Ordinal)
+        {
+            ["ConnectionStrings:OneLoaf"] = AppConnectionString,
+            ["Jwt:Issuer"] = Issuer,
+            ["Jwt:Audience"] = Audience,
+            ["Jwt:PublicKeyPem"] = _rsa.ExportSubjectPublicKeyInfoPem(),
+            ["Redis:ConnectionString"] = _redis.GetConnectionString(),
+            ["Anthropic:ApiKey"] = "not-used-by-the-scripted-client",
+            ["Assistant:CoreApiBaseUrl"] = "http://core-api.test",
+            ["Serilog:MinimumLevel:Default"] = "Warning",
+        }, claude, Api.Server.CreateHandler);
+        _assistants.Add(factory);
+        return factory;
     }
 
     /// <summary>Opens a broker connection to observe published events.</summary>

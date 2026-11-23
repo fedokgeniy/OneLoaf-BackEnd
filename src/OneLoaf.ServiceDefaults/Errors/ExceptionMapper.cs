@@ -24,6 +24,7 @@ public static class ExceptionMapper
     internal const string ConflictTitle = "The request conflicts with existing data.";
     internal const string StateConflictTitle = "The action is not allowed in the current state.";
     internal const string BusinessRuleTitle = "The request violates a business rule.";
+    internal const string TooManyRequestsTitle = "Too many requests.";
     internal const string UnavailableTitle = "A required service is temporarily unavailable.";
     internal const string InternalTitle = "An unexpected error occurred.";
     internal const string CancelledTitle = "The request was cancelled.";
@@ -52,6 +53,8 @@ public static class ExceptionMapper
             BusinessRuleException e => ClientError(StatusCodes.Status422UnprocessableEntity, ProblemTypes.BusinessRule,
                 BusinessRuleTitle, e),
             ForbiddenException e => ClientError(StatusCodes.Status403Forbidden, ProblemTypes.Forbidden, ForbiddenTitle, e),
+            TooManyRequestsException e => new ProblemMapping(StatusCodes.Status429TooManyRequests,
+                ProblemTypes.TooManyRequests, TooManyRequestsTitle, e.Message, LogLevel.Information, RetryAfter: e.RetryAfter),
             ExternalServiceUnavailableException e => new ProblemMapping(StatusCodes.Status503ServiceUnavailable,
                 ProblemTypes.ServiceUnavailable, UnavailableTitle, e.Message, LogLevel.Warning, RetryAfter: e.RetryAfter),
             _ when FindPostgresException(exception) is { } postgres => MapPostgres(postgres),

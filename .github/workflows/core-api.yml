@@ -13,6 +13,8 @@ on:
       - "dotnet-tools.json"
       - "coverlet.runsettings"
       - ".github/workflows/core-api.yml"
+      - "!src/Services/Assistant/**"
+      - "!tests/OneLoaf.Assistant.UnitTests/**"
   pull_request:
     paths:
       - "src/**"
@@ -24,6 +26,8 @@ on:
       - "dotnet-tools.json"
       - "coverlet.runsettings"
       - ".github/workflows/core-api.yml"
+      - "!src/Services/Assistant/**"
+      - "!tests/OneLoaf.Assistant.UnitTests/**"
   workflow_dispatch:
 
 permissions:
