@@ -33,7 +33,7 @@ jobs:
           node-version: 22
 
       - name: Spectral (OpenAPI rules and house conventions)
-        run: npx --yes @stoplight/spectral-cli@6.15.0 lint "docs/api/reference/*.openapi.json" --fail-severity=warn --format github-actions --format stylish
+        run: npx --yes @stoplight/spectral-cli@6.15.0 lint "docs/api/reference/*.openapi.json" --fail-severity=warn
 
       - name: Relative links in the documentation
         uses: lycheeverse/lychee-action@v2
