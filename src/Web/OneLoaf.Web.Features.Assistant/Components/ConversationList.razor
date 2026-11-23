@@ -1,0 +1,44 @@
+@* Conversations of the user, newest first, with the open one marked; delete raises OnDelete. *@
+@using OneLoaf.Web.Shared.Contracts.Assistant
+@using OneLoaf.Web.Shared.State
+
+@switch (Conversations)
+{
+    case Loadable<IReadOnlyList<ConversationDto>>.Failed { Error: var error }:
+        <OlAlert Kind="AlertKind.Danger" CorrelationId="@error.CorrelationId">@error.Message</OlAlert>
+        break;
+    case { Value: null }:
+        <OlSkeleton Variant="SkeletonVariant.Row" Count="3" />
+        break;
+    case { Value: { Count: 0 } }:
+        <p class="convs__empty">No conversations yet. Ask something to start one.</p>
+        break;
+    case { Value: { } conversations }:
+        <ul class="convs">
+            @foreach (var conversation in conversations)
+            {
+                var title = string.IsNullOrWhiteSpace(conversation.Title) ? "New conversation" : conversation.Title;
+                <li @key="conversation.Id" class="convs__item @(conversation.Id == CurrentId ? "is-current" : null)">
+                    <a href="@($"assistant/{conversation.Id}")" aria-current="@(conversation.Id == CurrentId ? "page" : null)">
+                        <span class="convs__title">@title</span>
+                        <span class="convs__date">@DisplayFormatDate(conversation.UpdatedAt)</span>
+                    </a>
+                    <OlIconButton Icon="IconName.Trash" Label="@($"Delete conversation {title}")" OnClick="() => OnDelete.InvokeAsync(conversation.Id)" />
+                </li>
+            }
+        </ul>
+        break;
+}
+
+@code {
+    /// <summary>Conversations.</summary>
+    [Parameter, EditorRequired] public Loadable<IReadOnlyList<ConversationDto>> Conversations { get; set; } = default!;
+
+    /// <summary>Open conversation.</summary>
+    [Parameter] public Guid? CurrentId { get; set; }
+
+    /// <summary>Delete pressed.</summary>
+    [Parameter] public EventCallback<Guid> OnDelete { get; set; }
+
+    private static string DisplayFormatDate(DateTimeOffset value) => Shared.Formatting.DisplayFormat.Date(value);
+}

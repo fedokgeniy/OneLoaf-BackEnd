@@ -1,0 +1,113 @@
+@page "/assistant"
+@page "/assistant/{ConversationId:guid}"
+@inherits FluxorComponent
+@using System.Collections.Immutable
+@using OneLoaf.Web.Features.Assistant.Components
+@using OneLoaf.Web.Features.Assistant.State
+@using OneLoaf.Web.Shared.Contracts.Assistant
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+
+<ShellTitle Text="Assistant">
+    <Actions>
+        <OlButton Variant="ButtonVariant.Ghost" class="assistant__convs-button" OnClick="() => _listOpen = true">Conversations</OlButton>
+        <OlButton Href="assistant" Icon="IconName.Plus" Variant="ButtonVariant.Secondary">New chat</OlButton>
+    </Actions>
+</ShellTitle>
+
+<div class="ol-container assistant">
+    <aside class="assistant__aside" aria-labelledby="convs-title">
+        <h2 class="h3" id="convs-title">Conversations</h2>
+        <ConversationList Conversations="State.Value.Conversations" CurrentId="ConversationId" OnDelete="Delete" />
+    </aside>
+
+    <section class="assistant__main" aria-label="Chat">
+        @switch (State.Value.Messages)
+        {
+            case Loadable<ImmutableList<ChatEntry>>.Failed { Error: var error }:
+                <OlAlert Kind="AlertKind.Danger" Title="The conversation could not be loaded." CorrelationId="@error.CorrelationId">
+                    <p>@error.Message</p>
+                    <OlButton Href="assistant" Variant="ButtonVariant.Secondary">Start a new chat</OlButton>
+                </OlAlert>
+                break;
+            case { Value: null }:
+                <div class="ol-chat" aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Row" Count="3" /></div>
+                break;
+            case { Value: { } entries }:
+                <div class="ol-chat" role="log" aria-live="polite" aria-relevant="additions">
+                    <div class="ol-msg ol-msg--assistant">
+                        <span class="ol-msg__meta"><OlIcon Name="IconName.Assistant" /> OneLoaf assistant · AI</span>
+                        <span>Hi! I’m an AI assistant. I can plan a batch, calculate cost and help analyse a bake.</span>
+                    </div>
+                    @foreach (var entry in entries)
+                    {
+                        <div @key="entry.Message.Id" class="ol-msg @(entry.Message.Role == "user" ? "ol-msg--user" : "ol-msg--assistant")">
+                            @if (entry.Message.Role != "user")
+                            {
+                                <span class="ol-msg__meta"><OlIcon Name="IconName.Assistant" /> OneLoaf assistant · AI</span>
+                            }
+                            else
+                            {
+                                <span class="ol-visually-hidden">You:</span>
+                            }
+                            <span class="assistant__text">@entry.Message.Content</span>
+                            @if (entry.UnverifiedNumbers is { Count: > 0 } unverified)
+                            {
+                                <OlAlert Kind="AlertKind.Warning" Title="Some numbers could not be checked">
+                                    <p>@string.Join(", ", unverified) did not come from the calculator. Check them on the recipe page before you rely on them.</p>
+                                </OlAlert>
+                            }
+                            @if (entry.Proposal is { } proposal)
+                            {
+                                <PlanCard Proposal="proposal" Status="entry.Status" BatchId="entry.BatchId" Busy="State.Value.ActingOn == proposal.ActionId"
+                                          OnConfirm="() => Dispatcher.Dispatch(new ConfirmProposal(proposal.ActionId))"
+                                          OnDecline="() => Dispatcher.Dispatch(new DeclineProposal(proposal.ActionId))" />
+                            }
+                            @if (!string.IsNullOrWhiteSpace(entry.Disclaimer))
+                            {
+                                <span class="ol-msg__disclaimer">@entry.Disclaimer</span>
+                            }
+                        </div>
+                    }
+                    @if (State.Value.Sending is { } sending)
+                    {
+                        <div class="ol-msg ol-msg--user"><span class="ol-visually-hidden">You:</span><span class="assistant__text">@sending</span></div>
+                        <div class="ol-msg ol-msg--assistant" aria-label="The assistant is typing">
+                            <span class="ol-typing" aria-hidden="true"><span></span><span></span><span></span></span>
+                        </div>
+                    }
+                    @if (State.Value.SendError is { } sendError)
+                    {
+                        <OlAlert Kind="AlertKind.Danger" CorrelationId="@sendError.CorrelationId" Title="@SendErrorTitle(sendError)">
+                            <p>@sendError.Message</p>
+                            @if (sendError.Kind is Shared.Api.ApiErrorKind.Unavailable or Shared.Api.ApiErrorKind.RateLimited)
+                            {
+                                <OlButton Href="batches/new" Variant="ButtonVariant.Secondary">Use the manual form</OlButton>
+                            }
+                        </OlAlert>
+                    }
+                    <div @ref="_end" class="assistant__end"></div>
+                </div>
+                break;
+        }
+
+        <form class="ol-composer" @onsubmit="Send" @onsubmit:preventDefault>
+            <label class="ol-visually-hidden" for="composer">Message</label>
+            <textarea id="composer" class="ol-textarea" rows="1" placeholder="Message" maxlength="@MaxLength"
+                      @bind="_draft" @bind:event="oninput" @onkeydown="OnKeyDown" aria-describedby="composer-help"></textarea>
+            <OlIconButton Type="submit" Icon="IconName.ChevronRight" Label="Send message" Variant="ButtonVariant.Primary"
+                          Disabled="@(State.Value.Sending is not null || string.IsNullOrWhiteSpace(_draft))" />
+        </form>
+        <p class="assistant__help" id="composer-help">
+            Ctrl + Enter sends. The assistant only saves a batch after you confirm it.
+            @if (State.Value.Usage.Value is { } usage)
+            {
+                <span>Today: @usage.Requests of @usage.RequestLimit requests.</span>
+            }
+        </p>
+    </section>
+</div>
+
+<OlDialog Open="_listOpen" Title="Conversations" OnClose="() => _listOpen = false">
+    <ChildContent><ConversationList Conversations="State.Value.Conversations" CurrentId="ConversationId" OnDelete="Delete" /></ChildContent>
+</OlDialog>

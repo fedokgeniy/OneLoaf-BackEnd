@@ -1,0 +1,68 @@
+.assistant {
+    display: grid;
+    gap: var(--space-5);
+    padding-top: var(--space-4);
+}
+
+.assistant__aside {
+    display: none;
+}
+
+.assistant__aside h2 {
+    margin: 0 0 var(--space-3);
+}
+
+.assistant__main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: calc(100dvh - 12rem);
+}
+
+.assistant__main .ol-chat {
+    flex: 1 1 auto;
+    width: 100%;
+}
+
+.assistant__text {
+    white-space: pre-line;
+}
+
+.assistant__end {
+    height: 1px;
+}
+
+.assistant__main .ol-composer {
+    width: 100%;
+    max-width: var(--reading-max);
+    margin-inline: auto;
+}
+
+.assistant__main .ol-composer textarea {
+    flex: 1 1 auto;
+}
+
+.assistant__help {
+    width: 100%;
+    max-width: var(--reading-max);
+    margin: 0 auto var(--space-4);
+    font-size: 0.8125rem;
+    color: var(--ink-muted);
+}
+
+@media (min-width: 64em) {
+    .assistant {
+        grid-template-columns: 16rem minmax(0, 1fr);
+        align-items: start;
+    }
+
+    .assistant__aside {
+        display: block;
+        position: sticky;
+        top: var(--space-4);
+    }
+
+    ::deep .assistant__convs-button {
+        display: none;
+    }
+}

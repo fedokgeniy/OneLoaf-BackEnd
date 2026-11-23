@@ -1,0 +1,46 @@
+.plan-card__note,
+.plan-card__result {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+.plan-card__note {
+    color: var(--ink-muted);
+}
+
+.plan-card__result {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 600;
+}
+
+.plan-card__stages summary {
+    min-height: var(--target-min);
+    display: flex;
+    align-items: center;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.plan-card__stages summary:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.plan-card__stages ol {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+}
+
+.plan-card__stages li {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
