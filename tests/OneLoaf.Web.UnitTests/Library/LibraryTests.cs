@@ -85,14 +85,71 @@ public sealed class LibraryTests : BunitContext
         cut.WaitForAssertion(() => Assert.Equal(LibraryCodes.Reject, _api.Resolved?.Action));
     }
 
+    [Fact]
+    public void LibraryPage_Search_SendsTheTermAndShowsMore()
+    {
+        var cut = Render<LibraryPage>();
+        cut.WaitForAssertion(() => Assert.Contains("Country sourdough", cut.Find(".ol-card").TextContent));
+
+        cut.Find("#library-search").Change("rye");
+        cut.Find("form.library__search").Submit();
+        cut.WaitForAssertion(() => Assert.Equal("rye", _api.LastSearch));
+
+        cut.FindAll("button").Single(b => b.TextContent.Contains("Show more recipes", StringComparison.Ordinal)).Click();
+        cut.WaitForAssertion(() => Assert.Equal(2, _api.LastPage));
+        cut.WaitForAssertion(() => Assert.Equal(2, cut.FindAll(".ol-card").Count));
+    }
+
+    [Fact]
+    public void Publish_Confirmed_OpensThePublication()
+    {
+        _auth.SetAuthorized("Boris");
+        var cut = Render<PublishPage>(p => p.Add(x => x.RecipeId, Guid.NewGuid()));
+        cut.WaitForAssertion(() => Assert.Contains("will be visible to everyone", cut.Markup, StringComparison.Ordinal));
+
+        cut.FindAll("button").Single(b => b.TextContent.Trim() == "Publish").Click();
+
+        cut.WaitForAssertion(() => Assert.EndsWith($"/library/{PublicationId}", Services.GetRequiredService<NavigationManager>().Uri, StringComparison.Ordinal));
+    }
+
+    [Fact]
+    public void CommentAndReport_SignedIn_PostsCommentAndSendsTheReason()
+    {
+        _auth.SetAuthorized("Boris");
+        var cut = Render<LibraryDetailPage>(p => p.Add(x => x.Id, PublicationId));
+        cut.WaitForAssertion(() => cut.Find("#comment-body"));
+
+        cut.Find("form.publication__comment-form").Submit();
+        Assert.Contains("Write a comment first.", cut.Markup, StringComparison.Ordinal);
+        cut.Find("#comment-body").Input("Lovely crumb");
+        cut.Find("form.publication__comment-form").Submit();
+        cut.WaitForAssertion(() => Assert.Contains("Lovely crumb", cut.Find(".publication__comment-list").TextContent, StringComparison.Ordinal));
+
+        cut.FindAll("button").First(b => b.TextContent.Trim() == "Report").Click();
+        cut.Find("#report-reason").Input("Wrong amounts");
+        cut.Find("form#report-form").Submit();
+        cut.WaitForAssertion(() => Assert.Equal("Wrong amounts", _api.Reported?.Reason));
+    }
+
     private sealed class Api : ILibraryApi
     {
         public string? Reaction { get; private set; }
 
+        public string? LastSearch { get; private set; }
+
+        public int LastPage { get; private set; }
+
+        public ReportRequest? Reported { get; private set; }
+
         public ResolveReportRequest? Resolved { get; private set; }
 
-        public Task<ApiResult<PagedResult<LibraryItemDto>>> SearchAsync(string? search, int page, CancellationToken ct = default) =>
-            Ok(new PagedResult<LibraryItemDto>([], 1, 20, 0));
+        public Task<ApiResult<PagedResult<LibraryItemDto>>> SearchAsync(string? search, int page, CancellationToken ct = default)
+        {
+            LastSearch = search;
+            LastPage = page;
+            return Ok(new PagedResult<LibraryItemDto>(
+                [new LibraryItemDto(Guid.NewGuid(), "Country sourdough", null, "Docs Baker", DateTimeOffset.UnixEpoch, 1, 4, 5, 0, 0)], page, 1, 21));
+        }
 
         public Task<ApiResult<PublishedRecipeDto>> GetAsync(Guid id, CancellationToken ct = default) => Ok(new PublishedRecipeDto(
             id, "Country sourdough", "Open crumb.", "Docs Baker", "published", DateTimeOffset.UnixEpoch,
@@ -117,8 +174,11 @@ public sealed class LibraryTests : BunitContext
         public Task<ApiResult<RecipeDto>> CopyAsync(Guid id, CancellationToken ct = default) =>
             Task.FromResult<ApiResult<RecipeDto>>(new ApiResult<RecipeDto>.Success(Recipe(CopyId)));
 
-        public Task<ApiResult<ReportCreatedResponse>> ReportAsync(Guid id, ReportRequest request, CancellationToken ct = default) =>
-            Ok(new ReportCreatedResponse(Guid.NewGuid()));
+        public Task<ApiResult<ReportCreatedResponse>> ReportAsync(Guid id, ReportRequest request, CancellationToken ct = default)
+        {
+            Reported = request;
+            return Ok(new ReportCreatedResponse(Guid.NewGuid()));
+        }
 
         public Task<ApiResult> UnpublishAsync(Guid id, CancellationToken ct = default) => Task.FromResult(ApiResult.Ok);
 
