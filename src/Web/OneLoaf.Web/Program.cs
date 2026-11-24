@@ -27,6 +27,7 @@ services.AddAuthorizationCore();
 services.AddScoped<JwtAuthenticationStateProvider>();
 services.AddScoped<AuthenticationStateProvider>(sp => sp.GetRequiredService<JwtAuthenticationStateProvider>());
 services.AddScoped<SessionMonitor>();
+services.AddScoped<SessionRefresher>();
 services.AddScoped<DeviceContext>();
 services.AddScoped<AccountApi>();
 services.AddScoped<ISettingsService, SettingsService>();
@@ -47,5 +48,12 @@ services.AddScoped(typeof(IState<>), typeof(LazyState<>));
 var host = builder.Build();
 
 // Restore the token of this tab before the first render, so AuthorizeRouteView sees the session at once.
-await host.Services.GetRequiredService<TokenStore>().InitializeAsync();
+var tokenStore = host.Services.GetRequiredService<TokenStore>();
+await tokenStore.InitializeAsync();
+if (tokenStore.ValidToken is null)
+{
+    // No access token in this tab (new tab, browser restart, token ended): the refresh cookie continues the sign-in.
+    await host.Services.GetRequiredService<SessionRefresher>().TryRefreshAsync();
+}
+
 await host.RunAsync();

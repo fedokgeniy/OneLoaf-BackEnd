@@ -1,0 +1,36 @@
+[
+  {
+    "case": "typical",
+    "method": "PUT",
+    "path": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo",
+    "authenticated": true,
+    "requestBody": {
+      "multipart/form-data": {
+        "file": "<pack.png, image/png, 29 bytes>"
+      }
+    },
+    "status": 204
+  },
+  {
+    "case": "not an image",
+    "method": "PUT",
+    "path": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo",
+    "authenticated": true,
+    "requestBody": {
+      "multipart/form-data": {
+        "file": "<notes.png, image/png, 10 bytes>"
+      }
+    },
+    "status": 422,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/business-rule",
+      "title": "The request violates a business rule.",
+      "status": 422,
+      "detail": "Only JPEG, PNG and WebP images are accepted.",
+      "instance": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo",
+      "traceId": "00-bdb0e7d923a8ba4515f4f3317e0bcda2-143db7d8f257fe8c-02",
+      "correlationId": "d02bf45297d14403a45ed751708ba50c"
+    }
+  }
+]

@@ -9,7 +9,8 @@ public sealed class OpenApiTests(ApiFixture fixture)
     [Theory]
     [InlineData("/api/v1/auth/register", "post", false)]
     [InlineData("/api/v1/auth/login", "post", false)]
-    [InlineData("/api/v1/auth/logout", "post", true)]
+    [InlineData("/api/v1/auth/refresh", "post", false)]
+    [InlineData("/api/v1/auth/logout", "post", false)]
     [InlineData("/api/v1/me", "get", true)]
     [InlineData("/api/v1/me", "delete", true)]
     public async Task Document_DescribesEndpointWithSummaryAndSecurity(string path, string method, bool requiresToken)

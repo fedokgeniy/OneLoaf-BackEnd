@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "PATCH",
-    "path": "/api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/2171377b-ad39-48da-b6a4-6c1e07b034dc",
+    "path": "/api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/4b24deea-da55-4dfc-83f5-edbe74525dbe",
     "authenticated": true,
     "requestBody": {
       "plannedMinMinutes": 270,
@@ -11,7 +11,7 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
+      "id": "93c147b8-4027-4364-bee1-2036985ab218",
       "name": "Weekday bake",
       "status": "planned",
       "source": "manual",
@@ -26,18 +26,18 @@
       "notes": null,
       "items": [
         {
-          "id": "16591114-3cdd-4b5f-aef8-395e09355c9b",
-          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+          "id": "3078b4d7-fc09-4a34-a1aa-14a028b8d95c",
+          "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+          "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
           "starterReminderMinutes": 60,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "711e6906-d70f-4fad-8fe1-b2ac8d54495c",
+              "id": "1869d3f1-1e2b-4705-99d8-44ad4fe74dd2",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
@@ -55,7 +55,7 @@
               "note": null
             },
             {
-              "id": "2171377b-ad39-48da-b6a4-6c1e07b034dc",
+              "id": "4b24deea-da55-4dfc-83f5-edbe74525dbe",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
@@ -73,7 +73,7 @@
               "note": null
             },
             {
-              "id": "dc7024da-5718-4b41-8d41-795ae3b8663f",
+              "id": "c9e10be6-719d-49a4-ab7b-8bc4c364ee57",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
@@ -91,7 +91,7 @@
               "note": null
             },
             {
-              "id": "bdd5da77-94d6-4104-a1b1-dff01c2e4b1f",
+              "id": "7b6680f3-589a-42a6-ad47-5bb627ac6e9c",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
@@ -109,7 +109,7 @@
               "note": null
             },
             {
-              "id": "616efe87-9f1f-408d-ac7a-0dad9259e56b",
+              "id": "0e2d537d-44a5-46a4-944d-eaa393775177",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",
@@ -137,7 +137,7 @@
   {
     "case": "minimum longer than maximum",
     "method": "PATCH",
-    "path": "/api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/2171377b-ad39-48da-b6a4-6c1e07b034dc",
+    "path": "/api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/4b24deea-da55-4dfc-83f5-edbe74525dbe",
     "authenticated": true,
     "requestBody": {
       "plannedMinMinutes": 400,
@@ -149,14 +149,14 @@
       "type": "https://oneloaf.app/problems/validation",
       "title": "One or more validation errors occurred.",
       "status": 400,
-      "instance": "/api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/2171377b-ad39-48da-b6a4-6c1e07b034dc",
+      "instance": "/api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/4b24deea-da55-4dfc-83f5-edbe74525dbe",
       "errors": {
         "plannedMaxMinutes": [
           "'Planned Max Minutes' должно быть больше или равно '400'."
         ]
       },
-      "traceId": "00-be09a8b71badb8095bb56a938f8b5852-e55d72f70c8138fa-02",
-      "correlationId": "5e9a03a1fcd84b2e96253e446249de2d"
+      "traceId": "00-f5b50ef917db2e6756aca98e4f0a3ae6-446317626114b22b-02",
+      "correlationId": "8a62b103128a41d5b6ab57400c0953a9"
     }
   }
 ]

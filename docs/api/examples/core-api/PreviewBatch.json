@@ -10,9 +10,9 @@
       "source": "manual",
       "items": [
         {
-          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+          "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
           "loaves": 3,
-          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+          "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
           "starterReminderMinutes": 60
         }
       ]
@@ -36,10 +36,10 @@
       "items": [
         {
           "id": "00000000-0000-0000-0000-000000000000",
-          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+          "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+          "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
           "starterReminderMinutes": 60,

@@ -1,0 +1,14 @@
+[
+  {
+    "case": "typical",
+    "method": "PUT",
+    "path": "/api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/photo",
+    "authenticated": true,
+    "requestBody": {
+      "multipart/form-data": {
+        "file": "<loaf.png, image/png, 29 bytes>"
+      }
+    },
+    "status": 204
+  }
+]

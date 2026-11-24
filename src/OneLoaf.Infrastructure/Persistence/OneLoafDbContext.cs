@@ -18,6 +18,7 @@ public class OneLoafDbContext : DbContext
     public DbSet<User> Users => Set<User>();
     public DbSet<KitchenSettings> KitchenSettings => Set<KitchenSettings>();
     public DbSet<PushSubscription> PushSubscriptions => Set<PushSubscription>();
+    public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
 
     // E3 Catalog and prices
     public DbSet<Flour> Flours => Set<Flour>();

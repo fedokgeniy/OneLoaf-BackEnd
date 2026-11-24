@@ -1,0 +1,9 @@
+[
+  {
+    "case": "typical",
+    "method": "DELETE",
+    "path": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo",
+    "authenticated": true,
+    "status": 204
+  }
+]

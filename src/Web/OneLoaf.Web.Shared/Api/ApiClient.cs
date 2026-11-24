@@ -15,6 +15,9 @@ public sealed partial class ApiClient(HttpClient http, ApiJsonOptions json, ILog
     public Task<ApiResult<T>> GetAsync<T>(string path, CancellationToken ct = default) =>
         SendAsync<T>(new HttpRequestMessage(HttpMethod.Get, path), ct);
 
+    // The option the browser HTTP handler of Blazor WebAssembly reads for fetch() settings.
+    private static readonly HttpRequestOptionsKey<IDictionary<string, object>> FetchOptions = new("WebAssemblyFetchOptions");
+
     /// <summary>POST with a body, returning a body.</summary>
     public Task<ApiResult<T>> PostAsync<TBody, T>(string path, TBody body, CancellationToken ct = default) =>
         SendAsync<T>(WithBody(HttpMethod.Post, path, body), ct);
@@ -38,6 +41,21 @@ public sealed partial class ApiClient(HttpClient http, ApiJsonOptions json, ILog
 
     public Task<ApiResult<T>> PostEmptyAsync<T>(string path, CancellationToken ct = default) =>
         SendAsync<T>(new HttpRequestMessage(HttpMethod.Post, path), ct);
+
+    /// <summary>
+    /// POST with a body, returning a body, with the browser's cookies for the API origin (sign-in: the API sets the
+    /// refresh token cookie).
+    /// </summary>
+    public Task<ApiResult<T>> PostWithCookiesAsync<TBody, T>(string path, TBody body, CancellationToken ct = default) =>
+        SendAsync<T>(WithCookies(WithBody(HttpMethod.Post, path, body)), ct);
+
+    /// <summary>POST without a body, returning a body, with the browser's cookies (session refresh).</summary>
+    public Task<ApiResult<T>> PostEmptyWithCookiesAsync<T>(string path, CancellationToken ct = default) =>
+        SendAsync<T>(WithCookies(new HttpRequestMessage(HttpMethod.Post, path)), ct);
+
+    /// <summary>POST without a body and without a response body, with the browser's cookies (sign-out).</summary>
+    public Task<ApiResult> PostWithCookiesAsync(string path, CancellationToken ct = default) =>
+        SendAsync(WithCookies(new HttpRequestMessage(HttpMethod.Post, path)), ct);
 
     /// <summary>PATCH with a body, returning a body.</summary>
     public Task<ApiResult<T>> PatchAsync<TBody, T>(string path, TBody body, CancellationToken ct = default) =>
@@ -94,6 +112,16 @@ public sealed partial class ApiClient(HttpClient http, ApiJsonOptions json, ILog
     /// <summary>DELETE with a JSON body (e.g. the password of <c>DELETE /me</c>).</summary>
     public Task<ApiResult> DeleteAsync<TBody>(string path, TBody body, CancellationToken ct = default) =>
         SendAsync(WithBody(HttpMethod.Delete, path, body), ct);
+
+    /// <summary>
+    /// Asks the browser to send and store cookies for this request (fetch <c>credentials: "include"</c>). Only the auth
+    /// endpoints need it: every other request is authorized by the bearer token alone.
+    /// </summary>
+    private static HttpRequestMessage WithCookies(HttpRequestMessage request)
+    {
+        request.Options.Set(FetchOptions, new Dictionary<string, object>(StringComparer.Ordinal) { ["credentials"] = "include" });
+        return request;
+    }
 
     private HttpRequestMessage WithBody<TBody>(HttpMethod method, string path, TBody body) =>
         new(method, path) { Content = JsonContent.Create(body, json.TypeInfo<TBody>()) };

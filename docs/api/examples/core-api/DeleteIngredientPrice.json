@@ -2,14 +2,14 @@
   {
     "case": "typical",
     "method": "DELETE",
-    "path": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/42df6159-205c-414f-a749-53275f1f4a1d",
+    "path": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/prices/27603253-6e13-412d-b951-955066d627f1",
     "authenticated": true,
     "status": 204
   },
   {
     "case": "already deleted",
     "method": "DELETE",
-    "path": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/42df6159-205c-414f-a749-53275f1f4a1d",
+    "path": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/prices/27603253-6e13-412d-b951-955066d627f1",
     "authenticated": true,
     "status": 404,
     "responseContentType": "application/problem+json",
@@ -18,9 +18,9 @@
       "title": "The requested resource was not found.",
       "status": 404,
       "detail": "The price was not found.",
-      "instance": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/42df6159-205c-414f-a749-53275f1f4a1d",
-      "traceId": "00-36290b7728f2b985326f28bffa85ccb7-adace2f302df2f5f-02",
-      "correlationId": "d6232c1ab9724877b9d3dacf2c36385e"
+      "instance": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/prices/27603253-6e13-412d-b951-955066d627f1",
+      "traceId": "00-26ac0a6b7b0b5c08360fb3ab247f8a68-e098be23fcba29f7-02",
+      "correlationId": "8455089d550f468085e582e7e574270b"
     }
   }
 ]

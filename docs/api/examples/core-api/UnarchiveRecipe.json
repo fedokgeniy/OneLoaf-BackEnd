@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/recipes/bb13b709-05f6-4b83-b335-b6f8d66fb34a/unarchive",
+    "path": "/api/v1/recipes/9152d05e-0b3d-4881-9365-862cbb121938/unarchive",
     "authenticated": true,
     "status": 204
   }

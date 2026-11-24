@@ -47,3 +47,23 @@ public class PushSubscription
 
     public User User { get; set; } = null!;
 }
+
+/// <summary>
+/// E1, US-02. A refresh token of a signed-in browser. Only the hash of the value is stored. Tokens of one sign-in form
+/// a family: each exchange marks the token as rotated and adds the next one; an exchanged token that is used again
+/// revokes the whole family.
+/// </summary>
+public class RefreshToken
+{
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
+    public Guid FamilyId { get; set; }
+    /// <summary>SHA-256 of the token value, hex.</summary>
+    public string TokenHash { get; set; } = string.Empty;
+    public DateTime ExpiresAt { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime? RotatedAt { get; set; }
+    public DateTime? RevokedAt { get; set; }
+
+    public User User { get; set; } = null!;
+}

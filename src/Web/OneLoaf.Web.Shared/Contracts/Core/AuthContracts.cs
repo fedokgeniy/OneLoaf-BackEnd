@@ -9,7 +9,7 @@ public sealed record RegisterResponse(Guid UserId);
 /// <summary><c>POST /api/v1/auth/login</c> body.</summary>
 public sealed record LoginRequest(string Email, string Password);
 
-/// <summary><c>POST /api/v1/auth/login</c> 200 response: a 60-minute access token, no refresh token.</summary>
+/// <summary><c>POST /api/v1/auth/login</c> and <c>auth/refresh</c> 200 response: a 60-minute access token (the refresh token is an HttpOnly cookie).</summary>
 public sealed record LoginResponse(string AccessToken, DateTimeOffset ExpiresAt, UserDto User);
 
 /// <summary>The signed-in user (<c>GET /api/v1/me</c>, also part of <see cref="LoginResponse"/>).</summary>

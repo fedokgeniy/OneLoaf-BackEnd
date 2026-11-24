@@ -9,7 +9,7 @@ using OneLoaf.Web.Shared.State.Notifications;
 namespace OneLoaf.Web.Account;
 
 /// <summary>Side effects of the <see cref="SessionState"/> slice: sign-in, registration, sign-out, expiry.</summary>
-public sealed class SessionEffects(AccountApi account, TokenStore tokens, NavigationManager navigation)
+public sealed class SessionEffects(AccountApi account, TokenStore tokens, SessionRefresher refresher, NavigationManager navigation)
 {
     /// <summary>Signs in; stores the token, then reports <see cref="LoggedIn"/> or <see cref="LoginFailed"/>.</summary>
     [EffectMethod]
@@ -54,7 +54,7 @@ public sealed class SessionEffects(AccountApi account, TokenStore tokens, Naviga
     public async Task HandleLogout(IDispatcher dispatcher)
     {
         ArgumentNullException.ThrowIfNull(dispatcher);
-        // The token is stateless; a failed logout call does not keep the user signed in.
+        // The API revokes the refresh token; a failed call does not keep the user signed in here.
         await account.LogoutAsync();
         await tokens.ClearAsync();
         dispatcher.Dispatch(new LoggedOut());
@@ -72,13 +72,21 @@ public sealed class SessionEffects(AccountApi account, TokenStore tokens, Naviga
         navigation.NavigateTo(ReturnUrl.LoginUrl(current));
     }
 
-    /// <summary>One minute before expiry: warn, so the user can finish and sign in again.</summary>
-    [EffectMethod(typeof(SessionEndingSoon))]
-    public static Task HandleSessionEndingSoon(IDispatcher dispatcher)
+    /// <summary>
+    /// Gets a new access token with the refresh cookie, without bothering the user. When the sign-in has ended (cookie
+    /// expired, revoked or missing) the session ends as before.
+    /// </summary>
+    [EffectMethod(typeof(RefreshSession))]
+    public async Task HandleRefresh(IDispatcher dispatcher)
     {
         ArgumentNullException.ThrowIfNull(dispatcher);
-        dispatcher.Dispatch(new ShowToast(Toast.Warning(
-            "Your session ends in about a minute. Save your work; you will need to sign in again.")));
-        return Task.CompletedTask;
+        if (await refresher.TryRefreshAsync() && tokens.ValidToken is { } token && tokens.ExpiresAt is { } expiresAt
+            && SessionUser.From(JwtClaims.ToPrincipal(token)) is { } user)
+        {
+            dispatcher.Dispatch(new SessionRestored(user, expiresAt));
+            return;
+        }
+
+        dispatcher.Dispatch(new SessionExpired());
     }
 }

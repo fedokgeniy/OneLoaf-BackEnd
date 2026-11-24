@@ -53,8 +53,8 @@ public sealed record Logout;
 /// <summary>Result: signed out, token dropped.</summary>
 public sealed record LoggedOut;
 
-/// <summary>The token expires in about a minute (there is no refresh token).</summary>
-public sealed record SessionEndingSoon;
+/// <summary>Intent: get a new access token before the current one ends, or after a 401.</summary>
+public sealed record RefreshSession;
 
 /// <summary>The token expired or an authenticated request got 401.</summary>
 public sealed record SessionExpired;

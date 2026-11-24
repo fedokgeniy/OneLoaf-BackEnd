@@ -8,7 +8,7 @@
 | Issuer | Core API, `POST /api/v1/auth/login` |
 | Algorithm | RS256 (RSA 2048); private key only in the Core API, public key in every service |
 | Lifetime | 60 minutes (`Jwt__AccessTokenMinutes`), clock skew tolerance 30 s |
-| Refresh | none — log in again after `401` (short-lived stateless tokens) |
+| Refresh | `POST /api/v1/auth/refresh` with the refresh token cookie; rotating, 30 days (`Jwt__RefreshTokenDays`) |
 | Roles | `user` (default), `admin` (moderation endpoints) |
 | Anonymous endpoints | register, login, library browsing (`GET /library…`), VAPID public key, health |
 
@@ -62,10 +62,36 @@ baker could. Proposals that change data (a new batch) are saved only after the b
 Event messages over RabbitMQ carry the owner id in the body; consumers trust the broker (internal network, credentials
 per environment), not the client.
 
+## Session refresh
+
+A sign-in returns the access token in the body and sets a **refresh token** as a cookie of the Core API:
+`oneloaf_refresh`, `HttpOnly` (scripts cannot read it), `SameSite=Strict`, `Secure` over HTTPS, limited to the auth
+endpoints by its path (`Jwt__RefreshCookiePath`). The token never appears in a response body.
+
+| Call | Result |
+|---|---|
+| `POST /api/v1/auth/refresh` (cookie sent by the browser) | `200 {accessToken, expiresAt, user}` and the next refresh cookie |
+| the same with a missing, expired or revoked token | `401`; the cookie is removed |
+| the same with a token that was exchanged more than 30 seconds ago | `401`, and **every token of that sign-in is revoked** |
+
+- **Rotation.** Every exchange replaces the refresh token; the old one is marked as used.
+- **Reuse detection.** A used token that shows up again means it was copied. The whole family (all tokens of that
+  sign-in) is revoked, so neither side can continue without the password.
+- **Grace period.** Two tabs of one browser share the cookie and may exchange it at the same moment, and a request can
+  be repeated after a lost answer. A token exchanged less than 30 seconds ago is therefore still accepted and gets its
+  own successor; only a later use counts as reuse.
+- **Storage.** The database keeps only the SHA-256 hash of a token (`refresh_tokens`), with the family, the expiry and
+  the rotation and revocation times. Tokens are deleted with the account and when a user is anonymized.
+- **Lifetime.** 30 days from the last exchange (`Jwt__RefreshTokenDays`): a baker who opens the app at least once a
+  month stays signed in.
+- A browser on another origin (development) must send the request with credentials; CORS allows credentials only for
+  the origins of `Cors__AllowedOrigins`.
+
 ## Logout
 
-`POST /api/v1/auth/logout` returns `204`. Tokens are stateless: the client drops its token; it stays technically valid
-until `exp` (max. 60 minutes). Deleting the account (`DELETE /api/v1/me` with the password) removes all data at once.
+`POST /api/v1/auth/logout` returns `204`, revokes the refresh tokens of this sign-in and removes the cookie. The access
+token is stateless: the client drops it; it stays technically valid until `exp` (max. 60 minutes). Deleting the account
+(`DELETE /api/v1/me` with the password) removes all data and sessions at once.
 
 ## Keys and rotation
 
@@ -75,6 +101,8 @@ key fail after the deployment and users log in again (at most one token lifetime
 
 ## Browser clients
 
-- Keep the token in memory (or `sessionStorage`), not in `localStorage` shared with third-party scripts.
+- Keep the access token in memory (or `sessionStorage`), not in `localStorage` shared with third-party scripts.
+- Never handle the refresh token in script: let the browser keep the cookie and call `auth/refresh` before the access
+  token ends.
 - CORS is limited to `Cors__AllowedOrigins`.
 - HTTPS only in production (Caddy, HSTS).

@@ -6,7 +6,7 @@
 **Version:** `v1` (in the path) · **Format:** JSON, camelCase, enums as snake_case strings, times ISO 8601 with offset  
 **Errors:** RFC 9457 problem details — see [error taxonomy](../guides/errors.md). **Auth:** see [authentication](../guides/authentication.md).
 
-101 operations.
+102 operations.
 
 ## Contents
 
@@ -35,6 +35,7 @@
 - [Auth](#auth)
   - [`POST /api/v1/auth/register`](#register) — Register a new account
   - [`POST /api/v1/auth/login`](#login) — Log in and get an access token
+  - [`POST /api/v1/auth/refresh`](#refreshsession) — Exchange the refresh token cookie for a new access token
   - [`POST /api/v1/auth/logout`](#logout) — Log out
 - [Account](#account)
   - [`GET /api/v1/me`](#getme) — Get the current user's profile
@@ -153,7 +154,7 @@ Response `200` `application/json`:
   {
     "issueCode": "missing_price",
     "entityType": "ingredient",
-    "entityId": "89d05c88-b4de-486d-b193-8b58926b10d6",
+    "entityId": "3e48070d-ec10-4d81-9687-644b87a19f2a",
     "details": "No price for \"Whole wheat flour\" used in \"Beginner sourdough\""
   }
 ]
@@ -194,7 +195,7 @@ Response `200` `application/json`:
   "laborRatePerHour": null,
   "currency": "EUR",
   "timeZone": "Europe/Vilnius",
-  "updatedAt": "2026-11-24T19:27:03.723295+00:00"
+  "updatedAt": "2026-11-24T20:55:43.811833+00:00"
 }
 ```
 
@@ -249,7 +250,7 @@ Response `200` `application/json`:
   "laborRatePerHour": 12.00,
   "currency": "EUR",
   "timeZone": "Europe/Vilnius",
-  "updatedAt": "2026-11-24T19:27:04.303698+00:00"
+  "updatedAt": "2026-11-24T20:55:44.47141+00:00"
 }
 ```
 
@@ -288,8 +289,8 @@ Response `400` `application/problem+json`:
       "'Time Zone' must be an IANA time zone, for example Europe/Vilnius."
     ]
   },
-  "traceId": "00-9e19d0199fcfe50b817e7f48c3155bc9-f89e51b7b8c66279-02",
-  "correlationId": "a821cc5da4b64fc7a1de0ce13d949f0d"
+  "traceId": "00-672e3245def8a7664d795906ac390952-27c62fa9fee4b1f2-02",
+  "correlationId": "73c20d12d7504e648671cdcbd54f5542"
 }
 ```
 
@@ -317,7 +318,7 @@ US-39. Publishes an immutable snapshot of the effective recipe; later edits of t
 <details><summary>Example — typical (201)</summary>
 
 ```http
-POST /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/publish
+POST /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/publish
 Authorization: Bearer <access token>
 ```
 
@@ -325,7 +326,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "publishedRecipeId": "3d6e7105-8612-408a-8ce0-5020b5cd8844"
+  "publishedRecipeId": "68005dad-4a98-48ce-9c10-bf2c977a7b72"
 }
 ```
 
@@ -334,7 +335,7 @@ Response `201` `application/json`:
 <details><summary>Example — publish again (new snapshot) (201)</summary>
 
 ```http
-POST /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/publish
+POST /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/publish
 Authorization: Bearer <access token>
 ```
 
@@ -342,7 +343,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "publishedRecipeId": "f09e306c-683d-4f39-8280-0ead8542802d"
+  "publishedRecipeId": "8c714f19-63fd-40ed-a3b6-3fc411eda17f"
 }
 ```
 
@@ -378,11 +379,11 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "3d6e7105-8612-408a-8ce0-5020b5cd8844",
+      "id": "68005dad-4a98-48ce-9c10-bf2c977a7b72",
       "title": "Country sourdough",
       "description": "Open crumb, crisp crust.",
       "authorName": "Docs Baker",
-      "publishedAt": "2026-11-24T19:27:07.200355+00:00",
+      "publishedAt": "2026-11-24T20:55:47.344687+00:00",
       "yieldLoaves": 1,
       "ingredientCount": 4,
       "stageCount": 5,
@@ -417,19 +418,19 @@ US-40. Anonymous. Snapshot, author name, comment and reaction counts. Unpublishe
 <details><summary>Example — anonymous (200)</summary>
 
 ```http
-GET /api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844
+GET /api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72
 ```
 
 Response `200` `application/json`:
 
 ```json
 {
-  "id": "3d6e7105-8612-408a-8ce0-5020b5cd8844",
+  "id": "68005dad-4a98-48ce-9c10-bf2c977a7b72",
   "title": "Country sourdough",
   "description": "Open crumb, crisp crust.",
   "authorName": "Docs Baker",
   "status": "published",
-  "publishedAt": "2026-11-24T19:27:07.200355+00:00",
+  "publishedAt": "2026-11-24T20:55:47.344687+00:00",
   "snapshot": {
     "stages": [
       {
@@ -495,8 +496,8 @@ Response `404` `application/problem+json`:
   "status": 404,
   "detail": "Publication not found.",
   "instance": "/api/v1/library/00000000-0000-4000-9999-000000000000",
-  "traceId": "00-de490622d265dbe11be37eccdb2ee4f9-599e3ca310ce1933-02",
-  "correlationId": "b8ba10640ce843cca0e954f38c3284ce"
+  "traceId": "00-355bdd6de65cdb35e948fb0c12102c69-fcb4e4b3bed256f5-02",
+  "correlationId": "baeb0e38601147b2b505371b9c787124"
 }
 ```
 
@@ -524,7 +525,7 @@ US-41. Anonymous. Oldest first; paged.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/comments?page=1&pageSize=20
+GET /api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/comments?page=1&pageSize=20
 Authorization: Bearer <access token>
 ```
 
@@ -534,10 +535,10 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "6c9d095e-21a5-4cd2-a5a4-55dd1bdca7f7",
+      "id": "0f84403b-0db2-4b8d-a0ab-4b9a11258d1a",
       "authorName": "Boris Novak",
       "body": "Baked it on Sunday, lovely crumb!",
-      "createdAt": "2026-11-24T19:27:07.292438+00:00",
+      "createdAt": "2026-11-24T20:55:47.450396+00:00",
       "editedAt": null,
       "isMine": true
     }
@@ -573,7 +574,7 @@ US-41. The comment is shown with the author's name.
 <details><summary>Example — typical (201)</summary>
 
 ```http
-POST /api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/comments
+POST /api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/comments
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -586,10 +587,10 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "6c9d095e-21a5-4cd2-a5a4-55dd1bdca7f7",
+  "id": "0f84403b-0db2-4b8d-a0ab-4b9a11258d1a",
   "authorName": "Boris Novak",
   "body": "Baked it on Sunday, lovely crumb!",
-  "createdAt": "2026-11-24T19:27:07.292438+00:00",
+  "createdAt": "2026-11-24T20:55:47.450396+00:00",
   "editedAt": null,
   "isMine": true
 }
@@ -600,7 +601,7 @@ Response `201` `application/json`:
 <details><summary>Example — empty body (400)</summary>
 
 ```http
-POST /api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/comments
+POST /api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/comments
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -616,15 +617,15 @@ Response `400` `application/problem+json`:
   "type": "https://oneloaf.app/problems/validation",
   "title": "One or more validation errors occurred.",
   "status": 400,
-  "instance": "/api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/comments",
+  "instance": "/api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/comments",
   "errors": {
     "body": [
       "'Body' должно быть заполнено.",
       "Не выполнено указанное условие для 'Body'."
     ]
   },
-  "traceId": "00-849e07cdf9d8374b32fc062b37e760a3-62eeb73fce963744-02",
-  "correlationId": "325d3e04a40d453dbae5133915563fba"
+  "traceId": "00-081b703ec9c4dbc6f7ddd51901ff66be-a2d11fc16df780d1-02",
+  "correlationId": "b6c8f3f939514fc7b5fde37ffb2b84ba"
 }
 ```
 
@@ -651,7 +652,7 @@ US-39. Only the author; idempotent. 409 when a moderator removed it.
 <details><summary>Example — not the author (404)</summary>
 
 ```http
-POST /api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/unpublish
+POST /api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/unpublish
 Authorization: Bearer <access token>
 ```
 
@@ -663,9 +664,9 @@ Response `404` `application/problem+json`:
   "title": "The requested resource was not found.",
   "status": 404,
   "detail": "Publication not found.",
-  "instance": "/api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/unpublish",
-  "traceId": "00-3b306d48ade59a40521126828e17363e-49db684517129eb7-02",
-  "correlationId": "e1d82edeeaff46c297db67305fadfefd"
+  "instance": "/api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/unpublish",
+  "traceId": "00-cc3488477b9c10c50cf191ddbb3e832b-87071ed957609fc9-02",
+  "correlationId": "b6b6d7a6d69a4f1d9f158b3c1894f867"
 }
 ```
 
@@ -674,7 +675,7 @@ Response `404` `application/problem+json`:
 <details><summary>Example — typical (204)</summary>
 
 ```http
-POST /api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/unpublish
+POST /api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/unpublish
 Authorization: Bearer <access token>
 ```
 
@@ -705,7 +706,7 @@ US-41. Soft remove; another user's comment gives 404.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-DELETE /api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/comments/6c9d095e-21a5-4cd2-a5a4-55dd1bdca7f7
+DELETE /api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/comments/0f84403b-0db2-4b8d-a0ab-4b9a11258d1a
 Authorization: Bearer <access token>
 ```
 
@@ -738,7 +739,7 @@ US-41. like, love or want_to_bake; replaces the previous one.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-PUT /api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/reactions/me
+PUT /api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/reactions/me
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -773,7 +774,7 @@ US-41. Idempotent.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-DELETE /api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/reactions/me
+DELETE /api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/reactions/me
 Authorization: Bearer <access token>
 ```
 
@@ -804,7 +805,7 @@ US-42. Creates an independent recipe; ingredients are matched to the own catalog
 <details><summary>Example — typical (201)</summary>
 
 ```http
-POST /api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/copy
+POST /api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/copy
 Authorization: Bearer <access token>
 ```
 
@@ -812,7 +813,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "8350a722-4b31-4cb6-85cf-9f8703e7a476",
+  "id": "5a66fc1f-9ccc-47a2-bbc8-84cb74fa8101",
   "parentRecipeId": null,
   "title": "Country sourdough",
   "description": "Open crumb, crisp crust.",
@@ -822,8 +823,8 @@ Response `201` `application/json`:
   "isArchived": false,
   "ingredients": [
     {
-      "lineId": "e8eaa2fe-a2cd-4962-81c3-5c9a492341aa",
-      "ingredientId": "0f45770b-cd6b-421f-89db-8a65ee220109",
+      "lineId": "bb75b039-eb36-421e-bcfa-8098da8d89c7",
+      "ingredientId": "5ab31dcf-3abc-4bb2-81b0-adccf9c138ac",
       "ingredientName": "Bread flour",
       "categoryCode": "flour",
       "unitCode": "g",
@@ -835,7 +836,7 @@ Response `201` `application/json`:
       "isInherited": false
     },
     {
-      "lineId": "0df59a48-2845-4167-bf83-4aabba762ca5",
+      "lineId": "e4070da6-e5d3-4037-829f-9bfa6e55d6e7",
       "ingredientId": "00000000-0000-4000-1001-000000000012",
       "ingredientName": "Water",
       "categoryCode": "water",
@@ -850,7 +851,7 @@ Response `201` `application/json`:
   ],
   "stages": [
     {
-      "lineId": "532b26b4-1772-4ff4-9d9b-1e7f3f0a6d2d",
+      "lineId": "d9917969-676b-42cb-bda8-843b1de366d0",
       "sortOrder": 1,
       "name": "Mix",
       "stageTypeCode": "mix",
@@ -866,7 +867,7 @@ Response `201` `application/json`:
       "isInherited": false
     },
     {
-      "lineId": "dd15e989-9da6-4cb0-9a0c-853df34a2421",
+      "lineId": "cfa3f5f3-699c-48eb-b332-032033b0f0b8",
       "sortOrder": 2,
       "name": "Bulk fermentation",
       "stageTypeCode": "bulk_fermentation",
@@ -882,8 +883,8 @@ Response `201` `application/json`:
       "isInherited": false
     }
   ],
-  "createdAt": "2026-11-24T19:27:07.365665+00:00",
-  "updatedAt": "2026-11-24T19:27:07.365665+00:00",
+  "createdAt": "2026-11-24T20:55:47.544744+00:00",
+  "updatedAt": "2026-11-24T20:55:47.544744+00:00",
   "hasPhoto": false
 }
 ```
@@ -913,13 +914,13 @@ LR-11. With commentId the comment is reported, otherwise the publication.
 <details><summary>Example — a comment (201)</summary>
 
 ```http
-POST /api/v1/library/3d6e7105-8612-408a-8ce0-5020b5cd8844/reports
+POST /api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/reports
 Authorization: Bearer <access token>
 Content-Type: application/json
 
 {
   "reason": "Off-topic advertising link",
-  "commentId": "6c9d095e-21a5-4cd2-a5a4-55dd1bdca7f7"
+  "commentId": "0f84403b-0db2-4b8d-a0ab-4b9a11258d1a"
 }
 ```
 
@@ -927,7 +928,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "reportId": "c09b6bed-2249-4501-bd3c-b82c8b4b7dd8"
+  "reportId": "bc54b381-fb6b-4026-84a6-2b3f66ba1a93"
 }
 ```
 
@@ -962,11 +963,11 @@ Content-Type: application/json
 {
   "items": [
     {
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "loaves": 3
     },
     {
-      "recipeId": "bb13b709-05f6-4b83-b335-b6f8d66fb34a",
+      "recipeId": "9152d05e-0b3d-4881-9365-862cbb121938",
       "loaves": 2
     }
   ]
@@ -987,12 +988,12 @@ Response `200` `application/json`:
       "startOffsetMinutes": 0,
       "items": [
         {
-          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+          "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
           "title": "Country sourdough",
           "loaves": 3
         },
         {
-          "recipeId": "bb13b709-05f6-4b83-b335-b6f8d66fb34a",
+          "recipeId": "9152d05e-0b3d-4881-9365-862cbb121938",
           "title": "Country sourdough, longer bulk",
           "loaves": 1
         }
@@ -1005,7 +1006,7 @@ Response `200` `application/json`:
       "startOffsetMinutes": 45,
       "items": [
         {
-          "recipeId": "bb13b709-05f6-4b83-b335-b6f8d66fb34a",
+          "recipeId": "9152d05e-0b3d-4881-9365-862cbb121938",
           "title": "Country sourdough, longer bulk",
           "loaves": 1
         }
@@ -1041,7 +1042,7 @@ US-14, US-15, US-47, US-48, US-49. Lines from fn_recipe_cost; total = sum of the
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/cost?loaves=3
+GET /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/cost?loaves=3
 Authorization: Bearer <access token>
 ```
 
@@ -1049,7 +1050,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+  "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
   "loaves": 3,
   "asOf": "2026-11-24",
   "currency": "EUR",
@@ -1058,7 +1059,7 @@ Response `200` `application/json`:
     {
       "lineNo": 1,
       "type": "ingredient",
-      "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+      "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
       "description": "Bread flour",
       "quantity": 1500.0000000000000000,
       "unit": "g",
@@ -1069,7 +1070,7 @@ Response `200` `application/json`:
     {
       "lineNo": 2,
       "type": "ingredient",
-      "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+      "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
       "description": "Water",
       "quantity": 1050.0000000000000000,
       "unit": "g",
@@ -1088,7 +1089,7 @@ Response `200` `application/json`:
 <details><summary>Example — loaves out of range (400)</summary>
 
 ```http
-GET /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/cost?loaves=0
+GET /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/cost?loaves=0
 Authorization: Bearer <access token>
 ```
 
@@ -1099,14 +1100,14 @@ Response `400` `application/problem+json`:
   "type": "https://oneloaf.app/problems/validation",
   "title": "One or more validation errors occurred.",
   "status": 400,
-  "instance": "/api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/cost",
+  "instance": "/api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/cost",
   "errors": {
     "loaves": [
       "'Loaves' должно быть в диапазоне от 1 до 1000. Введенное значение: 0."
     ]
   },
-  "traceId": "00-911023a095b2e5301091791021c083e1-df235771196e0eca-02",
-  "correlationId": "370e1ea02cdb466eb0724c1f817e6240"
+  "traceId": "00-cda2ed84d052ddc1a704ac50f554fca7-41f1c430431e9843-02",
+  "correlationId": "22dade3e853e452db3b86b2ba7bf4481"
 }
 ```
 
@@ -1134,7 +1135,7 @@ US-16. From fn_recipe_timeline and fn_recipe_ready_window.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/timeline?start=2026-11-26T08%3A00%3A00%2B02%3A00
+GET /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/timeline?start=2026-11-26T08%3A00%3A00%2B02%3A00
 Authorization: Bearer <access token>
 ```
 
@@ -1142,11 +1143,11 @@ Response `200` `application/json`:
 
 ```json
 {
-  "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+  "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
   "start": "2026-11-26T08:00:00+02:00",
   "stages": [
     {
-      "lineId": "a0a15184-103e-423d-ae4b-4d55e8b0d441",
+      "lineId": "def5082c-d12a-4882-82bc-20445a976e0d",
       "sortOrder": 1,
       "name": "Mix",
       "stageTypeCode": "mix",
@@ -1157,7 +1158,7 @@ Response `200` `application/json`:
       "plannedEndMaxAt": "2026-11-26T08:20:00+02:00"
     },
     {
-      "lineId": "a3e09913-99fe-4697-92b0-5a08665cde83",
+      "lineId": "dd83b90f-1b07-4783-a649-b08d31df73e6",
       "sortOrder": 2,
       "name": "Bulk fermentation",
       "stageTypeCode": "bulk_fermentation",
@@ -1197,7 +1198,7 @@ US-52. From fn_recipe_start_window.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/start-window?readyAt=2026-11-27T08%3A00%3A00%2B02%3A00
+GET /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/start-window?readyAt=2026-11-27T08%3A00%3A00%2B02%3A00
 Authorization: Bearer <access token>
 ```
 
@@ -1205,7 +1206,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+  "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
   "readyAt": "2026-11-27T08:00:00+02:00",
   "startFrom": "2026-11-26T13:40:00+02:00",
   "startTo": "2026-11-26T16:55:00+02:00"
@@ -1236,7 +1237,7 @@ US-17, US-18. From fn_dough_weight_g, fn_kneading_cycles, fn_starter_amount_g.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/production-figures?loaves=3
+GET /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/production-figures?loaves=3
 Authorization: Bearer <access token>
 ```
 
@@ -1244,7 +1245,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+  "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
   "loaves": 3,
   "doughWeightG": 2880.0000000000000000,
   "kneadingCycles": 1,
@@ -1279,7 +1280,7 @@ POST /api/v1/auth/register
 Content-Type: application/json
 
 {
-  "email": "docs.baker.e6e34d070@example.com",
+  "email": "docs.baker.7139404e2@example.com",
   "password": "Rye-Bread-2026!",
   "displayName": "Docs Baker"
 }
@@ -1289,7 +1290,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "userId": "779e2ba6-7490-4998-8e54-60465d7319e3"
+  "userId": "46001f4c-0521-4d65-9ce0-c307979b3b66"
 }
 ```
 
@@ -1302,7 +1303,7 @@ POST /api/v1/auth/register
 Content-Type: application/json
 
 {
-  "email": "docs.baker.e6e34d070@example.com",
+  "email": "docs.baker.7139404e2@example.com",
   "password": "Rye-Bread-2026!",
   "displayName": "Docs Baker"
 }
@@ -1317,8 +1318,8 @@ Response `409` `application/problem+json`:
   "status": 409,
   "detail": "An account with this e-mail already exists.",
   "instance": "/api/v1/auth/register",
-  "traceId": "00-9df41621dc94ac4790e97b836f3babcf-c051e1e5243e18cd-02",
-  "correlationId": "55620eb7f4c34657a35f10d10c91fbec"
+  "traceId": "00-87a33fb3c5c4b82e53d6a10ffec16d65-aeea8447d68bbe0a-02",
+  "correlationId": "d2033c77028f41d99030a6f45b9c3709"
 }
 ```
 
@@ -1357,8 +1358,8 @@ Response `400` `application/problem+json`:
       "'Display Name' must not be blank."
     ]
   },
-  "traceId": "00-e16b67e6f54f0c9e96492edf05c4bb81-40854fcbb5b53051-02",
-  "correlationId": "c46160fe2c524de1a66a6ae1629bb904"
+  "traceId": "00-45e76e9c9723d02d54c5a1f0abb3217f-60ee399b7de36f99-02",
+  "correlationId": "a5a46f48e3ed4456b0ed0f94f4157130"
 }
 ```
 
@@ -1371,7 +1372,7 @@ POST /api/v1/auth/register
 Content-Type: application/json
 
 {
-  "email": "leaving.e37c5284@example.com",
+  "email": "leaving.0a174d2e@example.com",
   "password": "Rye-Bread-2026!",
   "displayName": "Leaving Baker"
 }
@@ -1381,7 +1382,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "userId": "67e2155f-16aa-49cc-81ff-0bd409ac330d"
+  "userId": "832b5f09-4109-4bde-b87e-042085e204f0"
 }
 ```
 
@@ -1392,7 +1393,7 @@ Response `201` `application/json`:
 
 `POST /api/v1/auth/login` · operation id `Login` · auth: none
 
-US-02. Returns an RS256 JWT. Unknown e-mail and wrong password give the same 401.
+US-02. Returns an RS256 JWT and sets the refresh token as an HttpOnly cookie. Unknown e-mail and wrong password give the same 401.
 
 **Request body:** [LoginRequest](#model-loginrequest)
 
@@ -1409,7 +1410,7 @@ POST /api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "docs.baker.e6e34d070@example.com",
+  "email": "docs.baker.7139404e2@example.com",
   "password": "Rye-Bread-2026!"
 }
 ```
@@ -1419,14 +1420,14 @@ Response `200` `application/json`:
 ```json
 {
   "accessToken": "eyJhbGciOiJSUzI1NiIs...",
-  "expiresAt": "2026-11-24T20:27:03.9542542+00:00",
+  "expiresAt": "2026-11-24T21:55:44.0841406+00:00",
   "user": {
-    "id": "779e2ba6-7490-4998-8e54-60465d7319e3",
-    "email": "docs.baker.e6e34d070@example.com",
+    "id": "46001f4c-0521-4d65-9ce0-c307979b3b66",
+    "email": "docs.baker.7139404e2@example.com",
     "displayName": "Docs Baker",
     "role": "user",
-    "createdAt": "2026-11-24T19:27:03.723295+00:00",
-    "lastLoginAt": "2026-11-24T19:27:03.9374766+00:00"
+    "createdAt": "2026-11-24T20:55:43.811833+00:00",
+    "lastLoginAt": "2026-11-24T20:55:44.0647395+00:00"
   }
 }
 ```
@@ -1440,7 +1441,7 @@ POST /api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "docs.baker.e6e34d070@example.com",
+  "email": "docs.baker.7139404e2@example.com",
   "password": "Wrong-Password-1"
 }
 ```
@@ -1453,8 +1454,8 @@ Response `401` `application/problem+json`:
   "title": "Invalid e-mail or password.",
   "status": 401,
   "instance": "/api/v1/auth/login",
-  "traceId": "00-9ab35ccc0812921f1bf0615973693da5-2f70df8454fb3d9a-02",
-  "correlationId": "31857e1f79974db18620e6c45209e5d3"
+  "traceId": "00-0ad2ea260d788f483627ecb7e1497c0c-c635cdd741f99a7d-02",
+  "correlationId": "16293fb0501a4bc2adbb6bdbaa8a4bf3"
 }
 ```
 
@@ -1467,7 +1468,7 @@ POST /api/v1/auth/login
 Content-Type: application/json
 
 {
-  "email": "leaving.e37c5284@example.com",
+  "email": "leaving.0a174d2e@example.com",
   "password": "Rye-Bread-2026!"
 }
 ```
@@ -1477,15 +1478,49 @@ Response `200` `application/json`:
 ```json
 {
   "accessToken": "eyJhbGciOiJSUzI1NiIs...",
-  "expiresAt": "2026-11-24T20:27:07.6678708+00:00",
+  "expiresAt": "2026-11-24T21:55:47.9896835+00:00",
   "user": {
-    "id": "67e2155f-16aa-49cc-81ff-0bd409ac330d",
-    "email": "leaving.e37c5284@example.com",
+    "id": "832b5f09-4109-4bde-b87e-042085e204f0",
+    "email": "leaving.0a174d2e@example.com",
     "displayName": "Leaving Baker",
     "role": "user",
-    "createdAt": "2026-11-24T19:27:07.599479+00:00",
-    "lastLoginAt": "2026-11-24T19:27:07.6658395+00:00"
+    "createdAt": "2026-11-24T20:55:47.906716+00:00",
+    "lastLoginAt": "2026-11-24T20:55:47.9873458+00:00"
   }
+}
+```
+
+</details>
+
+<a id="refreshsession"></a>
+### Exchange the refresh token cookie for a new access token
+
+`POST /api/v1/auth/refresh` · operation id `RefreshSession` · auth: none
+
+US-02. The cookie is replaced by the next token of the same sign-in (rotation). 401 for a missing, expired or revoked token; a token that was already exchanged revokes the whole sign-in.
+
+| Status | Meaning | Body |
+|---|---|---|
+| 200 | OK | [LoginResponse](#model-loginresponse) |
+| 401 | Missing, invalid or expired bearer token | [ProblemDetails](#model-problemdetails) |
+| 429 | Rate limit or budget reached; see `Retry-After` | [ProblemDetails](#model-problemdetails) |
+
+<details><summary>Example — without refresh cookie (401)</summary>
+
+```http
+POST /api/v1/auth/refresh
+```
+
+Response `401` `application/problem+json`:
+
+```json
+{
+  "type": "https://oneloaf.app/problems/unauthorized",
+  "title": "The session has ended. Sign in again.",
+  "status": 401,
+  "instance": "/api/v1/auth/refresh",
+  "traceId": "00-145b482e0df0ab23da694ea1249eee0c-e1943d7d33b883c2-02",
+  "correlationId": "107c00f877444d27b77969fc3a3fd7bc"
 }
 ```
 
@@ -1494,14 +1529,13 @@ Response `200` `application/json`:
 <a id="logout"></a>
 ### Log out
 
-`POST /api/v1/auth/logout` · operation id `Logout` · auth: bearer token
+`POST /api/v1/auth/logout` · operation id `Logout` · auth: none
 
-US-02. Access tokens are short-lived and stateless; the client discards its token.
+US-02. Revokes the refresh tokens of this sign-in and removes the cookie; the access token expires by itself and the client discards it.
 
 | Status | Meaning | Body |
 |---|---|---|
 | 204 | No content | — |
-| 401 | Missing, invalid or expired bearer token | [ProblemDetails](#model-problemdetails) |
 | 429 | Rate limit or budget reached; see `Retry-After` | [ProblemDetails](#model-problemdetails) |
 
 <details><summary>Example — typical (204)</summary>
@@ -1546,8 +1580,8 @@ Response `401` `application/problem+json`:
   "title": "A valid bearer token is required.",
   "status": 401,
   "instance": "/api/v1/me",
-  "traceId": "00-a572a72075f4d59cafb890ffc9f38cf5-052d2e797be2bebe-02",
-  "correlationId": "5a0144c6bd184d30ae5b4e840d9b1374"
+  "traceId": "00-bbf49cb66c976f561c835739e75ec7e7-5bc4d45f55b6c26d-02",
+  "correlationId": "9a97f749483a4662a1748b10674c2087"
 }
 ```
 
@@ -1564,12 +1598,12 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "779e2ba6-7490-4998-8e54-60465d7319e3",
-  "email": "docs.baker.e6e34d070@example.com",
+  "id": "46001f4c-0521-4d65-9ce0-c307979b3b66",
+  "email": "docs.baker.7139404e2@example.com",
   "displayName": "Docs Baker",
   "role": "user",
-  "createdAt": "2026-11-24T19:27:03.723295+00:00",
-  "lastLoginAt": "2026-11-24T19:27:03.937476+00:00"
+  "createdAt": "2026-11-24T20:55:43.811833+00:00",
+  "lastLoginAt": "2026-11-24T20:55:44.064739+00:00"
 }
 ```
 
@@ -1613,8 +1647,8 @@ Response `403` `application/problem+json`:
   "status": 403,
   "detail": "The password is incorrect.",
   "instance": "/api/v1/me",
-  "traceId": "00-5a59efeb9deff7f2693ea28fee83c33f-2bea729cc8a94e50-02",
-  "correlationId": "c1ba5ba324c14692a278979eed363d5c"
+  "traceId": "00-f6d6297330b74e4248e3458985e58cc8-4cd8725a8a925c04-02",
+  "correlationId": "178168687b2f40c5b26d4ac2ace6fd2e"
 }
 ```
 
@@ -1661,10 +1695,10 @@ Response `200` `text/csv`:
 
 ```text
 title,is_variant,yield_loaves,loaf_weight_g,ingredient_lines,stage_lines,is_archived,created_at,updated_at
-Beginner sourdough,false,1,900.0,2,2,false,2026-11-24T19:27:05.3382160+00:00,2026-11-24T19:27:05.3382160+00:00
-Country sourdough,false,1,900.0,4,5,false,2026-11-24T19:27:05.2422390+00:00,2026-11-24T19:27:05.5608000+00:00
-"Country sourdough, as baked",true,1,,0,5,false,2026-11-24T19:27:06.7412940+00:00,2026-11-24T19:27:06.7412940+00:00
-"Country sourdough, longer bulk",true,1,,8,10,false,2026-11-24T19:27:05.5864280+00:00,2026-11-24T19:27:05.8271880+00:00
+Beginner sourdough,false,1,900.0,2,2,false,2026-11-24T20:55:45.4358590+00:00,2026-11-24T20:55:45.4358590+00:00
+Country sourdough,false,1,900.0,4,5,false,2026-11-24T20:55:45.3203530+00:00,2026-11-24T20:55:45.6514630+00:00
+"Country sourdough, as baked",true,1,,0,5,false,2026-11-24T20:55:46.8359510+00:00,2026-11-24T20:55:46.8359510+00:00
+"Country sourdough, longer bulk",true,1,,8,10,false,2026-11-24T20:55:45.6771480+00:00,2026-11-24T20:55:45.9183660+00:00
 ```
 
 </details>
@@ -1924,14 +1958,14 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+      "id": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
       "name": "Bread flour T550",
       "flourTypeCode": "wheat",
       "proteinPercent": 12.5,
       "grind": "fine",
       "notes": null,
-      "createdAt": "2026-11-24T19:27:04.345891+00:00",
-      "updatedAt": "2026-11-24T19:27:04.345891+00:00"
+      "createdAt": "2026-11-24T20:55:44.514346+00:00",
+      "updatedAt": "2026-11-24T20:55:44.514346+00:00"
     }
   ],
   "page": 1,
@@ -1978,14 +2012,14 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+  "id": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
   "name": "Bread flour T550",
   "flourTypeCode": "wheat",
   "proteinPercent": 12.5,
   "grind": "fine",
   "notes": null,
-  "createdAt": "2026-11-24T19:27:04.345891+00:00",
-  "updatedAt": "2026-11-24T19:27:04.345891+00:00"
+  "createdAt": "2026-11-24T20:55:44.514346+00:00",
+  "updatedAt": "2026-11-24T20:55:44.514346+00:00"
 }
 ```
 
@@ -2016,8 +2050,8 @@ Response `409` `application/problem+json`:
   "status": 409,
   "detail": "A flour with this name already exists.",
   "instance": "/api/v1/flours",
-  "traceId": "00-f4a327285b9f4e7fcdbbfa2ef41bd343-69dea226c330106d-02",
-  "correlationId": "90208610fb0745afb3013913e6d3f3c6"
+  "traceId": "00-3d6f4d3cd54485e10d2033209c351d55-d0b676ca4133a23b-02",
+  "correlationId": "35c6189740b9422ba223f5ecb4f653c0"
 }
 ```
 
@@ -2043,14 +2077,14 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "360f4135-b73a-4979-b5a4-3b0367f96c0f",
+  "id": "0c207a19-27f7-4d5f-b682-487441c92d41",
   "name": "Spare spelt",
   "flourTypeCode": "spelt",
   "proteinPercent": 11.0,
   "grind": null,
   "notes": null,
-  "createdAt": "2026-11-24T19:27:04.417791+00:00",
-  "updatedAt": "2026-11-24T19:27:04.417791+00:00"
+  "createdAt": "2026-11-24T20:55:44.584201+00:00",
+  "updatedAt": "2026-11-24T20:55:44.584201+00:00"
 }
 ```
 
@@ -2076,7 +2110,7 @@ US-11.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/flours/9d44625f-756c-49f7-be92-00dc9eee4b66
+GET /api/v1/flours/8f4c071d-eede-44f5-b6dc-05ab4394cf9b
 Authorization: Bearer <access token>
 ```
 
@@ -2084,14 +2118,14 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+  "id": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
   "name": "Bread flour T550",
   "flourTypeCode": "wheat",
   "proteinPercent": 12.5,
   "grind": "fine",
   "notes": null,
-  "createdAt": "2026-11-24T19:27:04.345891+00:00",
-  "updatedAt": "2026-11-24T19:27:04.345891+00:00"
+  "createdAt": "2026-11-24T20:55:44.514346+00:00",
+  "updatedAt": "2026-11-24T20:55:44.514346+00:00"
 }
 ```
 
@@ -2113,8 +2147,8 @@ Response `404` `application/problem+json`:
   "status": 404,
   "detail": "The flour was not found.",
   "instance": "/api/v1/flours/00000000-0000-4000-9999-000000000000",
-  "traceId": "00-c5251b149b3b0689cf953e691f914d3d-11d8f4aa63f0fb4f-02",
-  "correlationId": "e7fce7238e0e4432b1edbbb1fc7e90fe"
+  "traceId": "00-bf41e48acc7e2197d5f57160317a7432-47698003576550d6-02",
+  "correlationId": "887a7bd07e4040f79e0f96b04c820cae"
 }
 ```
 
@@ -2144,7 +2178,7 @@ US-11.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-PUT /api/v1/flours/9d44625f-756c-49f7-be92-00dc9eee4b66
+PUT /api/v1/flours/8f4c071d-eede-44f5-b6dc-05ab4394cf9b
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -2161,14 +2195,14 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+  "id": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
   "name": "Bread flour T550",
   "flourTypeCode": "wheat",
   "proteinPercent": 12.8,
   "grind": "fine",
   "notes": "Local mill",
-  "createdAt": "2026-11-24T19:27:04.345891+00:00",
-  "updatedAt": "2026-11-24T19:27:04.412586+00:00"
+  "createdAt": "2026-11-24T20:55:44.514346+00:00",
+  "updatedAt": "2026-11-24T20:55:44.579489+00:00"
 }
 ```
 
@@ -2194,7 +2228,7 @@ US-11. Linked ingredients and starters keep existing without the flour.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-DELETE /api/v1/flours/360f4135-b73a-4979-b5a4-3b0367f96c0f
+DELETE /api/v1/flours/0c207a19-27f7-4d5f-b682-487441c92d41
 Authorization: Bearer <access token>
 ```
 
@@ -2237,16 +2271,16 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "16b33a70-1168-4063-a238-2610109d609d",
+      "id": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
       "name": "Bread flour",
       "categoryCode": "flour",
       "unitCode": "g",
-      "flourId": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+      "flourId": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
       "flourName": "Bread flour T550",
       "proteinPercent": 12.8,
       "currentPrice": null,
-      "createdAt": "2026-11-24T19:27:04.485631+00:00",
-      "updatedAt": "2026-11-24T19:27:04.485631+00:00",
+      "createdAt": "2026-11-24T20:55:44.648735+00:00",
+      "updatedAt": "2026-11-24T20:55:44.648735+00:00",
       "trackStock": false,
       "stock": null,
       "reorderLevel": null,
@@ -2290,7 +2324,7 @@ Content-Type: application/json
   "name": "Bread flour",
   "categoryCode": "flour",
   "unitCode": "g",
-  "flourId": "9d44625f-756c-49f7-be92-00dc9eee4b66"
+  "flourId": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b"
 }
 ```
 
@@ -2298,16 +2332,16 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "16b33a70-1168-4063-a238-2610109d609d",
+  "id": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
   "name": "Bread flour",
   "categoryCode": "flour",
   "unitCode": "g",
-  "flourId": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+  "flourId": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
   "flourName": "Bread flour T550",
   "proteinPercent": 12.8,
   "currentPrice": null,
-  "createdAt": "2026-11-24T19:27:04.485631+00:00",
-  "updatedAt": "2026-11-24T19:27:04.485631+00:00",
+  "createdAt": "2026-11-24T20:55:44.648735+00:00",
+  "updatedAt": "2026-11-24T20:55:44.648735+00:00",
   "trackStock": false,
   "stock": null,
   "reorderLevel": null,
@@ -2338,7 +2372,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+  "id": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
   "name": "Water",
   "categoryCode": "water",
   "unitCode": "g",
@@ -2346,8 +2380,8 @@ Response `201` `application/json`:
   "flourName": null,
   "proteinPercent": null,
   "currentPrice": null,
-  "createdAt": "2026-11-24T19:27:04.638886+00:00",
-  "updatedAt": "2026-11-24T19:27:04.638886+00:00",
+  "createdAt": "2026-11-24T20:55:44.787355+00:00",
+  "updatedAt": "2026-11-24T20:55:44.787355+00:00",
   "trackStock": false,
   "stock": null,
   "reorderLevel": null,
@@ -2378,7 +2412,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "cad0f44b-a059-45d6-ac52-beb5446d76d1",
+  "id": "ba1627ce-53a9-4c85-ba2d-968ef091cdf3",
   "name": "Salt",
   "categoryCode": "salt",
   "unitCode": "g",
@@ -2386,8 +2420,8 @@ Response `201` `application/json`:
   "flourName": null,
   "proteinPercent": null,
   "currentPrice": null,
-  "createdAt": "2026-11-24T19:27:04.648837+00:00",
-  "updatedAt": "2026-11-24T19:27:04.648837+00:00",
+  "createdAt": "2026-11-24T20:55:44.796544+00:00",
+  "updatedAt": "2026-11-24T20:55:44.796544+00:00",
   "trackStock": false,
   "stock": null,
   "reorderLevel": null,
@@ -2418,7 +2452,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "9af4e978-d28a-4181-bfc9-4c045e878797",
+  "id": "76b5f6a4-b7cc-4b22-9847-1023decfd765",
   "name": "Rye starter",
   "categoryCode": "starter",
   "unitCode": "g",
@@ -2426,8 +2460,8 @@ Response `201` `application/json`:
   "flourName": null,
   "proteinPercent": null,
   "currentPrice": null,
-  "createdAt": "2026-11-24T19:27:04.664821+00:00",
-  "updatedAt": "2026-11-24T19:27:04.664821+00:00",
+  "createdAt": "2026-11-24T20:55:44.810335+00:00",
+  "updatedAt": "2026-11-24T20:55:44.810335+00:00",
   "trackStock": false,
   "stock": null,
   "reorderLevel": null,
@@ -2467,8 +2501,8 @@ Response `400` `application/problem+json`:
       "Unknown unit 'spoon'."
     ]
   },
-  "traceId": "00-986d407dba78257eac067234a168df9d-91909baf6f0d70be-02",
-  "correlationId": "44d6fcf3817347f5a9895f9399f14d4e"
+  "traceId": "00-42e2f27e68fa9c5386774cf7e477c479-01dd9c89e017294a-02",
+  "correlationId": "67bc03df27a7470bb86733b7f186826a"
 }
 ```
 
@@ -2493,7 +2527,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "317c99ec-52ca-481a-8475-0461f0ea44cb",
+  "id": "4a090204-2c17-4c93-9748-86a45bb028e9",
   "name": "Sesame",
   "categoryCode": "add_in",
   "unitCode": "g",
@@ -2501,8 +2535,8 @@ Response `201` `application/json`:
   "flourName": null,
   "proteinPercent": null,
   "currentPrice": null,
-  "createdAt": "2026-11-24T19:27:04.796654+00:00",
-  "updatedAt": "2026-11-24T19:27:04.796654+00:00",
+  "createdAt": "2026-11-24T20:55:44.942453+00:00",
+  "updatedAt": "2026-11-24T20:55:44.942453+00:00",
   "trackStock": false,
   "stock": null,
   "reorderLevel": null,
@@ -2533,7 +2567,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "bdbc70fe-0af1-408e-acf2-9804f9841163",
+  "id": "1e30b37f-c209-4d97-874b-d465cc30c864",
   "name": "Sunflower seeds",
   "categoryCode": "add_in",
   "unitCode": "g",
@@ -2541,8 +2575,8 @@ Response `201` `application/json`:
   "flourName": null,
   "proteinPercent": null,
   "currentPrice": null,
-  "createdAt": "2026-11-24T19:27:04.803428+00:00",
-  "updatedAt": "2026-11-24T19:27:04.803428+00:00",
+  "createdAt": "2026-11-24T20:55:44.947891+00:00",
+  "updatedAt": "2026-11-24T20:55:44.947891+00:00",
   "trackStock": false,
   "stock": null,
   "reorderLevel": null,
@@ -2574,7 +2608,7 @@ US-10.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/ingredients/cad0f44b-a059-45d6-ac52-beb5446d76d1
+GET /api/v1/ingredients/ba1627ce-53a9-4c85-ba2d-968ef091cdf3
 Authorization: Bearer <access token>
 ```
 
@@ -2582,7 +2616,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "cad0f44b-a059-45d6-ac52-beb5446d76d1",
+  "id": "ba1627ce-53a9-4c85-ba2d-968ef091cdf3",
   "name": "Salt",
   "categoryCode": "salt",
   "unitCode": "g",
@@ -2590,8 +2624,8 @@ Response `200` `application/json`:
   "flourName": null,
   "proteinPercent": null,
   "currentPrice": null,
-  "createdAt": "2026-11-24T19:27:04.648837+00:00",
-  "updatedAt": "2026-11-24T19:27:04.648837+00:00",
+  "createdAt": "2026-11-24T20:55:44.796544+00:00",
+  "updatedAt": "2026-11-24T20:55:44.796544+00:00",
   "trackStock": false,
   "stock": null,
   "reorderLevel": null,
@@ -2606,7 +2640,7 @@ Response `200` `application/json`:
 <details><summary>Example — with kept stock (200)</summary>
 
 ```http
-GET /api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163
+GET /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864
 Authorization: Bearer <access token>
 ```
 
@@ -2614,7 +2648,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "bdbc70fe-0af1-408e-acf2-9804f9841163",
+  "id": "1e30b37f-c209-4d97-874b-d465cc30c864",
   "name": "Sunflower seeds",
   "categoryCode": "add_in",
   "unitCode": "g",
@@ -2628,8 +2662,8 @@ Response `200` `application/json`:
     "currency": "EUR",
     "effectiveFrom": "2026-11-22"
   },
-  "createdAt": "2026-11-24T19:27:04.803428+00:00",
-  "updatedAt": "2026-11-24T19:27:04.905227+00:00",
+  "createdAt": "2026-11-24T20:55:44.947891+00:00",
+  "updatedAt": "2026-11-24T20:55:45.010776+00:00",
   "trackStock": true,
   "stock": 500.000,
   "reorderLevel": null,
@@ -2665,7 +2699,7 @@ US-10.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-PUT /api/v1/ingredients/cad0f44b-a059-45d6-ac52-beb5446d76d1
+PUT /api/v1/ingredients/ba1627ce-53a9-4c85-ba2d-968ef091cdf3
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -2681,7 +2715,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "cad0f44b-a059-45d6-ac52-beb5446d76d1",
+  "id": "ba1627ce-53a9-4c85-ba2d-968ef091cdf3",
   "name": "Sea salt",
   "categoryCode": "salt",
   "unitCode": "g",
@@ -2689,8 +2723,8 @@ Response `200` `application/json`:
   "flourName": null,
   "proteinPercent": null,
   "currentPrice": null,
-  "createdAt": "2026-11-24T19:27:04.648837+00:00",
-  "updatedAt": "2026-11-24T19:27:04.707834+00:00",
+  "createdAt": "2026-11-24T20:55:44.796544+00:00",
+  "updatedAt": "2026-11-24T20:55:44.860672+00:00",
   "trackStock": false,
   "stock": null,
   "reorderLevel": null,
@@ -2723,7 +2757,7 @@ US-10. An ingredient used in a recipe cannot be deleted (409).
 <details><summary>Example — typical (204)</summary>
 
 ```http
-DELETE /api/v1/ingredients/317c99ec-52ca-481a-8475-0461f0ea44cb
+DELETE /api/v1/ingredients/4a090204-2c17-4c93-9748-86a45bb028e9
 Authorization: Bearer <access token>
 ```
 
@@ -2736,7 +2770,7 @@ _(no body)_
 <details><summary>Example — used in a recipe (409)</summary>
 
 ```http
-DELETE /api/v1/ingredients/16b33a70-1168-4063-a238-2610109d609d
+DELETE /api/v1/ingredients/dabd17ca-2d7d-4f2f-b3b1-dbb59250912b
 Authorization: Bearer <access token>
 ```
 
@@ -2748,9 +2782,9 @@ Response `409` `application/problem+json`:
   "title": "The request conflicts with existing data.",
   "status": 409,
   "detail": "The ingredient is used in recipes and cannot be deleted.",
-  "instance": "/api/v1/ingredients/16b33a70-1168-4063-a238-2610109d609d",
-  "traceId": "00-e1c68fc0ecde4e7db8e8ff1020be4659-a093a17dc399cece-02",
-  "correlationId": "a2071578d4c84be9b6e4e56a0c99c6a8"
+  "instance": "/api/v1/ingredients/dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
+  "traceId": "00-15010f03d5452c63a1a528aa6c2f8ddd-b4d1a84957eb52b7-02",
+  "correlationId": "020a4a615d284bccaecb820da0009633"
 }
 ```
 
@@ -2776,7 +2810,7 @@ US-12. Newest first, with the change against the previous price.
 <details><summary>Example — history with change percent (200)</summary>
 
 ```http
-GET /api/v1/ingredients/16b33a70-1168-4063-a238-2610109d609d/prices
+GET /api/v1/ingredients/dabd17ca-2d7d-4f2f-b3b1-dbb59250912b/prices
 Authorization: Bearer <access token>
 ```
 
@@ -2785,7 +2819,7 @@ Response `200` `application/json`:
 ```json
 [
   {
-    "id": "e66aa57f-69c5-41a2-9aef-833185e7c3d0",
+    "id": "bf85216d-dfa4-4db6-af08-6379a8e11758",
     "price": 1.3500,
     "perQuantity": 1000.000,
     "unitPrice": 0.00135,
@@ -2794,7 +2828,7 @@ Response `200` `application/json`:
     "changePercent": 12.5
   },
   {
-    "id": "debe23b3-41a2-4155-93ec-a0cb816a9d53",
+    "id": "2c3c757b-bf4e-4c5e-bd49-0d91594ba007",
     "price": 1.2000,
     "perQuantity": 1000.000,
     "unitPrice": 0.0012,
@@ -2831,7 +2865,7 @@ US-12. Older prices are kept; a second price on the same date is a 409.
 <details><summary>Example — typical (201)</summary>
 
 ```http
-POST /api/v1/ingredients/16b33a70-1168-4063-a238-2610109d609d/prices
+POST /api/v1/ingredients/dabd17ca-2d7d-4f2f-b3b1-dbb59250912b/prices
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -2847,7 +2881,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "debe23b3-41a2-4155-93ec-a0cb816a9d53",
+  "id": "2c3c757b-bf4e-4c5e-bd49-0d91594ba007",
   "price": 1.2000,
   "perQuantity": 1000.000,
   "unitPrice": 0.0012,
@@ -2862,7 +2896,7 @@ Response `201` `application/json`:
 <details><summary>Example — price change (201)</summary>
 
 ```http
-POST /api/v1/ingredients/16b33a70-1168-4063-a238-2610109d609d/prices
+POST /api/v1/ingredients/dabd17ca-2d7d-4f2f-b3b1-dbb59250912b/prices
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -2878,7 +2912,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "e66aa57f-69c5-41a2-9aef-833185e7c3d0",
+  "id": "bf85216d-dfa4-4db6-af08-6379a8e11758",
   "price": 1.3500,
   "perQuantity": 1000.000,
   "unitPrice": 0.00135,
@@ -2893,7 +2927,7 @@ Response `201` `application/json`:
 <details><summary>Example — other ingredient (201)</summary>
 
 ```http
-POST /api/v1/ingredients/b293b19c-6022-4a0d-ac28-2000b56431d3/prices
+POST /api/v1/ingredients/1e1b56b2-ebb3-4e7d-917f-c3c41778225c/prices
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -2909,7 +2943,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "1419de7e-7726-49f7-889e-1a5eba911d12",
+  "id": "a53f797e-f3b6-4c41-8cd3-fa016019e003",
   "price": 0.0100,
   "perQuantity": 1000.000,
   "unitPrice": 0.00001,
@@ -2924,7 +2958,7 @@ Response `201` `application/json`:
 <details><summary>Example — price entered by mistake (201)</summary>
 
 ```http
-POST /api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices
+POST /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/prices
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -2940,7 +2974,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "42df6159-205c-414f-a749-53275f1f4a1d",
+  "id": "27603253-6e13-412d-b951-955066d627f1",
   "price": 45.0000,
   "perQuantity": 1000.000,
   "unitPrice": 0.045,
@@ -2977,7 +3011,7 @@ US-12. Corrects a price entered by mistake; another price on the new date is a 4
 <details><summary>Example — typical (200)</summary>
 
 ```http
-PUT /api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/42df6159-205c-414f-a749-53275f1f4a1d
+PUT /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/prices/27603253-6e13-412d-b951-955066d627f1
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -2993,7 +3027,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "42df6159-205c-414f-a749-53275f1f4a1d",
+  "id": "27603253-6e13-412d-b951-955066d627f1",
   "price": 4.5000,
   "perQuantity": 1000.000,
   "unitPrice": 0.0045,
@@ -3008,7 +3042,7 @@ Response `200` `application/json`:
 <details><summary>Example — price not found (404)</summary>
 
 ```http
-PUT /api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/00000000-0000-4000-9999-000000000000
+PUT /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/prices/00000000-0000-4000-9999-000000000000
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -3028,9 +3062,9 @@ Response `404` `application/problem+json`:
   "title": "The requested resource was not found.",
   "status": 404,
   "detail": "The price was not found.",
-  "instance": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/00000000-0000-4000-9999-000000000000",
-  "traceId": "00-27c3d05cd034f3d3bfe119c2784d4492-e09cfed79fb5d427-02",
-  "correlationId": "917cd5babfa4457792e9f199010fa089"
+  "instance": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/prices/00000000-0000-4000-9999-000000000000",
+  "traceId": "00-49a0ed67aa5953aa459c79b69bdc8c43-7e98feace77c5265-02",
+  "correlationId": "28c629a9b81f474387ef979360088223"
 }
 ```
 
@@ -3057,7 +3091,7 @@ US-12. Costs on the dates of the deleted price fall back to the previous price.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-DELETE /api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/42df6159-205c-414f-a749-53275f1f4a1d
+DELETE /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/prices/27603253-6e13-412d-b951-955066d627f1
 Authorization: Bearer <access token>
 ```
 
@@ -3070,7 +3104,7 @@ _(no body)_
 <details><summary>Example — already deleted (404)</summary>
 
 ```http
-DELETE /api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/42df6159-205c-414f-a749-53275f1f4a1d
+DELETE /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/prices/27603253-6e13-412d-b951-955066d627f1
 Authorization: Bearer <access token>
 ```
 
@@ -3082,9 +3116,9 @@ Response `404` `application/problem+json`:
   "title": "The requested resource was not found.",
   "status": 404,
   "detail": "The price was not found.",
-  "instance": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/42df6159-205c-414f-a749-53275f1f4a1d",
-  "traceId": "00-36290b7728f2b985326f28bffa85ccb7-adace2f302df2f5f-02",
-  "correlationId": "d6232c1ab9724877b9d3dacf2c36385e"
+  "instance": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/prices/27603253-6e13-412d-b951-955066d627f1",
+  "traceId": "00-26ac0a6b7b0b5c08360fb3ab247f8a68-e098be23fcba29f7-02",
+  "correlationId": "8455089d550f468085e582e7e574270b"
 }
 ```
 
@@ -3113,7 +3147,7 @@ Purchases, batch consumption and returns, starter feedings and corrections; newe
 <details><summary>Example — purchase and correction (200)</summary>
 
 ```http
-GET /api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/stock-movements?page=1&pageSize=20
+GET /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/stock-movements?page=1&pageSize=20
 Authorization: Bearer <access token>
 ```
 
@@ -3123,7 +3157,7 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "b1ca09cd-304e-499d-a0d5-08ea68555af4",
+      "id": "5fdec6cb-faca-4f0f-a50f-a07a16db6848",
       "type": "adjustment",
       "quantity": -70.000,
       "occurredOn": "2026-11-24",
@@ -3134,10 +3168,10 @@ Response `200` `application/json`:
       "totalCost": null,
       "currency": null,
       "note": "Counted the shelf",
-      "createdAt": "2026-11-24T19:27:05.023505+00:00"
+      "createdAt": "2026-11-24T20:55:45.115083+00:00"
     },
     {
-      "id": "d1145f42-1c6d-4493-bdf4-c54865c14bee",
+      "id": "08626dc2-27b2-4a53-bd82-e662ca169854",
       "type": "purchase",
       "quantity": 500.000,
       "occurredOn": "2026-11-22",
@@ -3148,7 +3182,7 @@ Response `200` `application/json`:
       "totalCost": 3.2000,
       "currency": "EUR",
       "note": "Market",
-      "createdAt": "2026-11-24T19:27:04.905227+00:00"
+      "createdAt": "2026-11-24T20:55:45.010776+00:00"
     }
   ],
   "page": 1,
@@ -3182,7 +3216,7 @@ Packs of a size bought for an amount: the price of the date is created or replac
 <details><summary>Example — two packs of 250 g (200)</summary>
 
 ```http
-POST /api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/records
+POST /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/records
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -3201,7 +3235,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "bdbc70fe-0af1-408e-acf2-9804f9841163",
+  "id": "1e30b37f-c209-4d97-874b-d465cc30c864",
   "name": "Sunflower seeds",
   "categoryCode": "add_in",
   "unitCode": "g",
@@ -3215,8 +3249,8 @@ Response `200` `application/json`:
     "currency": "EUR",
     "effectiveFrom": "2026-11-22"
   },
-  "createdAt": "2026-11-24T19:27:04.803428+00:00",
-  "updatedAt": "2026-11-24T19:27:04.905227+00:00",
+  "createdAt": "2026-11-24T20:55:44.947891+00:00",
+  "updatedAt": "2026-11-24T20:55:45.010776+00:00",
   "trackStock": true,
   "stock": 500.000,
   "reorderLevel": null,
@@ -3231,7 +3265,7 @@ Response `200` `application/json`:
 <details><summary>Example — price only (200)</summary>
 
 ```http
-POST /api/v1/ingredients/cad0f44b-a059-45d6-ac52-beb5446d76d1/records
+POST /api/v1/ingredients/ba1627ce-53a9-4c85-ba2d-968ef091cdf3/records
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -3250,7 +3284,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "cad0f44b-a059-45d6-ac52-beb5446d76d1",
+  "id": "ba1627ce-53a9-4c85-ba2d-968ef091cdf3",
   "name": "Sea salt",
   "categoryCode": "salt",
   "unitCode": "g",
@@ -3264,8 +3298,8 @@ Response `200` `application/json`:
     "currency": "EUR",
     "effectiveFrom": "2026-11-21"
   },
-  "createdAt": "2026-11-24T19:27:04.648837+00:00",
-  "updatedAt": "2026-11-24T19:27:04.707834+00:00",
+  "createdAt": "2026-11-24T20:55:44.796544+00:00",
+  "updatedAt": "2026-11-24T20:55:44.860672+00:00",
   "trackStock": false,
   "stock": null,
   "reorderLevel": null,
@@ -3280,7 +3314,7 @@ Response `200` `application/json`:
 <details><summary>Example — no packs (400)</summary>
 
 ```http
-POST /api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/records
+POST /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/records
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -3302,14 +3336,14 @@ Response `400` `application/problem+json`:
   "type": "https://oneloaf.app/problems/validation",
   "title": "One or more validation errors occurred.",
   "status": 400,
-  "instance": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/records",
+  "instance": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/records",
   "errors": {
     "packCount": [
       "'Pack Count' должно быть в диапазоне от 1 до 10000. Введенное значение: 0."
     ]
   },
-  "traceId": "00-27cf0b0f2c60bcf8a04edb0cbd5dd5c6-673115be9a8375a4-02",
-  "correlationId": "d6f9be9c9a4a4a0180c2c1a1246ccbcd"
+  "traceId": "00-49663d103c21558445bd0b3c4a2471b0-d59b5e82ebff41f8-02",
+  "correlationId": "3101441dcc5840a8b0e29e627cfecd28"
 }
 ```
 
@@ -3332,33 +3366,39 @@ Only the owner; 404 without a photo.
 | 401 | Missing, invalid or expired bearer token | [ProblemDetails](#model-problemdetails) |
 | 404 | Not found, or it belongs to another user | [ProblemDetails](#model-problemdetails) |
 
-<details><summary>Example — generated from the schema</summary>
+<details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/ingredients/{id}/photo
+GET /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo
 Authorization: Bearer <access token>
 ```
 
-Response `200`:
+Response `200` `image/png`:
+
+```text
+<binary image/png, 29 bytes>
+```
+
+</details>
+
+<details><summary>Example — no photo (404)</summary>
+
+```http
+GET /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo
+Authorization: Bearer <access token>
+```
+
+Response `404` `application/problem+json`:
 
 ```json
 {
-  "contentType": "string",
-  "fileDownloadName": "string",
-  "lastModified": "2026-12-05T08:00:00+02:00",
-  "entityTag": {
-    "tag": {
-      "buffer": null,
-      "offset": null,
-      "length": null,
-      "value": null,
-      "hasValue": null
-    },
-    "isWeak": true
-  },
-  "enableRangeProcessing": true,
-  "fileLength": 1,
-  "fileStream": "string"
+  "type": "https://oneloaf.app/problems/not-found",
+  "title": "The requested resource was not found.",
+  "status": 404,
+  "detail": "The photo was not found.",
+  "instance": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo",
+  "traceId": "00-9efc23c8291e164e5a06645ceed79895-731083ca67372f6b-02",
+  "correlationId": "40641d5a0ebe4c37aef057740c7388c5"
 }
 ```
 
@@ -3382,11 +3422,52 @@ multipart/form-data with the image in the field 'file'; JPEG, PNG or WebP (check
 | 404 | Not found, or it belongs to another user | [ProblemDetails](#model-problemdetails) |
 | 422 | Business rule violated; `detail` says which | [ProblemDetails](#model-problemdetails) |
 
-<details><summary>Example — generated from the schema</summary>
+<details><summary>Example — typical (204)</summary>
 
 ```http
-PUT /api/v1/ingredients/{id}/photo
+PUT /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo
 Authorization: Bearer <access token>
+Content-Type: application/json
+
+{
+  "multipart/form-data": {
+    "file": "<pack.png, image/png, 29 bytes>"
+  }
+}
+```
+
+Response `204`:
+
+_(no body)_
+
+</details>
+
+<details><summary>Example — not an image (422)</summary>
+
+```http
+PUT /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo
+Authorization: Bearer <access token>
+Content-Type: application/json
+
+{
+  "multipart/form-data": {
+    "file": "<notes.png, image/png, 10 bytes>"
+  }
+}
+```
+
+Response `422` `application/problem+json`:
+
+```json
+{
+  "type": "https://oneloaf.app/problems/business-rule",
+  "title": "The request violates a business rule.",
+  "status": 422,
+  "detail": "Only JPEG, PNG and WebP images are accepted.",
+  "instance": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo",
+  "traceId": "00-bdb0e7d923a8ba4515f4f3317e0bcda2-143db7d8f257fe8c-02",
+  "correlationId": "d02bf45297d14403a45ed751708ba50c"
+}
 ```
 
 </details>
@@ -3408,12 +3489,16 @@ Authorization: Bearer <access token>
 | 401 | Missing, invalid or expired bearer token | [ProblemDetails](#model-problemdetails) |
 | 404 | Not found, or it belongs to another user | [ProblemDetails](#model-problemdetails) |
 
-<details><summary>Example — generated from the schema</summary>
+<details><summary>Example — typical (204)</summary>
 
 ```http
-DELETE /api/v1/ingredients/{id}/photo
+DELETE /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo
 Authorization: Bearer <access token>
 ```
+
+Response `204`:
+
+_(no body)_
 
 </details>
 
@@ -3440,7 +3525,7 @@ Writes the difference between the counted quantity and the stock to the ledger; 
 <details><summary>Example — typical (201)</summary>
 
 ```http
-POST /api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/stock-adjustments
+POST /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/stock-adjustments
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -3454,7 +3539,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "b1ca09cd-304e-499d-a0d5-08ea68555af4",
+  "id": "5fdec6cb-faca-4f0f-a50f-a07a16db6848",
   "type": "adjustment",
   "quantity": -70.000,
   "occurredOn": "2026-11-24",
@@ -3465,7 +3550,7 @@ Response `201` `application/json`:
   "totalCost": null,
   "currency": null,
   "note": "Counted the shelf",
-  "createdAt": "2026-11-24T19:27:05.023505+00:00"
+  "createdAt": "2026-11-24T20:55:45.115083+00:00"
 }
 ```
 
@@ -3474,7 +3559,7 @@ Response `201` `application/json`:
 <details><summary>Example — stock already equals the quantity (400)</summary>
 
 ```http
-POST /api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/stock-adjustments
+POST /api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/stock-adjustments
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -3491,14 +3576,14 @@ Response `400` `application/problem+json`:
   "type": "https://oneloaf.app/problems/validation",
   "title": "One or more validation errors occurred.",
   "status": 400,
-  "instance": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/stock-adjustments",
+  "instance": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/stock-adjustments",
   "errors": {
     "actualQuantity": [
       "The stock already equals this quantity."
     ]
   },
-  "traceId": "00-acd2388f43ce795b830fdfe2b277e591-a1fc0e6f24919842-02",
-  "correlationId": "27a7051362c84b6ab7a3804a14e1d89d"
+  "traceId": "00-f7e22b8034f42f9ae124713dda5201da-ead8d2da54628318-02",
+  "correlationId": "32ec3642e7d84dafa035e2afbe7e2b51"
 }
 ```
 
@@ -3540,12 +3625,12 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "title": "Country sourdough",
       "parentRecipeId": null,
       "yieldLoaves": 1,
       "isArchived": false,
-      "updatedAt": "2026-11-24T19:27:05.242239+00:00",
+      "updatedAt": "2026-11-24T20:55:45.320353+00:00",
       "hasPhoto": false
     }
   ],
@@ -3570,12 +3655,12 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "title": "Country sourdough",
       "parentRecipeId": null,
       "yieldLoaves": 1,
       "isArchived": false,
-      "updatedAt": "2026-11-24T19:27:05.242239+00:00",
+      "updatedAt": "2026-11-24T20:55:45.320353+00:00",
       "hasPhoto": false
     }
   ],
@@ -3617,19 +3702,19 @@ Content-Type: application/json
   "notes": null,
   "ingredients": [
     {
-      "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+      "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
       "quantity": 500
     },
     {
-      "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+      "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
       "quantity": 350
     },
     {
-      "ingredientId": "cad0f44b-a059-45d6-ac52-beb5446d76d1",
+      "ingredientId": "ba1627ce-53a9-4c85-ba2d-968ef091cdf3",
       "quantity": 10
     },
     {
-      "ingredientId": "9af4e978-d28a-4181-bfc9-4c045e878797",
+      "ingredientId": "76b5f6a4-b7cc-4b22-9847-1023decfd765",
       "quantity": 100
     }
   ],
@@ -3678,7 +3763,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+  "id": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
   "parentRecipeId": null,
   "title": "Country sourdough",
   "description": "Open crumb, crisp crust.",
@@ -3688,8 +3773,8 @@ Response `201` `application/json`:
   "isArchived": false,
   "ingredients": [
     {
-      "lineId": "7d8ae9c8-2c0b-491c-a944-020e38fd84e4",
-      "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+      "lineId": "29de6d6e-d865-4d29-9746-02d3bbf0307d",
+      "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
       "ingredientName": "Bread flour",
       "categoryCode": "flour",
       "unitCode": "g",
@@ -3701,8 +3786,8 @@ Response `201` `application/json`:
       "isInherited": false
     },
     {
-      "lineId": "2708a4b8-d57e-4a9a-8cd1-0dd06df4f5e8",
-      "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+      "lineId": "4c1a17d3-39fb-4edf-a841-e2604265d426",
+      "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
       "ingredientName": "Water",
       "categoryCode": "water",
       "unitCode": "g",
@@ -3716,7 +3801,7 @@ Response `201` `application/json`:
   ],
   "stages": [
     {
-      "lineId": "0e3bf0ab-e124-449b-9019-a0c6d27bda77",
+      "lineId": "c44a20bc-672a-430b-93e5-ae614f41ad66",
       "sortOrder": 1,
       "name": "Mix",
       "stageTypeCode": "mix",
@@ -3732,7 +3817,7 @@ Response `201` `application/json`:
       "isInherited": false
     },
     {
-      "lineId": "f611d077-0cd4-4960-a194-b2e5a88f170b",
+      "lineId": "b54762cd-381a-4b2f-adb6-ad3f969cff4b",
       "sortOrder": 2,
       "name": "Bulk fermentation",
       "stageTypeCode": "bulk_fermentation",
@@ -3748,8 +3833,8 @@ Response `201` `application/json`:
       "isInherited": false
     }
   ],
-  "createdAt": "2026-11-24T19:27:05.242239+00:00",
-  "updatedAt": "2026-11-24T19:27:05.242239+00:00",
+  "createdAt": "2026-11-24T20:55:45.320353+00:00",
+  "updatedAt": "2026-11-24T20:55:45.320353+00:00",
   "hasPhoto": false
 }
 ```
@@ -3771,7 +3856,7 @@ Content-Type: application/json
   "notes": null,
   "ingredients": [
     {
-      "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+      "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
       "quantity": 100
     }
   ],
@@ -3799,8 +3884,8 @@ Response `400` `application/problem+json`:
       "'Max Duration Minutes' должно быть больше или равно '30'."
     ]
   },
-  "traceId": "00-d8d6b2eca9afea2101a924fac4509ae5-2ee71cb1ed345e49-02",
-  "correlationId": "1bbe859f95634f9db2af2d7b30179ca7"
+  "traceId": "00-724e23757a595355286e8e3c26ce4c6d-c93ee4c573540ea6-02",
+  "correlationId": "6c4cede5413943c4b56f6769f9d93f5e"
 }
 ```
 
@@ -3874,7 +3959,7 @@ Response `201` `application/json`:
 ```json
 {
   "recipe": {
-    "id": "16e99bd7-14a8-4baf-97ed-1865d56a923c",
+    "id": "a33d00a5-ea14-424a-bc20-a90405d725f1",
     "parentRecipeId": null,
     "title": "Beginner sourdough",
     "description": "A simple first loaf.",
@@ -3884,8 +3969,8 @@ Response `201` `application/json`:
     "isArchived": false,
     "ingredients": [
       {
-        "lineId": "50eac70a-9200-451e-a13a-f14252449851",
-        "ingredientId": "89d05c88-b4de-486d-b193-8b58926b10d6",
+        "lineId": "65992042-bc3b-4de9-990c-c49dd79c011f",
+        "ingredientId": "3e48070d-ec10-4d81-9687-644b87a19f2a",
         "ingredientName": "Whole wheat flour",
         "categoryCode": "flour",
         "unitCode": "g",
@@ -3897,8 +3982,8 @@ Response `201` `application/json`:
         "isInherited": false
       },
       {
-        "lineId": "c5ca24ee-cd80-492c-837a-133d7e6aa902",
-        "ingredientId": "9f9d80b6-e340-44c0-adec-5a972006669e",
+        "lineId": "deb76716-3d71-4ac7-af25-17a758aa52ac",
+        "ingredientId": "d9bc2825-e8aa-4006-b84c-9275b1e529d4",
         "ingredientName": "Honey",
         "categoryCode": "sweetener",
         "unitCode": "g",
@@ -3912,7 +3997,7 @@ Response `201` `application/json`:
     ],
     "stages": [
       {
-        "lineId": "9dc6374d-5aa4-4838-818c-23becdf4ebf6",
+        "lineId": "8c3be2a8-b5f3-4425-b0b4-42ffcd188628",
         "sortOrder": 1,
         "name": "Mix",
         "stageTypeCode": "mix",
@@ -3928,7 +4013,7 @@ Response `201` `application/json`:
         "isInherited": false
       },
       {
-        "lineId": "fdca96c4-2599-425d-bb49-ad9f0932e41d",
+        "lineId": "0df7d502-415e-47a5-91d5-4891ebc35634",
         "sortOrder": 2,
         "name": "Bake",
         "stageTypeCode": "bake",
@@ -3944,8 +4029,8 @@ Response `201` `application/json`:
         "isInherited": false
       }
     ],
-    "createdAt": "2026-11-24T19:27:05.338216+00:00",
-    "updatedAt": "2026-11-24T19:27:05.338216+00:00",
+    "createdAt": "2026-11-24T20:55:45.435859+00:00",
+    "updatedAt": "2026-11-24T20:55:45.435859+00:00",
     "hasPhoto": false
   },
   "createdIngredients": [
@@ -4004,8 +4089,8 @@ Response `400` `application/problem+json`:
       "Unknown stage type 'nap'."
     ]
   },
-  "traceId": "00-bf962a9714c0072a33babc411c571b8c-a96f654948abd3ce-02",
-  "correlationId": "e59013aadf5146d4bfb88ed617937171"
+  "traceId": "00-1b7b4e422cee16200e2caf24f1a14a9c-76bbf935a1575f6d-02",
+  "correlationId": "b0336c85d47a426c88d5bfc9725b0d4b"
 }
 ```
 
@@ -4031,7 +4116,7 @@ US-05, US-07. A variant is shown with the inherited content resolved (isInherite
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9
+GET /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98
 Authorization: Bearer <access token>
 ```
 
@@ -4039,7 +4124,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+  "id": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
   "parentRecipeId": null,
   "title": "Country sourdough",
   "description": "Open crumb, crisp crust.",
@@ -4049,8 +4134,8 @@ Response `200` `application/json`:
   "isArchived": false,
   "ingredients": [
     {
-      "lineId": "7d8ae9c8-2c0b-491c-a944-020e38fd84e4",
-      "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+      "lineId": "29de6d6e-d865-4d29-9746-02d3bbf0307d",
+      "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
       "ingredientName": "Bread flour",
       "categoryCode": "flour",
       "unitCode": "g",
@@ -4062,8 +4147,8 @@ Response `200` `application/json`:
       "isInherited": false
     },
     {
-      "lineId": "2708a4b8-d57e-4a9a-8cd1-0dd06df4f5e8",
-      "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+      "lineId": "4c1a17d3-39fb-4edf-a841-e2604265d426",
+      "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
       "ingredientName": "Water",
       "categoryCode": "water",
       "unitCode": "g",
@@ -4077,7 +4162,7 @@ Response `200` `application/json`:
   ],
   "stages": [
     {
-      "lineId": "0e3bf0ab-e124-449b-9019-a0c6d27bda77",
+      "lineId": "c44a20bc-672a-430b-93e5-ae614f41ad66",
       "sortOrder": 1,
       "name": "Mix",
       "stageTypeCode": "mix",
@@ -4093,7 +4178,7 @@ Response `200` `application/json`:
       "isInherited": false
     },
     {
-      "lineId": "f611d077-0cd4-4960-a194-b2e5a88f170b",
+      "lineId": "b54762cd-381a-4b2f-adb6-ad3f969cff4b",
       "sortOrder": 2,
       "name": "Bulk fermentation",
       "stageTypeCode": "bulk_fermentation",
@@ -4109,8 +4194,8 @@ Response `200` `application/json`:
       "isInherited": false
     }
   ],
-  "createdAt": "2026-11-24T19:27:05.242239+00:00",
-  "updatedAt": "2026-11-24T19:27:05.242239+00:00",
+  "createdAt": "2026-11-24T20:55:45.320353+00:00",
+  "updatedAt": "2026-11-24T20:55:45.320353+00:00",
   "hasPhoto": false
 }
 ```
@@ -4141,7 +4226,7 @@ US-05, US-07. For a variant only the differences from the parent are stored.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-PUT /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9
+PUT /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -4153,19 +4238,19 @@ Content-Type: application/json
   "notes": "Feed the starter the evening before.",
   "ingredients": [
     {
-      "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+      "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
       "quantity": 500
     },
     {
-      "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+      "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
       "quantity": 350
     },
     {
-      "ingredientId": "cad0f44b-a059-45d6-ac52-beb5446d76d1",
+      "ingredientId": "ba1627ce-53a9-4c85-ba2d-968ef091cdf3",
       "quantity": 10
     },
     {
-      "ingredientId": "9af4e978-d28a-4181-bfc9-4c045e878797",
+      "ingredientId": "76b5f6a4-b7cc-4b22-9847-1023decfd765",
       "quantity": 100
     }
   ],
@@ -4214,7 +4299,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+  "id": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
   "parentRecipeId": null,
   "title": "Country sourdough",
   "description": "Open crumb, crisp crust.",
@@ -4224,8 +4309,8 @@ Response `200` `application/json`:
   "isArchived": false,
   "ingredients": [
     {
-      "lineId": "7255196f-01cc-4ff7-975c-71515166277d",
-      "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+      "lineId": "ff90f1d1-034e-46a2-b9d6-4c40300a9e72",
+      "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
       "ingredientName": "Bread flour",
       "categoryCode": "flour",
       "unitCode": "g",
@@ -4237,8 +4322,8 @@ Response `200` `application/json`:
       "isInherited": false
     },
     {
-      "lineId": "53eed3f5-de01-40b2-9568-f2f49b345f8e",
-      "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+      "lineId": "7018b103-892a-42df-b458-46bf43753e69",
+      "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
       "ingredientName": "Water",
       "categoryCode": "water",
       "unitCode": "g",
@@ -4252,7 +4337,7 @@ Response `200` `application/json`:
   ],
   "stages": [
     {
-      "lineId": "a0a15184-103e-423d-ae4b-4d55e8b0d441",
+      "lineId": "def5082c-d12a-4882-82bc-20445a976e0d",
       "sortOrder": 1,
       "name": "Mix",
       "stageTypeCode": "mix",
@@ -4268,7 +4353,7 @@ Response `200` `application/json`:
       "isInherited": false
     },
     {
-      "lineId": "a3e09913-99fe-4697-92b0-5a08665cde83",
+      "lineId": "dd83b90f-1b07-4783-a649-b08d31df73e6",
       "sortOrder": 2,
       "name": "Bulk fermentation",
       "stageTypeCode": "bulk_fermentation",
@@ -4284,8 +4369,8 @@ Response `200` `application/json`:
       "isInherited": false
     }
   ],
-  "createdAt": "2026-11-24T19:27:05.242239+00:00",
-  "updatedAt": "2026-11-24T19:27:05.5608+00:00",
+  "createdAt": "2026-11-24T20:55:45.320353+00:00",
+  "updatedAt": "2026-11-24T20:55:45.651463+00:00",
   "hasPhoto": false
 }
 ```
@@ -4295,7 +4380,7 @@ Response `200` `application/json`:
 <details><summary>Example — variant (only differences are stored) (200)</summary>
 
 ```http
-PUT /api/v1/recipes/bb13b709-05f6-4b83-b335-b6f8d66fb34a
+PUT /api/v1/recipes/9152d05e-0b3d-4881-9365-862cbb121938
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -4307,19 +4392,19 @@ Content-Type: application/json
   "notes": null,
   "ingredients": [
     {
-      "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+      "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
       "quantity": 500
     },
     {
-      "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+      "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
       "quantity": 350
     },
     {
-      "ingredientId": "cad0f44b-a059-45d6-ac52-beb5446d76d1",
+      "ingredientId": "ba1627ce-53a9-4c85-ba2d-968ef091cdf3",
       "quantity": 10
     },
     {
-      "ingredientId": "9af4e978-d28a-4181-bfc9-4c045e878797",
+      "ingredientId": "76b5f6a4-b7cc-4b22-9847-1023decfd765",
       "quantity": 100
     }
   ],
@@ -4368,8 +4453,8 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "bb13b709-05f6-4b83-b335-b6f8d66fb34a",
-  "parentRecipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+  "id": "9152d05e-0b3d-4881-9365-862cbb121938",
+  "parentRecipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
   "title": "Country sourdough, longer bulk",
   "description": "Open crumb, crisp crust.",
   "yieldLoaves": 1,
@@ -4378,8 +4463,8 @@ Response `200` `application/json`:
   "isArchived": false,
   "ingredients": [
     {
-      "lineId": "522dc97d-59d6-44a7-98b1-0fac2c91a3a9",
-      "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+      "lineId": "7802039a-737a-4d0e-a84b-43721f3cdc97",
+      "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
       "ingredientName": "Bread flour",
       "categoryCode": "flour",
       "unitCode": "g",
@@ -4391,8 +4476,8 @@ Response `200` `application/json`:
       "isInherited": false
     },
     {
-      "lineId": "b5b8d0fb-63ff-4ba2-ab75-324795c4df1f",
-      "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+      "lineId": "034ead54-6120-4d07-b05e-2b35de9efe0e",
+      "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
       "ingredientName": "Water",
       "categoryCode": "water",
       "unitCode": "g",
@@ -4406,7 +4491,7 @@ Response `200` `application/json`:
   ],
   "stages": [
     {
-      "lineId": "9c88eeaf-308b-4ecf-af3d-c0486154373d",
+      "lineId": "7589bacb-30e6-4d1c-9c63-d02fbc843212",
       "sortOrder": 1,
       "name": "Mix",
       "stageTypeCode": "mix",
@@ -4422,7 +4507,7 @@ Response `200` `application/json`:
       "isInherited": false
     },
     {
-      "lineId": "c414c075-75cf-4f54-bea5-b94a3afee17c",
+      "lineId": "226abbd5-fe76-4606-9cb0-aa92942f68b9",
       "sortOrder": 2,
       "name": "Bulk fermentation",
       "stageTypeCode": "bulk_fermentation",
@@ -4438,8 +4523,8 @@ Response `200` `application/json`:
       "isInherited": false
     }
   ],
-  "createdAt": "2026-11-24T19:27:05.586428+00:00",
-  "updatedAt": "2026-11-24T19:27:05.614507+00:00",
+  "createdAt": "2026-11-24T20:55:45.677148+00:00",
+  "updatedAt": "2026-11-24T20:55:45.708183+00:00",
   "hasPhoto": false
 }
 ```
@@ -4467,7 +4552,7 @@ US-05. A recipe with variants or used in batches cannot be deleted (409); archiv
 <details><summary>Example — has variants (409)</summary>
 
 ```http
-DELETE /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9
+DELETE /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98
 Authorization: Bearer <access token>
 ```
 
@@ -4479,9 +4564,9 @@ Response `409` `application/problem+json`:
   "title": "The request conflicts with existing data.",
   "status": 409,
   "detail": "The recipe has variants or is used in batches; archive it instead.",
-  "instance": "/api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9",
-  "traceId": "00-62873ff1341de322396480e8c90ec5d0-effd83f468259c76-02",
-  "correlationId": "0269eeb212874b4db65144b6a633f3ce"
+  "instance": "/api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
+  "traceId": "00-5f683b61b976598976ff9b887686754c-4642ac2a5b6415ca-02",
+  "correlationId": "b9938533dbdd4783bfad3e7aaecfd738"
 }
 ```
 
@@ -4504,33 +4589,39 @@ Only the owner; 404 without a photo.
 | 401 | Missing, invalid or expired bearer token | [ProblemDetails](#model-problemdetails) |
 | 404 | Not found, or it belongs to another user | [ProblemDetails](#model-problemdetails) |
 
-<details><summary>Example — generated from the schema</summary>
+<details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/recipes/{id}/photo
+GET /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/photo
 Authorization: Bearer <access token>
 ```
 
-Response `200`:
+Response `200` `image/png`:
+
+```text
+<binary image/png, 29 bytes>
+```
+
+</details>
+
+<details><summary>Example — no photo (404)</summary>
+
+```http
+GET /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/photo
+Authorization: Bearer <access token>
+```
+
+Response `404` `application/problem+json`:
 
 ```json
 {
-  "contentType": "string",
-  "fileDownloadName": "string",
-  "lastModified": "2026-12-05T08:00:00+02:00",
-  "entityTag": {
-    "tag": {
-      "buffer": null,
-      "offset": null,
-      "length": null,
-      "value": null,
-      "hasValue": null
-    },
-    "isWeak": true
-  },
-  "enableRangeProcessing": true,
-  "fileLength": 1,
-  "fileStream": "string"
+  "type": "https://oneloaf.app/problems/not-found",
+  "title": "The requested resource was not found.",
+  "status": 404,
+  "detail": "The photo was not found.",
+  "instance": "/api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/photo",
+  "traceId": "00-495425d96f5ecbceb14a2fcf939444af-95543e868b43b113-02",
+  "correlationId": "85226df805a24bd9bcf8a89c6da712c7"
 }
 ```
 
@@ -4554,12 +4645,23 @@ multipart/form-data with the image in the field 'file'; JPEG, PNG or WebP (check
 | 404 | Not found, or it belongs to another user | [ProblemDetails](#model-problemdetails) |
 | 422 | Business rule violated; `detail` says which | [ProblemDetails](#model-problemdetails) |
 
-<details><summary>Example — generated from the schema</summary>
+<details><summary>Example — typical (204)</summary>
 
 ```http
-PUT /api/v1/recipes/{id}/photo
+PUT /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/photo
 Authorization: Bearer <access token>
+Content-Type: application/json
+
+{
+  "multipart/form-data": {
+    "file": "<loaf.png, image/png, 29 bytes>"
+  }
+}
 ```
+
+Response `204`:
+
+_(no body)_
 
 </details>
 
@@ -4580,12 +4682,16 @@ Authorization: Bearer <access token>
 | 401 | Missing, invalid or expired bearer token | [ProblemDetails](#model-problemdetails) |
 | 404 | Not found, or it belongs to another user | [ProblemDetails](#model-problemdetails) |
 
-<details><summary>Example — generated from the schema</summary>
+<details><summary>Example — typical (204)</summary>
 
 ```http
-DELETE /api/v1/recipes/{id}/photo
+DELETE /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/photo
 Authorization: Bearer <access token>
 ```
+
+Response `204`:
+
+_(no body)_
 
 </details>
 
@@ -4609,7 +4715,7 @@ US-05. Hidden from the default list.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-POST /api/v1/recipes/bb13b709-05f6-4b83-b335-b6f8d66fb34a/archive
+POST /api/v1/recipes/9152d05e-0b3d-4881-9365-862cbb121938/archive
 Authorization: Bearer <access token>
 ```
 
@@ -4639,7 +4745,7 @@ US-05.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-POST /api/v1/recipes/bb13b709-05f6-4b83-b335-b6f8d66fb34a/unarchive
+POST /api/v1/recipes/9152d05e-0b3d-4881-9365-862cbb121938/unarchive
 Authorization: Bearer <access token>
 ```
 
@@ -4672,7 +4778,7 @@ US-07. The variant inherits everything; change it with PUT.
 <details><summary>Example — typical (201)</summary>
 
 ```http
-POST /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/variants
+POST /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/variants
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -4685,8 +4791,8 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "bb13b709-05f6-4b83-b335-b6f8d66fb34a",
-  "parentRecipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+  "id": "9152d05e-0b3d-4881-9365-862cbb121938",
+  "parentRecipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
   "title": "Country sourdough, longer bulk",
   "description": "Open crumb, crisp crust.",
   "yieldLoaves": 1,
@@ -4695,8 +4801,8 @@ Response `201` `application/json`:
   "isArchived": false,
   "ingredients": [
     {
-      "lineId": "7255196f-01cc-4ff7-975c-71515166277d",
-      "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+      "lineId": "ff90f1d1-034e-46a2-b9d6-4c40300a9e72",
+      "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
       "ingredientName": "Bread flour",
       "categoryCode": "flour",
       "unitCode": "g",
@@ -4708,8 +4814,8 @@ Response `201` `application/json`:
       "isInherited": true
     },
     {
-      "lineId": "53eed3f5-de01-40b2-9568-f2f49b345f8e",
-      "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+      "lineId": "7018b103-892a-42df-b458-46bf43753e69",
+      "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
       "ingredientName": "Water",
       "categoryCode": "water",
       "unitCode": "g",
@@ -4723,7 +4829,7 @@ Response `201` `application/json`:
   ],
   "stages": [
     {
-      "lineId": "a0a15184-103e-423d-ae4b-4d55e8b0d441",
+      "lineId": "def5082c-d12a-4882-82bc-20445a976e0d",
       "sortOrder": 1,
       "name": "Mix",
       "stageTypeCode": "mix",
@@ -4739,7 +4845,7 @@ Response `201` `application/json`:
       "isInherited": true
     },
     {
-      "lineId": "a3e09913-99fe-4697-92b0-5a08665cde83",
+      "lineId": "dd83b90f-1b07-4783-a649-b08d31df73e6",
       "sortOrder": 2,
       "name": "Bulk fermentation",
       "stageTypeCode": "bulk_fermentation",
@@ -4755,8 +4861,8 @@ Response `201` `application/json`:
       "isInherited": true
     }
   ],
-  "createdAt": "2026-11-24T19:27:05.586428+00:00",
-  "updatedAt": "2026-11-24T19:27:05.586428+00:00",
+  "createdAt": "2026-11-24T20:55:45.677148+00:00",
+  "updatedAt": "2026-11-24T20:55:45.677148+00:00",
   "hasPhoto": false
 }
 ```
@@ -4784,7 +4890,7 @@ US-08. Unchanged, changed, added and removed lines.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/recipes/bb13b709-05f6-4b83-b335-b6f8d66fb34a/comparison
+GET /api/v1/recipes/9152d05e-0b3d-4881-9365-862cbb121938/comparison
 Authorization: Bearer <access token>
 ```
 
@@ -4792,8 +4898,8 @@ Response `200` `application/json`:
 
 ```json
 {
-  "recipeId": "bb13b709-05f6-4b83-b335-b6f8d66fb34a",
-  "parentRecipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+  "recipeId": "9152d05e-0b3d-4881-9365-862cbb121938",
+  "parentRecipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
   "changedFields": [
     "title",
     "notes"
@@ -4802,8 +4908,8 @@ Response `200` `application/json`:
     {
       "change": "removed",
       "parent": {
-        "lineId": "7255196f-01cc-4ff7-975c-71515166277d",
-        "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+        "lineId": "ff90f1d1-034e-46a2-b9d6-4c40300a9e72",
+        "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
         "ingredientName": "Bread flour",
         "categoryCode": "flour",
         "unitCode": "g",
@@ -4819,8 +4925,8 @@ Response `200` `application/json`:
     {
       "change": "removed",
       "parent": {
-        "lineId": "53eed3f5-de01-40b2-9568-f2f49b345f8e",
-        "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+        "lineId": "7018b103-892a-42df-b458-46bf43753e69",
+        "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
         "ingredientName": "Water",
         "categoryCode": "water",
         "unitCode": "g",
@@ -4838,7 +4944,7 @@ Response `200` `application/json`:
     {
       "change": "removed",
       "parent": {
-        "lineId": "a0a15184-103e-423d-ae4b-4d55e8b0d441",
+        "lineId": "def5082c-d12a-4882-82bc-20445a976e0d",
         "sortOrder": 1,
         "name": "Mix",
         "stageTypeCode": "mix",
@@ -4858,7 +4964,7 @@ Response `200` `application/json`:
     {
       "change": "removed",
       "parent": {
-        "lineId": "a3e09913-99fe-4697-92b0-5a08665cde83",
+        "lineId": "dd83b90f-1b07-4783-a649-b08d31df73e6",
         "sortOrder": 2,
         "name": "Bulk fermentation",
         "stageTypeCode": "bulk_fermentation",
@@ -4884,7 +4990,7 @@ Response `200` `application/json`:
 <details><summary>Example — not a variant (422)</summary>
 
 ```http
-GET /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/comparison
+GET /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/comparison
 Authorization: Bearer <access token>
 ```
 
@@ -4896,9 +5002,9 @@ Response `422` `application/problem+json`:
   "title": "The request violates a business rule.",
   "status": 422,
   "detail": "Only a variant can be compared with its parent recipe.",
-  "instance": "/api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/comparison",
-  "traceId": "00-2b2b598c74c90c1f8244c3fa2363adcd-db16949457af3bd4-02",
-  "correlationId": "4decdb2b10fa49a6819222d05a6224c0"
+  "instance": "/api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/comparison",
+  "traceId": "00-fc9d979cb1378d6ec1faa0f87076d386-7b0c38e25e9025a3-02",
+  "correlationId": "59a8b9d376cd4cc7af6228226186db27"
 }
 ```
 
@@ -4926,7 +5032,7 @@ US-06.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/scaled?loaves=3
+GET /api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/scaled?loaves=3
 Authorization: Bearer <access token>
 ```
 
@@ -4934,21 +5040,21 @@ Response `200` `application/json`:
 
 ```json
 {
-  "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+  "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
   "yieldLoaves": 1,
   "loaves": 3,
   "ingredients": [
     {
-      "lineId": "7255196f-01cc-4ff7-975c-71515166277d",
-      "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+      "lineId": "ff90f1d1-034e-46a2-b9d6-4c40300a9e72",
+      "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
       "ingredientName": "Bread flour",
       "unitCode": "g",
       "quantity": 1500.000,
       "isOptional": false
     },
     {
-      "lineId": "53eed3f5-de01-40b2-9568-f2f49b345f8e",
-      "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+      "lineId": "7018b103-892a-42df-b458-46bf43753e69",
+      "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
       "ingredientName": "Water",
       "unitCode": "g",
       "quantity": 1050.000,
@@ -4996,7 +5102,7 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "3357976d-a4d6-422d-affd-80581c93dbce",
+      "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
       "name": "Weekend bake",
       "status": "planned",
       "plannedStartAt": "2026-11-26T06:00:00+00:00",
@@ -5033,8 +5139,8 @@ Response `400` `application/problem+json`:
       "status must be one of: planned, in_progress, done, cancelled."
     ]
   },
-  "traceId": "00-762151f18699f2053f79615a0d4f5899-e6291c8f7c191b2f-02",
-  "correlationId": "e5724047349d49c5ac13bbc756c01d14"
+  "traceId": "00-5230617acc47779d217a68de0c728852-b7d776a8b32fed03-02",
+  "correlationId": "1b13cd82fe604f7bb1a6a37624a0a7ec"
 }
 ```
 
@@ -5053,7 +5159,7 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "3357976d-a4d6-422d-affd-80581c93dbce",
+      "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
       "name": "Weekend bake",
       "status": "planned",
       "plannedStartAt": "2026-11-26T06:00:00+00:00",
@@ -5098,9 +5204,9 @@ Content-Type: application/json
   "source": "manual",
   "items": [
     {
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterReminderMinutes": 60
     }
   ]
@@ -5111,7 +5217,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "name": "Weekend bake",
   "status": "planned",
   "source": "manual",
@@ -5126,18 +5232,18 @@ Response `201` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "45c9a726-8b78-4430-b7e8-312822027d94",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "29c1c75c-5f28-46e6-8e63-c12c49ae466a",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "3340298d-3606-4424-af52-ddce9dbec2ac",
+          "id": "64d87a3c-c6ab-483f-979c-86c3719f91ab",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -5155,7 +5261,7 @@ Response `201` `application/json`:
           "note": null
         },
         {
-          "id": "75592e29-c89d-4d12-811c-3975ffba1c74",
+          "id": "c78dd015-b93a-418b-b709-7063be00eb9c",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -5211,8 +5317,8 @@ Response `400` `application/problem+json`:
       "'Items' должно быть заполнено."
     ]
   },
-  "traceId": "00-58fe453d1b4ec68041a9cc94fc2b1e26-7b0a0cea6bcaf2b2-02",
-  "correlationId": "4e8cfd3f0b8c4c278f62c1ffac6c02d1"
+  "traceId": "00-5bc9c324738b1edb4b21dda98576d385-5ef9b3d54488f4e5-02",
+  "correlationId": "e54c79f969f84aaf95d36b3df5edd470"
 }
 ```
 
@@ -5231,9 +5337,9 @@ Content-Type: application/json
   "source": "manual",
   "items": [
     {
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterReminderMinutes": 60
     }
   ]
@@ -5244,7 +5350,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "f7634d36-c828-4989-ae7e-8d3c6bd419ae",
+  "id": "4e37c132-72a3-42ef-8b3e-fa057e904643",
   "name": "Untouched bake",
   "status": "planned",
   "source": "manual",
@@ -5259,18 +5365,18 @@ Response `201` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "5133da24-423f-4504-b5f1-1399f2658962",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "a3e8785e-bc1b-4c74-b81d-622fc4bdc993",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "4a8be4a6-bc63-42be-ae63-bbc9ad6c6896",
+          "id": "821dcec3-a847-4164-bbc2-10ec96e92459",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -5288,7 +5394,7 @@ Response `201` `application/json`:
           "note": null
         },
         {
-          "id": "88facfd8-878c-420f-88d0-4e84cee72bde",
+          "id": "9d8f9b83-1730-41f4-9d35-2f560a65d8c8",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -5329,9 +5435,9 @@ Content-Type: application/json
   "source": "manual",
   "items": [
     {
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterReminderMinutes": 60
     }
   ]
@@ -5342,7 +5448,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
+  "id": "93c147b8-4027-4364-bee1-2036985ab218",
   "name": "Weekday bake",
   "status": "planned",
   "source": "manual",
@@ -5357,18 +5463,18 @@ Response `201` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "16591114-3cdd-4b5f-aef8-395e09355c9b",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "3078b4d7-fc09-4a34-a1aa-14a028b8d95c",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "711e6906-d70f-4fad-8fe1-b2ac8d54495c",
+          "id": "1869d3f1-1e2b-4705-99d8-44ad4fe74dd2",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -5386,7 +5492,7 @@ Response `201` `application/json`:
           "note": null
         },
         {
-          "id": "2171377b-ad39-48da-b6a4-6c1e07b034dc",
+          "id": "4b24deea-da55-4dfc-83f5-edbe74525dbe",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -5442,9 +5548,9 @@ Content-Type: application/json
   "source": "manual",
   "items": [
     {
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterReminderMinutes": 60
     }
   ]
@@ -5471,10 +5577,10 @@ Response `200` `application/json`:
   "items": [
     {
       "id": "00000000-0000-0000-0000-000000000000",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
@@ -5547,7 +5653,7 @@ US-20, US-23.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce
+GET /api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0
 Authorization: Bearer <access token>
 ```
 
@@ -5555,7 +5661,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "name": "Weekend bake",
   "status": "planned",
   "source": "manual",
@@ -5570,18 +5676,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "45c9a726-8b78-4430-b7e8-312822027d94",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "29c1c75c-5f28-46e6-8e63-c12c49ae466a",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "3340298d-3606-4424-af52-ddce9dbec2ac",
+          "id": "64d87a3c-c6ab-483f-979c-86c3719f91ab",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -5599,7 +5705,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "75592e29-c89d-4d12-811c-3975ffba1c74",
+          "id": "c78dd015-b93a-418b-b709-7063be00eb9c",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -5630,7 +5736,7 @@ Response `200` `application/json`:
 <details><summary>Example — after replanning (200)</summary>
 
 ```http
-GET /api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce
+GET /api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0
 Authorization: Bearer <access token>
 ```
 
@@ -5638,7 +5744,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "name": "Weekend bake",
   "status": "planned",
   "source": "manual",
@@ -5653,18 +5759,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "2014de74-6b23-4ee2-975b-2b32c4de65c8",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "21da1e48-6d12-4106-9c12-43d620557541",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "1190c203-b7cf-4cc0-a754-3102d0d71d6f",
+          "id": "a92341b6-fc2d-41d4-a411-c70ad580bb82",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -5682,7 +5788,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "20dc26da-79ff-4cdc-8c70-26c6dd5daebc",
+          "id": "98dc47f6-2c73-4a2f-8231-0b3a5c258ed2",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -5713,7 +5819,7 @@ Response `200` `application/json`:
 <details><summary>Example — second batch (200)</summary>
 
 ```http
-GET /api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd
+GET /api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218
 Authorization: Bearer <access token>
 ```
 
@@ -5721,7 +5827,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
+  "id": "93c147b8-4027-4364-bee1-2036985ab218",
   "name": "Weekday bake",
   "status": "planned",
   "source": "manual",
@@ -5736,18 +5842,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "16591114-3cdd-4b5f-aef8-395e09355c9b",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "3078b4d7-fc09-4a34-a1aa-14a028b8d95c",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "711e6906-d70f-4fad-8fe1-b2ac8d54495c",
+          "id": "1869d3f1-1e2b-4705-99d8-44ad4fe74dd2",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -5765,7 +5871,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "2171377b-ad39-48da-b6a4-6c1e07b034dc",
+          "id": "4b24deea-da55-4dfc-83f5-edbe74525dbe",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -5817,7 +5923,7 @@ US-20. Only a batch that has not started can be changed (409 otherwise).
 <details><summary>Example — move the start (200)</summary>
 
 ```http
-PUT /api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce
+PUT /api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -5827,9 +5933,9 @@ Content-Type: application/json
   "source": "manual",
   "items": [
     {
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterReminderMinutes": 60
     }
   ]
@@ -5840,7 +5946,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "name": "Weekend bake",
   "status": "planned",
   "source": "manual",
@@ -5855,18 +5961,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "2014de74-6b23-4ee2-975b-2b32c4de65c8",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "21da1e48-6d12-4106-9c12-43d620557541",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "1190c203-b7cf-4cc0-a754-3102d0d71d6f",
+          "id": "a92341b6-fc2d-41d4-a411-c70ad580bb82",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -5884,7 +5990,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "20dc26da-79ff-4cdc-8c70-26c6dd5daebc",
+          "id": "98dc47f6-2c73-4a2f-8231-0b3a5c258ed2",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -5934,7 +6040,7 @@ A running batch cannot be deleted (409). The history record of a completed batch
 <details><summary>Example — cancelled batch (204)</summary>
 
 ```http
-DELETE /api/v1/batches/f7634d36-c828-4989-ae7e-8d3c6bd419ae?ingredientsUsed=false
+DELETE /api/v1/batches/4e37c132-72a3-42ef-8b3e-fa057e904643?ingredientsUsed=false
 Authorization: Bearer <access token>
 ```
 
@@ -5947,7 +6053,7 @@ _(no body)_
 <details><summary>Example — running batch (409)</summary>
 
 ```http
-DELETE /api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd
+DELETE /api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218
 Authorization: Bearer <access token>
 ```
 
@@ -5959,9 +6065,9 @@ Response `409` `application/problem+json`:
   "title": "The request conflicts with existing data.",
   "status": 409,
   "detail": "Complete or cancel the running batch before deleting it.",
-  "instance": "/api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
-  "traceId": "00-624afd8925bafe3fc9a96caf8c6fb3db-ec3b07bdde70bbc8-02",
-  "correlationId": "63ea7adbae9840d2843447b688383af3"
+  "instance": "/api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218",
+  "traceId": "00-439cb4ef79cb8e541c6cdf8e7708c57c-c92cd88895819760-02",
+  "correlationId": "ac29e64d8cce48c597714c84254387c0"
 }
 ```
 
@@ -5989,7 +6095,7 @@ Scheduled reminders of the batch are cancelled. ingredientsUsed=false returns th
 <details><summary>Example — untouched batch, ingredients returned to the stock (204)</summary>
 
 ```http
-POST /api/v1/batches/f7634d36-c828-4989-ae7e-8d3c6bd419ae/cancel?ingredientsUsed=false
+POST /api/v1/batches/4e37c132-72a3-42ef-8b3e-fa057e904643/cancel?ingredientsUsed=false
 Authorization: Bearer <access token>
 ```
 
@@ -6002,7 +6108,7 @@ _(no body)_
 <details><summary>Example — typical (204)</summary>
 
 ```http
-POST /api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/cancel
+POST /api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/cancel
 Authorization: Bearer <access token>
 ```
 
@@ -6028,8 +6134,8 @@ Response `404` `application/problem+json`:
   "status": 404,
   "detail": "The batch was not found.",
   "instance": "/api/v1/batches/00000000-0000-4000-9999-000000000000/cancel",
-  "traceId": "00-70f2fbf576363f23ea960d21d759aacd-37c3f78fbcaa140c-02",
-  "correlationId": "85285a771898424e81a4fa55cb24e659"
+  "traceId": "00-db77b745a029f606476d42530b0f7e0a-89ec8053d9f1b055-02",
+  "correlationId": "e320b9a813ad49cd84e29ddbe4ba7c52"
 }
 ```
 
@@ -6056,7 +6162,7 @@ US-31. The database creates the history record with the cost on the bake date.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-POST /api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce/complete
+POST /api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0/complete
 Authorization: Bearer <access token>
 ```
 
@@ -6064,7 +6170,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "bakeRecordId": "6161f51b-d2fb-43d9-b036-064e475ecb8b"
+  "bakeRecordId": "7b049ade-7914-409f-9d42-88d8957ede11"
 }
 ```
 
@@ -6073,7 +6179,7 @@ Response `200` `application/json`:
 <details><summary>Example — already completed (409)</summary>
 
 ```http
-POST /api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce/complete
+POST /api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0/complete
 Authorization: Bearer <access token>
 ```
 
@@ -6085,9 +6191,9 @@ Response `409` `application/problem+json`:
   "title": "The request conflicts with existing data.",
   "status": 409,
   "detail": "The batch is already finished.",
-  "instance": "/api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce/complete",
-  "traceId": "00-b2b45649693c5037c230e90bf0290f88-b1e364d13b018167-02",
-  "correlationId": "a8066c0ae78b401e8901c8fe90465ecc"
+  "instance": "/api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0/complete",
+  "traceId": "00-b207a416219b6d2705d5467dbcb42f02-01bfc0935bc88d79-02",
+  "correlationId": "e169f971fa0a49689e1161c7c0edfd68"
 }
 ```
 
@@ -6117,7 +6223,7 @@ US-25. Finished stages take their measured duration, changed or extended stages 
 <details><summary>Example — typical (201)</summary>
 
 ```http
-POST /api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce/save-as-variant
+POST /api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0/save-as-variant
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -6132,8 +6238,8 @@ Response `201` `application/json`:
 ```json
 {
   "recipe": {
-    "id": "a0104cba-ef08-4942-9f2f-f49a13cfaa6b",
-    "parentRecipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+    "id": "4207b58e-3604-4f13-8665-d111254a99ba",
+    "parentRecipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
     "title": "Country sourdough, as baked",
     "description": "Open crumb, crisp crust.",
     "yieldLoaves": 1,
@@ -6142,8 +6248,8 @@ Response `201` `application/json`:
     "isArchived": false,
     "ingredients": [
       {
-        "lineId": "7255196f-01cc-4ff7-975c-71515166277d",
-        "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
+        "lineId": "ff90f1d1-034e-46a2-b9d6-4c40300a9e72",
+        "ingredientId": "dabd17ca-2d7d-4f2f-b3b1-dbb59250912b",
         "ingredientName": "Bread flour",
         "categoryCode": "flour",
         "unitCode": "g",
@@ -6155,8 +6261,8 @@ Response `201` `application/json`:
         "isInherited": true
       },
       {
-        "lineId": "53eed3f5-de01-40b2-9568-f2f49b345f8e",
-        "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
+        "lineId": "7018b103-892a-42df-b458-46bf43753e69",
+        "ingredientId": "1e1b56b2-ebb3-4e7d-917f-c3c41778225c",
         "ingredientName": "Water",
         "categoryCode": "water",
         "unitCode": "g",
@@ -6170,7 +6276,7 @@ Response `201` `application/json`:
     ],
     "stages": [
       {
-        "lineId": "886a50f9-a0f9-43d9-9daf-92b782b13b1c",
+        "lineId": "c007db4a-4493-4691-8233-64e5ed21ff72",
         "sortOrder": 1,
         "name": "Mix",
         "stageTypeCode": "mix",
@@ -6186,7 +6292,7 @@ Response `201` `application/json`:
         "isInherited": false
       },
       {
-        "lineId": "98f11398-f9dc-48b8-a987-7557c587056b",
+        "lineId": "1edb5cc3-b52e-48a9-85d8-ff1404055d9f",
         "sortOrder": 2,
         "name": "Bulk fermentation",
         "stageTypeCode": "bulk_fermentation",
@@ -6202,8 +6308,8 @@ Response `201` `application/json`:
         "isInherited": false
       }
     ],
-    "createdAt": "2026-11-24T19:27:06.741294+00:00",
-    "updatedAt": "2026-11-24T19:27:06.741294+00:00",
+    "createdAt": "2026-11-24T20:55:46.835951+00:00",
+    "updatedAt": "2026-11-24T20:55:46.835951+00:00",
     "hasPhoto": false
   },
   "changes": [
@@ -6232,7 +6338,7 @@ Response `201` `application/json`:
 <details><summary>Example — batch followed the recipe (422)</summary>
 
 ```http
-POST /api/v1/batches/f7634d36-c828-4989-ae7e-8d3c6bd419ae/save-as-variant
+POST /api/v1/batches/4e37c132-72a3-42ef-8b3e-fa057e904643/save-as-variant
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -6250,9 +6356,9 @@ Response `422` `application/problem+json`:
   "title": "The request violates a business rule.",
   "status": 422,
   "detail": "The batch followed the recipe; there is nothing to save as a variant.",
-  "instance": "/api/v1/batches/f7634d36-c828-4989-ae7e-8d3c6bd419ae/save-as-variant",
-  "traceId": "00-6c512bf1ac5f206aea25169a1d3c60c7-43465cddc1f892b9-02",
-  "correlationId": "7ed3ace1a2a340f097de04045155ec55"
+  "instance": "/api/v1/batches/4e37c132-72a3-42ef-8b3e-fa057e904643/save-as-variant",
+  "traceId": "00-88c1c24ba7ee755bf15b93dcfdfde5b9-177127f574bc400f-02",
+  "correlationId": "12e493187e00421b93d6cacaa031a43b"
 }
 ```
 
@@ -6278,7 +6384,7 @@ US-22.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce/kneading-plan
+GET /api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0/kneading-plan
 Authorization: Bearer <access token>
 ```
 
@@ -6286,13 +6392,13 @@ Response `200` `application/json`:
 
 ```json
 {
-  "batchId": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "batchId": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "groups": [
     {
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "itemIds": [
-        "45c9a726-8b78-4430-b7e8-312822027d94"
+        "29c1c75c-5f28-46e6-8e63-c12c49ae466a"
       ],
       "loaves": 3,
       "doughWeightG": 2880.0000000000000000,
@@ -6333,7 +6439,7 @@ US-23. Stores the actual start; the first started stage moves the batch to in_pr
 <details><summary>Example — typical (200)</summary>
 
 ```http
-POST /api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce/stages/1190c203-b7cf-4cc0-a754-3102d0d71d6f/start
+POST /api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0/stages/a92341b6-fc2d-41d4-a411-c70ad580bb82/start
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -6347,14 +6453,14 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "name": "Weekend bake",
   "status": "in_progress",
   "source": "manual",
   "plannedStartAt": "2026-11-26T07:00:00+00:00",
   "plannedReadyFrom": "2026-11-26T22:05:00+00:00",
   "plannedReadyTo": "2026-11-27T01:20:00+00:00",
-  "actualStartAt": "2026-11-24T19:27:06.595243+00:00",
+  "actualStartAt": "2026-11-24T20:55:46.708731+00:00",
   "completedAt": null,
   "priceDate": "2026-11-24",
   "totalCost": 8.95,
@@ -6362,18 +6468,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "2014de74-6b23-4ee2-975b-2b32c4de65c8",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "21da1e48-6d12-4106-9c12-43d620557541",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "1190c203-b7cf-4cc0-a754-3102d0d71d6f",
+          "id": "a92341b6-fc2d-41d4-a411-c70ad580bb82",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -6382,7 +6488,7 @@ Response `200` `application/json`:
           "plannedStartAt": "2026-11-26T07:00:00+00:00",
           "plannedEndMinAt": "2026-11-26T07:15:00+00:00",
           "plannedEndMaxAt": "2026-11-26T07:20:00+00:00",
-          "actualStartAt": "2026-11-24T19:27:06.595243+00:00",
+          "actualStartAt": "2026-11-24T20:55:46.708731+00:00",
           "actualEndAt": null,
           "status": "running",
           "extendedMinutes": 0,
@@ -6391,7 +6497,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "20dc26da-79ff-4cdc-8c70-26c6dd5daebc",
+          "id": "98dc47f6-2c73-4a2f-8231-0b3a5c258ed2",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -6422,7 +6528,7 @@ Response `200` `application/json`:
 <details><summary>Example — next stage (200)</summary>
 
 ```http
-POST /api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce/stages/20dc26da-79ff-4cdc-8c70-26c6dd5daebc/start
+POST /api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0/stages/98dc47f6-2c73-4a2f-8231-0b3a5c258ed2/start
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -6436,14 +6542,14 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "name": "Weekend bake",
   "status": "in_progress",
   "source": "manual",
   "plannedStartAt": "2026-11-26T07:00:00+00:00",
   "plannedReadyFrom": "2026-11-26T22:05:00+00:00",
   "plannedReadyTo": "2026-11-27T01:20:00+00:00",
-  "actualStartAt": "2026-11-24T19:27:06.595243+00:00",
+  "actualStartAt": "2026-11-24T20:55:46.708731+00:00",
   "completedAt": null,
   "priceDate": "2026-11-24",
   "totalCost": 8.95,
@@ -6451,18 +6557,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "2014de74-6b23-4ee2-975b-2b32c4de65c8",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "21da1e48-6d12-4106-9c12-43d620557541",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "1190c203-b7cf-4cc0-a754-3102d0d71d6f",
+          "id": "a92341b6-fc2d-41d4-a411-c70ad580bb82",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -6471,8 +6577,8 @@ Response `200` `application/json`:
           "plannedStartAt": "2026-11-26T07:00:00+00:00",
           "plannedEndMinAt": "2026-11-26T07:15:00+00:00",
           "plannedEndMaxAt": "2026-11-26T07:20:00+00:00",
-          "actualStartAt": "2026-11-24T19:27:06.595243+00:00",
-          "actualEndAt": "2026-11-24T19:27:06.608913+00:00",
+          "actualStartAt": "2026-11-24T20:55:46.708731+00:00",
+          "actualEndAt": "2026-11-24T20:55:46.721129+00:00",
           "status": "done",
           "extendedMinutes": 0,
           "isOverridden": false,
@@ -6480,7 +6586,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "20dc26da-79ff-4cdc-8c70-26c6dd5daebc",
+          "id": "98dc47f6-2c73-4a2f-8231-0b3a5c258ed2",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -6489,7 +6595,7 @@ Response `200` `application/json`:
           "plannedStartAt": "2026-11-26T07:15:00+00:00",
           "plannedEndMinAt": "2026-11-26T11:15:00+00:00",
           "plannedEndMaxAt": "2026-11-26T12:20:00+00:00",
-          "actualStartAt": "2026-11-24T19:27:06.618952+00:00",
+          "actualStartAt": "2026-11-24T20:55:46.729995+00:00",
           "actualEndAt": null,
           "status": "running",
           "extendedMinutes": 0,
@@ -6511,7 +6617,7 @@ Response `200` `application/json`:
 <details><summary>Example — first stage of the second batch (200)</summary>
 
 ```http
-POST /api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/711e6906-d70f-4fad-8fe1-b2ac8d54495c/start
+POST /api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/1869d3f1-1e2b-4705-99d8-44ad4fe74dd2/start
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -6525,14 +6631,14 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
+  "id": "93c147b8-4027-4364-bee1-2036985ab218",
   "name": "Weekday bake",
   "status": "in_progress",
   "source": "manual",
   "plannedStartAt": "2026-11-29T06:00:00+00:00",
   "plannedReadyFrom": "2026-11-29T21:05:00+00:00",
   "plannedReadyTo": "2026-11-30T00:20:00+00:00",
-  "actualStartAt": "2026-11-24T19:27:06.890523+00:00",
+  "actualStartAt": "2026-11-24T20:55:47.0161+00:00",
   "completedAt": null,
   "priceDate": "2026-11-24",
   "totalCost": 8.95,
@@ -6540,18 +6646,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "16591114-3cdd-4b5f-aef8-395e09355c9b",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "3078b4d7-fc09-4a34-a1aa-14a028b8d95c",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "711e6906-d70f-4fad-8fe1-b2ac8d54495c",
+          "id": "1869d3f1-1e2b-4705-99d8-44ad4fe74dd2",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -6560,7 +6666,7 @@ Response `200` `application/json`:
           "plannedStartAt": "2026-11-29T06:00:00+00:00",
           "plannedEndMinAt": "2026-11-29T06:15:00+00:00",
           "plannedEndMaxAt": "2026-11-29T06:20:00+00:00",
-          "actualStartAt": "2026-11-24T19:27:06.890523+00:00",
+          "actualStartAt": "2026-11-24T20:55:47.0161+00:00",
           "actualEndAt": null,
           "status": "running",
           "extendedMinutes": 0,
@@ -6569,7 +6675,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "2171377b-ad39-48da-b6a4-6c1e07b034dc",
+          "id": "4b24deea-da55-4dfc-83f5-edbe74525dbe",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -6622,7 +6728,7 @@ US-23.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-POST /api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce/stages/1190c203-b7cf-4cc0-a754-3102d0d71d6f/complete
+POST /api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0/stages/a92341b6-fc2d-41d4-a411-c70ad580bb82/complete
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -6636,14 +6742,14 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "name": "Weekend bake",
   "status": "in_progress",
   "source": "manual",
   "plannedStartAt": "2026-11-26T07:00:00+00:00",
   "plannedReadyFrom": "2026-11-26T22:05:00+00:00",
   "plannedReadyTo": "2026-11-27T01:20:00+00:00",
-  "actualStartAt": "2026-11-24T19:27:06.595243+00:00",
+  "actualStartAt": "2026-11-24T20:55:46.708731+00:00",
   "completedAt": null,
   "priceDate": "2026-11-24",
   "totalCost": 8.95,
@@ -6651,18 +6757,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "2014de74-6b23-4ee2-975b-2b32c4de65c8",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "21da1e48-6d12-4106-9c12-43d620557541",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "1190c203-b7cf-4cc0-a754-3102d0d71d6f",
+          "id": "a92341b6-fc2d-41d4-a411-c70ad580bb82",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -6671,8 +6777,8 @@ Response `200` `application/json`:
           "plannedStartAt": "2026-11-26T07:00:00+00:00",
           "plannedEndMinAt": "2026-11-26T07:15:00+00:00",
           "plannedEndMaxAt": "2026-11-26T07:20:00+00:00",
-          "actualStartAt": "2026-11-24T19:27:06.595243+00:00",
-          "actualEndAt": "2026-11-24T19:27:06.608913+00:00",
+          "actualStartAt": "2026-11-24T20:55:46.708731+00:00",
+          "actualEndAt": "2026-11-24T20:55:46.721129+00:00",
           "status": "done",
           "extendedMinutes": 0,
           "isOverridden": false,
@@ -6680,7 +6786,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "20dc26da-79ff-4cdc-8c70-26c6dd5daebc",
+          "id": "98dc47f6-2c73-4a2f-8231-0b3a5c258ed2",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -6711,7 +6817,7 @@ Response `200` `application/json`:
 <details><summary>Example — next stage (200)</summary>
 
 ```http
-POST /api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce/stages/20dc26da-79ff-4cdc-8c70-26c6dd5daebc/complete
+POST /api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0/stages/98dc47f6-2c73-4a2f-8231-0b3a5c258ed2/complete
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -6725,14 +6831,14 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "name": "Weekend bake",
   "status": "in_progress",
   "source": "manual",
   "plannedStartAt": "2026-11-26T07:00:00+00:00",
   "plannedReadyFrom": "2026-11-26T22:05:00+00:00",
   "plannedReadyTo": "2026-11-27T01:20:00+00:00",
-  "actualStartAt": "2026-11-24T19:27:06.595243+00:00",
+  "actualStartAt": "2026-11-24T20:55:46.708731+00:00",
   "completedAt": null,
   "priceDate": "2026-11-24",
   "totalCost": 8.95,
@@ -6740,18 +6846,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "2014de74-6b23-4ee2-975b-2b32c4de65c8",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "21da1e48-6d12-4106-9c12-43d620557541",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "1190c203-b7cf-4cc0-a754-3102d0d71d6f",
+          "id": "a92341b6-fc2d-41d4-a411-c70ad580bb82",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -6760,8 +6866,8 @@ Response `200` `application/json`:
           "plannedStartAt": "2026-11-26T07:00:00+00:00",
           "plannedEndMinAt": "2026-11-26T07:15:00+00:00",
           "plannedEndMaxAt": "2026-11-26T07:20:00+00:00",
-          "actualStartAt": "2026-11-24T19:27:06.595243+00:00",
-          "actualEndAt": "2026-11-24T19:27:06.608913+00:00",
+          "actualStartAt": "2026-11-24T20:55:46.708731+00:00",
+          "actualEndAt": "2026-11-24T20:55:46.721129+00:00",
           "status": "done",
           "extendedMinutes": 0,
           "isOverridden": false,
@@ -6769,7 +6875,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "20dc26da-79ff-4cdc-8c70-26c6dd5daebc",
+          "id": "98dc47f6-2c73-4a2f-8231-0b3a5c258ed2",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -6778,8 +6884,8 @@ Response `200` `application/json`:
           "plannedStartAt": "2026-11-26T07:15:00+00:00",
           "plannedEndMinAt": "2026-11-26T11:15:00+00:00",
           "plannedEndMaxAt": "2026-11-26T12:20:00+00:00",
-          "actualStartAt": "2026-11-24T19:27:06.618952+00:00",
-          "actualEndAt": "2026-11-24T19:27:06.626297+00:00",
+          "actualStartAt": "2026-11-24T20:55:46.729995+00:00",
+          "actualEndAt": "2026-11-24T20:55:46.737933+00:00",
           "status": "done",
           "extendedMinutes": 0,
           "isOverridden": false,
@@ -6822,7 +6928,7 @@ US-09, US-23.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-POST /api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/dc7024da-5718-4b41-8d41-795ae3b8663f/skip
+POST /api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/c9e10be6-719d-49a4-ab7b-8bc4c364ee57/skip
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -6836,14 +6942,14 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
+  "id": "93c147b8-4027-4364-bee1-2036985ab218",
   "name": "Weekday bake",
   "status": "in_progress",
   "source": "manual",
   "plannedStartAt": "2026-11-29T06:00:00+00:00",
   "plannedReadyFrom": "2026-11-29T21:35:00+00:00",
   "plannedReadyTo": "2026-11-30T00:50:00+00:00",
-  "actualStartAt": "2026-11-24T19:27:06.890523+00:00",
+  "actualStartAt": "2026-11-24T20:55:47.0161+00:00",
   "completedAt": null,
   "priceDate": "2026-11-24",
   "totalCost": 8.95,
@@ -6851,18 +6957,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "16591114-3cdd-4b5f-aef8-395e09355c9b",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "3078b4d7-fc09-4a34-a1aa-14a028b8d95c",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "711e6906-d70f-4fad-8fe1-b2ac8d54495c",
+          "id": "1869d3f1-1e2b-4705-99d8-44ad4fe74dd2",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -6871,7 +6977,7 @@ Response `200` `application/json`:
           "plannedStartAt": "2026-11-29T06:00:00+00:00",
           "plannedEndMinAt": "2026-11-29T06:45:00+00:00",
           "plannedEndMaxAt": "2026-11-29T06:50:00+00:00",
-          "actualStartAt": "2026-11-24T19:27:06.890523+00:00",
+          "actualStartAt": "2026-11-24T20:55:47.0161+00:00",
           "actualEndAt": null,
           "status": "running",
           "extendedMinutes": 30,
@@ -6880,7 +6986,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "2171377b-ad39-48da-b6a4-6c1e07b034dc",
+          "id": "4b24deea-da55-4dfc-83f5-edbe74525dbe",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -6933,7 +7039,7 @@ US-24. Following stages, reminders and the ready window shift (sp_extend_batch_s
 <details><summary>Example — typical (200)</summary>
 
 ```http
-POST /api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/711e6906-d70f-4fad-8fe1-b2ac8d54495c/extend
+POST /api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/1869d3f1-1e2b-4705-99d8-44ad4fe74dd2/extend
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -6946,14 +7052,14 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
+  "id": "93c147b8-4027-4364-bee1-2036985ab218",
   "name": "Weekday bake",
   "status": "in_progress",
   "source": "manual",
   "plannedStartAt": "2026-11-29T06:00:00+00:00",
   "plannedReadyFrom": "2026-11-29T21:35:00+00:00",
   "plannedReadyTo": "2026-11-30T00:50:00+00:00",
-  "actualStartAt": "2026-11-24T19:27:06.890523+00:00",
+  "actualStartAt": "2026-11-24T20:55:47.0161+00:00",
   "completedAt": null,
   "priceDate": "2026-11-24",
   "totalCost": 8.95,
@@ -6961,18 +7067,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "16591114-3cdd-4b5f-aef8-395e09355c9b",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "3078b4d7-fc09-4a34-a1aa-14a028b8d95c",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "711e6906-d70f-4fad-8fe1-b2ac8d54495c",
+          "id": "1869d3f1-1e2b-4705-99d8-44ad4fe74dd2",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -6981,7 +7087,7 @@ Response `200` `application/json`:
           "plannedStartAt": "2026-11-29T06:00:00+00:00",
           "plannedEndMinAt": "2026-11-29T06:45:00+00:00",
           "plannedEndMaxAt": "2026-11-29T06:50:00+00:00",
-          "actualStartAt": "2026-11-24T19:27:06.890523+00:00",
+          "actualStartAt": "2026-11-24T20:55:47.0161+00:00",
           "actualEndAt": null,
           "status": "running",
           "extendedMinutes": 30,
@@ -6990,7 +7096,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "2171377b-ad39-48da-b6a4-6c1e07b034dc",
+          "id": "4b24deea-da55-4dfc-83f5-edbe74525dbe",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -7043,7 +7149,7 @@ US-21.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-PATCH /api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/2171377b-ad39-48da-b6a4-6c1e07b034dc
+PATCH /api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/4b24deea-da55-4dfc-83f5-edbe74525dbe
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -7057,7 +7163,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
+  "id": "93c147b8-4027-4364-bee1-2036985ab218",
   "name": "Weekday bake",
   "status": "planned",
   "source": "manual",
@@ -7072,18 +7178,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "16591114-3cdd-4b5f-aef8-395e09355c9b",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "3078b4d7-fc09-4a34-a1aa-14a028b8d95c",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "711e6906-d70f-4fad-8fe1-b2ac8d54495c",
+          "id": "1869d3f1-1e2b-4705-99d8-44ad4fe74dd2",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -7101,7 +7207,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "2171377b-ad39-48da-b6a4-6c1e07b034dc",
+          "id": "4b24deea-da55-4dfc-83f5-edbe74525dbe",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -7132,7 +7238,7 @@ Response `200` `application/json`:
 <details><summary>Example — minimum longer than maximum (400)</summary>
 
 ```http
-PATCH /api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/2171377b-ad39-48da-b6a4-6c1e07b034dc
+PATCH /api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/4b24deea-da55-4dfc-83f5-edbe74525dbe
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -7149,14 +7255,14 @@ Response `400` `application/problem+json`:
   "type": "https://oneloaf.app/problems/validation",
   "title": "One or more validation errors occurred.",
   "status": 400,
-  "instance": "/api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/2171377b-ad39-48da-b6a4-6c1e07b034dc",
+  "instance": "/api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/4b24deea-da55-4dfc-83f5-edbe74525dbe",
   "errors": {
     "plannedMaxMinutes": [
       "'Planned Max Minutes' должно быть больше или равно '400'."
     ]
   },
-  "traceId": "00-be09a8b71badb8095bb56a938f8b5852-e55d72f70c8138fa-02",
-  "correlationId": "5e9a03a1fcd84b2e96253e446249de2d"
+  "traceId": "00-f5b50ef917db2e6756aca98e4f0a3ae6-446317626114b22b-02",
+  "correlationId": "8a62b103128a41d5b6ab57400c0953a9"
 }
 ```
 
@@ -7184,7 +7290,7 @@ US-21.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-POST /api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/2171377b-ad39-48da-b6a4-6c1e07b034dc/reset
+POST /api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/4b24deea-da55-4dfc-83f5-edbe74525dbe/reset
 Authorization: Bearer <access token>
 ```
 
@@ -7192,7 +7298,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
+  "id": "93c147b8-4027-4364-bee1-2036985ab218",
   "name": "Weekday bake",
   "status": "planned",
   "source": "manual",
@@ -7207,18 +7313,18 @@ Response `200` `application/json`:
   "notes": null,
   "items": [
     {
-      "id": "16591114-3cdd-4b5f-aef8-395e09355c9b",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "3078b4d7-fc09-4a34-a1aa-14a028b8d95c",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
-      "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "starterAmountG": 300.0,
       "kneadingCycles": 1,
       "starterReminderMinutes": 60,
       "sortOrder": 1,
       "stages": [
         {
-          "id": "711e6906-d70f-4fad-8fe1-b2ac8d54495c",
+          "id": "1869d3f1-1e2b-4705-99d8-44ad4fe74dd2",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -7236,7 +7342,7 @@ Response `200` `application/json`:
           "note": null
         },
         {
-          "id": "2171377b-ad39-48da-b6a4-6c1e07b034dc",
+          "id": "4b24deea-da55-4dfc-83f5-edbe74525dbe",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -7267,7 +7373,7 @@ Response `200` `application/json`:
 <details><summary>Example — stage already running (409)</summary>
 
 ```http
-POST /api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/711e6906-d70f-4fad-8fe1-b2ac8d54495c/reset
+POST /api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/1869d3f1-1e2b-4705-99d8-44ad4fe74dd2/reset
 Authorization: Bearer <access token>
 ```
 
@@ -7279,9 +7385,9 @@ Response `409` `application/problem+json`:
   "title": "The request conflicts with existing data.",
   "status": 409,
   "detail": "The action is not allowed for the stage in its current state.",
-  "instance": "/api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd/stages/711e6906-d70f-4fad-8fe1-b2ac8d54495c/reset",
-  "traceId": "00-b3af746c50272f301e5fcef5fa9b10a0-d5ec94f05f9ed536-02",
-  "correlationId": "32704bb212f2434f8960350932a2dd25"
+  "instance": "/api/v1/batches/93c147b8-4027-4364-bee1-2036985ab218/stages/1869d3f1-1e2b-4705-99d8-44ad4fe74dd2/reset",
+  "traceId": "00-b4c7a718928b301e58c1cf474f36e48a-813a662c6ab6d1ad-02",
+  "correlationId": "ad2f48ac0e5a49b2ae5750e65c2e32b6"
 }
 ```
 
@@ -7320,9 +7426,9 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "bb8deeb7-12be-4d49-a321-671525f0b027",
+      "id": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
       "name": "Rye mother",
-      "flourId": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+      "flourId": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
       "hydrationPercent": 100.0,
       "feedingMode": "regular",
       "feedingIntervalHours": 24,
@@ -7332,12 +7438,12 @@ Response `200` `application/json`:
       "lastFedAt": null,
       "nextFeedingAt": null,
       "expectedPeakAt": null,
-      "createdAt": "2026-11-24T19:27:05.901454+00:00",
-      "updatedAt": "2026-11-24T19:27:05.901454+00:00",
+      "createdAt": "2026-11-24T20:55:45.998717+00:00",
+      "updatedAt": "2026-11-24T20:55:45.998717+00:00",
       "flourIngredientId": null,
       "waterIngredientId": null,
       "amountG": null,
-      "ingredientId": "0036c646-cd04-457f-a469-03904782bc25",
+      "ingredientId": "d3b5c6d2-8c2b-4c36-a862-24512c10373e",
       "usableShare": 0.667,
       "usableG": 0.0,
       "suggestedKeptG": null
@@ -7379,7 +7485,7 @@ Content-Type: application/json
   "hydrationPercent": 100,
   "feedingMode": "regular",
   "feedingIntervalHours": 24,
-  "flourId": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+  "flourId": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
   "riseHours": 8
 }
 ```
@@ -7388,9 +7494,9 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "bb8deeb7-12be-4d49-a321-671525f0b027",
+  "id": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
   "name": "Rye mother",
-  "flourId": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+  "flourId": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
   "hydrationPercent": 100.0,
   "feedingMode": "regular",
   "feedingIntervalHours": 24,
@@ -7400,12 +7506,12 @@ Response `201` `application/json`:
   "lastFedAt": null,
   "nextFeedingAt": null,
   "expectedPeakAt": null,
-  "createdAt": "2026-11-24T19:27:05.901454+00:00",
-  "updatedAt": "2026-11-24T19:27:05.901454+00:00",
+  "createdAt": "2026-11-24T20:55:45.998717+00:00",
+  "updatedAt": "2026-11-24T20:55:45.998717+00:00",
   "flourIngredientId": null,
   "waterIngredientId": null,
   "amountG": null,
-  "ingredientId": "0036c646-cd04-457f-a469-03904782bc25",
+  "ingredientId": "d3b5c6d2-8c2b-4c36-a862-24512c10373e",
   "usableShare": 0.667,
   "usableG": 0.0,
   "suggestedKeptG": null
@@ -7435,7 +7541,7 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "6f900572-2e72-4b20-b73f-f37c9e9e721f",
+  "id": "f247ad45-33e7-487c-8492-f3ab04f9459c",
   "name": "Fridge levain",
   "flourId": null,
   "hydrationPercent": 80.0,
@@ -7447,12 +7553,12 @@ Response `201` `application/json`:
   "lastFedAt": null,
   "nextFeedingAt": null,
   "expectedPeakAt": null,
-  "createdAt": "2026-11-24T19:27:06.179556+00:00",
-  "updatedAt": "2026-11-24T19:27:06.179556+00:00",
+  "createdAt": "2026-11-24T20:55:46.287166+00:00",
+  "updatedAt": "2026-11-24T20:55:46.287166+00:00",
   "flourIngredientId": null,
   "waterIngredientId": null,
   "amountG": null,
-  "ingredientId": "87dc0a4d-d57e-438c-91dd-1d4b5c95af9e",
+  "ingredientId": "056003e2-0f5f-479d-9b10-5b4c2c715d08",
   "usableShare": 0.500,
   "usableG": 0.0,
   "suggestedKeptG": null
@@ -7481,7 +7587,7 @@ US-27.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/starters/bb8deeb7-12be-4d49-a321-671525f0b027
+GET /api/v1/starters/4e967a64-78a4-4f3f-bec9-cdea9ef5f127
 Authorization: Bearer <access token>
 ```
 
@@ -7489,9 +7595,9 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "bb8deeb7-12be-4d49-a321-671525f0b027",
+  "id": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
   "name": "Rye mother",
-  "flourId": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+  "flourId": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
   "hydrationPercent": 100.0,
   "feedingMode": "regular",
   "feedingIntervalHours": 24,
@@ -7501,12 +7607,12 @@ Response `200` `application/json`:
   "lastFedAt": null,
   "nextFeedingAt": null,
   "expectedPeakAt": null,
-  "createdAt": "2026-11-24T19:27:05.901454+00:00",
-  "updatedAt": "2026-11-24T19:27:05.901454+00:00",
+  "createdAt": "2026-11-24T20:55:45.998717+00:00",
+  "updatedAt": "2026-11-24T20:55:45.998717+00:00",
   "flourIngredientId": null,
   "waterIngredientId": null,
   "amountG": null,
-  "ingredientId": "0036c646-cd04-457f-a469-03904782bc25",
+  "ingredientId": "d3b5c6d2-8c2b-4c36-a862-24512c10373e",
   "usableShare": 0.667,
   "usableG": 0.0,
   "suggestedKeptG": null
@@ -7539,7 +7645,7 @@ US-27.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-PUT /api/v1/starters/bb8deeb7-12be-4d49-a321-671525f0b027
+PUT /api/v1/starters/4e967a64-78a4-4f3f-bec9-cdea9ef5f127
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -7548,7 +7654,7 @@ Content-Type: application/json
   "hydrationPercent": 100,
   "feedingMode": "regular",
   "feedingIntervalHours": 12,
-  "flourId": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+  "flourId": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
   "riseHours": 8,
   "notes": "Kitchen counter"
 }
@@ -7558,9 +7664,9 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "bb8deeb7-12be-4d49-a321-671525f0b027",
+  "id": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
   "name": "Rye mother",
-  "flourId": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+  "flourId": "8f4c071d-eede-44f5-b6dc-05ab4394cf9b",
   "hydrationPercent": 100.0,
   "feedingMode": "regular",
   "feedingIntervalHours": 12,
@@ -7570,12 +7676,12 @@ Response `200` `application/json`:
   "lastFedAt": null,
   "nextFeedingAt": null,
   "expectedPeakAt": null,
-  "createdAt": "2026-11-24T19:27:05.901454+00:00",
-  "updatedAt": "2026-11-24T19:27:05.989004+00:00",
+  "createdAt": "2026-11-24T20:55:45.998717+00:00",
+  "updatedAt": "2026-11-24T20:55:46.07782+00:00",
   "flourIngredientId": null,
   "waterIngredientId": null,
   "amountG": null,
-  "ingredientId": "0036c646-cd04-457f-a469-03904782bc25",
+  "ingredientId": "d3b5c6d2-8c2b-4c36-a862-24512c10373e",
   "usableShare": 0.667,
   "usableG": 0.0,
   "suggestedKeptG": null
@@ -7604,7 +7710,7 @@ US-27. Batches keep their items without it.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-DELETE /api/v1/starters/6f900572-2e72-4b20-b73f-f37c9e9e721f
+DELETE /api/v1/starters/f247ad45-33e7-487c-8492-f3ab04f9459c
 Authorization: Bearer <access token>
 ```
 
@@ -7637,7 +7743,7 @@ US-28.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/starters/bb8deeb7-12be-4d49-a321-671525f0b027/feedings
+GET /api/v1/starters/4e967a64-78a4-4f3f-bec9-cdea9ef5f127/feedings
 Authorization: Bearer <access token>
 ```
 
@@ -7647,14 +7753,14 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "df3e2ba3-052f-441e-ab8c-f6cc18ad806f",
-      "fedAt": "2026-11-24T18:27:05.99186+00:00",
+      "id": "da5c91a1-84c4-46c3-b77b-f1b7fb619503",
+      "fedAt": "2026-11-24T19:55:46.082283+00:00",
       "flourG": 50.0,
       "waterG": 50.0,
       "starterKeptG": 20.0,
       "temperatureC": 24.0,
-      "nextFeedingAt": "2026-11-25T06:27:05.99186+00:00",
-      "expectedPeakAt": "2026-11-25T02:27:05.99186+00:00",
+      "nextFeedingAt": "2026-11-25T07:55:46.082283+00:00",
+      "expectedPeakAt": "2026-11-25T03:55:46.082283+00:00",
       "note": null
     }
   ],
@@ -7689,12 +7795,12 @@ US-28, US-29, US-30. The next feeding, the peak and the feeding reminder are set
 <details><summary>Example — typical (201)</summary>
 
 ```http
-POST /api/v1/starters/bb8deeb7-12be-4d49-a321-671525f0b027/feedings
+POST /api/v1/starters/4e967a64-78a4-4f3f-bec9-cdea9ef5f127/feedings
 Authorization: Bearer <access token>
 Content-Type: application/json
 
 {
-  "fedAt": "2026-11-24T18:27:05.9918606+00:00",
+  "fedAt": "2026-11-24T19:55:46.0822838+00:00",
   "flourG": 50,
   "waterG": 50,
   "starterKeptG": 20,
@@ -7706,14 +7812,14 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "df3e2ba3-052f-441e-ab8c-f6cc18ad806f",
-  "fedAt": "2026-11-24T18:27:05.99186+00:00",
+  "id": "da5c91a1-84c4-46c3-b77b-f1b7fb619503",
+  "fedAt": "2026-11-24T19:55:46.082283+00:00",
   "flourG": 50.0,
   "waterG": 50.0,
   "starterKeptG": 20.0,
   "temperatureC": 24.0,
-  "nextFeedingAt": "2026-11-25T06:27:05.99186+00:00",
-  "expectedPeakAt": "2026-11-25T02:27:05.99186+00:00",
+  "nextFeedingAt": "2026-11-25T07:55:46.082283+00:00",
+  "expectedPeakAt": "2026-11-25T03:55:46.082283+00:00",
   "note": null
 }
 ```
@@ -7757,8 +7863,8 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "6161f51b-d2fb-43d9-b036-064e475ecb8b",
-      "batchId": "3357976d-a4d6-422d-affd-80581c93dbce",
+      "id": "7b049ade-7914-409f-9d42-88d8957ede11",
+      "batchId": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
       "bakedOn": "2026-11-24",
       "totalLoaves": 3,
       "totalCost": 8.95,
@@ -7803,7 +7909,7 @@ Response `200` `application/json`:
 ```json
 [
   {
-    "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+    "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
     "recipeTitle": "Country sourdough",
     "bakesCount": 1,
     "loavesTotal": 3,
@@ -7838,7 +7944,7 @@ US-31.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b
+GET /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11
 Authorization: Bearer <access token>
 ```
 
@@ -7846,8 +7952,8 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "6161f51b-d2fb-43d9-b036-064e475ecb8b",
-  "batchId": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "7b049ade-7914-409f-9d42-88d8957ede11",
+  "batchId": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "bakedOn": "2026-11-24",
   "totalLoaves": 3,
   "totalCost": 8.95,
@@ -7858,15 +7964,15 @@ Response `200` `application/json`:
   "analysisAt": null,
   "items": [
     {
-      "id": "7268adcf-ea82-47d1-a2a0-070488cd5822",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "dae970b4-7921-4bb1-a6de-aecdb8f80fd7",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
       "cost": 8.95
     }
   ],
-  "createdAt": "2026-11-24T19:27:06.695373+00:00",
-  "updatedAt": "2026-11-24T19:27:06.695373+00:00",
+  "createdAt": "2026-11-24T20:55:46.789416+00:00",
+  "updatedAt": "2026-11-24T20:55:46.789416+00:00",
   "photos": []
 }
 ```
@@ -7876,7 +7982,7 @@ Response `200` `application/json`:
 <details><summary>Example — with a photo (200)</summary>
 
 ```http
-GET /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b
+GET /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11
 Authorization: Bearer <access token>
 ```
 
@@ -7884,8 +7990,8 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "6161f51b-d2fb-43d9-b036-064e475ecb8b",
-  "batchId": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "7b049ade-7914-409f-9d42-88d8957ede11",
+  "batchId": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "bakedOn": "2026-11-24",
   "totalLoaves": 3,
   "totalCost": 8.95,
@@ -7893,24 +7999,24 @@ Response `200` `application/json`:
   "rating": 4,
   "comment": "Good oven spring, crumb a bit tight.",
   "assistantAnalysis": "Bulk fermentation ended early; give the dough more time next bake.",
-  "analysisAt": "2026-11-24T19:27:07.056988+00:00",
+  "analysisAt": "2026-11-24T20:55:47.184441+00:00",
   "items": [
     {
-      "id": "7268adcf-ea82-47d1-a2a0-070488cd5822",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "dae970b4-7921-4bb1-a6de-aecdb8f80fd7",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
       "cost": 8.95
     }
   ],
-  "createdAt": "2026-11-24T19:27:06.695373+00:00",
-  "updatedAt": "2026-11-24T19:27:07.0605+00:00",
+  "createdAt": "2026-11-24T20:55:46.789416+00:00",
+  "updatedAt": "2026-11-24T20:55:47.188179+00:00",
   "photos": [
     {
-      "id": "49730e30-51e8-4f75-a8bc-265e09976b81",
+      "id": "ec8cdc5b-60e2-4075-9236-2f82462c13c1",
       "contentType": "image/png",
-      "url": "/api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos/49730e30-51e8-4f75-a8bc-265e09976b81",
-      "createdAt": "2026-11-24T19:27:07.098014+00:00"
+      "url": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/ec8cdc5b-60e2-4075-9236-2f82462c13c1",
+      "createdAt": "2026-11-24T20:55:47.231051+00:00"
     }
   ]
 }
@@ -7941,7 +8047,7 @@ US-32.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-PATCH /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b
+PATCH /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -7955,8 +8061,8 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "6161f51b-d2fb-43d9-b036-064e475ecb8b",
-  "batchId": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "7b049ade-7914-409f-9d42-88d8957ede11",
+  "batchId": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "bakedOn": "2026-11-24",
   "totalLoaves": 3,
   "totalCost": 8.95,
@@ -7967,15 +8073,15 @@ Response `200` `application/json`:
   "analysisAt": null,
   "items": [
     {
-      "id": "7268adcf-ea82-47d1-a2a0-070488cd5822",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "dae970b4-7921-4bb1-a6de-aecdb8f80fd7",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
       "cost": 8.95
     }
   ],
-  "createdAt": "2026-11-24T19:27:06.695373+00:00",
-  "updatedAt": "2026-11-24T19:27:07.022639+00:00",
+  "createdAt": "2026-11-24T20:55:46.789416+00:00",
+  "updatedAt": "2026-11-24T20:55:47.150682+00:00",
   "photos": []
 }
 ```
@@ -7985,7 +8091,7 @@ Response `200` `application/json`:
 <details><summary>Example — rating out of range (400)</summary>
 
 ```http
-PATCH /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b
+PATCH /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -8002,14 +8108,14 @@ Response `400` `application/problem+json`:
   "type": "https://oneloaf.app/problems/validation",
   "title": "One or more validation errors occurred.",
   "status": 400,
-  "instance": "/api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b",
+  "instance": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11",
   "errors": {
     "rating": [
       "'Rating' должно быть в диапазоне от 1 до 5. Введенное значение: 9."
     ]
   },
-  "traceId": "00-6515bff9fabfe6626a0410bf5c7286fc-b7ef71f1676ba9df-02",
-  "correlationId": "8455100919124ba7af3e7aa98359c488"
+  "traceId": "00-0b90bd7a67a3c45f4a03262c01d3503b-50e4cc27bb322fa1-02",
+  "correlationId": "e5ccc0687e694e85a331da02e7968a6d"
 }
 ```
 
@@ -8035,7 +8141,7 @@ US-36. Start delays and deviations from the planned windows (v_batch_stage_log).
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/stage-log
+GET /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/stage-log
 Authorization: Bearer <access token>
 ```
 
@@ -8044,9 +8150,9 @@ Response `200` `application/json`:
 ```json
 [
   {
-    "batchItemId": "2014de74-6b23-4ee2-975b-2b32c4de65c8",
+    "batchItemId": "21da1e48-6d12-4106-9c12-43d620557541",
     "recipeTitle": "Country sourdough",
-    "batchStageId": "1190c203-b7cf-4cc0-a754-3102d0d71d6f",
+    "batchStageId": "a92341b6-fc2d-41d4-a411-c70ad580bb82",
     "sortOrder": 1,
     "stageName": "Mix",
     "stageTypeCode": "mix",
@@ -8054,20 +8160,20 @@ Response `200` `application/json`:
     "plannedStartAt": "2026-11-26T07:00:00+00:00",
     "plannedEndMinAt": "2026-11-26T07:15:00+00:00",
     "plannedEndMaxAt": "2026-11-26T07:20:00+00:00",
-    "actualStartAt": "2026-11-24T19:27:06.595243+00:00",
-    "actualEndAt": "2026-11-24T19:27:06.608913+00:00",
+    "actualStartAt": "2026-11-24T20:55:46.708731+00:00",
+    "actualEndAt": "2026-11-24T20:55:46.721129+00:00",
     "extendedMinutes": 0,
     "actualTemperatureC": 24.5,
-    "startDelayMinutes": -2133,
+    "startDelayMinutes": -2044,
     "plannedMinMinutes": 15,
     "plannedMaxMinutes": 20,
     "actualMinutes": 0,
     "deviationMinutes": -15
   },
   {
-    "batchItemId": "2014de74-6b23-4ee2-975b-2b32c4de65c8",
+    "batchItemId": "21da1e48-6d12-4106-9c12-43d620557541",
     "recipeTitle": "Country sourdough",
-    "batchStageId": "20dc26da-79ff-4cdc-8c70-26c6dd5daebc",
+    "batchStageId": "98dc47f6-2c73-4a2f-8231-0b3a5c258ed2",
     "sortOrder": 2,
     "stageName": "Bulk fermentation",
     "stageTypeCode": "bulk_fermentation",
@@ -8075,11 +8181,11 @@ Response `200` `application/json`:
     "plannedStartAt": "2026-11-26T07:15:00+00:00",
     "plannedEndMinAt": "2026-11-26T11:15:00+00:00",
     "plannedEndMaxAt": "2026-11-26T12:20:00+00:00",
-    "actualStartAt": "2026-11-24T19:27:06.618952+00:00",
-    "actualEndAt": "2026-11-24T19:27:06.626297+00:00",
+    "actualStartAt": "2026-11-24T20:55:46.729995+00:00",
+    "actualEndAt": "2026-11-24T20:55:46.737933+00:00",
     "extendedMinutes": 0,
     "actualTemperatureC": 24.5,
-    "startDelayMinutes": -2148,
+    "startDelayMinutes": -2059,
     "plannedMinMinutes": 240,
     "plannedMaxMinutes": 300,
     "actualMinutes": 0,
@@ -8110,7 +8216,7 @@ US-51. Oldest first.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos
+GET /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos
 Authorization: Bearer <access token>
 ```
 
@@ -8119,10 +8225,10 @@ Response `200` `application/json`:
 ```json
 [
   {
-    "id": "49730e30-51e8-4f75-a8bc-265e09976b81",
+    "id": "ec8cdc5b-60e2-4075-9236-2f82462c13c1",
     "contentType": "image/png",
-    "url": "/api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos/49730e30-51e8-4f75-a8bc-265e09976b81",
-    "createdAt": "2026-11-24T19:27:07.098014+00:00"
+    "url": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/ec8cdc5b-60e2-4075-9236-2f82462c13c1",
+    "createdAt": "2026-11-24T20:55:47.231051+00:00"
   }
 ]
 ```
@@ -8150,7 +8256,7 @@ US-51. multipart/form-data with the image in the field 'file'; JPEG, PNG or WebP
 <details><summary>Example — typical (201)</summary>
 
 ```http
-POST /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos
+POST /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -8165,10 +8271,10 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "49730e30-51e8-4f75-a8bc-265e09976b81",
+  "id": "ec8cdc5b-60e2-4075-9236-2f82462c13c1",
   "contentType": "image/png",
-  "url": "/api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos/49730e30-51e8-4f75-a8bc-265e09976b81",
-  "createdAt": "2026-11-24T19:27:07.098014+00:00"
+  "url": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/ec8cdc5b-60e2-4075-9236-2f82462c13c1",
+  "createdAt": "2026-11-24T20:55:47.231051+00:00"
 }
 ```
 
@@ -8177,7 +8283,7 @@ Response `201` `application/json`:
 <details><summary>Example — not an image (422)</summary>
 
 ```http
-POST /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos
+POST /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -8196,9 +8302,9 @@ Response `422` `application/problem+json`:
   "title": "The request violates a business rule.",
   "status": 422,
   "detail": "Only JPEG, PNG and WebP images are accepted.",
-  "instance": "/api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos",
-  "traceId": "00-286dc073b5bccb178e47e7a8224f4751-d3998b4287746813-02",
-  "correlationId": "cbf4678d76bf4c1db4ee2dd1be15f9d0"
+  "instance": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos",
+  "traceId": "00-4204fdc3c39a25f07a8f68e9353eb831-ad5079f5fd27ca5d-02",
+  "correlationId": "ba3d7febfb1f4640b7cab8a2995e241d"
 }
 ```
 
@@ -8207,7 +8313,7 @@ Response `422` `application/problem+json`:
 <details><summary>Example — second photo (201)</summary>
 
 ```http
-POST /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos
+POST /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -8222,10 +8328,10 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "972c7e34-f29e-4cf8-9c2f-a83c072a5759",
+  "id": "01553e96-af42-4377-8a33-c58dbd6c427f",
   "contentType": "image/png",
-  "url": "/api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos/972c7e34-f29e-4cf8-9c2f-a83c072a5759",
-  "createdAt": "2026-11-24T19:27:07.143163+00:00"
+  "url": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/01553e96-af42-4377-8a33-c58dbd6c427f",
+  "createdAt": "2026-11-24T20:55:47.280689+00:00"
 }
 ```
 
@@ -8252,7 +8358,7 @@ US-51. Only the owner of the record.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos/49730e30-51e8-4f75-a8bc-265e09976b81
+GET /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/ec8cdc5b-60e2-4075-9236-2f82462c13c1
 Authorization: Bearer <access token>
 ```
 
@@ -8285,7 +8391,7 @@ US-51.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-DELETE /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos/972c7e34-f29e-4cf8-9c2f-a83c072a5759
+DELETE /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/01553e96-af42-4377-8a33-c58dbd6c427f
 Authorization: Bearer <access token>
 ```
 
@@ -8298,7 +8404,7 @@ _(no body)_
 <details><summary>Example — not found or another user's (404)</summary>
 
 ```http
-DELETE /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos/972c7e34-f29e-4cf8-9c2f-a83c072a5759
+DELETE /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/01553e96-af42-4377-8a33-c58dbd6c427f
 Authorization: Bearer <access token>
 ```
 
@@ -8310,9 +8416,9 @@ Response `404` `application/problem+json`:
   "title": "The requested resource was not found.",
   "status": 404,
   "detail": "The photo was not found.",
-  "instance": "/api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos/972c7e34-f29e-4cf8-9c2f-a83c072a5759",
-  "traceId": "00-af6f5a418a4e655f89481af004df1971-f99da41ff8c9d84f-02",
-  "correlationId": "5be48b9912d548f9a9e61ae9b7c415c3"
+  "instance": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/01553e96-af42-4377-8a33-c58dbd6c427f",
+  "traceId": "00-c5d4d5a52cb0b34e5c211babc9b4f753-fa9644e3e3f4baf2-02",
+  "correlationId": "edcdd0134ae34076b939920cdb3146d0"
 }
 ```
 
@@ -8341,7 +8447,7 @@ US-36. Called by the AI Assistant with the user's token.
 <details><summary>Example — typical (200)</summary>
 
 ```http
-PUT /api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/analysis
+PUT /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/analysis
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -8354,8 +8460,8 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "6161f51b-d2fb-43d9-b036-064e475ecb8b",
-  "batchId": "3357976d-a4d6-422d-affd-80581c93dbce",
+  "id": "7b049ade-7914-409f-9d42-88d8957ede11",
+  "batchId": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
   "bakedOn": "2026-11-24",
   "totalLoaves": 3,
   "totalCost": 8.95,
@@ -8363,18 +8469,18 @@ Response `200` `application/json`:
   "rating": 4,
   "comment": "Good oven spring, crumb a bit tight.",
   "assistantAnalysis": "Bulk fermentation ended early; give the dough more time next bake.",
-  "analysisAt": "2026-11-24T19:27:07.056988+00:00",
+  "analysisAt": "2026-11-24T20:55:47.184441+00:00",
   "items": [
     {
-      "id": "7268adcf-ea82-47d1-a2a0-070488cd5822",
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "id": "dae970b4-7921-4bb1-a6de-aecdb8f80fd7",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "recipeTitle": "Country sourdough",
       "loaves": 3,
       "cost": 8.95
     }
   ],
-  "createdAt": "2026-11-24T19:27:06.695373+00:00",
-  "updatedAt": "2026-11-24T19:27:07.0605+00:00",
+  "createdAt": "2026-11-24T20:55:46.789416+00:00",
+  "updatedAt": "2026-11-24T20:55:47.188179+00:00",
   "photos": []
 }
 ```
@@ -8418,8 +8524,8 @@ Response `403` `application/problem+json`:
   "title": "You are not allowed to perform this action.",
   "status": 403,
   "instance": "/api/v1/admin/reports",
-  "traceId": "00-b3703ea8d5b3f83c61af272aeeb0a441-ce71cf77e0e13d76-02",
-  "correlationId": "e942070f91594ac894098af216b3cb6c"
+  "traceId": "00-e05fe8765fdc0448af70cf326f89c350-8eb433178b19fe8b-02",
+  "correlationId": "992caa8860154217aa3487ade792f84b"
 }
 ```
 
@@ -8438,25 +8544,25 @@ Response `200` `application/json`:
 {
   "items": [
     {
-      "id": "e6e37e2b-4b66-49c4-8ee3-817762519a3c",
-      "publishedRecipeId": "db3a631f-117b-47c7-8e80-23efdce0e3f9",
+      "id": "435fa4ad-193b-4892-8fe4-00c9916060ea",
+      "publishedRecipeId": "183373f0-5788-44c0-ac4a-691dd75dcdbc",
       "publicationTitle": "White loaf with rye",
       "commentId": null,
       "commentBody": null,
       "reason": "Quantities look wrong",
       "status": "open",
-      "createdAt": "2026-11-24T19:27:01.36087+00:00",
+      "createdAt": "2026-11-24T20:55:41.366841+00:00",
       "resolvedAt": null
     },
     {
-      "id": "c09b6bed-2249-4501-bd3c-b82c8b4b7dd8",
-      "publishedRecipeId": "3d6e7105-8612-408a-8ce0-5020b5cd8844",
+      "id": "bc54b381-fb6b-4026-84a6-2b3f66ba1a93",
+      "publishedRecipeId": "68005dad-4a98-48ce-9c10-bf2c977a7b72",
       "publicationTitle": "Country sourdough",
-      "commentId": "6c9d095e-21a5-4cd2-a5a4-55dd1bdca7f7",
+      "commentId": "0f84403b-0db2-4b8d-a0ab-4b9a11258d1a",
       "commentBody": "Baked it on Sunday, lovely crumb!",
       "reason": "Off-topic advertising link",
       "status": "open",
-      "createdAt": "2026-11-24T19:27:07.422967+00:00",
+      "createdAt": "2026-11-24T20:55:47.611471+00:00",
       "resolvedAt": null
     }
   ],
@@ -8493,7 +8599,7 @@ LR-11. remove hides the reported comment or removes the publication with the rea
 <details><summary>Example — reject (204)</summary>
 
 ```http
-POST /api/v1/admin/reports/c09b6bed-2249-4501-bd3c-b82c8b4b7dd8/resolve
+POST /api/v1/admin/reports/bc54b381-fb6b-4026-84a6-2b3f66ba1a93/resolve
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -8512,7 +8618,7 @@ _(no body)_
 <details><summary>Example — already decided (409)</summary>
 
 ```http
-POST /api/v1/admin/reports/c09b6bed-2249-4501-bd3c-b82c8b4b7dd8/resolve
+POST /api/v1/admin/reports/bc54b381-fb6b-4026-84a6-2b3f66ba1a93/resolve
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -8530,9 +8636,9 @@ Response `409` `application/problem+json`:
   "title": "The request conflicts with existing data.",
   "status": 409,
   "detail": "The report was already decided.",
-  "instance": "/api/v1/admin/reports/c09b6bed-2249-4501-bd3c-b82c8b4b7dd8/resolve",
-  "traceId": "00-5e0faaff3046d1286db16c5f722e4f00-5cb9687f19532721-02",
-  "correlationId": "8582ef44f20b4479873e5497c25252fa"
+  "instance": "/api/v1/admin/reports/bc54b381-fb6b-4026-84a6-2b3f66ba1a93/resolve",
+  "traceId": "00-3baa38e1510f1d1cd7d8364a778adbd7-cb990775280477b8-02",
+  "correlationId": "49f1d4d58ddf41af8f04e9af2ecefd2b"
 }
 ```
 
@@ -8562,7 +8668,7 @@ LR-11. The publication cannot be published again. Requires the admin role.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-POST /api/v1/admin/library/f09e306c-683d-4f39-8280-0ead8542802d/remove
+POST /api/v1/admin/library/8c714f19-63fd-40ed-a3b6-3fc411eda17f/remove
 Authorization: Bearer <access token>
 Content-Type: application/json
 

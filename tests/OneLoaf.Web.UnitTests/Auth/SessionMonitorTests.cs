@@ -16,7 +16,7 @@ public sealed class SessionMonitorTests
     public SessionMonitorTests() => _tokens = new TokenStore(new BunitJSInterop { Mode = JSRuntimeMode.Loose }.JSRuntime, _time);
 
     [Fact]
-    public async Task Start_KeptToken_RestoresSessionThenWarnsAndExpires()
+    public async Task Start_KeptToken_RestoresSessionThenAsksForANewTokenAndExpiresWithoutOne()
     {
         await _tokens.SetAsync(Token(), _time.GetUtcNow().AddMinutes(60));
         using var monitor = new SessionMonitor(_tokens, _events, _dispatcher, _time);
@@ -26,7 +26,7 @@ public sealed class SessionMonitorTests
         Assert.Equal("Docs Baker", restored.User.DisplayName);
 
         _time.Advance(TimeSpan.FromMinutes(59));
-        Assert.IsType<SessionEndingSoon>(_dispatcher.Actions[^1]);
+        Assert.IsType<RefreshSession>(_dispatcher.Actions[^1]);
 
         _time.Advance(TimeSpan.FromMinutes(1));
         Assert.IsType<SessionExpired>(_dispatcher.Actions[^1]);
@@ -34,7 +34,23 @@ public sealed class SessionMonitorTests
     }
 
     [Fact]
-    public async Task Unauthorized_SeveralAtOnce_ReportsExpiryOnce()
+    public async Task Refresh_NewTokenArrives_KeepsTheSessionAndPlansTheNextRefresh()
+    {
+        await _tokens.SetAsync(Token(), _time.GetUtcNow().AddMinutes(60));
+        using var monitor = new SessionMonitor(_tokens, _events, _dispatcher, _time);
+        monitor.Start();
+
+        _time.Advance(TimeSpan.FromMinutes(59));
+        await _tokens.SetAsync(Token(), _time.GetUtcNow().AddMinutes(60));
+        _time.Advance(TimeSpan.FromMinutes(30));
+        Assert.Empty(_dispatcher.Actions.OfType<SessionExpired>());
+
+        _time.Advance(TimeSpan.FromMinutes(29));
+        Assert.Equal(2, _dispatcher.Actions.OfType<RefreshSession>().Count());
+    }
+
+    [Fact]
+    public async Task Unauthorized_SeveralAtOnce_AsksForANewTokenOnceAndExpiresOnce()
     {
         await _tokens.SetAsync(Token(), _time.GetUtcNow().AddMinutes(60));
         using var monitor = new SessionMonitor(_tokens, _events, _dispatcher, _time);
@@ -44,8 +60,8 @@ public sealed class SessionMonitorTests
         _events.RaiseUnauthorized();
         _time.Advance(TimeSpan.FromHours(2));
 
+        Assert.Single(_dispatcher.Actions.OfType<RefreshSession>());
         Assert.Single(_dispatcher.Actions.OfType<SessionExpired>());
-        Assert.Empty(_dispatcher.Actions.OfType<SessionEndingSoon>());
     }
 
     [Fact]

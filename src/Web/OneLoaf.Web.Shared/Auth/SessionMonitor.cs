@@ -3,19 +3,21 @@ using Fluxor;
 namespace OneLoaf.Web.Shared.Auth;
 
 /// <summary>
-/// Watches the token: restores the session after a reload, warns one minute before expiry and ends the session at
-/// expiry or on a 401 from an authenticated request (ADR-F07: no refresh token). Started once by the app.
+/// Watches the access token: restores the session after a reload, asks for a new token one minute before expiry and
+/// after a 401 from an authenticated request, and ends the session when no new token arrives (ADR-F07). Started
+/// once by the app.
 /// </summary>
 public sealed class SessionMonitor(TokenStore tokens, AuthEvents authEvents, IDispatcher dispatcher, TimeProvider time)
     : IDisposable
 {
-    /// <summary>How long before expiry the user is warned.</summary>
-    public static readonly TimeSpan WarningLead = TimeSpan.FromMinutes(1);
+    /// <summary>How long before expiry a new access token is requested.</summary>
+    public static readonly TimeSpan RefreshLead = TimeSpan.FromMinutes(1);
 
-    private ITimer? _warningTimer;
+    private ITimer? _refreshTimer;
     private ITimer? _expiryTimer;
     private bool _started;
     private bool _expiredReported;
+    private bool _refreshRequested;
 
     /// <summary>Subscribes to token changes and 401s, and dispatches <see cref="SessionRestored"/> for a kept token.</summary>
     public void Start()
@@ -47,7 +49,20 @@ public sealed class SessionMonitor(TokenStore tokens, AuthEvents authEvents, IDi
 
     private void OnTokenChanged(object? sender, EventArgs e) => Schedule();
 
-    private void OnUnauthorized(object? sender, EventArgs e) => ReportExpired();
+    /// <summary>A 401 with a token: the token was not accepted any more, so one refresh is tried before giving up.</summary>
+    private void OnUnauthorized(object? sender, EventArgs e) => RequestRefresh();
+
+    /// <summary>One refresh per access token: several 401s or timers at once ask only once.</summary>
+    private void RequestRefresh()
+    {
+        if (_refreshRequested || _expiredReported)
+        {
+            return;
+        }
+
+        _refreshRequested = true;
+        dispatcher.Dispatch(new RefreshSession());
+    }
 
     private void Schedule()
     {
@@ -58,13 +73,11 @@ public sealed class SessionMonitor(TokenStore tokens, AuthEvents authEvents, IDi
         }
 
         _expiredReported = false;
+        _refreshRequested = false;
         var untilExpiry = expiresAt - time.GetUtcNow();
-        var untilWarning = untilExpiry - WarningLead;
-        if (untilWarning > TimeSpan.Zero)
-        {
-            _warningTimer = time.CreateTimer(
-                _ => dispatcher.Dispatch(new SessionEndingSoon()), null, untilWarning, Timeout.InfiniteTimeSpan);
-        }
+        var untilRefresh = untilExpiry - RefreshLead;
+        _refreshTimer = time.CreateTimer(
+            _ => RequestRefresh(), null, untilRefresh > TimeSpan.Zero ? untilRefresh : TimeSpan.Zero, Timeout.InfiniteTimeSpan);
 
         _expiryTimer = time.CreateTimer(
             _ => ReportExpired(), null, untilExpiry > TimeSpan.Zero ? untilExpiry : TimeSpan.Zero, Timeout.InfiniteTimeSpan);
@@ -85,9 +98,9 @@ public sealed class SessionMonitor(TokenStore tokens, AuthEvents authEvents, IDi
 
     private void CancelTimers()
     {
-        _warningTimer?.Dispose();
+        _refreshTimer?.Dispose();
         _expiryTimer?.Dispose();
-        _warningTimer = null;
+        _refreshTimer = null;
         _expiryTimer = null;
     }
 }

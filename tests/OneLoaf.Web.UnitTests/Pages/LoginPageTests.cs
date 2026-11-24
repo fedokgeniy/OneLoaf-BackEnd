@@ -75,6 +75,7 @@ public sealed class LoginPageTests : BunitContext
         Services.AddSingleton(NullLogger<ApiClient>.Instance);
         Services.AddScoped<ApiClientFactory>();
         Services.AddScoped<AccountApi>();
+        Services.AddScoped<OneLoaf.Web.Account.SessionRefresher>();
         Services.AddScoped<DeviceContext>();
         Services.AddFluxor(o => o.ScanAssemblies(typeof(LoginPage).Assembly, typeof(SessionState).Assembly));
 

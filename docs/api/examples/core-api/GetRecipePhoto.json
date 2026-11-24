@@ -1,0 +1,28 @@
+[
+  {
+    "case": "typical",
+    "method": "GET",
+    "path": "/api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/photo",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "image/png",
+    "responseBody": "<binary image/png, 29 bytes>"
+  },
+  {
+    "case": "no photo",
+    "method": "GET",
+    "path": "/api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/photo",
+    "authenticated": true,
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "The photo was not found.",
+      "instance": "/api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/photo",
+      "traceId": "00-495425d96f5ecbceb14a2fcf939444af-95543e868b43b113-02",
+      "correlationId": "85226df805a24bd9bcf8a89c6da712c7"
+    }
+  }
+]

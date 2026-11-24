@@ -29,6 +29,7 @@ public sealed class SettingsPageTests : BunitContext
         Services.AddSingleton(NullLogger<ApiClient>.Instance);
         Services.AddScoped<ApiClientFactory>();
         Services.AddScoped<AccountApi>();
+        Services.AddScoped<OneLoaf.Web.Account.SessionRefresher>();
         Services.AddScoped<DeviceContext>();
         Services.AddSingleton<ISettingsService>(_settings);
         Services.AddFluxor(o => o.ScanAssemblies(typeof(SettingsPage).Assembly, typeof(SessionState).Assembly));

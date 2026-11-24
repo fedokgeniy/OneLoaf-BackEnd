@@ -22,7 +22,7 @@ BLOCKS = [
      ["units", "currencies", "stage_types", "ingredient_categories", "flour_types"],
      "Fixed data: units, currencies, stage types, ingredient categories, flour types. Inserted by a migration; the services only read them."),
     ("acc", "E1 Accounts and kitchen", "#2563eb", "#eff6ff",
-     ["users", "kitchen_settings", "push_subscriptions"],
+     ["users", "kitchen_settings", "push_subscriptions", "refresh_tokens"],
      "The user is the root of a workspace. All data of a baker references the user through owner_id and is deleted with the account."),
     ("cat", "E3 Catalog, prices and stock", "#059669", "#ecfdf5",
      ["flours", "ingredients", "ingredient_prices", "stock_movements"],
@@ -62,7 +62,7 @@ LAYOUT_ALIGN = {"hist": "right", "lib": "right"}
 LAYOUT_CELL_ALIGN = {"hist": "left", "rec": "right"}
 LAYOUT_BLOCKS = {
     "ref": [["units", "currencies", "stage_types", "ingredient_categories", "flour_types"]],
-    "acc": [["users", "kitchen_settings"], ["push_subscriptions"]],
+    "acc": [["users", "kitchen_settings"], ["push_subscriptions", "refresh_tokens"]],
     "cat": [["ingredient_prices", "ingredients", "flours"], ["stock_movements"]],
     "ai": [["chat_conversations"], ["chat_messages"]],
     "lib": [["recipe_reactions", "published_recipes"], ["content_reports", "recipe_comments"]],

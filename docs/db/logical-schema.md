@@ -13,7 +13,7 @@ The overview shows every table with its key columns; all columns are in the per-
 | Block | Tables | Purpose |
 |---|---|---|
 | Reference data | `units`, `currencies`, `stage_types`, `ingredient_categories`, `flour_types` | Fixed data: units, currencies, stage types, ingredient categories, flour types. Inserted by a migration; the services only read them. |
-| E1 Accounts and kitchen | `users`, `kitchen_settings`, `push_subscriptions` | The user is the root of a workspace. All data of a baker references the user through owner_id and is deleted with the account. |
+| E1 Accounts and kitchen | `users`, `kitchen_settings`, `push_subscriptions`, `refresh_tokens` | The user is the root of a workspace. All data of a baker references the user through owner_id and is deleted with the account. |
 | E3 Catalog, prices and stock | `flours`, `ingredients`, `ingredient_prices`, `stock_movements` | Flours, ingredients and price history - the basis of the cost on any date - and the stock ledger of purchases and consumption. |
 | E2 Recipes and variants | `recipes`, `recipe_ingredients`, `recipe_stages` | Recipe knowledge base. A variant references its parent and stores only the differences: replacing lines and variant_overrides. |
 | E5 Production | `batches`, `batch_items`, `batch_stages` | Batch - items (recipe x loaves) - stage log with plan and actual times. |
@@ -64,6 +64,16 @@ erDiagram
         varchar auth
         timestamptz created_at
     }
+    refresh_tokens {
+        uuid id PK
+        uuid user_id FK
+        uuid family_id
+        char token_hash UK
+        timestamptz expires_at
+        timestamptz created_at
+        timestamptz rotated_at
+        timestamptz revoked_at
+    }
     users {
         uuid id PK
         varchar email
@@ -77,6 +87,7 @@ erDiagram
     }
     users ||--o| kitchen_settings : "user_id"
     users ||--o{ push_subscriptions : "user_id"
+    users ||--o{ refresh_tokens : "user_id"
 ```
 
 ### E3 Catalog, prices and stock

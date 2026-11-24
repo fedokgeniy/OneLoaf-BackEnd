@@ -7,12 +7,32 @@ versions follow [semantic versioning](guides/versioning.md). Dates are UTC.
 
 ### Added
 
+- **Session refresh** (US-02): the sign-in sets a rotating refresh token as an `HttpOnly`, `SameSite=Strict` cookie;
+  `POST /auth/refresh` exchanges it for a new access token. A token used again more than 30 seconds after its exchange
+  revokes the whole sign-in. CORS allows credentials for the configured origins.
+- **Ingredient stock**: a ledger of purchases (packs × pack size), batch consumption and returns, starter feedings and
+  corrections; `POST /ingredients/{id}/records` stores a price and a purchase in one request (or only the price),
+  `POST /ingredients/{id}/stock-adjustments`, `GET /ingredients/{id}/stock-movements`; ingredients show their stock and
+  a low-stock flag. A batch preview reports shortages at its planned start with two offers (fewer loaves, scaled dough).
+- **Prices can be corrected**: `PUT` and `DELETE /ingredients/{id}/prices/{priceId}`; one price per day.
+- **Starter as an ingredient**: every starter has an ingredient (`ingredientId`), is fed from flour and water
+  ingredients, and its usable share (`usableShare`, default two thirds) reaches the stock when it is ripe.
+- **Photos of ingredients and recipes**: `PUT`, `GET` and `DELETE …/photo` (one photo each, same checks as crumb photos).
+- **Recipe drafts**: `POST /recipes/drafts` creates a recipe together with its missing ingredients in one transaction;
+  the assistant proposes such a recipe (`create_recipe` action) and saves it only after the confirmation.
 - **Save a batch as a variant** (US-25): `POST /batches/{id}/save-as-variant` creates a variant of the batch item's recipe
   with the measured durations of finished stages and the changed or extended durations of the others; `422` when the
   batch followed the recipe.
 - **Crumb photos** (US-51): upload (`multipart/form-data`, JPEG/PNG/WebP checked by file signature, up to 5 MB and 10 per
   record), list, download and delete; bake records show their photos and the list shows `photoCount`. Files live on a
   volume (`Storage__PhotosPath`), the database keeps the key.
+
+### Changed
+
+- `POST /auth/logout` no longer needs an access token: it revokes the refresh tokens of the sign-in and removes the
+  cookie, so signing out works with an expired access token.
+- Cancelling or deleting a batch takes `ingredientsUsed`: when false, the ingredients return to the stock.
+- A starter requires its time to peak (`riseHours`).
 
 ### Fixed
 

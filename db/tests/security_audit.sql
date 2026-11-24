@@ -15,7 +15,7 @@ LANGUAGE sql AS $$ INSERT INTO test_results (name, passed, detail) VALUES (p_nam
 CREATE TEMP TABLE policy (relname text PRIMARY KEY, app_write char(1), app_read char(1)) ON COMMIT DROP;
 INSERT INTO policy VALUES
  ('units','R','R'), ('currencies','R','R'), ('stage_types','R','R'), ('ingredient_categories','R','R'), ('flour_types','R','R'),
- ('users','W','-'), ('push_subscriptions','W','-'), ('kitchen_settings','W','R'),
+ ('users','W','-'), ('push_subscriptions','W','-'), ('refresh_tokens','W','-'), ('kitchen_settings','W','R'),
  ('flours','W','R'), ('ingredients','W','R'), ('ingredient_prices','W','R'), ('stock_movements','W','C'),
  ('recipes','W','R'), ('recipe_ingredients','W','R'), ('recipe_stages','W','R'),
  ('batches','W','R'), ('batch_items','W','R'), ('batch_stages','W','R'),

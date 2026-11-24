@@ -3963,3 +3963,97 @@ BEGIN
 END $EF$;
 COMMIT;
 
+START TRANSACTION;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM __ef_migrations_history WHERE "MigrationId" = '20261124193748_RefreshTokens') THEN
+    CREATE TABLE refresh_tokens (
+        id uuid NOT NULL DEFAULT (gen_random_uuid()),
+        user_id uuid NOT NULL,
+        family_id uuid NOT NULL,
+        token_hash character(64) NOT NULL,
+        expires_at timestamp with time zone NOT NULL,
+        created_at timestamp with time zone NOT NULL DEFAULT (now()),
+        rotated_at timestamp with time zone,
+        revoked_at timestamp with time zone,
+        CONSTRAINT pk_refresh_tokens PRIMARY KEY (id),
+        CONSTRAINT ck_refresh_tokens_expires_after_created CHECK (expires_at > created_at),
+        CONSTRAINT ck_refresh_tokens_token_hash CHECK (token_hash ~ '^[0-9a-f]{64}$'),
+        CONSTRAINT fk_refresh_tokens_users_user_id FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+    );
+    COMMENT ON TABLE refresh_tokens IS 'E1, US-02. Hashes of the refresh tokens of signed-in browsers; a family is the chain of one sign-in.';
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM __ef_migrations_history WHERE "MigrationId" = '20261124193748_RefreshTokens') THEN
+    CREATE INDEX ix_refresh_tokens_family_id ON refresh_tokens (family_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM __ef_migrations_history WHERE "MigrationId" = '20261124193748_RefreshTokens') THEN
+    CREATE INDEX ix_refresh_tokens_user_id ON refresh_tokens (user_id);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM __ef_migrations_history WHERE "MigrationId" = '20261124193748_RefreshTokens') THEN
+    CREATE UNIQUE INDEX ux_refresh_tokens_token_hash ON refresh_tokens (token_hash);
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM __ef_migrations_history WHERE "MigrationId" = '20261124193748_RefreshTokens') THEN
+    -- Refresh tokens are personal session data: anonymizing a user signs the account out everywhere.
+    CREATE OR REPLACE PROCEDURE sp_anonymize_user(p_user_id uuid)
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        IF NOT EXISTS (SELECT 1 FROM users WHERE id = p_user_id) THEN
+            RAISE EXCEPTION 'User % not found', p_user_id USING ERRCODE = 'P0002';
+        END IF;
+
+        DELETE FROM refresh_tokens     WHERE user_id = p_user_id;
+        DELETE FROM push_subscriptions WHERE user_id = p_user_id;
+        DELETE FROM chat_conversations WHERE owner_id = p_user_id;
+        DELETE FROM reminders          WHERE owner_id = p_user_id;
+        DELETE FROM bake_records       WHERE owner_id = p_user_id;
+        DELETE FROM batches            WHERE owner_id = p_user_id;
+        DELETE FROM starters           WHERE owner_id = p_user_id;
+        DELETE FROM recipes            WHERE owner_id = p_user_id;
+        DELETE FROM ingredients        WHERE owner_id = p_user_id;
+        DELETE FROM flours             WHERE owner_id = p_user_id;
+        DELETE FROM kitchen_settings   WHERE user_id  = p_user_id;
+
+        UPDATE users
+        SET email            = 'anonymized-' || id || '@anonymized.invalid',
+            normalized_email = upper('anonymized-' || id || '@anonymized.invalid'),
+            display_name     = 'Anonymous baker',
+            password_hash    = fn_random_disabled_password_hash(),
+            role             = 'user',
+            last_login_at    = NULL
+        WHERE id = p_user_id;
+    END;
+    $$;
+
+    COMMENT ON PROCEDURE sp_anonymize_user(uuid) IS
+        'Removes personal data, sessions and the private workspace of a user, keeps public contributions as "Anonymous baker" (GDPR).';
+
+    END IF;
+END $EF$;
+
+DO $EF$
+BEGIN
+    IF NOT EXISTS(SELECT 1 FROM __ef_migrations_history WHERE "MigrationId" = '20261124193748_RefreshTokens') THEN
+    INSERT INTO __ef_migrations_history ("MigrationId", "ProductVersion")
+    VALUES ('20261124193748_RefreshTokens', '10.0.15');
+    END IF;
+END $EF$;
+COMMIT;
+
