@@ -2,14 +2,14 @@
   {
     "case": "typical",
     "method": "DELETE",
-    "path": "/api/v1/ingredients/ce9d3fe9-33af-4b1b-a12f-bc6ec8894138",
+    "path": "/api/v1/ingredients/317c99ec-52ca-481a-8475-0461f0ea44cb",
     "authenticated": true,
     "status": 204
   },
   {
     "case": "used in a recipe",
     "method": "DELETE",
-    "path": "/api/v1/ingredients/10c358b9-7268-404a-b141-aaf0cebfc880",
+    "path": "/api/v1/ingredients/16b33a70-1168-4063-a238-2610109d609d",
     "authenticated": true,
     "status": 409,
     "responseContentType": "application/problem+json",
@@ -18,9 +18,9 @@
       "title": "The request conflicts with existing data.",
       "status": 409,
       "detail": "The ingredient is used in recipes and cannot be deleted.",
-      "instance": "/api/v1/ingredients/10c358b9-7268-404a-b141-aaf0cebfc880",
-      "traceId": "00-5b5e3ddf359bb830449ddfc636118e38-7c9688f977f0fe95-02",
-      "correlationId": "53cc33463e1647c3bedaffcfb5e727e5"
+      "instance": "/api/v1/ingredients/16b33a70-1168-4063-a238-2610109d609d",
+      "traceId": "00-e1c68fc0ecde4e7db8e8ff1020be4659-a093a17dc399cece-02",
+      "correlationId": "a2071578d4c84be9b6e4e56a0c99c6a8"
     }
   }
 ]

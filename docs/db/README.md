@@ -8,8 +8,8 @@ Type: relational transactional database (OLTP), **PostgreSQL 16**. The structure
 Code First) and created **only by scripts**: a chain of migrations or the DDL script [`db/schema.sql`](../../db/schema.sql)
 generated from it.
 
-**Contents:** 30 tables (5 of them reference tables), 59 foreign keys, 103 CHECK constraints, 103 indexes, 32 triggers,
-23 functions, 23 trigger functions, 6 procedures, 8 views, 1 materialized view, 3 access roles; 242 automated checks.
+**Contents:** 30 tables (5 of them reference tables), 60 foreign keys, 104 CHECK constraints, 104 indexes, 36 triggers,
+24 functions, 27 trigger functions, 6 procedures, 8 views, 1 materialized view, 3 access roles; 247 automated checks.
 
 ## Documentation
 
@@ -51,7 +51,7 @@ generated from it.
 | Requirement | Where |
 |---|---|
 | Structure created by scripts or migrations, not manually | EF Core migrations and `db/schema.sql`; see [Getting started](#getting-started) |
-| Scripts and migrations in Git | [`src/OneLoaf.Infrastructure/Persistence/Migrations/`](../../src/OneLoaf.Infrastructure/Persistence/Migrations) (8 migrations and their SQL scripts), [`db/`](../../db) |
+| Scripts and migrations in Git | [`src/OneLoaf.Infrastructure/Persistence/Migrations/`](../../src/OneLoaf.Infrastructure/Persistence/Migrations) (9 migrations and their SQL scripts), [`db/`](../../db) |
 | Scripts for reference tables | `InitialSchema` migration (EF Core `HasData`, [`ReferenceData.cs`](../../src/OneLoaf.Infrastructure/Persistence/ReferenceData.cs)); values in the [dictionary](data-dictionary.md#reference-values) |
 | Test data covering edge cases | [`db/seed/test_data.sql`](../../db/seed/test_data.sql) (5 users, every status; the edge cases are listed in the file header); volume data in [`db/seed/volume_data.sql`](../../db/seed/volume_data.sql) |
 
@@ -143,7 +143,7 @@ the logical schema match the database, loads the volume data and shows the query
 | File | Role | What it checks | Checks |
 |---|---|---|---|
 | [`db/tests/constraint_tests.sql`](../../db/tests/constraint_tests.sql) | `oneloaf_app` | The database rejects invalid data with an integrity error: formats, ranges, reference data, user isolation, variant rules, status transitions, JSON structure, weak password hashes; cascading account deletion | 71 |
-| [`db/tests/business_tests.sql`](../../db/tests/business_tests.sql) | `oneloaf_app` | Functions, procedures, triggers and views return the values of the acceptance criteria US-06 - US-52 and of the ingredient stock | 78 |
+| [`db/tests/business_tests.sql`](../../db/tests/business_tests.sql) | `oneloaf_app` | Functions, procedures, triggers and views return the values of the acceptance criteria US-06 - US-52 and of the ingredient stock and starter ripening | 83 |
 | [`db/tests/security_audit.sql`](../../db/tests/security_audit.sql) | `app_admin` | Privileges of every table and view match the policy; role attributes; default privileges; no function is executable by `PUBLIC` | 60 |
 | [`db/tests/security_app.sql`](../../db/tests/security_app.sql) | `oneloaf_app` | The application role writes data but cannot change the structure, reference data, migration history or its own privileges | 17 |
 | [`db/tests/security_reader.sql`](../../db/tests/security_reader.sql) | `oneloaf_reader` | The reporting role sees personal data only masked and cannot change anything | 16 |
@@ -162,7 +162,7 @@ src/
       ModelConventions.cs             snake_case, enum as text + CHECK, defaults
       ReferenceData.cs                reference data
       Configurations/                 keys, indexes, CHECK, ON DELETE (Fluent API)
-      Migrations/                     8 migrations
+      Migrations/                     9 migrations
         Sql/<Migration>/*.sql         functions, triggers, procedures, views, privileges
   OneLoaf.DbMigrator/                 console application that applies the migrations
 db/

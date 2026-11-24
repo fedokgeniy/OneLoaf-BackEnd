@@ -2,42 +2,42 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/recipes/f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33/scaled?loaves=3",
+    "path": "/api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/scaled?loaves=3",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "recipeId": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
+      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
       "yieldLoaves": 1,
       "loaves": 3,
       "ingredients": [
         {
-          "lineId": "b4fc7443-d520-4650-aa82-b54da5c23209",
-          "ingredientId": "10c358b9-7268-404a-b141-aaf0cebfc880",
+          "lineId": "7255196f-01cc-4ff7-975c-71515166277d",
+          "ingredientId": "16b33a70-1168-4063-a238-2610109d609d",
           "ingredientName": "Bread flour",
           "unitCode": "g",
           "quantity": 1500.000,
           "isOptional": false
         },
         {
-          "lineId": "ef4f43da-03d1-44d4-a8b9-7df8192b7014",
-          "ingredientId": "d0d37e1b-b474-431e-bcb7-d1c4364eb162",
+          "lineId": "53eed3f5-de01-40b2-9568-f2f49b345f8e",
+          "ingredientId": "b293b19c-6022-4a0d-ac28-2000b56431d3",
           "ingredientName": "Water",
           "unitCode": "g",
           "quantity": 1050.000,
           "isOptional": false
         },
         {
-          "lineId": "3acb1630-76e9-457c-9db4-73f83bb86a74",
-          "ingredientId": "6d143075-ce04-4d4e-941d-3d42146db57e",
+          "lineId": "3a424871-3836-49f6-81e0-b26ba80b3193",
+          "ingredientId": "cad0f44b-a059-45d6-ac52-beb5446d76d1",
           "ingredientName": "Sea salt",
           "unitCode": "g",
           "quantity": 30.000,
           "isOptional": false
         },
         {
-          "lineId": "caa11ba9-009a-46c1-ad85-ca586c719fc8",
-          "ingredientId": "37b13fb3-fcb2-4a9c-9ef7-bf45408a3336",
+          "lineId": "76d05a3b-bc49-463d-8436-ff9bb98eb739",
+          "ingredientId": "9af4e978-d28a-4181-bfc9-4c045e878797",
           "ingredientName": "Rye starter",
           "unitCode": "g",
           "quantity": 300.000,

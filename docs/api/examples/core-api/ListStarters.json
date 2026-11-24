@@ -9,9 +9,9 @@
     "responseBody": {
       "items": [
         {
-          "id": "e0f6ccfa-7f1e-499d-a4d8-fdd07579da80",
+          "id": "bb8deeb7-12be-4d49-a321-671525f0b027",
           "name": "Rye mother",
-          "flourId": "ab7520cd-d427-4acf-882e-bf82bf81f612",
+          "flourId": "9d44625f-756c-49f7-be92-00dc9eee4b66",
           "hydrationPercent": 100.0,
           "feedingMode": "regular",
           "feedingIntervalHours": 24,
@@ -21,11 +21,15 @@
           "lastFedAt": null,
           "nextFeedingAt": null,
           "expectedPeakAt": null,
-          "createdAt": "2026-11-24T16:43:52.19171+00:00",
-          "updatedAt": "2026-11-24T16:43:52.19171+00:00",
+          "createdAt": "2026-11-24T19:27:05.901454+00:00",
+          "updatedAt": "2026-11-24T19:27:05.901454+00:00",
           "flourIngredientId": null,
           "waterIngredientId": null,
-          "amountG": null
+          "amountG": null,
+          "ingredientId": "0036c646-cd04-457f-a469-03904782bc25",
+          "usableShare": 0.667,
+          "usableG": 0.0,
+          "suggestedKeptG": null
         }
       ],
       "page": 1,

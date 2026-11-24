@@ -47,7 +47,7 @@
     "responseContentType": "application/json",
     "responseBody": {
       "recipe": {
-        "id": "841fd988-13af-4bb6-8298-354f902bc406",
+        "id": "16e99bd7-14a8-4baf-97ed-1865d56a923c",
         "parentRecipeId": null,
         "title": "Beginner sourdough",
         "description": "A simple first loaf.",
@@ -57,8 +57,8 @@
         "isArchived": false,
         "ingredients": [
           {
-            "lineId": "ca8ebe6c-464c-4030-bcde-6d1e83d78d94",
-            "ingredientId": "0e4741f8-e218-4334-a48e-236ae90d15e6",
+            "lineId": "50eac70a-9200-451e-a13a-f14252449851",
+            "ingredientId": "89d05c88-b4de-486d-b193-8b58926b10d6",
             "ingredientName": "Whole wheat flour",
             "categoryCode": "flour",
             "unitCode": "g",
@@ -70,8 +70,8 @@
             "isInherited": false
           },
           {
-            "lineId": "e60e57d0-7d0b-4735-acf0-57f26a6a343d",
-            "ingredientId": "00baf121-47fc-4220-b5cd-f5d766df8f5e",
+            "lineId": "c5ca24ee-cd80-492c-837a-133d7e6aa902",
+            "ingredientId": "9f9d80b6-e340-44c0-adec-5a972006669e",
             "ingredientName": "Honey",
             "categoryCode": "sweetener",
             "unitCode": "g",
@@ -85,7 +85,7 @@
         ],
         "stages": [
           {
-            "lineId": "a6130cf3-d3e2-42d1-b388-ebdf2d74898d",
+            "lineId": "9dc6374d-5aa4-4838-818c-23becdf4ebf6",
             "sortOrder": 1,
             "name": "Mix",
             "stageTypeCode": "mix",
@@ -101,7 +101,7 @@
             "isInherited": false
           },
           {
-            "lineId": "1ad3faa9-93ab-4011-b81f-2943855a73a0",
+            "lineId": "fdca96c4-2599-425d-bb49-ad9f0932e41d",
             "sortOrder": 2,
             "name": "Bake",
             "stageTypeCode": "bake",
@@ -117,8 +117,9 @@
             "isInherited": false
           }
         ],
-        "createdAt": "2026-11-24T16:43:51.690764+00:00",
-        "updatedAt": "2026-11-24T16:43:51.690764+00:00"
+        "createdAt": "2026-11-24T19:27:05.338216+00:00",
+        "updatedAt": "2026-11-24T19:27:05.338216+00:00",
+        "hasPhoto": false
       },
       "createdIngredients": [
         "Whole wheat flour",
@@ -168,8 +169,8 @@
           "Unknown stage type 'nap'."
         ]
       },
-      "traceId": "00-b4bd9e3b4d71f84f4ce2ea764a76f6c8-dd6027bba08103ab-02",
-      "correlationId": "5bfab343daff45c4b7c314347adf2a61"
+      "traceId": "00-bf962a9714c0072a33babc411c571b8c-a96f654948abd3ce-02",
+      "correlationId": "e59013aadf5146d4bfb88ed617937171"
     }
   }
 ]

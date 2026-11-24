@@ -265,8 +265,27 @@ INSERT INTO starter_feedings (starter_id, fed_at, flour_g, water_g, starter_kept
 SELECT id, now(), 50, 50, 20 FROM starters WHERE owner_id = :anna ORDER BY name LIMIT 1;
 SELECT pg_temp.check_equal('feeding takes its flour from the linked ingredient', fn_stock_balance(:flour), 1950::numeric);
 
-DELETE FROM starter_feedings WHERE id IN (SELECT feeding_id FROM stock_movements WHERE ingredient_id = :flour AND feeding_id IS NOT NULL);
-DELETE FROM stock_movements WHERE ingredient_id = :flour;
+-- A starter is an ingredient of its own; two thirds of the fed starter reach the stock when it is ripe.
+\set mother '''00000000-0000-4000-5001-000000000001'''
+SELECT pg_temp.check_equal('a starter has an ingredient of the category starter with its name',
+    (SELECT i.category_code || ':' || i.name FROM starters s JOIN ingredients i ON i.id = s.ingredient_id WHERE s.id = :mother), 'starter:Rye mother');
+INSERT INTO starter_feedings (starter_id, fed_at, flour_g, water_g, starter_kept_g) VALUES (:mother, now() + interval '1 minute', 50, 50, 20);
+SELECT pg_temp.check_equal('a fed starter is not stock before it is ripe',
+    (SELECT fn_stock_balance(ingredient_id) FROM starters WHERE id = :mother), 0::numeric);
+SELECT pg_temp.check_equal('the usable share is stock after the peak',
+    (SELECT fn_stock_balance_at(ingredient_id, now() + interval '13 hours') FROM starters WHERE id = :mother), 80.04::numeric);
+INSERT INTO starter_feedings (starter_id, fed_at, flour_g, water_g, starter_kept_g) VALUES (:mother, now() + interval '14 hours', 30, 30, 60);
+SELECT pg_temp.check_equal('the next feeding returns the ripe starter to the jar and ripens anew',
+    (SELECT string_agg(movement_type || ' ' || trim_scale(quantity), ', ' ORDER BY created_at, quantity)
+     FROM stock_movements WHERE ingredient_id = (SELECT ingredient_id FROM starters WHERE id = :mother)),
+    'starter_refed -80.04, starter_ripened 80.04, starter_ripened 80.04');
+UPDATE starters SET name = 'Rye mother renamed' WHERE id = :mother;
+SELECT pg_temp.check_equal('renaming a starter renames its ingredient',
+    (SELECT i.name FROM starters s JOIN ingredients i ON i.id = s.ingredient_id WHERE s.id = :mother), 'Rye mother renamed');
+UPDATE starters SET name = 'Rye mother' WHERE id = :mother;
+
+DELETE FROM starter_feedings WHERE id IN (SELECT feeding_id FROM stock_movements WHERE feeding_id IS NOT NULL);
+DELETE FROM stock_movements WHERE ingredient_id = :flour OR ingredient_id IN (SELECT ingredient_id FROM starters WHERE owner_id = :anna);
 UPDATE starters SET flour_ingredient_id = NULL WHERE owner_id = :anna;
 UPDATE ingredients SET track_stock = false, reorder_level = NULL WHERE id = :flour;
 

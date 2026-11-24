@@ -1147,6 +1147,17 @@
     },
     "description": "Body of DELETE /me (US-04): the password confirms the deletion."
   },
+  "EntityTagHeaderValue": {
+    "type": "object",
+    "properties": {
+      "tag": {
+        "$ref": "#/components/schemas/StringSegment"
+      },
+      "isWeak": {
+        "type": "boolean"
+      }
+    }
+  },
   "ExtendStageRequest": {
     "type": "object",
     "properties": {
@@ -1291,6 +1302,50 @@
       }
     },
     "description": "Body of POST /starters/{id}/feedings (US-28)."
+  },
+  "FileStreamHttpResult": {
+    "type": "object",
+    "properties": {
+      "contentType": {
+        "type": "string"
+      },
+      "fileDownloadName": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "lastModified": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "format": "date-time"
+      },
+      "entityTag": {
+        "oneOf": [
+          {
+            "type": "null"
+          },
+          {
+            "$ref": "#/components/schemas/EntityTagHeaderValue"
+          }
+        ]
+      },
+      "enableRangeProcessing": {
+        "type": "boolean"
+      },
+      "fileLength": {
+        "type": [
+          "null",
+          "integer"
+        ],
+        "format": "int64"
+      },
+      "fileStream": {
+        "$ref": "#/components/schemas/Stream"
+      }
+    }
   },
   "FlourDto": {
     "required": [
@@ -1626,9 +1681,71 @@
         "type": "boolean",
         "description": "True when the stock is below the reorder level, or below zero without a level.",
         "default": false
+      },
+      "hasPhoto": {
+        "type": "boolean",
+        "description": "True when GET /ingredients/{id}/photo returns an image.",
+        "default": false
+      },
+      "starterId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "The starter this ingredient belongs to; its stock is the ripe starter.",
+        "format": "uuid"
       }
     },
     "description": "Ingredient of the user's catalog (US-10)."
+  },
+  "IngredientRecordRequest": {
+    "required": [
+      "packCount",
+      "packSize",
+      "totalCost",
+      "currency",
+      "date"
+    ],
+    "type": "object",
+    "properties": {
+      "packCount": {
+        "type": "integer",
+        "description": "Number of packs, 1-10000.",
+        "format": "int32"
+      },
+      "packSize": {
+        "type": "number",
+        "description": "Content of one pack in the ingredient unit (1000 for a 1 kg bag of an ingredient kept in g).",
+        "format": "double"
+      },
+      "totalCost": {
+        "type": "number",
+        "description": "Amount paid for all packs, at least 0.",
+        "format": "double"
+      },
+      "currency": {
+        "type": "string",
+        "description": "Currency code."
+      },
+      "date": {
+        "type": "string",
+        "description": "Date of the purchase; the price applies from this date.",
+        "format": "date"
+      },
+      "note": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Note, for example the shop."
+      },
+      "priceOnly": {
+        "type": "boolean",
+        "description": "True records only the price: the stock does not change and is not switched on.",
+        "default": false
+      }
+    },
+    "description": "Body of POST /ingredients/{id}/records: what was bought and what it cost. The record sets the price of its date; unless it is price only, it also adds packs x pack size to the stock."
   },
   "IngredientRequest": {
     "required": [
@@ -2854,50 +2971,6 @@
     },
     "description": "Response of POST /recipes/{id}/publish."
   },
-  "PurchaseRequest": {
-    "required": [
-      "packCount",
-      "packSize",
-      "totalCost",
-      "currency",
-      "purchasedOn"
-    ],
-    "type": "object",
-    "properties": {
-      "packCount": {
-        "type": "integer",
-        "description": "Number of packs, 1-10000.",
-        "format": "int32"
-      },
-      "packSize": {
-        "type": "number",
-        "description": "Content of one pack in the ingredient unit (1000 for a 1 kg bag of an ingredient kept in g).",
-        "format": "double"
-      },
-      "totalCost": {
-        "type": "number",
-        "description": "Amount paid for all packs, at least 0.",
-        "format": "double"
-      },
-      "currency": {
-        "type": "string",
-        "description": "Currency code."
-      },
-      "purchasedOn": {
-        "type": "string",
-        "description": "Date of the purchase; the price applies from this date.",
-        "format": "date"
-      },
-      "note": {
-        "type": [
-          "null",
-          "string"
-        ],
-        "description": "Note, for example the shop."
-      }
-    },
-    "description": "Body of POST /ingredients/{id}/purchases: packs of a size bought for an amount."
-  },
   "ReactionRequest": {
     "required": [
       "reaction"
@@ -3172,6 +3245,11 @@
         "type": "string",
         "description": "Last change.",
         "format": "date-time"
+      },
+      "hasPhoto": {
+        "type": "boolean",
+        "description": "True when GET /recipes/{id}/photo returns an image.",
+        "default": false
       }
     },
     "description": "Effective recipe (US-05, US-07): a variant is shown with the inherited content resolved."
@@ -3593,6 +3671,11 @@
         "type": "string",
         "description": "Last change.",
         "format": "date-time"
+      },
+      "hasPhoto": {
+        "type": "boolean",
+        "description": "True when GET /recipes/{id}/photo returns an image.",
+        "default": false
       }
     },
     "description": "Recipe in a list."
@@ -4327,6 +4410,36 @@
         ],
         "description": "Starter after the last feeding, g: flour + water + starter kept.",
         "format": "double"
+      },
+      "ingredientId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "The starter as an ingredient of the catalog: recipes use it, its stock is the ripe starter.",
+        "format": "uuid"
+      },
+      "usableShare": {
+        "type": "number",
+        "description": "Share of the fed starter that becomes stock when it is ripe.",
+        "format": "double",
+        "default": 0.667
+      },
+      "usableG": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Ripe starter in stock now, g; 0 while the starter is ripening.",
+        "format": "double"
+      },
+      "suggestedKeptG": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Starter left for the next feeding, g: the reserve plus what was not used.",
+        "format": "double"
       }
     },
     "description": "A starter with its schedule from the last feeding (US-27, US-28, US-30)."
@@ -4400,6 +4513,14 @@
         ],
         "description": "Ingredient whose stock a feeding takes the water from.",
         "format": "uuid"
+      },
+      "usableShare": {
+        "type": [
+          "null",
+          "number"
+        ],
+        "description": "Share of the fed starter that can go into dough once it is ripe, 0.05-1; the rest stays for the next feeding. Defaults to two thirds.",
+        "format": "double"
       }
     },
     "description": "Body of POST/PUT /starters (US-27)."
@@ -4557,7 +4678,9 @@
       "batch_consumption",
       "batch_return",
       "starter_feeding",
-      "adjustment"
+      "adjustment",
+      "starter_ripened",
+      "starter_refed"
     ],
     "description": "purchase, batch_consumption, batch_return, starter_feeding or adjustment."
   },
@@ -4604,8 +4727,39 @@
     "description": "An ingredient the stock does not cover for a batch."
   },
   "Stream": {
-    "type": "string",
+    "type": [
+      "null",
+      "string"
+    ],
     "format": "binary"
+  },
+  "StringSegment": {
+    "type": "object",
+    "properties": {
+      "buffer": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "offset": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "length": {
+        "type": "integer",
+        "format": "int32"
+      },
+      "value": {
+        "type": [
+          "null",
+          "string"
+        ]
+      },
+      "hasValue": {
+        "type": "boolean"
+      }
+    }
   },
   "TimelineDto": {
     "required": [

@@ -285,14 +285,15 @@ public sealed partial class IngredientsPage
         }
     }
 
-    /// <summary>The record starts from the last price: same currency and pack size.</summary>
+    /// <summary>The record starts from the last purchase: same currency and pack size (else the quantity of the last price).</summary>
     private void OpenRecord(IngredientDto ingredient)
     {
         _recordError = null;
+        var lastPurchase = State.Value.Movements.Value?.Items.FirstOrDefault(m => m.PackSize is not null);
         _recordForm = new IngredientRecordForm
         {
             Currency = ingredient.CurrentPrice?.Currency ?? "EUR",
-            PackSize = ingredient.CurrentPrice?.PerQuantity,
+            PackSize = lastPurchase?.PackSize ?? ingredient.CurrentPrice?.PerQuantity,
             Date = Today,
         };
         _recordFor = ingredient;
