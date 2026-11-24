@@ -17,29 +17,22 @@ namespace OneLoaf.Web.Features.Recipes.Pages;
 /// stock (quantity and movements). One "Add record" enters what was bought: the price and, unless it is price only,
 /// the quantity; the card also holds a photo of the ingredient or its pack. List and detail side by side on desktop
 /// (Ingredients-Desktop), one after the other on smaller screens. Every quantity and price comes from the Core API.
+/// The page owns the state and the commands; the card and the dialogs are components that show data and raise events.
 /// </summary>
 public sealed partial class IngredientsPage
 {
-    private const string PricesTab = "prices";
-    private const string StockTab = "stock";
-
     private static readonly TimeSpan SearchDelay = TimeSpan.FromMilliseconds(300);
-
-    private static readonly IReadOnlyList<TabItem> DetailTabs = [new(PricesTab, "Prices"), new(StockTab, "Stock")];
 
     private string _search = string.Empty;
     private CancellationTokenSource? _searchDelay;
-    private string _tab = PricesTab;
 
     private PriceDto? _editingPrice;
     private PriceForm _priceEditForm = new();
-    private ServerValidation? _priceEditServer;
     private ApiError? _priceEditError;
     private PriceDto? _confirmDeletePrice;
 
     private IngredientForm? _ingredientForm;
     private IngredientDto? _editing;
-    private ServerValidation? _ingredientServer;
     private ApiError? _ingredientError;
     private IngredientDto? _confirmDelete;
 
@@ -50,12 +43,10 @@ public sealed partial class IngredientsPage
 
     private IngredientDto? _recordFor;
     private IngredientRecordForm _recordForm = new();
-    private ServerValidation? _recordServer;
     private ApiError? _recordError;
 
     private IngredientDto? _adjustFor;
     private StockAdjustmentForm _adjustForm = new();
-    private ServerValidation? _adjustServer;
     private ApiError? _adjustError;
 
     [Inject]
@@ -154,38 +145,6 @@ public sealed partial class IngredientsPage
     private bool IsFlourCategory(string? code) => Reference?.Categories.FirstOrDefault(c => c.Code == code)?.IsFlour == true;
 
     private FlourDto? FlourOf(IngredientDto ingredient) => Reference?.Flours.FirstOrDefault(f => f.Id == ingredient.FlourId);
-
-    private string PanelClass(string tab) => _tab == tab ? "ingredients__panel" : "ingredients__panel ingredients__panel--hidden";
-
-    private static string MovementTitle(StockMovementDto movement) => movement.Type switch
-    {
-        "purchase" => "Purchase",
-        "batch_consumption" => "Used in a batch",
-        "batch_return" => "Returned from a batch",
-        "starter_feeding" => "Starter feeding",
-        "adjustment" => "Correction",
-        _ => movement.Type,
-    };
-
-    /// <summary>Second line of a movement: the packs and the amount of a purchase, the batch, or the note.</summary>
-    private static string? MovementDetail(StockMovementDto movement, IngredientDto ingredient)
-    {
-        if (movement is { Type: "purchase", PackCount: { } packs, PackSize: { } size, TotalCost: { } cost })
-        {
-            var text = $"{packs} × {DisplayFormat.Quantity(size, ingredient.UnitCode)} for {DisplayFormat.Money(cost, movement.Currency)}";
-            return movement.Note is null ? text : $"{text} · {movement.Note}";
-        }
-
-        return movement.BatchName ?? movement.Note;
-    }
-
-    private static string PackHelp(IngredientDto ingredient) => ingredient.UnitCode switch
-    {
-        "g" => "A 1 kg bag is 1000 g.",
-        "ml" => "A 1 litre bottle is 1000 ml.",
-        "pcs" => "A box of ten eggs is 10 pcs.",
-        _ => $"In {ingredient.UnitCode}, the unit of this ingredient.",
-    };
 
     private void OpenPriceEdit(PriceDto price)
     {
@@ -328,26 +287,23 @@ public sealed partial class IngredientsPage
         Dispatcher.Dispatch(new AdjustStock(_adjustFor.Id, _adjustForm.ToRequest()));
     }
 
-    /// <summary>
-    /// Field errors go under the field; a duplicate price date (409) under the date, a duplicate name under the name.
-    /// Anything else is shown as an alert in the form that sent the command.
-    /// </summary>
+    /// <summary>The form that sent the command shows its error: under the field when it has one, else as an alert.</summary>
     private void OnCommandFailed(CatalogCommandFailed failed)
     {
         var error = failed.Error;
         switch (failed.Command)
         {
             case nameof(Recipes.State.UpdatePrice):
-                _priceEditError = Unplaced(error, _priceEditServer, nameof(PriceForm.EffectiveFrom));
+                _priceEditError = error;
                 break;
             case nameof(Recipes.State.SaveIngredient):
-                _ingredientError = Unplaced(error, _ingredientServer, nameof(IngredientForm.Name));
+                _ingredientError = error;
                 break;
             case nameof(Recipes.State.AddRecord):
-                _recordError = Unplaced(error, _recordServer, null);
+                _recordError = error;
                 break;
             case nameof(Recipes.State.AdjustStock):
-                _adjustError = Unplaced(error, _adjustServer, null);
+                _adjustError = error;
                 break;
             case nameof(Recipes.State.SaveFlour):
                 _flourError = error;
@@ -361,22 +317,5 @@ public sealed partial class IngredientsPage
         }
 
         StateHasChanged();
-    }
-
-    /// <summary>Puts the error under its field when it can and returns what is left to show as an alert.</summary>
-    private static ApiError? Unplaced(ApiError error, ServerValidation? server, string? conflictField)
-    {
-        if (error.Kind == ApiErrorKind.Validation && server is not null && server.Display(error.FieldErrors).Count == 0)
-        {
-            return null;
-        }
-
-        if (error.Kind == ApiErrorKind.Conflict && server is not null && conflictField is not null)
-        {
-            server.DisplayFor(conflictField, error.Message);
-            return null;
-        }
-
-        return error;
     }
 }

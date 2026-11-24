@@ -1,5 +1,6 @@
 @page "/ingredients"
 @inherits FluxorComponent
+@using OneLoaf.Web.Features.Recipes.Components
 @using OneLoaf.Web.Features.Recipes.Models
 @using OneLoaf.Web.Features.Recipes.State
 @using OneLoaf.Web.Shared.Api
@@ -108,170 +109,15 @@
                 <button type="button" class="ol-btn ol-btn--ghost ingredients__back" @onclick="() => Dispatcher.Dispatch(new SelectIngredient(null))">
                     <OlIcon Name="IconName.ChevronLeft" /> All ingredients
                 </button>
-                <div class="ol-card ingredients__card">
-                    <div class="ingredients__card-head">
-                        <h2 class="h3 ingredients__title">@ingredient.Name</h2>
-                        <div class="ingredients__card-actions">
-                            <OlIconButton Icon="IconName.Edit" Label="@($"Edit {ingredient.Name}")" OnClick="() => OpenIngredientForm(ingredient)" />
-                            <OlIconButton Icon="IconName.Trash" Label="@($"Delete {ingredient.Name}")" Danger="true" OnClick="() => _confirmDelete = ingredient" />
-                        </div>
-                    </div>
-                    <span class="ol-card__meta">@CategoryName(ingredient.CategoryCode) · unit: @ingredient.UnitCode</span>
-                    @if (ingredient.FlourName is not null)
-                    {
-                        <div class="ol-stats">
-                            <OlStatTile Label="Flour" Value="@ingredient.FlourName" />
-                            <OlStatTile Label="Protein" Value="@(ingredient.ProteinPercent is { } p ? DisplayFormat.Percent(p) : "—")" />
-                            @if (FlourOf(ingredient)?.Grind is { } grind)
-                            {
-                                <OlStatTile Label="Grind" Value="@grind" />
-                            }
-                        </div>
-                        @if (FlourOf(ingredient) is { } flour)
-                        {
-                            <div class="ingredients__inline-actions">
-                                <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Edit" OnClick="() => OpenFlourForm(flour)">Edit flour details</OlButton>
-                                <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Trash" OnClick="() => _confirmDeleteFlour = flour">Delete flour details</OlButton>
-                            </div>
-                        }
-                    }
-
-                    @if (ingredient.StarterId is { } starterId)
-                    {
-                        <OlAlert Kind="AlertKind.Info" Title="This ingredient is your starter">
-                            <p>Its stock is the ripe starter: it grows when a feeding has ripened and is used by batches. <OlLink Href="@($"starters/{starterId}/edit")">Open the starter</OlLink></p>
-                        </OlAlert>
-                    }
-
-                    <OlPhotoPicker Src="@State.Value.PhotoSrc" Loading="State.Value.PhotoLoading" Busy="State.Value.PhotoBusy"
-                                   Alt="@($"Photo of {ingredient.Name}")" AddLabel="Add a photo of the pack"
-                                   OnSelected="photo => Dispatcher.Dispatch(new UploadIngredientPhoto(ingredient.Id, photo))"
-                                   OnRemove="() => Dispatcher.Dispatch(new RemoveIngredientPhoto(ingredient.Id))" />
-
-                    <div class="ingredients__inline-actions">
-                        <OlButton Icon="IconName.Plus" OnClick="() => OpenRecord(ingredient)">Add record</OlButton>
-                        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => OpenAdjust(ingredient)">Correct stock</OlButton>
-                    </div>
-
-                    <OlTabs Label="Ingredient sections" Tabs="DetailTabs" ActiveId="@_tab" ActiveIdChanged="t => _tab = t" IdPrefix="ingredient" />
-
-                    <section class="@PanelClass("prices")" id="ingredient-panel-prices" role="tabpanel" aria-labelledby="ingredient-tab-prices">
-                        <h3 class="ol-card__overline">Price history</h3>
-                        @switch (State.Value.Prices)
-                        {
-                            case Loadable<IReadOnlyList<PriceDto>>.Failed { Error: var priceError }:
-                                <OlAlert Kind="AlertKind.Danger" CorrelationId="@priceError.CorrelationId">@priceError.Message</OlAlert>
-                                break;
-                            case { Value: { } prices } when prices.Count == 0:
-                                <p class="ingredients__empty">No price yet. Recipe costs stay incomplete until you add a record with what you paid.</p>
-                                break;
-                            case { Value: { } prices }:
-                                <div class="ol-table-wrap">
-                                    <table class="ol-table">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Effective from</th>
-                                                <th scope="col" class="ol-num">Price</th>
-                                                <th scope="col" class="ol-num">Per unit</th>
-                                                <th scope="col" class="ol-num">Change</th>
-                                                <th scope="col"><span class="ol-visually-hidden">Actions</span></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var price in prices)
-                                            {
-                                                <tr @key="price.Id">
-                                                    <td>@DisplayFormat.Date(price.EffectiveFrom)</td>
-                                                    <td class="ol-num">@DisplayFormat.Money(price.Price, price.Currency) / @DisplayFormat.Quantity(price.PerQuantity, ingredient.UnitCode)</td>
-                                                    <td class="ol-num">@DisplayFormat.UnitPrice(price.UnitPrice, ingredient.UnitCode)</td>
-                                                    <td class="ol-num">@(price.ChangePercent is { } change ? (change > 0 ? "+" : string.Empty) + DisplayFormat.Percent(change) : "—")</td>
-                                                    <td class="ingredients__row-actions">
-                                                        <OlIconButton Icon="IconName.Edit" Label="@($"Edit the price from {DisplayFormat.Date(price.EffectiveFrom)}")" OnClick="() => OpenPriceEdit(price)" />
-                                                        <OlIconButton Icon="IconName.Trash" Label="@($"Delete the price from {DisplayFormat.Date(price.EffectiveFrom)}")" Danger="true" OnClick="() => _confirmDeletePrice = price" />
-                                                    </td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                                break;
-                            default:
-                                <OlSkeleton Variant="SkeletonVariant.Row" Count="3" />
-                                break;
-                        }
-
-                    </section>
-
-                    <section class="@PanelClass("stock")" id="ingredient-panel-stock" role="tabpanel" aria-labelledby="ingredient-tab-stock">
-                        @if (ingredient.Stock is { } inStock)
-                        {
-                            <div class="ol-stats">
-                                <OlStatTile Label="In stock" Value="@DisplayFormat.Quantity(inStock, ingredient.UnitCode)" />
-                                <OlStatTile Label="Reorder level" Value="@(ingredient.ReorderLevel is { } level ? DisplayFormat.Quantity(level, ingredient.UnitCode) : "—")" />
-                            </div>
-                            @if (ingredient.IsLowStock)
-                            {
-                                <OlAlert Kind="AlertKind.Warning" Title="Low stock">
-                                    <p>@(ingredient.ReorderLevel is null ? "The stock is below zero: record a purchase or correct the stock." : "The stock is below the reorder level.")</p>
-                                </OlAlert>
-                            }
-                        }
-                        else
-                        {
-                            <p class="ingredients__empty">
-                                The stock of this ingredient is not kept: batches and starter feedings do not take from it.
-                                Add a record of what you bought, or correct the stock, to start keeping it.
-                            </p>
-                        }
-
-                        <h3 class="ol-card__overline">Stock movements</h3>
-                        @switch (State.Value.Movements)
-                        {
-                            case Loadable<PagedResult<StockMovementDto>>.Failed { Error: var movementsError }:
-                                <OlAlert Kind="AlertKind.Danger" CorrelationId="@movementsError.CorrelationId">@movementsError.Message</OlAlert>
-                                break;
-                            case { Value: { } movements } when movements.Items.Count == 0:
-                                <p class="ingredients__empty">Nothing recorded yet. Add a record of your first purchase to start.</p>
-                                break;
-                            case { Value: { } movements }:
-                                <div class="ol-table-wrap">
-                                    <table class="ol-table">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">Date</th>
-                                                <th scope="col">What</th>
-                                                <th scope="col" class="ol-num">Quantity</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach (var movement in movements.Items)
-                                            {
-                                                <tr @key="movement.Id">
-                                                    <td>@DisplayFormat.Date(movement.OccurredOn)</td>
-                                                    <td>
-                                                        @MovementTitle(movement)
-                                                        @if (MovementDetail(movement, ingredient) is { } detail)
-                                                        {
-                                                            <span class="ingredients__movement-detail">@detail</span>
-                                                        }
-                                                    </td>
-                                                    <td class="ol-num">@(movement.Quantity > 0 ? "+" : string.Empty)@DisplayFormat.Quantity(movement.Quantity, ingredient.UnitCode)</td>
-                                                </tr>
-                                            }
-                                        </tbody>
-                                    </table>
-                                </div>
-                                @if (movements.TotalCount > movements.Items.Count)
-                                {
-                                    <p class="ingredients__more">Showing the latest @movements.Items.Count of @movements.TotalCount movements.</p>
-                                }
-                                break;
-                            default:
-                                <OlSkeleton Variant="SkeletonVariant.Row" Count="3" />
-                                break;
-                        }
-                    </section>
-                </div>
+                <IngredientCard Ingredient="ingredient" CategoryName="@CategoryName(ingredient.CategoryCode)" Flour="FlourOf(ingredient)"
+                                Prices="State.Value.Prices" Movements="State.Value.Movements"
+                                PhotoSrc="@State.Value.PhotoSrc" PhotoLoading="State.Value.PhotoLoading" PhotoBusy="State.Value.PhotoBusy"
+                                OnEdit="() => OpenIngredientForm(ingredient)" OnDelete="() => _confirmDelete = ingredient"
+                                OnEditFlour="OpenFlourForm" OnDeleteFlour="flour => _confirmDeleteFlour = flour"
+                                OnAddRecord="() => OpenRecord(ingredient)" OnAdjust="() => OpenAdjust(ingredient)"
+                                OnEditPrice="OpenPriceEdit" OnDeletePrice="price => _confirmDeletePrice = price"
+                                OnPhotoSelected="photo => Dispatcher.Dispatch(new UploadIngredientPhoto(ingredient.Id, photo))"
+                                OnPhotoRemove="() => Dispatcher.Dispatch(new RemoveIngredientPhoto(ingredient.Id))" />
             }
             else
             {
@@ -283,153 +129,38 @@
     </div>
 </div>
 
-<OlDialog Open="_ingredientForm is not null" Title="@(_editing is null ? "New ingredient" : $"Edit {_editing.Name}")" OnClose="CloseIngredientForm">
-    <ChildContent>
-        @if (_ingredientForm is not null)
-        {
-            <EditForm id="ingredient-form" Model="_ingredientForm" OnValidSubmit="SaveIngredient" class="form-stack" novalidate>
-                <ObjectGraphValidation />
-                <ServerValidation @ref="_ingredientServer" />
-                <OlTextField Label="Name" @bind-Value="_ingredientForm.Name" />
-                <OlSelect Label="Category" Options="CategoryOptions" Placeholder="Choose a category" @bind-Value="_ingredientForm.CategoryCode" />
-                <OlSelect Label="Unit" Options="UnitOptions" @bind-Value="_ingredientForm.UnitCode" />
-                @if (IsFlourCategory(_ingredientForm.CategoryCode))
-                {
-                    <OlSelect Label="Flour details" Options="FlourOptions" Placeholder="No flour details" @bind-Value="_ingredientForm.FlourId" />
-                    <div class="ingredients__inline-actions">
-                        <OlButton Variant="ButtonVariant.Secondary" Icon="IconName.Plus" OnClick="() => OpenFlourForm(null)">Add flour</OlButton>
-                    </div>
-                }
-                <OlSwitch @bind-Value="_ingredientForm.TrackStock">Keep the stock of this ingredient</OlSwitch>
-                @if (_ingredientForm.TrackStock)
-                {
-                    <OlNumberField TValue="decimal?" Label="Reorder level" Suffix="@_ingredientForm.UnitCode"
-                                   Help="Below this stock the ingredient is marked as low. Leave empty for no warning." @bind-Value="_ingredientForm.ReorderLevel" />
-                }
-                @if (_ingredientError is not null)
-                {
-                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@_ingredientError.CorrelationId">@_ingredientError.Message</OlAlert>
-                }
-            </EditForm>
-        }
-    </ChildContent>
-    <Footer>
-        <OlButton Variant="ButtonVariant.Secondary" OnClick="CloseIngredientForm">Cancel</OlButton>
-        <OlButton Type="submit" form="ingredient-form" Loading="@State.Value.Busy">Save</OlButton>
-    </Footer>
-</OlDialog>
+<IngredientFormDialog Form="_ingredientForm" Title="@(_editing is null ? "New ingredient" : $"Edit {_editing.Name}")"
+                      Categories="CategoryOptions" Units="UnitOptions" Flours="FlourOptions" IsFlourCategory="IsFlourCategory"
+                      Busy="State.Value.Busy" Error="_ingredientError"
+                      OnSubmit="SaveIngredient" OnClose="CloseIngredientForm" OnAddFlour="() => OpenFlourForm(null)" />
 
 <FlourFormDialog Open="_flourOpen" Flour="_editingFlour" FlourTypes="FlourTypeOptions" Busy="State.Value.Busy" Error="_flourError"
                  OnSave="SaveFlour" OnClose="CloseFlourForm" />
 
-<OlDialog Open="_recordFor is not null" Title="@($"Record for {_recordFor?.Name}")" OnClose="() => _recordFor = null">
-    <ChildContent>
-        @if (_recordFor is not null)
-        {
-            <EditForm id="record-form" Model="_recordForm" OnValidSubmit="SaveRecord" class="form-stack" novalidate>
-                <ObjectGraphValidation />
-                <ServerValidation @ref="_recordServer" />
-                <OlNumberField TValue="int?" Label="Packs" @bind-Value="_recordForm.PackCount" />
-                <OlNumberField TValue="decimal?" Label="Size of one pack" Suffix="@_recordFor.UnitCode"
-                               Help="@PackHelp(_recordFor)" @bind-Value="_recordForm.PackSize" />
-                <OlNumberField TValue="decimal?" Label="Paid for all packs" @bind-Value="_recordForm.TotalCost" />
-                <OlSelect Label="Currency" Options="CurrencyOptions" @bind-Value="_recordForm.Currency" />
-                <OlTextField Label="Date" Type="date" Help="The price applies from this date; a price already entered for it is replaced."
-                             @bind-Value="_recordForm.Date" />
-                <OlSwitch @bind-Value="_recordForm.PriceOnly">Only price — do not change the stock</OlSwitch>
-                <p class="ingredients__empty">@(_recordForm.PriceOnly
-                    ? "The record sets the price. The stock of this ingredient stays as it is."
-                    : "The record sets the price and adds packs × size to the stock.")</p>
-                <OlTextField Label="Note" Placeholder="Shop, brand" @bind-Value="_recordForm.Note" />
-                @if (_recordError is not null)
-                {
-                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@_recordError.CorrelationId">@_recordError.Message</OlAlert>
-                }
-            </EditForm>
-        }
-    </ChildContent>
-    <Footer>
-        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _recordFor = null">Cancel</OlButton>
-        <OlButton Type="submit" form="record-form" Loading="@State.Value.Busy">Add record</OlButton>
-    </Footer>
-</OlDialog>
+<IngredientRecordDialog Ingredient="_recordFor" Form="_recordForm" Currencies="CurrencyOptions" Busy="State.Value.Busy" Error="_recordError"
+                        OnSubmit="SaveRecord" OnClose="() => _recordFor = null" />
 
-<OlDialog Open="_adjustFor is not null" Title="@($"Correct the stock of {_adjustFor?.Name}")" OnClose="() => _adjustFor = null">
-    <ChildContent>
-        @if (_adjustFor is not null)
-        {
-            <EditForm id="adjust-form" Model="_adjustForm" OnValidSubmit="SaveAdjustment" class="form-stack" novalidate>
-                <ObjectGraphValidation />
-                <ServerValidation @ref="_adjustServer" />
-                <OlNumberField TValue="decimal?" Label="Counted on the shelf" Suffix="@_adjustFor.UnitCode"
-                               Help="The stock is set to this quantity; the difference goes to the movements." @bind-Value="_adjustForm.ActualQuantity" />
-                <OlTextField Label="Reason" Placeholder="Counted the shelf, spilled, gave away" @bind-Value="_adjustForm.Note" />
-                @if (_adjustError is not null)
-                {
-                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@_adjustError.CorrelationId">@_adjustError.Message</OlAlert>
-                }
-            </EditForm>
-        }
-    </ChildContent>
-    <Footer>
-        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _adjustFor = null">Cancel</OlButton>
-        <OlButton Type="submit" form="adjust-form" Loading="@State.Value.Busy">Correct stock</OlButton>
-    </Footer>
-</OlDialog>
+<StockAdjustDialog Ingredient="_adjustFor" Form="_adjustForm" Busy="State.Value.Busy" Error="_adjustError"
+                   OnSubmit="SaveAdjustment" OnClose="() => _adjustFor = null" />
 
-<OlDialog Open="_editingPrice is not null" Title="Edit the price" OnClose="() => _editingPrice = null">
-    <ChildContent>
-        @if (_editingPrice is not null && Selected is { } priced)
-        {
-            <EditForm id="price-edit-form" Model="_priceEditForm" OnValidSubmit="SavePriceEdit" class="form-stack" novalidate>
-                <ObjectGraphValidation />
-                <ServerValidation @ref="_priceEditServer" />
-                <OlNumberField TValue="decimal?" Label="Price paid" @bind-Value="_priceEditForm.Price" />
-                <OlNumberField TValue="decimal?" Label="For" Suffix="@priced.UnitCode" @bind-Value="_priceEditForm.PerQuantity" />
-                <OlSelect Label="Currency" Options="CurrencyOptions" @bind-Value="_priceEditForm.Currency" />
-                <OlTextField Label="Valid from" Type="date" @bind-Value="_priceEditForm.EffectiveFrom" />
-                @if (_priceEditError is not null)
-                {
-                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@_priceEditError.CorrelationId">@_priceEditError.Message</OlAlert>
-                }
-            </EditForm>
-        }
-    </ChildContent>
-    <Footer>
-        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _editingPrice = null">Cancel</OlButton>
-        <OlButton Type="submit" form="price-edit-form" Loading="@State.Value.Busy">Save price</OlButton>
-    </Footer>
-</OlDialog>
+<PriceEditDialog Open="_editingPrice is not null && Selected is not null" UnitCode="@Selected?.UnitCode" Form="_priceEditForm"
+                 Currencies="CurrencyOptions" Busy="State.Value.Busy" Error="_priceEditError"
+                 OnSubmit="SavePriceEdit" OnClose="() => _editingPrice = null" />
 
-<OlDialog Open="_confirmDeletePrice is not null" Title="Delete this price?" OnClose="() => _confirmDeletePrice = null">
-    <ChildContent>
-        <p>
-            The price from @(_confirmDeletePrice is { } doomed ? DisplayFormat.Date(doomed.EffectiveFrom) : null) is removed.
-            Recipe costs for its dates use the previous price, or stay incomplete when there is none.
-        </p>
-    </ChildContent>
-    <Footer>
-        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmDeletePrice = null">Keep it</OlButton>
-        <OlButton Variant="ButtonVariant.Danger" Loading="@State.Value.Busy" OnClick="DeletePrice">Delete price</OlButton>
-    </Footer>
-</OlDialog>
+<OlConfirmDialog Open="_confirmDeletePrice is not null" Title="Delete this price?" ConfirmText="Delete price" Busy="State.Value.Busy"
+                 OnConfirm="DeletePrice" OnClose="() => _confirmDeletePrice = null">
+    <p>
+        The price from @(_confirmDeletePrice is { } doomed ? DisplayFormat.Date(doomed.EffectiveFrom) : null) is removed.
+        Recipe costs for its dates use the previous price, or stay incomplete when there is none.
+    </p>
+</OlConfirmDialog>
 
-<OlDialog Open="_confirmDeleteFlour is not null" Title="Delete these flour details?" OnClose="() => _confirmDeleteFlour = null">
-    <ChildContent>
-        <p>“@_confirmDeleteFlour?.Name” is removed from the flour catalog. Ingredients and starters that use it stay, without the flour details.</p>
-    </ChildContent>
-    <Footer>
-        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmDeleteFlour = null">Keep it</OlButton>
-        <OlButton Variant="ButtonVariant.Danger" Loading="@State.Value.Busy" OnClick="DeleteFlour">Delete</OlButton>
-    </Footer>
-</OlDialog>
+<OlConfirmDialog Open="_confirmDeleteFlour is not null" Title="Delete these flour details?" Busy="State.Value.Busy"
+                 OnConfirm="DeleteFlour" OnClose="() => _confirmDeleteFlour = null">
+    <p>“@_confirmDeleteFlour?.Name” is removed from the flour catalog. Ingredients and starters that use it stay, without the flour details.</p>
+</OlConfirmDialog>
 
-<OlDialog Open="_confirmDelete is not null" Title="Delete this ingredient?" OnClose="() => _confirmDelete = null">
-    <ChildContent>
-        <p>“@_confirmDelete?.Name”, its price history and its stock movements are removed. An ingredient used in a recipe cannot be deleted.</p>
-    </ChildContent>
-    <Footer>
-        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmDelete = null">Keep it</OlButton>
-        <OlButton Variant="ButtonVariant.Danger" Loading="@State.Value.Busy" OnClick="Delete">Delete</OlButton>
-    </Footer>
-</OlDialog>
+<OlConfirmDialog Open="_confirmDelete is not null" Title="Delete this ingredient?" Busy="State.Value.Busy"
+                 OnConfirm="Delete" OnClose="() => _confirmDelete = null">
+    <p>“@_confirmDelete?.Name”, its price history and its stock movements are removed. An ingredient used in a recipe cannot be deleted.</p>
+</OlConfirmDialog>

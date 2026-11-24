@@ -1,0 +1,57 @@
+@* Dialog that records what was bought: the price and, unless it is price only, the quantity that goes to the stock. *@
+@inherits FormDialogBase
+@using OneLoaf.Web.Features.Recipes.Models
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Forms
+
+<OlDialog Open="Ingredient is not null" Title="@($"Record for {Ingredient?.Name}")" OnClose="OnClose">
+    <ChildContent>
+        @if (Ingredient is not null)
+        {
+            <EditForm id="record-form" Model="Form" OnValidSubmit="SubmitAsync" class="form-stack" novalidate>
+                <ObjectGraphValidation />
+                <ServerValidation @ref="Server" />
+                <OlNumberField TValue="int?" Label="Packs" @bind-Value="Form.PackCount" />
+                <OlNumberField TValue="decimal?" Label="Size of one pack" Suffix="@Ingredient.UnitCode"
+                               Help="@PackHelp(Ingredient)" @bind-Value="Form.PackSize" />
+                <OlNumberField TValue="decimal?" Label="Paid for all packs" @bind-Value="Form.TotalCost" />
+                <OlSelect Label="Currency" Options="Currencies" @bind-Value="Form.Currency" />
+                <OlTextField Label="Date" Type="date" Help="The price applies from this date; a price already entered for it is replaced."
+                             @bind-Value="Form.Date" />
+                <OlSwitch @bind-Value="Form.PriceOnly">Only price — do not change the stock</OlSwitch>
+                <p class="ol-field__help">@(Form.PriceOnly
+                    ? "The record sets the price. The stock of this ingredient stays as it is."
+                    : "The record sets the price and adds packs × size to the stock.")</p>
+                <OlTextField Label="Note" Placeholder="Shop, brand" @bind-Value="Form.Note" />
+                @if (Alert is not null)
+                {
+                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@Alert.CorrelationId">@Alert.Message</OlAlert>
+                }
+            </EditForm>
+        }
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="OnClose">Cancel</OlButton>
+        <OlButton Type="submit" form="record-form" Loading="@Busy">Add record</OlButton>
+    </Footer>
+</OlDialog>
+
+@code {
+    /// <summary>The ingredient the record is for; null closes the dialog.</summary>
+    [Parameter] public IngredientDto? Ingredient { get; set; }
+
+    /// <summary>The form the page owns.</summary>
+    [Parameter, EditorRequired] public IngredientRecordForm Form { get; set; } = new();
+
+    /// <summary>Currencies of the reference data.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<SelectOption> Currencies { get; set; } = [];
+
+    private static string PackHelp(IngredientDto ingredient) => ingredient.UnitCode switch
+    {
+        "g" => "A 1 kg bag is 1000 g.",
+        "ml" => "A 1 litre bottle is 1000 ml.",
+        "pcs" => "A box of ten eggs is 10 pcs.",
+        _ => $"In {ingredient.UnitCode}, the unit of this ingredient.",
+    };
+}

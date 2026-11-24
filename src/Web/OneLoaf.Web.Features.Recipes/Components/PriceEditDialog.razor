@@ -1,0 +1,47 @@
+@* Dialog that corrects one price of the history: amount, quantity, currency and the date it is valid from. *@
+@inherits FormDialogBase
+@using OneLoaf.Web.Features.Recipes.Models
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Forms
+
+<OlDialog Open="Open" Title="Edit the price" OnClose="OnClose">
+    <ChildContent>
+        @if (Open)
+        {
+            <EditForm id="price-edit-form" Model="Form" OnValidSubmit="SubmitAsync" class="form-stack" novalidate>
+                <ObjectGraphValidation />
+                <ServerValidation @ref="Server" />
+                <OlNumberField TValue="decimal?" Label="Price paid" @bind-Value="Form.Price" />
+                <OlNumberField TValue="decimal?" Label="For" Suffix="@UnitCode" @bind-Value="Form.PerQuantity" />
+                <OlSelect Label="Currency" Options="Currencies" @bind-Value="Form.Currency" />
+                <OlTextField Label="Valid from" Type="date" @bind-Value="Form.EffectiveFrom" />
+                @if (Alert is not null)
+                {
+                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@Alert.CorrelationId">@Alert.Message</OlAlert>
+                }
+            </EditForm>
+        }
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="OnClose">Cancel</OlButton>
+        <OlButton Type="submit" form="price-edit-form" Loading="@Busy">Save price</OlButton>
+    </Footer>
+</OlDialog>
+
+@code {
+    /// <summary>Open state.</summary>
+    [Parameter] public bool Open { get; set; }
+
+    /// <summary>Unit of the ingredient, shown after the quantity.</summary>
+    [Parameter] public string? UnitCode { get; set; }
+
+    /// <summary>The form the page owns.</summary>
+    [Parameter, EditorRequired] public PriceForm Form { get; set; } = new();
+
+    /// <summary>Currencies of the reference data.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<SelectOption> Currencies { get; set; } = [];
+
+    /// <inheritdoc />
+    protected override string? ConflictField => nameof(PriceForm.EffectiveFrom);
+}

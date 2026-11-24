@@ -1,0 +1,37 @@
+@* Dialog that corrects the stock of an ingredient to the counted quantity. *@
+@inherits FormDialogBase
+@using OneLoaf.Web.Features.Recipes.Models
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Forms
+
+<OlDialog Open="Ingredient is not null" Title="@($"Correct the stock of {Ingredient?.Name}")" OnClose="OnClose">
+    <ChildContent>
+        @if (Ingredient is not null)
+        {
+            <EditForm id="adjust-form" Model="Form" OnValidSubmit="SubmitAsync" class="form-stack" novalidate>
+                <ObjectGraphValidation />
+                <ServerValidation @ref="Server" />
+                <OlNumberField TValue="decimal?" Label="Counted on the shelf" Suffix="@Ingredient.UnitCode"
+                               Help="The stock is set to this quantity; the difference goes to the movements." @bind-Value="Form.ActualQuantity" />
+                <OlTextField Label="Reason" Placeholder="Counted the shelf, spilled, gave away" @bind-Value="Form.Note" />
+                @if (Alert is not null)
+                {
+                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@Alert.CorrelationId">@Alert.Message</OlAlert>
+                }
+            </EditForm>
+        }
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="OnClose">Cancel</OlButton>
+        <OlButton Type="submit" form="adjust-form" Loading="@Busy">Correct stock</OlButton>
+    </Footer>
+</OlDialog>
+
+@code {
+    /// <summary>The ingredient to correct; null closes the dialog.</summary>
+    [Parameter] public IngredientDto? Ingredient { get; set; }
+
+    /// <summary>The form the page owns.</summary>
+    [Parameter, EditorRequired] public StockAdjustmentForm Form { get; set; } = new();
+}
