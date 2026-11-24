@@ -86,7 +86,7 @@ public sealed partial class IngredientsPage
         Reference?.Currencies.Select(c => new SelectOption(c.Code, c.Code)).ToList() ?? [new SelectOption("EUR", "EUR")];
 
     private IReadOnlyList<SelectOption> FlourOptions =>
-        Reference?.Flours.Select(f => new SelectOption(f.Id.ToString(), f.ProteinPercent is { } p ? $"{f.Name} · {p:0.#} %" : f.Name)).ToList() ?? [];
+        Reference?.Flours.Select(f => new SelectOption(f.Id.ToString(), f.ProteinPercent is { } p ? $"{f.Name} · {DisplayFormat.Percent(p)}" : f.Name)).ToList() ?? [];
 
     private IReadOnlyList<SelectOption> FlourTypeOptions =>
         Reference?.FlourTypes.Select(t => new SelectOption(t.Code, t.Name)).ToList() ?? [];
