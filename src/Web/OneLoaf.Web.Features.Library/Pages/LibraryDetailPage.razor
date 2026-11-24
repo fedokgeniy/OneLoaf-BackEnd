@@ -1,0 +1,197 @@
+@page "/library/{Id:guid}"
+@attribute [AllowAnonymous]
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Library.State
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+
+<PageTitle>@(State.Value.Publication.Value?.Title ?? "Library recipe") · OneLoaf</PageTitle>
+<ShellTitle Text="@(State.Value.Publication.Value?.Title ?? "Library recipe")" BackHref="library" BackLabel="Back to the library" />
+
+<div class="ol-container publication">
+    @switch (State.Value.Publication)
+    {
+        case Loadable<PublishedRecipeDto>.Failed { Error: var error }:
+            <OlAlert Kind="AlertKind.Danger" Title="@(error.Kind == Shared.Api.ApiErrorKind.NotFound ? "This recipe is no longer in the library." : "The recipe could not be loaded.")"
+                     CorrelationId="@error.CorrelationId">
+                <p>@error.Message</p>
+                <OlButton Href="library" Variant="ButtonVariant.Secondary">Back to the library</OlButton>
+            </OlAlert>
+            break;
+        case { Value: null }:
+            <div aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Card" Count="2" /></div>
+            break;
+        case { Value: { } publication }:
+            <header class="publication__head">
+                <span class="ol-card__overline">by @publication.AuthorName · published @DisplayFormat.Date(publication.PublishedAt)</span>
+                <h2 class="h2 publication__title">@publication.Title</h2>
+                <p class="publication__meta">
+                    @if (publication.Snapshot.YieldLoaves is { } loaves)
+                    {
+                        <span>@DisplayFormat.Loaves(loaves)</span>
+                    }
+                    @if (publication.Snapshot.LoafWeightG is { } weight)
+                    {
+                        <span> · @DisplayFormat.Grams(weight) per loaf</span>
+                    }
+                </p>
+                @if (!string.IsNullOrWhiteSpace(publication.Description))
+                {
+                    <p class="publication__description">@publication.Description</p>
+                }
+            </header>
+
+            <div class="publication__actions">
+                <div class="publication__reactions" role="group" aria-label="Reactions">
+                    @foreach (var code in LibraryCodes.Reactions)
+                    {
+                        var count = publication.Reactions.TryGetValue(code, out var n) ? n : 0;
+                        var mine = publication.MyReaction == code;
+                        <button type="button" class="ol-chip" aria-pressed="@(mine ? "true" : "false")"
+                                disabled="@(!_signedIn || State.Value.Running is not null)" @onclick="() => React(mine ? null : code)">
+                            @ReactionText(code) <span class="ol-num">@count</span>
+                        </button>
+                    }
+                </div>
+                <AuthorizeView>
+                    <Authorized>
+                        <OlButton Icon="IconName.Plus" Loading="@(State.Value.Running == nameof(CopyPublication))"
+                                  OnClick="() => Dispatcher.Dispatch(new CopyPublication())">Copy to my recipes</OlButton>
+                        @if (publication.IsMine)
+                        {
+                            <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmUnpublish = true">Remove from library</OlButton>
+                        }
+                        else
+                        {
+                            <OlButton Variant="ButtonVariant.Ghost" OnClick="() => OpenReport(null)">Report</OlButton>
+                        }
+                    </Authorized>
+                    <NotAuthorized>
+                        <OlButton Href="@LoginHref" Variant="ButtonVariant.Secondary">Sign in to copy and comment</OlButton>
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+
+            <div class="publication__grid">
+                <section aria-labelledby="ingredients-title">
+                    <h3 class="h3" id="ingredients-title">Ingredients</h3>
+                    <div class="ol-table-wrap">
+                        <table class="ol-table">
+                            <caption class="ol-visually-hidden">Ingredients for @DisplayFormat.Loaves(publication.Snapshot.YieldLoaves ?? 1)</caption>
+                            <thead><tr><th scope="col">Ingredient</th><th scope="col" class="ol-num">Amount</th></tr></thead>
+                            <tbody>
+                                @foreach (var line in publication.Snapshot.Ingredients)
+                                {
+                                    <tr>
+                                        <td>@line.Name@(line.IsOptional ? " (optional)" : null)</td>
+                                        <td class="ol-num">@DisplayFormat.Quantity(line.Quantity, line.Unit)</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+                <section aria-labelledby="stages-title">
+                    <h3 class="h3" id="stages-title">Stages</h3>
+                    <ol class="publication__stages">
+                        @foreach (var stage in publication.Snapshot.Stages)
+                        {
+                            <li>
+                                <span>@stage.Name@(stage.IsOptional ? " (optional)" : null)</span>
+                                <span class="ol-num">@DisplayFormat.DurationRange(stage.MinMinutes, stage.MaxMinutes)@(stage.TemperatureC is { } t ? $" · {DisplayFormat.Number(t, 0)} °C" : null)</span>
+                            </li>
+                        }
+                    </ol>
+                </section>
+            </div>
+
+            <section class="publication__comments" aria-labelledby="comments-title">
+                <h3 class="h3" id="comments-title">Comments · @publication.CommentCount</h3>
+                <AuthorizeView>
+                    <Authorized>
+                        <form class="publication__comment-form" @onsubmit="SendComment" @onsubmit:preventDefault>
+                            <label class="ol-field__label" for="comment-body">Comment</label>
+                            <textarea id="comment-body" class="ol-textarea" rows="3" maxlength="2000" @bind="_comment" @bind:event="oninput"
+                                      aria-invalid="@(_commentError is null ? null : "true")" aria-describedby="@(_commentError is null ? null : "comment-error")"></textarea>
+                            @if (_commentError is not null)
+                            {
+                                <span id="comment-error" class="ol-field__error">@_commentError</span>
+                            }
+                            <div><OlButton Type="submit" Loading="@(State.Value.Running == nameof(AddComment))">Post comment</OlButton></div>
+                        </form>
+                    </Authorized>
+                </AuthorizeView>
+                @switch (State.Value.Comments)
+                {
+                    case Loadable<PagedList<CommentDto>>.Failed { Error: var commentsError }:
+                        <OlAlert Kind="AlertKind.Danger" CorrelationId="@commentsError.CorrelationId">@commentsError.Message</OlAlert>
+                        break;
+                    case { Value: null }:
+                        <OlSkeleton Variant="SkeletonVariant.Row" Count="3" />
+                        break;
+                    case { Value: { Items.Count: 0 } }:
+                        <p class="publication__help">No comments yet.</p>
+                        break;
+                    case { Value: { } comments }:
+                        <ul class="publication__comment-list">
+                            @foreach (var comment in comments.Items)
+                            {
+                                <li @key="comment.Id">
+                                    <p class="publication__comment-meta"><strong>@comment.AuthorName</strong> · @DisplayFormat.Date(comment.CreatedAt)</p>
+                                    <p class="publication__comment-body">@comment.Body</p>
+                                    <AuthorizeView>
+                                        <Authorized>
+                                            @if (comment.IsMine)
+                                            {
+                                                <OlButton Variant="ButtonVariant.Ghost" OnClick="() => Dispatcher.Dispatch(new RemoveComment(comment.Id))">Delete</OlButton>
+                                            }
+                                            else
+                                            {
+                                                <OlButton Variant="ButtonVariant.Ghost" OnClick="() => OpenReport(comment.Id)">Report</OlButton>
+                                            }
+                                        </Authorized>
+                                    </AuthorizeView>
+                                </li>
+                            }
+                        </ul>
+                        @if (comments.HasMore)
+                        {
+                            <OlButton Variant="ButtonVariant.Secondary" Loading="@(State.Value.Running == nameof(LoadMoreComments))"
+                                      OnClick="() => Dispatcher.Dispatch(new LoadMoreComments())">Show more comments</OlButton>
+                        }
+                        break;
+                }
+            </section>
+            break;
+    }
+</div>
+
+<OlDialog Open="_reportOpen" Title="@(_reportComment is null ? "Report this recipe" : "Report this comment")" OnClose="() => _reportOpen = false">
+    <ChildContent>
+        <form id="report-form" class="form-stack" @onsubmit="SendReport" @onsubmit:preventDefault>
+            <label class="ol-field__label" for="report-reason">What is wrong?</label>
+            <textarea id="report-reason" class="ol-textarea" rows="3" maxlength="500" @bind="_reportReason" @bind:event="oninput"
+                      aria-invalid="@(_reportError is null ? null : "true")" aria-describedby="@(_reportError is null ? null : "report-error")"></textarea>
+            @if (_reportError is not null)
+            {
+                <span id="report-error" class="ol-field__error">@_reportError</span>
+            }
+        </form>
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _reportOpen = false">Cancel</OlButton>
+        <OlButton Type="submit" form="report-form" Loading="@(State.Value.Running == nameof(ReportContent))">Send report</OlButton>
+    </Footer>
+</OlDialog>
+
+<OlDialog Open="_confirmUnpublish" Title="Remove from the library?" OnClose="() => _confirmUnpublish = false">
+    <ChildContent>
+        <p>The published copy disappears from the library with its comments and reactions. Your own recipe stays as it is.</p>
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmUnpublish = false">Keep it</OlButton>
+        <OlButton Variant="ButtonVariant.Danger" Loading="@(State.Value.Running == nameof(UnpublishPublication))"
+                  OnClick="() => Dispatcher.Dispatch(new UnpublishPublication())">Remove</OlButton>
+    </Footer>
+</OlDialog>

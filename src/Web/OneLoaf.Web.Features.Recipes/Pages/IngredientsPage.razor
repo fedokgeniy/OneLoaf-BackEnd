@@ -1,0 +1,223 @@
+@page "/ingredients"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Recipes.Models
+@using OneLoaf.Web.Features.Recipes.State
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.Forms
+@using OneLoaf.Web.Shared.State
+
+<ShellTitle Text="Ingredients & prices">
+    <Actions>
+        <OlButton Variant="ButtonVariant.Secondary" Icon="IconName.Plus" class="app-hide-compact" OnClick="() => OpenIngredientForm(null)">New ingredient</OlButton>
+    </Actions>
+</ShellTitle>
+
+<div class="ol-container ingredients">
+    <div class="ol-split ingredients__split @(State.Value.SelectedId is null ? null : "ingredients__split--detail")">
+        <section class="ingredients__list" aria-label="Ingredient list">
+            <div class="ingredients__filters">
+                <div class="ol-field ingredients__search">
+                    <label class="ol-visually-hidden" for="ingredient-search">Search ingredients</label>
+                    <div class="ol-field__control">
+                        <span class="ingredients__search-icon"><OlIcon Name="IconName.Search" /></span>
+                        <input id="ingredient-search" class="ol-input ingredients__search-input" type="search" placeholder="Search ingredients"
+                               value="@_search" @oninput="OnSearch" />
+                    </div>
+                </div>
+                <OlButton Variant="ButtonVariant.Secondary" Icon="IconName.Plus" class="ingredients__new" OnClick="() => OpenIngredientForm(null)">New ingredient</OlButton>
+            </div>
+            @if (State.Value.Reference.Value is { } reference)
+            {
+                <div class="ingredients__chips" role="group" aria-label="Category">
+                    <OlChip Pressed="State.Value.Category is null" PressedChanged="_ => SetCategory(null)">All</OlChip>
+                    @foreach (var category in reference.Categories)
+                    {
+                        <OlChip @key="category.Code" Pressed="State.Value.Category == category.Code" PressedChanged="_ => SetCategory(category.Code)">@category.Name</OlChip>
+                    }
+                </div>
+            }
+            <div aria-busy="@(State.Value.List is Loadable<PagedResult<IngredientDto>>.Loading ? "true" : "false")">
+                @switch (State.Value.List)
+                {
+                    case Loadable<PagedResult<IngredientDto>>.Failed { Error: var error }:
+                        <OlAlert Kind="AlertKind.Danger" Title="The ingredients could not be loaded." CorrelationId="@error.CorrelationId">
+                            <p>@error.Message</p>
+                            <OlButton Variant="ButtonVariant.Secondary" OnClick="Reload">Try again</OlButton>
+                        </OlAlert>
+                        break;
+                    case { Value: { } result }:
+                        @if (result.Items.Count == 0)
+                        {
+                            <OlEmptyState Title="@(IsFiltered ? "No ingredients match" : "No ingredients yet")" Icon="IconName.Calculator"
+                                          Text="@(IsFiltered ? "Try another search or category." : "Add flour, water, salt and your starter, then their prices.")">
+                                <Action><OlButton OnClick="() => OpenIngredientForm(null)" Icon="IconName.Plus">New ingredient</OlButton></Action>
+                            </OlEmptyState>
+                        }
+                        else
+                        {
+                            <ul class="ol-table-wrap ingredients__rows">
+                                @foreach (var item in result.Items)
+                                {
+                                    <li @key="item.Id">
+                                        <button type="button" class="ingredients__row" aria-current="@(item.Id == State.Value.SelectedId ? "true" : null)"
+                                                @onclick="() => Dispatcher.Dispatch(new SelectIngredient(item.Id))">
+                                            <span class="ingredients__name">@item.Name</span>
+                                            @if (item.CurrentPrice is { } price)
+                                            {
+                                                <span class="ol-num ingredients__price">@DisplayFormat.UnitPrice(price.UnitPrice, item.UnitCode)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="ol-badge ol-badge--running ingredients__price">Price missing</span>
+                                            }
+                                            <span class="ingredients__category">@CategoryName(item.CategoryCode)@(item.ProteinPercent is { } protein ? $" · {DisplayFormat.Percent(protein)} protein" : null)</span>
+                                        </button>
+                                    </li>
+                                }
+                            </ul>
+                            @if (result.TotalCount > result.Items.Count)
+                            {
+                                <p class="ingredients__more">Showing @result.Items.Count of @result.TotalCount. Search to narrow the list.</p>
+                            }
+                        }
+                        break;
+                    default:
+                        <OlSkeleton Variant="SkeletonVariant.Row" Count="6" />
+                        break;
+                }
+            </div>
+        </section>
+
+        <section class="ingredients__detail" aria-label="Ingredient details">
+            @if (Selected is { } ingredient)
+            {
+                <button type="button" class="ol-btn ol-btn--ghost ingredients__back" @onclick="() => Dispatcher.Dispatch(new SelectIngredient(null))">
+                    <OlIcon Name="IconName.ChevronLeft" /> All ingredients
+                </button>
+                <div class="ol-card ingredients__card">
+                    <div class="ingredients__card-head">
+                        <h2 class="h3 ingredients__title">@ingredient.Name</h2>
+                        <div class="ingredients__card-actions">
+                            <OlIconButton Icon="IconName.Edit" Label="@($"Edit {ingredient.Name}")" OnClick="() => OpenIngredientForm(ingredient)" />
+                            <OlIconButton Icon="IconName.Trash" Label="@($"Delete {ingredient.Name}")" Danger="true" OnClick="() => _confirmDelete = ingredient" />
+                        </div>
+                    </div>
+                    <span class="ol-card__meta">@CategoryName(ingredient.CategoryCode) · unit: @ingredient.UnitCode</span>
+                    @if (ingredient.FlourName is not null)
+                    {
+                        <div class="ol-stats">
+                            <OlStatTile Label="Flour" Value="@ingredient.FlourName" />
+                            <OlStatTile Label="Protein" Value="@(ingredient.ProteinPercent is { } p ? DisplayFormat.Percent(p) : "—")" />
+                            @if (FlourOf(ingredient)?.Grind is { } grind)
+                            {
+                                <OlStatTile Label="Grind" Value="@grind" />
+                            }
+                        </div>
+                    }
+
+                    <h3 class="ol-card__overline">Price history</h3>
+                    @switch (State.Value.Prices)
+                    {
+                        case Loadable<IReadOnlyList<PriceDto>>.Failed { Error: var priceError }:
+                            <OlAlert Kind="AlertKind.Danger" CorrelationId="@priceError.CorrelationId">@priceError.Message</OlAlert>
+                            break;
+                        case { Value: { } prices } when prices.Count == 0:
+                            <p class="ingredients__empty">No price yet. Recipe costs stay incomplete until you add one.</p>
+                            break;
+                        case { Value: { } prices }:
+                            <div class="ol-table-wrap">
+                                <table class="ol-table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Effective from</th>
+                                            <th scope="col" class="ol-num">Price</th>
+                                            <th scope="col" class="ol-num">Per unit</th>
+                                            <th scope="col" class="ol-num">Change</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var price in prices)
+                                        {
+                                            <tr @key="price.Id">
+                                                <td>@DisplayFormat.Date(price.EffectiveFrom)</td>
+                                                <td class="ol-num">@DisplayFormat.Money(price.Price, price.Currency) / @DisplayFormat.Quantity(price.PerQuantity, ingredient.UnitCode)</td>
+                                                <td class="ol-num">@DisplayFormat.UnitPrice(price.UnitPrice, ingredient.UnitCode)</td>
+                                                <td class="ol-num">@(price.ChangePercent is { } change ? (change > 0 ? "+" : string.Empty) + DisplayFormat.Percent(change) : "—")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                            break;
+                        default:
+                            <OlSkeleton Variant="SkeletonVariant.Row" Count="3" />
+                            break;
+                    }
+
+                    <h3 class="ol-card__overline">Add a price</h3>
+                    <EditForm Model="_priceForm" OnValidSubmit="() => AddPrice(ingredient)" class="form-grid" novalidate>
+                        <ObjectGraphValidation />
+                        <ServerValidation @ref="_priceServer" />
+                        <OlNumberField TValue="decimal?" Label="Price paid" @bind-Value="_priceForm.Price" />
+                        <OlNumberField TValue="decimal?" Label="For" Suffix="@ingredient.UnitCode" @bind-Value="_priceForm.PerQuantity" />
+                        <OlSelect Label="Currency" Options="CurrencyOptions" @bind-Value="_priceForm.Currency" />
+                        <OlTextField Label="Valid from" Type="date" @bind-Value="_priceForm.EffectiveFrom" />
+                        <div class="form-grid__end">
+                            <OlButton Type="submit" Loading="@State.Value.Busy">Add price</OlButton>
+                        </div>
+                        @if (_priceError is not null)
+                        {
+                            <OlAlert Kind="AlertKind.Danger" CorrelationId="@_priceError.CorrelationId">@_priceError.Message</OlAlert>
+                        }
+                    </EditForm>
+                </div>
+            }
+            else
+            {
+                <div class="ingredients__placeholder">
+                    <OlEmptyState Title="Choose an ingredient" Icon="IconName.Calculator" Text="Its prices and flour details appear here." />
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+<OlDialog Open="_ingredientForm is not null" Title="@(_editing is null ? "New ingredient" : $"Edit {_editing.Name}")" OnClose="CloseIngredientForm">
+    <ChildContent>
+        @if (_ingredientForm is not null)
+        {
+            <EditForm id="ingredient-form" Model="_ingredientForm" OnValidSubmit="SaveIngredient" class="form-stack" novalidate>
+                <ObjectGraphValidation />
+                <ServerValidation @ref="_ingredientServer" />
+                <OlTextField Label="Name" @bind-Value="_ingredientForm.Name" />
+                <OlSelect Label="Category" Options="CategoryOptions" Placeholder="Choose a category" @bind-Value="_ingredientForm.CategoryCode" />
+                <OlSelect Label="Unit" Options="UnitOptions" @bind-Value="_ingredientForm.UnitCode" />
+                @if (IsFlourCategory(_ingredientForm.CategoryCode))
+                {
+                    <OlSelect Label="Flour" Options="FlourOptions" Placeholder="No flour details" @bind-Value="_ingredientForm.FlourId" />
+                }
+                @if (_ingredientError is not null)
+                {
+                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@_ingredientError.CorrelationId">@_ingredientError.Message</OlAlert>
+                }
+            </EditForm>
+        }
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="CloseIngredientForm">Cancel</OlButton>
+        <OlButton Type="submit" form="ingredient-form" Loading="@State.Value.Busy">Save</OlButton>
+    </Footer>
+</OlDialog>
+
+<OlDialog Open="_confirmDelete is not null" Title="Delete this ingredient?" OnClose="() => _confirmDelete = null">
+    <ChildContent>
+        <p>“@_confirmDelete?.Name” and its price history are removed. An ingredient used in a recipe cannot be deleted.</p>
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmDelete = null">Keep it</OlButton>
+        <OlButton Variant="ButtonVariant.Danger" Loading="@State.Value.Busy" OnClick="Delete">Delete</OlButton>
+    </Footer>
+</OlDialog>

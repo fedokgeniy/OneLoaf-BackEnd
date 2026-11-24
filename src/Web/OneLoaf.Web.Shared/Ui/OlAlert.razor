@@ -1,0 +1,45 @@
+@* Inline alert (.ol-alert). Danger alerts use role=alert, the others role=status; the icon repeats the meaning so
+   status is never colour alone. *@
+<div class="ol-alert ol-alert--@Kind.ToString().ToLowerInvariant()" role="@(Kind == AlertKind.Danger ? "alert" : "status")"
+     @attributes="AdditionalAttributes">
+    <OlIcon Name="IconFor(Kind)" />
+    <div class="ol-alert__body">
+        @if (!string.IsNullOrEmpty(Title))
+        {
+            <p class="ol-alert__title">@Title</p>
+        }
+        @ChildContent
+        @if (!string.IsNullOrEmpty(CorrelationId))
+        {
+            <p class="ol-alert__ref">Reference: <span class="ol-num">@CorrelationId</span></p>
+        }
+        @Action
+    </div>
+</div>
+
+@code {
+    /// <summary>Meaning of the alert.</summary>
+    [Parameter] public AlertKind Kind { get; set; } = AlertKind.Info;
+
+    /// <summary>Bold first line.</summary>
+    [Parameter] public string? Title { get; set; }
+
+    /// <summary>Message.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Correlation id of a failed request, shown for support.</summary>
+    [Parameter] public string? CorrelationId { get; set; }
+
+    /// <summary>Optional action (link or button).</summary>
+    [Parameter] public RenderFragment? Action { get; set; }
+
+    /// <summary>Other attributes (id, tabindex for focusing a summary).</summary>
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private static IconName IconFor(AlertKind kind) => kind switch
+    {
+        AlertKind.Success => IconName.CheckCircle,
+        AlertKind.Warning or AlertKind.Danger => IconName.Alert,
+        _ => IconName.Info,
+    };
+}

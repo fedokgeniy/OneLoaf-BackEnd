@@ -1,0 +1,21 @@
+.ol-stepper {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.ol-stepper__input {
+    width: 6rem;
+    text-align: center;
+    -moz-appearance: textfield;
+}
+
+.ol-stepper__input::-webkit-outer-spin-button,
+.ol-stepper__input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+::deep .ol-stepper__btn {
+    border: 1.5px solid var(--border-control);
+}

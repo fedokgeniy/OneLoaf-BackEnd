@@ -1,0 +1,72 @@
+@* Button of the design system (.ol-btn). Renders <a> when Href is set. Loading keeps the label for screen readers. *@
+@if (Href is not null)
+{
+    <a href="@Href" @attributes="AdditionalAttributes" class="@CssClass">
+        @if (Icon is { } icon)
+        {
+            <OlIcon Name="icon" />
+        }
+        @ChildContent
+    </a>
+}
+else
+{
+    <button type="@Type" disabled="@Disabled" aria-busy="@(Loading ? "true" : null)"
+            aria-disabled="@(Loading ? "true" : null)" @onclick="HandleClick" @attributes="AdditionalAttributes" class="@CssClass">
+        @if (Icon is { } icon)
+        {
+            <OlIcon Name="icon" />
+        }
+        @ChildContent
+    </button>
+}
+
+@code {
+    /// <summary>Visual variant.</summary>
+    [Parameter] public ButtonVariant Variant { get; set; } = ButtonVariant.Primary;
+
+    /// <summary>Large (48px) button.</summary>
+    [Parameter] public bool Large { get; set; }
+
+    /// <summary>Full width.</summary>
+    [Parameter] public bool Block { get; set; }
+
+    /// <summary>A request runs: spinner, clicks ignored, <c>aria-busy</c>.</summary>
+    [Parameter] public bool Loading { get; set; }
+
+    /// <summary>Disabled.</summary>
+    [Parameter] public bool Disabled { get; set; }
+
+    /// <summary><c>button</c> (default), <c>submit</c> or <c>reset</c>.</summary>
+    [Parameter] public string Type { get; set; } = "button";
+
+    /// <summary>Renders a link styled as a button.</summary>
+    [Parameter] public string? Href { get; set; }
+
+    /// <summary>Leading icon.</summary>
+    [Parameter] public IconName? Icon { get; set; }
+
+    /// <summary>Click handler.</summary>
+    [Parameter] public EventCallback<MouseEventArgs> OnClick { get; set; }
+
+    /// <summary>Label.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Other attributes (aria-*, data-*); a <c>class</c> is added to the button classes.</summary>
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+
+    private string CssClass
+    {
+        get
+        {
+            var css = "ol-btn ol-btn--" + Variant.ToString().ToLowerInvariant();
+            if (AdditionalAttributes?.TryGetValue("class", out var extra) == true) css += " " + extra;
+            if (Large) css += " ol-btn--lg";
+            if (Block) css += " ol-btn--block";
+            if (Loading) css += " is-loading";
+            return css;
+        }
+    }
+
+    private Task HandleClick(MouseEventArgs args) => Loading || Disabled ? Task.CompletedTask : OnClick.InvokeAsync(args);
+}

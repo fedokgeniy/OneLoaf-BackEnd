@@ -1,0 +1,54 @@
+.starters {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-block: var(--space-5);
+}
+
+.starters__help {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--ink-muted);
+}
+
+.starters__times {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--space-1) var(--space-3);
+    margin: 0;
+    font-size: 0.9375rem;
+}
+
+.starters__times dt {
+    color: var(--ink-muted);
+}
+
+.starters__times dd {
+    margin: 0;
+}
+
+.starters__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.starters__log {
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--border-hairline);
+}
+
+.starters__feedings {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: 0.875rem;
+}
+
+.starters__feedings li {
+    display: flex;
+    flex-direction: column;
+}

@@ -1,0 +1,21 @@
+@* Status of a compared line: a word with a dot (.ol-badge), never colour alone. Unchanged lines read "Same". *@
+@switch (Change)
+{
+    case "changed":
+        <span class="ol-badge ol-badge--running">Changed</span>
+        break;
+    case "added":
+        <span class="ol-badge ol-badge--done">Added</span>
+        break;
+    case "removed":
+        <span class="ol-badge ol-badge--overdue">Removed</span>
+        break;
+    default:
+        <span class="ol-badge ol-badge--neutral">Same</span>
+        break;
+}
+
+@code {
+    /// <summary><c>unchanged</c>, <c>changed</c>, <c>added</c> or <c>removed</c>.</summary>
+    [Parameter, EditorRequired] public string Change { get; set; } = "unchanged";
+}

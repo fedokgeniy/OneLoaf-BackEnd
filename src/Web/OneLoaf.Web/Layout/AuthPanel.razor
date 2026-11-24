@@ -1,0 +1,47 @@
+@* Frame of the Login-* and Register-* boards: phone — brand and form on the page; tablet — the form in a centred
+   card; desktop — espresso pitch panel on the left, form on the right. *@
+<div class="auth">
+    <section class="auth__pitch" aria-label="About OneLoaf">
+        <BrandMark OnDark="true" />
+        <div class="auth__pitch-body">
+            <p class="display auth__headline">@Headline</p>
+            <ul class="auth__points">
+                @foreach (var (icon, text) in Points)
+                {
+                    <li class="auth__point"><span class="auth__point-icon"><OlIcon Name="icon" /></span>@text</li>
+                }
+            </ul>
+        </div>
+        <p class="auth__footnote">@Footnote</p>
+    </section>
+    <section class="auth__side">
+        <div class="auth__card">
+            <div class="auth__brand"><BrandMark /></div>
+            <div>
+                <h1 class="h2 auth__title" tabindex="-1">@Title</h1>
+                <p class="auth__lead">@Lead</p>
+            </div>
+            @ChildContent
+        </div>
+    </section>
+</div>
+
+@code {
+    /// <summary>Page heading, e.g. "Welcome back".</summary>
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+
+    /// <summary>Line under the heading.</summary>
+    [Parameter] public string? Lead { get; set; }
+
+    /// <summary>Headline of the desktop pitch panel.</summary>
+    [Parameter] public string Headline { get; set; } = string.Empty;
+
+    /// <summary>Feature points of the pitch panel.</summary>
+    [Parameter] public IReadOnlyList<(IconName Icon, string Text)> Points { get; set; } = [];
+
+    /// <summary>Small print at the bottom of the pitch panel.</summary>
+    [Parameter] public string? Footnote { get; set; }
+
+    /// <summary>The form.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+}

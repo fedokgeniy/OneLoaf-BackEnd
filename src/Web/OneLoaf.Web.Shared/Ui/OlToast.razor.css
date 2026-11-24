@@ -1,0 +1,20 @@
+.ol-toast__text {
+    flex: 1;
+    min-width: 0;
+}
+
+.ol-toast__ref {
+    display: block;
+    font-size: 0.8125rem;
+    color: var(--espresso-muted);
+    overflow-wrap: anywhere;
+}
+
+.ol-toast__close {
+    color: var(--espresso-muted);
+}
+
+.ol-toast__close:hover {
+    background: var(--espresso-hover);
+    color: var(--espresso-ink);
+}

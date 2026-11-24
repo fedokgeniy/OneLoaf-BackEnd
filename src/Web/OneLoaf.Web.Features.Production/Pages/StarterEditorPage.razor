@@ -1,0 +1,154 @@
+@page "/starters/new"
+@page "/starters/{Id:guid}/edit"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Production.Models
+@using OneLoaf.Web.Features.Production.State
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Forms
+@using OneLoaf.Web.Shared.State
+@inject IState<StartersState> State
+@inject IDispatcher Dispatcher
+
+<ShellTitle Text="@(Id is null ? "New starter" : "Edit starter")" BackHref="starters" BackLabel="Back to starters">
+    <Actions>
+        @if (_form is not null)
+        {
+            <OlButton Type="submit" form="starter-form" Loading="State.Value.Busy" class="app-hide-compact">Save</OlButton>
+        }
+    </Actions>
+</ShellTitle>
+
+@if (_notFound)
+{
+    <div class="ol-container editor">
+        <OlEmptyState Title="Starter not found" Text="This starter does not exist or is not yours." Icon="IconName.Starter">
+            <Action><OlButton Href="starters">Back to starters</OlButton></Action>
+        </OlEmptyState>
+    </div>
+}
+else if (_form is null)
+{
+    <div class="ol-container editor" aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Row" Count="5" /></div>
+}
+else
+{
+    <EditForm id="starter-form" Model="_form" OnValidSubmit="Save" class="ol-container editor" novalidate>
+        <ObjectGraphValidation />
+        <ServerValidation @ref="_server" />
+        @if (_error is not null)
+        {
+            <OlAlert Kind="AlertKind.Danger" CorrelationId="@_error.CorrelationId">@_error.Message</OlAlert>
+        }
+        <section class="ol-card editor__card" aria-label="Starter">
+            <div class="editor__general">
+                <div class="editor__wide"><OlTextField Label="Name" Placeholder="Mother rye" @bind-Value="_form.Name" /></div>
+                <OlNumberField TValue="decimal?" Label="Hydration" Suffix="%" Help="Water per 100 g of flour." @bind-Value="_form.HydrationPercent" />
+                <OlSelect Label="Flour" Options="FlourOptions" Placeholder="Not specified" @bind-Value="_form.FlourId" />
+                <OlSelect Label="Feeding" Options="ModeOptions" @bind-Value="_form.FeedingMode" />
+                <OlNumberField TValue="int?" Label="Every" Suffix="h" @bind-Value="_form.FeedingIntervalHours" />
+                <OlNumberField TValue="decimal?" Label="Time to peak" Suffix="h" Help="After a feeding; used for the expected peak." @bind-Value="_form.RiseHours" />
+                <div class="editor__wide">
+                    <OlSwitch @bind-Value="_form.IsActive">Active — send feeding reminders</OlSwitch>
+                    <p class="ol-field__help">Reminders reach this device when push reminders are on in Settings.</p>
+                </div>
+                <div class="editor__wide"><OlTextArea Label="Notes" Rows="2" @bind-Value="_form.Notes" /></div>
+            </div>
+        </section>
+        <div class="editor__foot">
+            @if (Id is not null)
+            {
+                <OlButton Variant="ButtonVariant.Ghost" OnClick="() => _confirmDelete = true">Delete</OlButton>
+            }
+            <OlButton Type="submit" Loading="State.Value.Busy">@(Id is null ? "Add starter" : "Save changes")</OlButton>
+        </div>
+    </EditForm>
+}
+
+<OlDialog Open="_confirmDelete" Title="Delete this starter?" OnClose="() => _confirmDelete = false">
+    <ChildContent><p>The starter and its feeding log are removed, and its reminders stop.</p></ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmDelete = false">Keep it</OlButton>
+        <OlButton Variant="ButtonVariant.Danger" OnClick="Delete">Delete</OlButton>
+    </Footer>
+</OlDialog>
+
+@code {
+    private static readonly IReadOnlyList<SelectOption> ModeOptions =
+        [new("regular", "Regularly"), new("weekly", "Weekly"), new("fridge", "Kept in the fridge")];
+
+    private StarterForm? _form;
+    private ServerValidation? _server;
+    private ApiError? _error;
+    private bool _notFound;
+    private bool _confirmDelete;
+
+    /// <summary>Starter id; null for a new starter.</summary>
+    [Parameter] public Guid? Id { get; set; }
+
+    private IReadOnlyList<SelectOption> FlourOptions =>
+        State.Value.Flours.Value?.Select(f => new SelectOption(f.Id.ToString(), f.Name)).ToList() ?? [];
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<StartersLoaded>(_ => BuildForm());
+        SubscribeToAction<StarterCommandFailed>(a =>
+        {
+            if (a.Command == nameof(SaveStarter))
+            {
+                _error = a.Error.Kind == ApiErrorKind.Validation && _server is not null && _server.Display(a.Error.FieldErrors).Count == 0 ? null
+                    : a.Error.Kind == ApiErrorKind.Conflict && _server is not null ? ShowUnderName(a.Error) : a.Error;
+            }
+        });
+        if (State.Value.Starters is Loadable<IReadOnlyList<StarterDto>>.Loaded)
+        {
+            BuildForm();
+        }
+        else
+        {
+            Dispatcher.Dispatch(new LoadStarters());
+        }
+    }
+
+    private void BuildForm()
+    {
+        if (Id is null)
+        {
+            _form ??= new StarterForm();
+            return;
+        }
+
+        var starter = State.Value.Starters.Value?.FirstOrDefault(s => s.Id == Id);
+        _notFound = starter is null && State.Value.Starters is Loadable<IReadOnlyList<StarterDto>>.Loaded;
+        if (starter is not null)
+        {
+            _form ??= StarterForm.From(starter);
+        }
+    }
+
+    private ApiError? ShowUnderName(ApiError error)
+    {
+        _server!.DisplayFor(nameof(StarterForm.Name), error.Message);
+        return null;
+    }
+
+    private void Save()
+    {
+        if (!State.Value.Busy && _form is not null)
+        {
+            _error = null;
+            Dispatcher.Dispatch(new SaveStarter(Id, _form.ToRequest()));
+        }
+    }
+
+    private void Delete()
+    {
+        _confirmDelete = false;
+        if (Id is { } id)
+        {
+            Dispatcher.Dispatch(new DeleteStarter(id));
+        }
+    }
+}

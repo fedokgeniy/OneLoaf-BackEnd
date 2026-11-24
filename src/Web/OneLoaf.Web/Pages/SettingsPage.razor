@@ -1,0 +1,117 @@
+@page "/settings"
+@inherits FluxorComponent
+@using OneLoaf.Web.Account
+@using OneLoaf.Web.Shared.Auth
+@using OneLoaf.Web.Shared.State.Display
+
+<PageTitle>Settings · OneLoaf</PageTitle>
+<ShellTitle Text="Settings" />
+
+<div class="ol-container settings">
+    <section class="ol-card settings__section" aria-labelledby="display-title">
+        <div class="ol-card__body">
+            <h2 class="h3" id="display-title">Display</h2>
+            <OlSegmented TValue="ThemePreference" Label="Theme" Options="ThemeOptions" Value="Display.Value.Preferences.Theme"
+                         ValueChanged="t => Dispatcher.Dispatch(new SetTheme(t))" />
+            <div class="settings__field">
+                <OlSegmented TValue="int" Label="Display scale" Options="ScaleOptions" Value="Display.Value.Preferences.Scale"
+                             ValueChanged="s => Dispatcher.Dispatch(new SetScale(s))" />
+                <p class="settings__help">Scales text, buttons and spacing. Works together with your browser zoom.</p>
+            </div>
+            <label class="ol-switch">
+                <input type="checkbox" role="switch" checked="@Display.Value.Preferences.ReduceMotion"
+                       @onchange="e => Dispatcher.Dispatch(new SetReduceMotion(e.Value is true))" />
+                <span>Reduce motion</span>
+            </label>
+        </div>
+    </section>
+
+    <section class="ol-card settings__section" aria-labelledby="reminders-title" aria-live="polite">
+        <div class="ol-card__body">
+            <h2 class="h3" id="reminders-title">Reminders</h2>
+            <p class="settings__help">
+                Push reminders tell you when a starter needs feeding and when a batch stage starts. Kneading reminders are chosen
+                per batch in the new batch form.
+            </p>
+            @switch (_push)
+            {
+                case PushStatus.Unknown:
+                    <OlSkeleton Variant="SkeletonVariant.Text" />
+                    break;
+                case PushStatus.Unsupported:
+                    <OlAlert Kind="AlertKind.Info">This browser cannot receive push reminders here. Install the app or open it in a browser with notifications.</OlAlert>
+                    break;
+                case PushStatus.Denied:
+                    <OlAlert Kind="AlertKind.Warning">Notifications are blocked for OneLoaf. Allow them in the browser's site settings, then come back.</OlAlert>
+                    break;
+                default:
+                    <label class="ol-switch">
+                        <input type="checkbox" role="switch" checked="@(_push == PushStatus.On)" disabled="@_pushBusy"
+                               @onchange="e => TogglePush(e.Value is true)" />
+                        <span>Push reminders on this device</span>
+                    </label>
+                    @if (_push == PushStatus.On)
+                    {
+                        <div><OlButton Variant="ButtonVariant.Secondary" Loading="_testBusy" OnClick="SendTest">Send test</OlButton></div>
+                    }
+                    break;
+            }
+            @if (_pushError is not null)
+            {
+                <OlAlert Kind="AlertKind.Danger" CorrelationId="@_pushError.CorrelationId">@_pushError.Message</OlAlert>
+            }
+        </div>
+    </section>
+
+    <section class="ol-card settings__section" aria-labelledby="account-title">
+        <div class="ol-card__body">
+            <h2 class="h3" id="account-title">Account</h2>
+            @if (Session.Value.User is { } user)
+            {
+                <dl class="settings__account">
+                    <dt>Name</dt>
+                    <dd>@user.DisplayName</dd>
+                    <dt>E-mail</dt>
+                    <dd>@user.Email</dd>
+                </dl>
+                @if (user.Role == SessionUser.AdminRole)
+                {
+                    <div><OlButton Href="admin/reports" Variant="ButtonVariant.Secondary">Moderation queue</OlButton></div>
+                }
+            }
+            <div class="settings__field">
+                <span class="ol-field__label">Export my data</span>
+                <div class="settings__exports">
+                    @foreach (var export in SettingsService.Exports)
+                    {
+                        <OlButton Variant="ButtonVariant.Secondary" Loading="_exporting == export.Path" Disabled="_exporting is not null"
+                                  OnClick="() => Export(export.Path, export.FileName)">@export.Text (CSV)</OlButton>
+                    }
+                </div>
+            </div>
+            <div class="settings__links">
+                <a class="ol-link" href="settings/kitchen">Kitchen and cost settings</a>
+            </div>
+            <div><OlButton Variant="ButtonVariant.Danger" OnClick="OpenDelete">Delete account</OlButton></div>
+        </div>
+    </section>
+</div>
+
+<OlDialog Open="_deleteOpen" Title="Delete your account?" OnClose="() => _deleteOpen = false">
+    <ChildContent>
+        <form id="delete-form" class="form-stack" @onsubmit="DeleteAccount" @onsubmit:preventDefault>
+            <p>All your recipes, batches, starters, bake history and publications are deleted. This cannot be undone.</p>
+            <label class="ol-field__label" for="delete-password">Password</label>
+            <input id="delete-password" class="ol-input" type="password" autocomplete="current-password" @bind="_password" @bind:event="oninput"
+                   aria-invalid="@(_deleteError is null ? null : "true")" aria-describedby="@(_deleteError is null ? null : "delete-error")" />
+            @if (_deleteError is not null)
+            {
+                <span id="delete-error" class="ol-field__error">@_deleteError</span>
+            }
+        </form>
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _deleteOpen = false">Keep my account</OlButton>
+        <OlButton Type="submit" form="delete-form" Variant="ButtonVariant.Danger" Loading="_deleting">Delete account</OlButton>
+    </Footer>
+</OlDialog>

@@ -1,0 +1,175 @@
+@* App shell (.ol-shell): exactly one main navigation per size class — bottom bar (phone), rail (tablet, phone
+   landscape), sidebar (desktop) — plus the top bar with the page title and the profile menu. Before device.js reports
+   the size class, all three are rendered and CSS shows the one that fits, so nothing jumps. Sign out is reachable in
+   all three patterns (avatar menu, bottom of the rail, bottom of the sidebar). *@
+@inherits FluxorComponent
+@inject IState<DisplayState> Display
+@inject IState<SessionState> Session
+@inject IState<ConnectivityState> Connectivity
+@inject IDispatcher Dispatcher
+@inject NavigationManager Navigation
+
+<a class="ol-btn ol-btn--secondary app-skip" href="@SkipHref">Skip to content</a>
+<div class="ol-shell app-shell">
+    @if (Shows(SizeClass.Expanded, SizeClass.Large, SizeClass.Ultra))
+    {
+        <nav class="ol-nav ol-nav--sidebar ol-show-expanded" aria-label="Main">
+            <a class="ol-nav__brand app-shell__sidebar-brand" href=""><BrandMark OnDark="true" Class="brand--sm" /></a>
+            @foreach (var item in NavDestinations.Main)
+            {
+                <NavItem Destination="item" />
+            }
+            <span class="ol-nav__spacer"></span>
+            <NavItem Destination="NavDestinations.Settings" />
+            <button type="button" class="ol-nav__item" @onclick="SignOut">
+                <OlIcon Name="IconName.Logout" />
+                <span class="ol-nav__label">Sign out</span>
+            </button>
+        </nav>
+    }
+    @if (Shows(SizeClass.Medium))
+    {
+        <nav class="ol-nav ol-nav--rail ol-show-medium" aria-label="Main">
+            <a class="app-shell__rail-brand" href="" aria-label="OneLoaf home">
+                <svg class="app-shell__heart" viewBox="0 0 20 18" aria-hidden="true" focusable="false"><path d="M10 16.8C10 16.8 1.2 10.6 1.2 5.4 1.2 2.5 3.5 1 6 1 7.9 1 9.3 2.1 10 3.6 10.7 2.1 12.1 1 14 1 16.5 1 18.8 2.5 18.8 5.4 18.8 10.6 10 16.8 10 16.8Z" /></svg>
+            </a>
+            @foreach (var item in NavDestinations.Main)
+            {
+                <NavItem Destination="item" />
+            }
+            <span class="ol-nav__spacer"></span>
+            <NavItem Destination="NavDestinations.Settings" />
+            <button type="button" class="ol-nav__item" @onclick="SignOut">
+                <OlIcon Name="IconName.Logout" />
+                <span class="ol-nav__label">Sign out</span>
+            </button>
+        </nav>
+    }
+
+    <div class="app-shell__body">
+        <OlTopBar Class="app-shell__topbar" TitleClass="app-shell__title">
+            <Leading>
+                <SectionOutlet SectionName="@PageTitleSection.Back" />
+                <span class="ol-show-compact app-shell__compact-brand"><a class="app-shell__brand-link" href=""><BrandMark Class="brand--sm" /></a></span>
+            </Leading>
+            <Title><SectionOutlet SectionName="@PageTitleSection.Name" /></Title>
+            <Actions>
+                <div class="app-shell__page-actions"><SectionOutlet SectionName="@PageTitleSection.Actions" /></div>
+                <div class="app-shell__account">
+                    <OlIconButton Icon="IconName.User" Label="Profile and settings" aria-expanded="@(_menuOpen ? "true" : "false")"
+                                  aria-controls="account-menu" OnClick="ToggleMenu" />
+                    @if (_menuOpen)
+                    {
+                        <button type="button" class="app-shell__menu-scrim" aria-label="Close menu" tabindex="-1" @onclick="CloseMenu"></button>
+                        <div id="account-menu" class="app-shell__menu" @onkeydown="OnMenuKeyDown">
+                            @if (Session.Value.User is { } user)
+                            {
+                                <p class="app-shell__menu-user">
+                                    <span class="app-shell__menu-name">@user.DisplayName</span>
+                                    <span class="app-shell__menu-email">@user.Email</span>
+                                </p>
+                            }
+                            <nav aria-label="Account">
+                                <ul class="app-shell__menu-list">
+                                    @foreach (var item in MenuItems)
+                                    {
+                                        <li><a class="ol-nav__item" href="@item.Href" @onclick="CloseMenu"><OlIcon Name="item.Icon" /><span>@item.Text</span></a></li>
+                                    }
+                                    <li>
+                                        <button type="button" class="ol-nav__item app-shell__menu-signout" @onclick="SignOut">
+                                            <OlIcon Name="IconName.Logout" /><span>Sign out</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </nav>
+                        </div>
+                    }
+                </div>
+            </Actions>
+        </OlTopBar>
+
+        @if (!Connectivity.Value.IsOnline)
+        {
+            <div class="ol-container app-shell__offline">
+                <OlAlert Kind="AlertKind.Warning" Title="You're offline.">
+                    Recipes you opened before are still readable; changes cannot be saved until the connection is back.
+                </OlAlert>
+            </div>
+        }
+
+        <main id="main" class="ol-shell__main app-shell__main" tabindex="-1">
+            @ChildContent
+        </main>
+    </div>
+
+    @if (Shows(SizeClass.Compact, SizeClass.Watch))
+    {
+        <nav class="ol-nav ol-nav--bottom ol-show-compact" aria-label="Main">
+            @foreach (var item in NavDestinations.BottomBar)
+            {
+                <NavItem Destination="item" />
+            }
+        </nav>
+    }
+</div>
+
+@code {
+    private bool _menuOpen;
+
+    /// <summary>The page.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string SkipHref => Navigation.ToBaseRelativePath(Navigation.Uri).Split('#')[0] + "#main";
+
+    /// <summary>On phones the menu holds everything the bottom bar has no room for; elsewhere only settings pages.</summary>
+    private IReadOnlyList<NavDestination> MenuItems =>
+        Display.Value.Device.SizeClass is SizeClass.Unknown or SizeClass.Compact or SizeClass.Watch
+        ? NavDestinations.AccountMenu
+        : [NavDestinations.Ingredients, NavDestinations.Kitchen, NavDestinations.Settings];
+
+    /// <summary>True when the reported size class is one of <paramref name="classes"/>, or nothing was reported yet.</summary>
+    private bool Shows(params SizeClass[] classes) =>
+        Display.Value.Device.SizeClass == SizeClass.Unknown || classes.Contains(Display.Value.Device.SizeClass);
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        Navigation.LocationChanged += OnLocationChanged;
+    }
+
+    private void ToggleMenu() => _menuOpen = !_menuOpen;
+
+    private void CloseMenu() => _menuOpen = false;
+
+    private void OnMenuKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape")
+        {
+            _menuOpen = false;
+        }
+    }
+
+    private void SignOut()
+    {
+        _menuOpen = false;
+        Dispatcher.Dispatch(new Logout());
+    }
+
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        _menuOpen = false;
+        InvokeAsync(StateHasChanged);
+    }
+
+    /// <inheritdoc />
+    protected override ValueTask DisposeAsyncCore(bool disposing)
+    {
+        if (disposing)
+        {
+            Navigation.LocationChanged -= OnLocationChanged;
+        }
+
+        return base.DisposeAsyncCore(disposing);
+    }
+}

@@ -1,0 +1,140 @@
+@page "/admin/reports"
+@attribute [Authorize(Roles = "admin")]
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Library.State
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+@inject IState<ModerationState> State
+@inject IDispatcher Dispatcher
+
+@* Moderation queue (LR-11, administrators): no mockup; a design-system table and a dialog asking for the reason. *@
+<PageTitle>Moderation · OneLoaf</PageTitle>
+<ShellTitle Text="Moderation" />
+
+<div class="ol-container moderation">
+    <OlSegmented TValue="string" Label="Status" Options="StatusOptions" Value="State.Value.Status"
+                 ValueChanged="s => Dispatcher.Dispatch(new LoadReports(s ?? ModerationState.Statuses[0]))" />
+    @switch (State.Value.Reports)
+    {
+        case Loadable<PagedList<ReportDto>>.Failed { Error: var error }:
+            <OlAlert Kind="AlertKind.Danger" Title="The reports could not be loaded." CorrelationId="@error.CorrelationId">@error.Message</OlAlert>
+            break;
+        case { Value: null }:
+            <OlSkeleton Variant="SkeletonVariant.Row" Count="4" />
+            break;
+        case { Value: { Items.Count: 0 } }:
+            <OlEmptyState Title="Nothing to review" Text="There are no reports with this status." />
+            break;
+        case { Value: { } reports }:
+            <div class="ol-table-wrap">
+                <table class="ol-table ol-table--stack">
+                    <caption class="ol-visually-hidden">Reports with status @State.Value.Status</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Content</th>
+                            <th scope="col">Reason</th>
+                            <th scope="col">Reported</th>
+                            <th scope="col"><span class="ol-visually-hidden">Actions</span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var report in reports.Items)
+                        {
+                            <tr @key="report.Id">
+                                <td>
+                                    @if (report.PublishedRecipeId is { } publicationId)
+                                    {
+                                        <a class="ol-link" href="@($"library/{publicationId}")">@(report.PublicationTitle ?? "Publication")</a>
+                                    }
+                                    @if (report.CommentBody is { } body)
+                                    {
+                                        <span class="moderation__comment">Comment: “@body”</span>
+                                    }
+                                </td>
+                                <td data-label="Reason">@report.Reason</td>
+                                <td data-label="Reported">@DisplayFormat.Date(report.CreatedAt)</td>
+                                <td>
+                                    @if (report.Status == ModerationState.Statuses[0])
+                                    {
+                                        <div class="moderation__actions">
+                                            <OlButton Variant="ButtonVariant.Danger" Disabled="State.Value.Resolving is not null" OnClick="() => Open(report, LibraryCodes.Remove)">Remove</OlButton>
+                                            <OlButton Variant="ButtonVariant.Secondary" Disabled="State.Value.Resolving is not null" OnClick="() => Open(report, LibraryCodes.Reject)">Reject</OlButton>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <span class="ol-badge ol-badge--neutral">@report.Status</span>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            break;
+    }
+</div>
+
+<OlDialog Open="_deciding is not null" Title="@(_action == LibraryCodes.Remove ? "Remove the content" : "Reject the report")" OnClose="() => _deciding = null">
+    <ChildContent>
+        <form id="resolve-form" class="form-stack" @onsubmit="Resolve" @onsubmit:preventDefault>
+            <p>@(_action == LibraryCodes.Remove ? "The reported content is removed from the library." : "The content stays; the report is closed.")</p>
+            <label class="ol-field__label" for="resolve-reason">Reason</label>
+            <textarea id="resolve-reason" class="ol-textarea" rows="3" maxlength="500" @bind="_reason" @bind:event="oninput"
+                      aria-invalid="@(_reasonError is null ? null : "true")" aria-describedby="@(_reasonError is null ? null : "resolve-error")"></textarea>
+            @if (_reasonError is not null)
+            {
+                <span id="resolve-error" class="ol-field__error">@_reasonError</span>
+            }
+        </form>
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _deciding = null">Cancel</OlButton>
+        <OlButton Type="submit" form="resolve-form" Variant="@(_action == LibraryCodes.Remove ? ButtonVariant.Danger : ButtonVariant.Primary)"
+                  Loading="State.Value.Resolving is not null">@(_action == LibraryCodes.Remove ? "Remove" : "Reject report")</OlButton>
+    </Footer>
+</OlDialog>
+
+@code {
+    private static readonly IReadOnlyList<SegmentOption<string>> StatusOptions =
+        [new("open", "Open"), new("resolved", "Resolved"), new("rejected", "Rejected")];
+
+    private ReportDto? _deciding;
+    private string _action = LibraryCodes.Reject;
+    private string? _reason;
+    private string? _reasonError;
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<ReportResolved>(_ => _deciding = null);
+        Dispatcher.Dispatch(new LoadReports(State.Value.Status));
+    }
+
+    private void Open(ReportDto report, string action)
+    {
+        _deciding = report;
+        _action = action;
+        _reason = null;
+        _reasonError = null;
+    }
+
+    private void Resolve()
+    {
+        _reasonError = null;
+        if (_deciding is null || State.Value.Resolving is not null)
+        {
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(_reason))
+        {
+            _reasonError = "Give a reason for the record.";
+            return;
+        }
+
+        Dispatcher.Dispatch(new ResolveReport(_deciding.Id, new ResolveReportRequest(_action, _reason.Trim())));
+    }
+}

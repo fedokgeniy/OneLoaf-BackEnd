@@ -1,0 +1,13 @@
+@* Text link with a 44px hit area (.ol-link). *@
+<a class="ol-link" href="@Href" @attributes="AdditionalAttributes">@ChildContent</a>
+
+@code {
+    /// <summary>Target, relative to the base href (e.g. <c>register</c>).</summary>
+    [Parameter, EditorRequired] public string Href { get; set; } = string.Empty;
+
+    /// <summary>Link text.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Other attributes.</summary>
+    [Parameter(CaptureUnmatchedValues = true)] public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
+}

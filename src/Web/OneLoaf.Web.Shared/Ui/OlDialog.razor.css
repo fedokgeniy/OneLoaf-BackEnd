@@ -1,0 +1,23 @@
+/* The native dialog takes the .ol-dialog look; the scrim of the design system becomes its ::backdrop. */
+.ol-native-dialog {
+    padding: 0;
+    border: 0;
+    margin: auto auto 0;
+    max-width: 100%;
+}
+
+.ol-native-dialog:not([open]) {
+    display: none;
+}
+
+.ol-native-dialog::backdrop {
+    background: var(--scrim);
+    backdrop-filter: blur(6px);
+}
+
+@media (min-width: 37.5em) {
+    .ol-native-dialog {
+        margin: auto;
+        width: calc(100% - 2 * var(--space-5));
+    }
+}

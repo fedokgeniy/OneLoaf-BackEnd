@@ -1,46 +1,14 @@
 using System.Globalization;
 using System.Text;
-using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using OneLoaf.Messaging.Contracts;
 using OneLoaf.ServiceDefaults.Correlation;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
 namespace OneLoaf.Messaging.RabbitMq;
-
-/// <summary>Routes of one queue: event type (routing key) to the handler invocation.</summary>
-public sealed class ConsumerRegistration
-{
-    private readonly Dictionary<string, Func<IServiceProvider, ReadOnlyMemory<byte>, MessageContext, CancellationToken, Task>> _routes =
-        new(StringComparer.Ordinal);
-
-    internal ConsumerRegistration(string queue) => Queue = queue;
-
-    /// <summary>Queue name.</summary>
-    public string Queue { get; }
-
-    internal IReadOnlyDictionary<string, Func<IServiceProvider, ReadOnlyMemory<byte>, MessageContext, CancellationToken, Task>> Routes => _routes;
-
-    /// <summary>Binds the queue to <paramref name="routingKey"/> and handles those events with <typeparamref name="THandler"/>.</summary>
-    public ConsumerRegistration On<TEvent, THandler>(string routingKey, IServiceCollection services)
-        where TEvent : IntegrationEvent
-        where THandler : class, IIntegrationEventConsumer<TEvent>
-    {
-        ArgumentNullException.ThrowIfNull(services);
-        services.AddScoped<THandler>();
-        _routes[routingKey] = (provider, body, context, ct) =>
-        {
-            var integrationEvent = JsonSerializer.Deserialize<TEvent>(body.Span, MessagingJson.Options)
-                                   ?? throw new JsonException($"Empty {typeof(TEvent).Name} message.");
-            return provider.GetRequiredService<THandler>().HandleAsync(integrationEvent, context, ct);
-        };
-        return this;
-    }
-}
 
 /// <summary>
 /// Consumes one queue. Declares the topology idempotently (queue bound to the events exchange, a delayed retry queue
@@ -224,35 +192,4 @@ public sealed partial class RabbitMqConsumer(
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Message {MessageId} from {Queue} failed after {Attempt} attempts; dead-lettered")]
     private static partial void LogDeadLettered(ILogger logger, Exception exception, string messageId, string queue, int attempt);
-}
-
-/// <summary>JSON settings shared by the publisher and the consumers (camelCase, snake_case enums).</summary>
-internal static class MessagingJson
-{
-    public static readonly JsonSerializerOptions Options = Create();
-
-    private static JsonSerializerOptions Create()
-    {
-        var json = new JsonSerializerOptions(JsonSerializerDefaults.Web);
-        ServiceDefaults.Extensions.ConfigureJson(json);
-        return json;
-    }
-}
-
-/// <summary>Registration of the consumers.</summary>
-public static class RabbitMqConsumerExtensions
-{
-    /// <summary>
-    /// Consumes <paramref name="queue"/> in a hosted service; <paramref name="configure"/> binds routing keys to handlers.
-    /// Requires <see cref="RabbitMqExtensions.AddRabbitMqPublisher"/> (connection and options).
-    /// </summary>
-    public static IServiceCollection AddRabbitMqConsumer(
-        this IServiceCollection services, string queue, Action<ConsumerRegistration, IServiceCollection> configure)
-    {
-        ArgumentNullException.ThrowIfNull(configure);
-        var registration = new ConsumerRegistration(queue);
-        configure(registration, services);
-        services.AddSingleton<IHostedService>(sp => ActivatorUtilities.CreateInstance<RabbitMqConsumer>(sp, registration));
-        return services;
-    }
 }

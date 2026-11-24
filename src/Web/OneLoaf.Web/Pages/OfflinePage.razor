@@ -1,0 +1,13 @@
+@page "/offline"
+@attribute [AllowAnonymous]
+
+@* Explains offline use (US-44); the service worker serves the app shell, so every route also works offline. *@
+<PageTitle>Offline · OneLoaf</PageTitle>
+<ShellTitle Text="Offline" />
+
+<div class="ol-container">
+    <OlEmptyState Title="You're offline" Icon="IconName.Info"
+                  Text="OneLoaf keeps the app and the recipes you opened before on this device. Batches, prices and the assistant need a connection.">
+        <Action><OlButton Href="recipes">Open my recipes</OlButton></Action>
+    </OlEmptyState>
+</div>

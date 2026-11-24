@@ -1,0 +1,45 @@
+@* Multi-line text (.ol-textarea). *@
+@inherits InputBase<string?>
+@{
+    _errors = EditContext is null ? [] : EditContext.GetValidationMessages(FieldIdentifier).ToArray();
+}
+
+<div class="ol-field">
+    <label class="ol-field__label" for="@_id">@Label</label>
+    <textarea id="@_id" class="ol-textarea" rows="@Rows" placeholder="@Placeholder" aria-invalid="@(_errors.Length > 0 ? "true" : null)"
+              aria-describedby="@(_errors.Length > 0 ? _id + "-error" : null)" @bind="CurrentValueAsString" @attributes="AdditionalAttributes" @ref="_element"></textarea>
+    @if (_errors.Length > 0)
+    {
+        <span id="@(_id + "-error")" class="ol-field__error">
+            <OlIcon Name="IconName.Alert" Size="IconSize.Sm" />
+            <span>@string.Join(" ", _errors)</span>
+        </span>
+    }
+</div>
+
+@code {
+    private readonly string _id = ElementIds.Next("textarea");
+    private string[] _errors = [];
+    private ElementReference _element;
+
+    /// <summary>Moves the keyboard focus to the text area (e.g. when the API asks for a comment first, US-36).</summary>
+    public ValueTask FocusAsync() => _element.FocusAsync();
+
+    /// <summary>Label.</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+
+    /// <summary>Visible rows.</summary>
+    [Parameter] public int Rows { get; set; } = 3;
+
+    /// <summary>Placeholder.</summary>
+    [Parameter] public string? Placeholder { get; set; }
+
+    /// <inheritdoc />
+    protected override bool TryParseValueFromString(
+        string? value, out string? result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        result = value;
+        validationErrorMessage = null;
+        return true;
+    }
+}

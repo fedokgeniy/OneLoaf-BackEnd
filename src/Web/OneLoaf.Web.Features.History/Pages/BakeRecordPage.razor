@@ -1,0 +1,187 @@
+@page "/history/{Id:guid}"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.History.Models
+@using OneLoaf.Web.Features.History.State
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.Forms
+@using OneLoaf.Web.Shared.State
+
+<ShellTitle Text="Bake" BackHref="history" BackLabel="Back to history" />
+
+<div class="ol-container bake">
+    @switch (State.Value.Record)
+    {
+        case Loadable<BakeRecordDto>.Failed { Error: var error }:
+            <OlAlert Kind="AlertKind.Danger" Title="The bake could not be loaded." CorrelationId="@error.CorrelationId">
+                <p>@error.Message</p>
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => Dispatcher.Dispatch(new OpenBakeRecord(Id))">Try again</OlButton>
+            </OlAlert>
+            break;
+        case { Value: null }:
+            <div aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Card" Count="2" /></div>
+            break;
+        case { Value: { } record }:
+            <header class="bake__head">
+                <span class="ol-card__overline">@record.BakedOn.ToString("ddd d MMM yyyy", System.Globalization.CultureInfo.InvariantCulture) · @DisplayFormat.Loaves(record.TotalLoaves)@(record.TotalCost is { } total ? $" · {DisplayFormat.Money(total, record.Currency)}" : null)</span>
+                <h2 class="h2 bake__title">@string.Join(", ", record.Items.Select(i => i.RecipeTitle))</h2>
+                @if (record.BatchId is { } batchId)
+                {
+                    <a class="ol-link" href="@($"batches/{batchId}")">Open the batch</a>
+                }
+            </header>
+
+            <div class="bake__grid">
+                <section class="ol-card bake__section" aria-labelledby="feedback-title">
+                    <div class="ol-card__body">
+                        <h3 class="h3" id="feedback-title">Your feedback</h3>
+                        @if (_form is not null)
+                        {
+                            <EditForm Model="_form" OnValidSubmit="SaveFeedback" class="form-stack" novalidate>
+                                <DataAnnotationsValidator />
+                                <ServerValidation @ref="_server" />
+                                <OlRating Label="Rating" @bind-Value="_form.Rating" />
+                                <OlTextArea @ref="_comment" Label="Comment" Rows="4" Placeholder="Oven spring, crumb, crust, what you would change"
+                                            @bind-Value="_form.Comment" />
+                                @if (_feedbackError is not null)
+                                {
+                                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@_feedbackError.CorrelationId">@_feedbackError.Message</OlAlert>
+                                }
+                                <div>
+                                    <OlButton Type="submit" Loading="State.Value.Saving">Save feedback</OlButton>
+                                </div>
+                            </EditForm>
+                        }
+                    </div>
+                </section>
+
+                <section class="ol-card bake__section bake__analysis" aria-labelledby="analysis-title" aria-live="polite" aria-busy="@(State.Value.Analysing ? "true" : "false")">
+                    <div class="ol-card__body">
+                        <h3 class="h3 bake__ai-title" id="analysis-title"><OlIcon Name="IconName.Assistant" /> OneLoaf assistant · AI</h3>
+                        @if (State.Value.Analysing)
+                        {
+                            <p class="bake__help">The assistant is reading your stage log and comment…</p>
+                            <OlSkeleton Variant="SkeletonVariant.Text" Count="3" />
+                        }
+                        else if (record.AssistantAnalysis is { } analysis)
+                        {
+                            <p class="bake__analysis-text">@analysis</p>
+                            @if (State.Value.UnverifiedNumbers.Count > 0)
+                            {
+                                <OlAlert Kind="AlertKind.Warning" Title="Some numbers could not be checked">
+                                    <p>These figures did not come from your recipe or stage log: @string.Join(", ", State.Value.UnverifiedNumbers). Treat them as estimates.</p>
+                                </OlAlert>
+                            }
+                            <p class="bake__disclaimer">Informational only — based on your stage log and comment@(record.AnalysisAt is { } at ? $", {DisplayFormat.Date(at)}" : null).</p>
+                        }
+                        else
+                        {
+                            <p class="bake__help">Rate the bake or describe it, then ask the assistant what to change next time.</p>
+                        }
+                        @if (_analysisError is not null)
+                        {
+                            <OlAlert Kind="@(_analysisError.Kind == Shared.Api.ApiErrorKind.BusinessRule ? AlertKind.Warning : AlertKind.Danger)"
+                                     CorrelationId="@_analysisError.CorrelationId">@AnalysisMessage(_analysisError)</OlAlert>
+                        }
+                        <div>
+                            <OlButton Variant="ButtonVariant.Secondary" Icon="IconName.Assistant" Loading="State.Value.Analysing" OnClick="Analyse">
+                                @(record.AssistantAnalysis is null ? "Ask the assistant" : "Ask the assistant again")
+                            </OlButton>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <section class="bake__section" aria-labelledby="log-title">
+                <h3 class="h3" id="log-title">Stages</h3>
+                @switch (State.Value.StageLog)
+                {
+                    case Loadable<IReadOnlyList<StageLogEntryDto>>.Failed { Error: var logError }:
+                        <OlAlert Kind="AlertKind.Danger" CorrelationId="@logError.CorrelationId">@logError.Message</OlAlert>
+                        break;
+                    case { Value: null }:
+                        <OlSkeleton Variant="SkeletonVariant.Row" Count="4" />
+                        break;
+                    case { Value: { Count: 0 } }:
+                        <p class="bake__help">No stage log: this bake was not tracked as a batch.</p>
+                        break;
+                    case { Value: { } log }:
+                        <div class="ol-table-wrap">
+                            <table class="ol-table ol-table--stack">
+                                <caption class="ol-visually-hidden">Planned and actual duration of every stage</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Stage</th>
+                                        <th scope="col" class="ol-num">Planned</th>
+                                        <th scope="col" class="ol-num">Actual</th>
+                                        <th scope="col" class="ol-num">Deviation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var stage in log)
+                                    {
+                                        <tr @key="stage.BatchStageId">
+                                            <td>@StageName(stage, log)</td>
+                                            <td class="ol-num" data-label="Planned">@DisplayFormat.DurationRange(stage.PlannedMinMinutes, stage.PlannedMaxMinutes)</td>
+                                            <td class="ol-num" data-label="Actual">@(stage.ActualMinutes is { } actual ? DisplayFormat.Duration(actual) : "—")</td>
+                                            <td class="ol-num" data-label="Deviation">
+                                                @if (stage.DeviationMinutes is { } deviation && deviation != 0)
+                                                {
+                                                    <span class="bake__deviation">@(deviation > 0 ? "+" : "−")@DisplayFormat.Duration(Math.Abs(deviation)) @(deviation > 0 ? "longer" : "shorter")</span>
+                                                }
+                                                else
+                                                {
+                                                    @(stage.DeviationMinutes is null ? "—" : "on plan")
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        break;
+                }
+            </section>
+
+            <section class="bake__section" aria-labelledby="photos-title">
+                <h3 class="h3" id="photos-title">Crumb photos</h3>
+                @if (record.Photos.Count > 0)
+                {
+                    <ul class="bake__photos">
+                        @foreach (var photo in record.Photos)
+                        {
+                            <li @key="photo.Id" class="bake__photo">
+                                @if (State.Value.PhotoUrls.TryGetValue(photo.Id, out var src))
+                                {
+                                    <img src="@src" alt="@($"Crumb photo added {DisplayFormat.Date(photo.CreatedAt)}")" loading="lazy" />
+                                }
+                                else
+                                {
+                                    <span class="ol-skeleton bake__photo-skeleton" aria-hidden="true"></span>
+                                }
+                                <OlIconButton Icon="IconName.Trash" Label="@($"Delete photo added {DisplayFormat.Date(photo.CreatedAt)}")" class="bake__photo-delete"
+                                              OnClick="() => Dispatcher.Dispatch(new DeletePhoto(Id, photo.Id))" />
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p class="bake__help">Add a photo of the crumb to compare bakes later.</p>
+                }
+                <div class="bake__upload">
+                    <label class="ol-btn ol-btn--secondary bake__upload-label" for="photo-input" aria-disabled="@(State.Value.Uploading ? "true" : null)">
+                        <OlIcon Name="IconName.Plus" /> @(State.Value.Uploading ? "Uploading…" : "Add photo")
+                    </label>
+                    <InputFile id="photo-input" class="ol-visually-hidden" accept="image/jpeg,image/png,image/webp" OnChange="Upload"
+                               disabled="@State.Value.Uploading" />
+                    <span class="bake__help">JPEG, PNG or WebP, up to 5 MB.</span>
+                </div>
+                @if (_photoError is not null)
+                {
+                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@_photoError.CorrelationId">@_photoError.Message</OlAlert>
+                }
+            </section>
+            break;
+    }
+</div>

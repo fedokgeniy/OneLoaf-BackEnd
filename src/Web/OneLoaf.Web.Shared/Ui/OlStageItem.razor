@@ -1,0 +1,106 @@
+@* Batch stage (.ol-stage, StageItem page): number, name, status word with dot (never colour alone), planned and actual
+   times, and one full-width row of actions — pending: Start, Skip, Adjust; running: Complete, +30 min, Adjust; done or
+   skipped: none. Callbacks carry the stage; the page talks to the API. *@
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+
+<article class="ol-stage @StateClass" aria-labelledby="@($"stage-{Stage.Id}")">
+    <span class="ol-stage__marker" aria-hidden="true">
+        @if (Stage.Status == StageStatuses.Done)
+        {
+            <OlIcon Name="IconName.Check" Size="IconSize.Sm" />
+        }
+        else
+        {
+            @Number
+        }
+    </span>
+    <div class="ol-stage__head">
+        <h3 class="ol-stage__name" id="@($"stage-{Stage.Id}")">@Stage.Name</h3>
+        <span class="ol-badge @BadgeClass">@StatusText</span>
+    </div>
+    <dl class="ol-stage__times">
+        <dt>Planned</dt>
+        <dd>@DisplayFormat.Time(Stage.PlannedStartAt)–@DisplayFormat.Time(Stage.PlannedEndMaxAt) · @DisplayFormat.DurationRange(Stage.PlannedMinMinutes, Stage.PlannedMaxMinutes)@(Stage.IsOverridden ? " · adjusted" : null)</dd>
+        @if (Stage.ActualStartAt is { } started)
+        {
+            <dt>Actual</dt>
+            <dd>
+                @(Stage.ActualEndAt is { } ended ? $"{DisplayFormat.Time(started)}–{DisplayFormat.Time(ended)}" : $"since {DisplayFormat.Time(started)}")
+                @if (Stage.ExtendedMinutes > 0)
+                {
+                    <span class="ol-stage__deviation"> · +@DisplayFormat.Duration(Stage.ExtendedMinutes)</span>
+                }
+            </dd>
+        }
+    </dl>
+    @if (Stage.Status is StageStatuses.Pending or StageStatuses.Running && Actionable)
+    {
+        <div class="ol-stage__actions">
+            @if (Stage.Status == StageStatuses.Pending)
+            {
+                <OlButton Large="true" Loading="Busy" OnClick="() => OnStart.InvokeAsync(Stage)">Start @Stage.Name.ToLowerInvariant()</OlButton>
+                <OlButton Variant="ButtonVariant.Ghost" Disabled="Busy" OnClick="() => OnSkip.InvokeAsync(Stage)">Skip</OlButton>
+            }
+            else
+            {
+                <OlButton Large="true" Loading="Busy" OnClick="() => OnComplete.InvokeAsync(Stage)">Complete @Stage.Name.ToLowerInvariant()</OlButton>
+                <OlButton Variant="ButtonVariant.Secondary" Icon="IconName.TimerPlus" Disabled="Busy" OnClick="() => OnExtend.InvokeAsync(Stage)">+30 min</OlButton>
+            }
+            <OlButton Variant="ButtonVariant.Ghost" Disabled="Busy" OnClick="() => OnAdjust.InvokeAsync(Stage)">Adjust</OlButton>
+        </div>
+    }
+</article>
+
+@code {
+    /// <summary>The stage.</summary>
+    [Parameter, EditorRequired] public BatchStageDto Stage { get; set; } = default!;
+
+    /// <summary>Position shown in the marker.</summary>
+    [Parameter] public int Number { get; set; }
+
+    /// <summary>A request for this stage runs.</summary>
+    [Parameter] public bool Busy { get; set; }
+
+    /// <summary>Actions are offered (false for a finished or cancelled batch).</summary>
+    [Parameter] public bool Actionable { get; set; } = true;
+
+    /// <summary>Start pressed.</summary>
+    [Parameter] public EventCallback<BatchStageDto> OnStart { get; set; }
+
+    /// <summary>Complete pressed.</summary>
+    [Parameter] public EventCallback<BatchStageDto> OnComplete { get; set; }
+
+    /// <summary>"+30 min" pressed.</summary>
+    [Parameter] public EventCallback<BatchStageDto> OnExtend { get; set; }
+
+    /// <summary>Skip pressed.</summary>
+    [Parameter] public EventCallback<BatchStageDto> OnSkip { get; set; }
+
+    /// <summary>Adjust pressed (durations dialog).</summary>
+    [Parameter] public EventCallback<BatchStageDto> OnAdjust { get; set; }
+
+    private string? StateClass => Stage.Status switch
+    {
+        StageStatuses.Running => "is-running",
+        StageStatuses.Done => "is-done",
+        StageStatuses.Skipped => "is-skipped",
+        _ => null,
+    };
+
+    private string BadgeClass => Stage.Status switch
+    {
+        StageStatuses.Running => "ol-badge--running",
+        StageStatuses.Done => "ol-badge--done",
+        StageStatuses.Skipped => "ol-badge--neutral",
+        _ => "ol-badge--planned",
+    };
+
+    private string StatusText => Stage.Status switch
+    {
+        StageStatuses.Running => "Running",
+        StageStatuses.Done => "Done",
+        StageStatuses.Skipped => "Skipped",
+        _ => "Planned",
+    };
+}

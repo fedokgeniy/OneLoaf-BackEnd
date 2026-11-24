@@ -1,0 +1,139 @@
+@page "/recipes/new"
+@page "/recipes/{Id:guid}/edit"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Recipes.Components
+@using OneLoaf.Web.Features.Recipes.Models
+@using OneLoaf.Web.Features.Recipes.State
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Forms
+@using OneLoaf.Web.Shared.State
+
+<ShellTitle Text="@PageTitle" BackHref="@BackHref" BackLabel="Cancel editing">
+    <Actions>
+        @if (Id is not null && State.Value.Data.Value?.Recipe is { } current)
+        {
+            <OlButton Variant="ButtonVariant.Secondary" Disabled="@State.Value.Busy" class="app-hide-compact"
+                      OnClick="() => Dispatcher.Dispatch(new SetRecipeArchived(current.Id, !current.IsArchived))">
+                @(current.IsArchived ? "Restore" : "Archive")
+            </OlButton>
+            <OlButton Variant="ButtonVariant.Ghost" Disabled="@State.Value.Busy" class="app-hide-compact" OnClick="() => _confirmDelete = true">Delete</OlButton>
+        }
+        @if (_form is not null)
+        {
+            <OlButton Type="submit" form="recipe-editor" Loading="@State.Value.Busy" class="app-hide-compact">Save</OlButton>
+        }
+    </Actions>
+</ShellTitle>
+
+@switch (State.Value.Data)
+{
+    case Loadable<EditorData>.Failed { Error: var error }:
+        <div class="ol-container editor">
+            @if (error.Kind == ApiErrorKind.NotFound)
+            {
+                <OlEmptyState Title="Recipe not found" Text="This recipe does not exist or is not yours.">
+                    <Action><OlButton Href="recipes">Back to recipes</OlButton></Action>
+                </OlEmptyState>
+            }
+            else
+            {
+                <OlAlert Kind="AlertKind.Danger" Title="The editor could not be loaded." CorrelationId="@error.CorrelationId">
+                    <p>@error.Message</p>
+                    <OlButton Variant="ButtonVariant.Secondary" OnClick="() => Dispatcher.Dispatch(new OpenEditor(Id))">Try again</OlButton>
+                </OlAlert>
+            }
+        </div>
+        break;
+    case { Value: { } data } when _form is not null:
+        <EditForm id="recipe-editor" Model="_form" OnValidSubmit="Save" OnInvalidSubmit="ShowSummary" class="ol-container editor" novalidate>
+            <ObjectGraphValidation />
+            <ServerValidation @ref="_server" />
+            <div aria-live="assertive">
+                @if (_summary is not null)
+                {
+                    <OlAlert Kind="AlertKind.Danger" Title="Some fields need attention." CorrelationId="@_summaryReference">@_summary</OlAlert>
+                }
+            </div>
+            @if (data.Recipe?.ParentRecipeId is not null)
+            {
+                <OlAlert Kind="AlertKind.Info" Title="This is a variant.">
+                    Lines marked “Inherited” come from the original recipe; only your changes are stored.
+                </OlAlert>
+            }
+
+            <section class="ol-card editor__card" aria-labelledby="editor-general">
+                <h2 class="h3 editor__card-title" id="editor-general">General</h2>
+                <div class="editor__general">
+                    <div class="editor__wide"><OlTextField Label="Title" @bind-Value="_form.Title" /></div>
+                    <OlNumberField TValue="int" Label="Yield" Suffix="loaves" @bind-Value="_form.YieldLoaves" />
+                    <OlNumberField TValue="decimal?" Label="Dough per loaf" Suffix="g" Help="Optional." @bind-Value="_form.LoafWeightG" />
+                    <div class="editor__wide"><OlTextArea Label="Description" Rows="2" @bind-Value="_form.Description" /></div>
+                    <div class="editor__wide"><OlTextArea Label="Notes" Rows="3" @bind-Value="_form.Notes" /></div>
+                </div>
+            </section>
+
+            <section class="ol-card editor__card" aria-labelledby="editor-ingredients">
+                <h2 class="h3 editor__card-title" id="editor-ingredients">Ingredients · for @_form.YieldLoaves @(_form.YieldLoaves == 1 ? "loaf" : "loaves")</h2>
+                @if (data.Ingredients.Count == 0)
+                {
+                    <OlAlert Kind="AlertKind.Info" Title="No ingredients yet.">
+                        Add flour, water, salt and your starter to the catalog first.
+                        <OlLink Href="ingredients">Open ingredients</OlLink>
+                    </OlAlert>
+                }
+                <ol class="line-list">
+                    @for (var i = 0; i < _form.Ingredients.Count; i++)
+                    {
+                        var index = i;
+                        var line = _form.Ingredients[index];
+                        <IngredientLineEditor @key="line" Line="line" Index="index" Count="_form.Ingredients.Count"
+                                              Ingredients="data.Ingredients" Options="_ingredientOptions"
+                                              OnMoveUp="() => Move(_form.Ingredients, index, -1)" OnMoveDown="() => Move(_form.Ingredients, index, 1)"
+                                              OnRemove="() => _form.Ingredients.RemoveAt(index)" />
+                    }
+                </ol>
+                <div>
+                    <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Plus" OnClick="() => _form.Ingredients.Add(new IngredientLineForm())">Add ingredient</OlButton>
+                </div>
+            </section>
+
+            <section class="ol-card editor__card" aria-labelledby="editor-stages">
+                <h2 class="h3 editor__card-title" id="editor-stages">Stages</h2>
+                <ol class="line-list">
+                    @for (var i = 0; i < _form.Stages.Count; i++)
+                    {
+                        var index = i;
+                        var stage = _form.Stages[index];
+                        <StageLineEditor @key="stage" Line="stage" Index="index" Count="_form.Stages.Count"
+                                         StageTypes="data.StageTypes" Options="_stageTypeOptions"
+                                         OnMoveUp="() => Move(_form.Stages, index, -1)" OnMoveDown="() => Move(_form.Stages, index, 1)"
+                                         OnRemove="() => _form.Stages.RemoveAt(index)" />
+                    }
+                </ol>
+                <div>
+                    <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Plus" OnClick="() => _form.Stages.Add(new StageLineForm())">Add stage</OlButton>
+                </div>
+            </section>
+
+            <div class="editor__foot">
+                <OlButton Variant="ButtonVariant.Ghost" Href="@BackHref">Cancel</OlButton>
+                <OlButton Type="submit" Loading="@State.Value.Busy">@(Id is null ? "Create recipe" : "Save changes")</OlButton>
+            </div>
+        </EditForm>
+        break;
+    default:
+        <div class="ol-container editor" aria-busy="true">
+            <OlSkeleton Variant="SkeletonVariant.Row" Count="8" />
+        </div>
+        break;
+}
+
+<OlDialog Open="_confirmDelete" Title="Delete this recipe?" OnClose="() => _confirmDelete = false">
+    <ChildContent>
+        <p>The recipe is removed for good. A recipe with variants or batches cannot be deleted — archive it instead.</p>
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmDelete = false">Keep recipe</OlButton>
+        <OlButton Variant="ButtonVariant.Danger" Loading="@State.Value.Busy" OnClick="Delete">Delete</OlButton>
+    </Footer>
+</OlDialog>

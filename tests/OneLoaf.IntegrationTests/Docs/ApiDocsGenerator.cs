@@ -109,8 +109,15 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
         await api.CallAsync("GetKitchenSettings", "defaults after registration", HttpMethod.Get, "/api/v1/kitchen-settings");
         var kitchen = new
         {
-            ovenPowerKw = 2.5m, ovenCapacityLoaves = 4, mixerBowlCapacityKg = 4.0m, electricityTariffPerKwh = 0.25m,
-            packagingCostPerLoaf = 0.15m, lossRatePercent = 10m, laborRatePerHour = 12m, currency = "EUR", timeZone = "Europe/Vilnius",
+            ovenPowerKw = 2.5m,
+            ovenCapacityLoaves = 4,
+            mixerBowlCapacityKg = 4.0m,
+            electricityTariffPerKwh = 0.25m,
+            packagingCostPerLoaf = 0.15m,
+            lossRatePercent = 10m,
+            laborRatePerHour = 12m,
+            currency = "EUR",
+            timeZone = "Europe/Vilnius",
         };
         await api.CallAsync("UpdateKitchenSettings", "typical", HttpMethod.Put, "/api/v1/kitchen-settings", kitchen);
         await api.CallAsync("UpdateKitchenSettings", "unknown time zone", HttpMethod.Put, "/api/v1/kitchen-settings",
@@ -166,7 +173,11 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
         // Recipes
         var recipeBody = new
         {
-            title = "Country sourdough", description = "Open crumb, crisp crust.", yieldLoaves = 1, loafWeightG = 900m, notes = (string?)null,
+            title = "Country sourdough",
+            description = "Open crumb, crisp crust.",
+            yieldLoaves = 1,
+            loafWeightG = 900m,
+            notes = (string?)null,
             ingredients = new object[]
             {
                 new { ingredientId = flourIngredient, quantity = 500m },
@@ -187,7 +198,11 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
         await api.CallAsync("CreateRecipe", "minimum longer than maximum", HttpMethod.Post, "/api/v1/recipes",
             new
             {
-                title = "Broken", description = (string?)null, yieldLoaves = 1, loafWeightG = (decimal?)null, notes = (string?)null,
+                title = "Broken",
+                description = (string?)null,
+                yieldLoaves = 1,
+                loafWeightG = (decimal?)null,
+                notes = (string?)null,
                 ingredients = new object[] { new { ingredientId = water, quantity = 100m } },
                 stages = new object[] { new { name = "Mix", stageTypeCode = "mix", minDurationMinutes = 30, maxDurationMinutes = 10 } },
             });
@@ -241,7 +256,9 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
         // Batches: one is baked through to the end, one shows the stage controls and is cancelled
         var batchBody = new
         {
-            name = "Weekend bake", plannedStartAt = start, source = "manual",
+            name = "Weekend bake",
+            plannedStartAt = start,
+            source = "manual",
             items = new[] { new { recipeId = recipe, loaves = 3, starterId = (string?)starter, starterReminderMinutes = (int?)60 } },
         };
         await api.CallAsync("PreviewBatch", "typical", HttpMethod.Post, "/api/v1/batches/preview", batchBody);

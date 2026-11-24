@@ -1,5 +1,6 @@
 # Reverse proxy with automatic HTTPS (Let's Encrypt). Each service gets a path prefix that Caddy strips, so the
-# services themselves serve /api/v1/..., /swagger, /health and /metrics at their root.
+# services themselves serve /api/v1/..., /swagger, /health and /metrics at their root. Everything else is the web
+# client (Blazor WebAssembly SPA on nginx), so the SPA and the APIs share one origin and need no CORS.
 {
 	email {$ACME_EMAIL:admin@example.com}
 }
@@ -43,6 +44,6 @@
 	}
 
 	handle {
-		respond "OneLoaf API. See /core/swagger, /assistant/swagger, /notify/swagger." 200
+		reverse_proxy web:8080
 	}
 }

@@ -80,6 +80,7 @@ services:
     image: oneloaf-core-api:local
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      Cors__AllowedOrigins: ${Cors__AllowedOrigins:-http://localhost:5090}
       ConnectionStrings__OneLoaf: "Host=db;Port=5432;Database=${ONELOAF_DB:-oneloaf};Username=oneloaf_app;Password=${ONELOAF_APP_PASSWORD}"
       Jwt__Issuer: ${Jwt__Issuer:?Set Jwt__Issuer in .env}
       Jwt__Audience: ${Jwt__Audience:?Set Jwt__Audience in .env}
@@ -113,6 +114,7 @@ services:
     image: oneloaf-assistant:local
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      Cors__AllowedOrigins: ${Cors__AllowedOrigins:-http://localhost:5090}
       ConnectionStrings__OneLoaf: "Host=db;Port=5432;Database=${ONELOAF_DB:-oneloaf};Username=oneloaf_app;Password=${ONELOAF_APP_PASSWORD}"
       Jwt__Issuer: ${Jwt__Issuer}
       Jwt__Audience: ${Jwt__Audience}
@@ -142,6 +144,7 @@ services:
     image: oneloaf-notification:local
     environment:
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      Cors__AllowedOrigins: ${Cors__AllowedOrigins:-http://localhost:5090}
       ConnectionStrings__OneLoaf: "Host=db;Port=5432;Database=${ONELOAF_DB:-oneloaf};Username=oneloaf_app;Password=${ONELOAF_APP_PASSWORD}"
       Jwt__Issuer: ${Jwt__Issuer}
       Jwt__Audience: ${Jwt__Audience}
@@ -169,6 +172,19 @@ services:
         condition: service_healthy
       migrator:
         condition: service_completed_successfully
+
+  # Production build of the web client on nginx (the image Caddy serves at /). It calls the APIs at /core, /assistant
+  # and /notify on its own origin, so it is meant to run behind Caddy; for day-to-day work run the client with
+  # `dotnet run --project src/Web/OneLoaf.Web` (http://localhost:5090) against the services above.
+  # Start it explicitly: docker compose --profile web up -d web
+  web:
+    build:
+      context: .
+      dockerfile: src/Web/OneLoaf.Web/Dockerfile
+    image: oneloaf-web:local
+    profiles: [web]
+    ports:
+      - "${WEB_PORT:-8090}:8080"
 
 volumes:
   pgdata:

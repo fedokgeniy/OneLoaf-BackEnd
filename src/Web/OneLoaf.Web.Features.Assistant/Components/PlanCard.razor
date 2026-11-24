@@ -1,0 +1,108 @@
+@* Plan card of an assistant proposal (US-34, rule 2): every figure comes from the plan the Core API calculated for the
+   assistant; nothing is saved until Confirm. After it is settled the card says what happened. *@
+@using OneLoaf.Web.Features.Assistant.Services
+@using OneLoaf.Web.Features.Assistant.State
+@using OneLoaf.Web.Shared.Formatting
+
+<section class="ol-plan" aria-labelledby="@TitleId">
+    @if (Proposal.Batch is { } batch)
+    {
+        <h3 class="ol-plan__title" id="@TitleId">@batch.Name</h3>
+        <dl class="ol-plan__rows">
+            <dt>Start</dt>
+            <dd>@DisplayFormat.Date(batch.PlannedStartAt) @DisplayFormat.Time(batch.PlannedStartAt)</dd>
+            @foreach (var item in batch.Items)
+            {
+                <dt>@item.RecipeTitle</dt>
+                <dd>@DisplayFormat.Loaves(item.Loaves)</dd>
+                @if (item.StarterAmountG is { } starter)
+                {
+                    <dt>Starter · prepare</dt>
+                    <dd>@DisplayFormat.Grams(starter)</dd>
+                }
+                @if (item.KneadingCycles is { } cycles)
+                {
+                    <dt>Kneading</dt>
+                    <dd>@cycles @(cycles == 1 ? "cycle" : "cycles")</dd>
+                }
+            }
+            @if (batch.PlannedReadyFrom is { } from && batch.PlannedReadyTo is { } to)
+            {
+                <dt>Ready</dt>
+                <dd>@DisplayFormat.TimeWindow(from, to, batch.PlannedStartAt)</dd>
+            }
+            @if (batch.TotalCost is { } cost)
+            {
+                <dt>Total cost</dt>
+                <dd>@DisplayFormat.Money(cost, batch.Currency)</dd>
+            }
+        </dl>
+        <details class="plan-card__stages">
+            <summary>Stages</summary>
+            <ol>
+                @foreach (var stage in batch.Items.SelectMany(i => i.Stages.Select(s => (Item: i, Stage: s))))
+                {
+                    <li>
+                        <span>@(batch.Items.Count > 1 ? $"{stage.Item.RecipeTitle} · " : null)@stage.Stage.Name</span>
+                        <span class="ol-num">@DisplayFormat.Time(stage.Stage.PlannedStartAt) · @DisplayFormat.DurationRange(stage.Stage.PlannedMinMinutes, stage.Stage.PlannedMaxMinutes)</span>
+                    </li>
+                }
+            </ol>
+        </details>
+    }
+    else
+    {
+        <h3 class="ol-plan__title" id="@TitleId">Proposal</h3>
+        <p class="plan-card__note">The assistant proposed an action this app cannot show. Decline it and ask again.</p>
+    }
+
+    @switch (Status)
+    {
+        case ProposalStatus.Confirmed:
+            <p class="plan-card__result" role="status"><OlIcon Name="IconName.CheckCircle" /> Saved as a batch.
+                @if (BatchId is { } id)
+                {
+                    <a class="ol-link" href="@($"batches/{id}")">Open the batch</a>
+                }
+            </p>
+            break;
+        case ProposalStatus.Declined:
+            <p class="plan-card__result" role="status">Declined. Tell the assistant what to change.</p>
+            break;
+        case ProposalStatus.Expired:
+            <p class="plan-card__result" role="status"><OlIcon Name="IconName.Alert" /> This proposal has expired or was already used. Ask for a new plan.</p>
+            break;
+        default:
+            <p class="plan-card__note">Nothing is saved until you confirm. Valid until @DisplayFormat.Time(Proposal.ExpiresAt).</p>
+            <div class="ol-plan__actions">
+                @if (Proposal.Batch is not null)
+                {
+                    <OlButton Icon="IconName.Check" Loading="Busy" Disabled="Busy" OnClick="OnConfirm">Confirm plan</OlButton>
+                }
+                <OlButton Variant="ButtonVariant.Secondary" Disabled="Busy" OnClick="OnDecline">Decline</OlButton>
+            </div>
+            break;
+    }
+</section>
+
+@code {
+    private string TitleId => $"plan-{Proposal.ActionId}";
+
+    /// <summary>The proposal with its mapped batch.</summary>
+    [Parameter, EditorRequired] public BatchProposal Proposal { get; set; } = default!;
+
+    /// <summary>Status of the proposal.</summary>
+    [Parameter] public ProposalStatus Status { get; set; }
+
+    /// <summary>Saved batch after Confirm.</summary>
+    [Parameter] public Guid? BatchId { get; set; }
+
+    /// <summary>Confirm or decline is running.</summary>
+    [Parameter] public bool Busy { get; set; }
+
+    /// <summary>Confirm pressed.</summary>
+    [Parameter] public EventCallback OnConfirm { get; set; }
+
+    /// <summary>Decline pressed.</summary>
+    [Parameter] public EventCallback OnDecline { get; set; }
+}

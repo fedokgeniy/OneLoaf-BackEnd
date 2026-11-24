@@ -51,6 +51,14 @@ dotnet_naming_symbols.private_fields.applicable_accessibilities = private
 dotnet_naming_style.underscore_camel.required_prefix = _
 dotnet_naming_style.underscore_camel.capitalization = camel_case
 
+# Private static readonly fields are PascalCase (.NET convention), like constants; the more specific rule wins.
+dotnet_naming_rule.private_static_readonly_pascal.symbols = private_static_readonly
+dotnet_naming_rule.private_static_readonly_pascal.style = pascal
+dotnet_naming_rule.private_static_readonly_pascal.severity = warning
+dotnet_naming_symbols.private_static_readonly.applicable_kinds = field
+dotnet_naming_symbols.private_static_readonly.applicable_accessibilities = private
+dotnet_naming_symbols.private_static_readonly.required_modifiers = static, readonly
+
 dotnet_naming_rule.constants_pascal.symbols = constants
 dotnet_naming_rule.constants_pascal.style = pascal
 dotnet_naming_rule.constants_pascal.severity = warning
@@ -71,3 +79,8 @@ generated_code = true
 # Existing EF Core configurations name the builder parameter "b" (submitted DB project); renaming is churn only.
 [**/Persistence/Configurations/*.cs]
 dotnet_diagnostic.CA1725.severity = none
+
+# Web client: the namespace OneLoaf.Web.Shared is fixed by docs/frontend/architecture.md; "Shared" is a keyword only in
+# Visual Basic, which never consumes these assemblies.
+[{src/Web/**,tests/OneLoaf.Web.*/**}.cs]
+dotnet_diagnostic.CA1716.severity = none

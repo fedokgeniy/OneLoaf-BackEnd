@@ -1,0 +1,81 @@
+@page "/login"
+@layout AuthLayout
+@attribute [AllowAnonymous]
+@inherits FluxorComponent
+@inject IState<SessionState> Session
+@inject IDispatcher Dispatcher
+@inject NavigationManager Navigation
+
+<PageTitle>Sign in · OneLoaf</PageTitle>
+
+<AuthPanel Title="Welcome back" Lead="Sign in to your baking workspace." Headline="Bake with control."
+           Points="Points" Footnote="For home bakers and small bakeries.">
+    <EditForm Model="_form" OnValidSubmit="Submit" class="auth-form" novalidate>
+        <DataAnnotationsValidator />
+        <div aria-live="polite">
+            @if (VisibleError is { } error)
+            {
+                <OlAlert Kind="AlertKind.Danger" CorrelationId="@(error.Kind == ApiErrorKind.Unauthorized ? null : error.CorrelationId)">
+                    @MessageFor(error)
+                </OlAlert>
+            }
+        </div>
+        <OlTextField Label="E-mail" Type="email" AutoComplete="email" Placeholder="you@example.com"
+                     @bind-Value="_form.Email" />
+        <OlTextField Label="Password" Type="password" AutoComplete="current-password" @bind-Value="_form.Password" />
+        <OlButton Type="submit" Large="true" Block="true" Loading="Busy">Sign in</OlButton>
+        <p class="auth-form__alt">New to OneLoaf? <OlLink Href="@RegisterHref">Create an account</OlLink></p>
+        <p class="auth-form__fine">By continuing you accept the terms and the privacy notice.</p>
+    </EditForm>
+</AuthPanel>
+
+@code {
+    private static readonly IReadOnlyList<(IconName, string)> Points =
+    [
+        (IconName.Batches, "Plan batches with planned and actual stage times"),
+        (IconName.Calculator, "Know the full cost: flour, energy, packaging, loss"),
+        (IconName.Bell, "Never miss a starter feeding"),
+        (IconName.Assistant, "Ask the AI assistant — numbers come from the calculator"),
+    ];
+
+    private readonly LoginForm _form = new();
+    private bool _submitted;
+
+    /// <summary>Local path to open after signing in.</summary>
+    [SupplyParameterFromQuery(Name = "returnUrl")]
+    public string? ReturnTo { get; set; }
+
+    private bool Busy => Session.Value.Status == SessionStatus.Busy;
+
+    // The session slice is shared with registration: show only the error of this page's own attempt.
+    private ApiError? VisibleError => _submitted && !Busy ? Session.Value.Error : null;
+
+    private string RegisterHref => string.IsNullOrEmpty(ReturnTo) ? "register" : $"register?returnUrl={Uri.EscapeDataString(ReturnTo)}";
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<LoggedIn>(_ => Navigation.NavigateTo(ReturnUrl.Sanitize(ReturnTo)));
+    }
+
+    private void Submit()
+    {
+        if (Busy)
+        {
+            return;
+        }
+
+        _submitted = true;
+        Dispatcher.Dispatch(new Login(_form.Email!, _form.Password!));
+    }
+
+    /// <summary>One generic message for a wrong e-mail or password (US-02); otherwise the API's own reason.</summary>
+    internal static string MessageFor(ApiError error) => error.Kind switch
+    {
+        ApiErrorKind.Unauthorized => "E-mail or password is wrong.",
+        ApiErrorKind.RateLimited when error.RetryAfter is { } wait =>
+            $"Too many sign-in attempts. Try again in {Math.Max(1, (int)Math.Ceiling(wait.TotalSeconds))} s.",
+        _ => error.Message,
+    };
+}

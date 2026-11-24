@@ -18,7 +18,7 @@ public sealed partial class AuthService(
     public const string EmailTakenMessage = "An account with this e-mail already exists.";
 
     private const string DummyPassword = "timing-equalization-only";
-    private static string? s_dummyHash;
+    private static string? _dummyHash;
 
     /// <summary>
     /// Creates the account and its empty workspace (<c>users</c> + <c>kitchen_settings</c> in one transaction).
@@ -68,7 +68,7 @@ public sealed partial class AuthService(
         var credentials = await users.FindByEmailAsync(EmailNormalizer.Normalize(request.Email), cancellationToken);
         if (credentials is null)
         {
-            var dummyHash = LazyInitializer.EnsureInitialized(ref s_dummyHash, () => passwordHasher.Hash(DummyPassword));
+            var dummyHash = LazyInitializer.EnsureInitialized(ref _dummyHash, () => passwordHasher.Hash(DummyPassword));
             passwordHasher.Verify(dummyHash, request.Password);
             LogLoginFailed(logger);
             return null;

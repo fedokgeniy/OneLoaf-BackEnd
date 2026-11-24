@@ -1,0 +1,82 @@
+@page "/recipes/{RecipeId:guid}/publish"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Library.State
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.State
+@inject IState<PublishState> State
+@inject IDispatcher Dispatcher
+@inject NavigationManager Navigation
+
+@* Publish dialog (US-39): the API publishes a snapshot of the recipe as it is now — title and description come from
+   the recipe; prices, costs and notes are never published. *@
+<PageTitle>Publish · OneLoaf</PageTitle>
+<ShellTitle Text="Publish to the library" BackHref="@RecipeHref" BackLabel="Back to the recipe" />
+
+<div class="ol-container publish">
+    @switch (State.Value.Recipe)
+    {
+        case Loadable<RecipeDto>.Failed { Error: var error }:
+            <OlAlert Kind="AlertKind.Danger" Title="The recipe could not be loaded." CorrelationId="@error.CorrelationId">@error.Message</OlAlert>
+            break;
+        case { Value: null }:
+            <OlSkeleton Variant="SkeletonVariant.Card" />
+            break;
+    }
+</div>
+
+<OlDialog Open="State.Value.Recipe.Value is not null" Title="Publish to the public library" OnClose="Close">
+    <ChildContent>
+        @if (State.Value.Recipe.Value is { } recipe)
+        {
+            <div class="form-stack">
+                <p>A snapshot of “@recipe.Title” will be visible to everyone. Later edits to your recipe do not change the published copy.</p>
+                <dl class="publish__summary">
+                    <dt>Public title</dt>
+                    <dd>@recipe.Title</dd>
+                    <dt>Description</dt>
+                    <dd>@(string.IsNullOrWhiteSpace(recipe.Description) ? "—" : recipe.Description)</dd>
+                </dl>
+                <p class="publish__help">Your display name is shown as the author. Prices, costs and your notes are never published. Change the title or description in the recipe editor before publishing.</p>
+                @if (State.Value.Error is { } error)
+                {
+                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@error.CorrelationId">@error.Message</OlAlert>
+                }
+            </div>
+        }
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="Close">Cancel</OlButton>
+        <OlButton Loading="State.Value.Publishing" OnClick="Publish">Publish</OlButton>
+    </Footer>
+</OlDialog>
+
+@code {
+    /// <summary>Recipe to publish.</summary>
+    [Parameter] public Guid RecipeId { get; set; }
+
+    private string RecipeHref => $"recipes/{RecipeId}";
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<RecipePublished>(a => Navigation.NavigateTo($"library/{a.PublicationId}"));
+    }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        Dispatcher.Dispatch(new OpenPublish(RecipeId));
+    }
+
+    private void Publish()
+    {
+        if (!State.Value.Publishing)
+        {
+            Dispatcher.Dispatch(new PublishRecipe());
+        }
+    }
+
+    private void Close() => Navigation.NavigateTo(RecipeHref);
+}

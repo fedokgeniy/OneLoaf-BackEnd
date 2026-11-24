@@ -1,0 +1,62 @@
+@* Stages of the recipe with their duration range, proof mode and temperature (US-09). *@
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+
+@if (Stages.Count == 0)
+{
+    <p class="stages__empty">No stages yet.</p>
+}
+else
+{
+    <div class="ol-table-wrap">
+        <table class="ol-table">
+            <thead>
+                <tr>
+                    <th scope="col">Stage</th>
+                    <th scope="col" class="ol-num">Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var stage in Stages.OrderBy(s => s.SortOrder))
+                {
+                    <tr @key="stage.LineId">
+                        <td>
+                            @stage.SortOrder. @stage.Name
+                            @if (Details(stage) is { Length: > 0 } details)
+                            {
+                                <span class="stages__details"> · @details</span>
+                            }
+                        </td>
+                        <td class="ol-num">@DisplayFormat.DurationRange(stage.MinDurationMinutes, stage.MaxDurationMinutes)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+@code {
+    /// <summary>Stages of the recipe.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<RecipeStageDto> Stages { get; set; } = [];
+
+    private static string Details(RecipeStageDto stage)
+    {
+        var parts = new List<string>(3);
+        if (stage.ProofMode is { } mode)
+        {
+            parts.Add(mode == "cold" ? "cold" : "warm");
+        }
+
+        if (stage.TemperatureC is { } temperature)
+        {
+            parts.Add(DisplayFormat.Number(temperature, 1) + " °C");
+        }
+
+        if (stage.IsOptional)
+        {
+            parts.Add("optional");
+        }
+
+        return string.Join(" · ", parts);
+    }
+}

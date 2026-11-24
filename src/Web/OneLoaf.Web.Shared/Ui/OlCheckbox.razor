@@ -1,0 +1,41 @@
+@* Checkbox with its label (.ol-check); validation message linked like OlTextField. *@
+@inherits InputBase<bool>
+@{
+    _errors = EditContext is null ? [] : EditContext.GetValidationMessages(FieldIdentifier).ToArray();
+}
+
+<div class="ol-field">
+    <label class="ol-check">
+        <input id="@_id" type="checkbox" checked="@CurrentValue" aria-invalid="@(_errors.Length > 0 ? "true" : null)"
+               aria-describedby="@(_errors.Length > 0 ? ErrorId : null)" @onchange="OnChange" @attributes="AdditionalAttributes" />
+        <span>@ChildContent</span>
+    </label>
+    @if (_errors.Length > 0)
+    {
+        <span id="@ErrorId" class="ol-field__error">
+            <OlIcon Name="IconName.Alert" Size="IconSize.Sm" />
+            <span>@string.Join(" ", _errors)</span>
+        </span>
+    }
+</div>
+
+@code {
+    private readonly string _id = ElementIds.Next("check");
+    private string[] _errors = [];
+
+    /// <summary>Label text.</summary>
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    private string ErrorId => _id + "-error";
+
+    private void OnChange(ChangeEventArgs e) => CurrentValue = e.Value is true || (e.Value is string s && bool.TryParse(s, out var b) && b);
+
+    /// <inheritdoc />
+    protected override bool TryParseValueFromString(
+        string? value, out bool result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        result = bool.TryParse(value, out var parsed) && parsed;
+        validationErrorMessage = null;
+        return true;
+    }
+}

@@ -1,0 +1,50 @@
+@* Segmented control (.ol-segmented): a labelled group of toggle buttons; the selected one has aria-pressed="true".
+   Arrow keys move the selection like a radio group. *@
+@typeparam TValue
+
+<div class="@(Fill ? "ol-segmented ol-segmented--fill" : "ol-segmented")" role="group" aria-label="@Label">
+    @foreach (var option in Options)
+    {
+        var selected = EqualityComparer<TValue>.Default.Equals(option.Value, Value);
+        <button type="button" class="ol-segmented__opt" aria-pressed="@(selected ? "true" : "false")"
+                @onclick="() => SelectAsync(option.Value)" @onkeydown="e => OnKeyDownAsync(e, option.Value)">
+            @if (option.Icon is { } icon)
+            {
+                <OlIcon Name="icon" Size="IconSize.Sm" />
+            }
+            @option.Text
+        </button>
+    }
+</div>
+
+@code {
+    /// <summary>Accessible name of the group, e.g. "Theme".</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+
+    /// <summary>Options in display order.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<SegmentOption<TValue>> Options { get; set; } = [];
+
+    /// <summary>Selected value.</summary>
+    [Parameter] public TValue? Value { get; set; }
+
+    /// <summary>Raised when the user picks another option.</summary>
+    [Parameter] public EventCallback<TValue> ValueChanged { get; set; }
+
+    /// <summary>Options share the full width.</summary>
+    [Parameter] public bool Fill { get; set; }
+
+    private Task SelectAsync(TValue value) =>
+        EqualityComparer<TValue>.Default.Equals(value, Value) ? Task.CompletedTask : ValueChanged.InvokeAsync(value);
+
+    private Task OnKeyDownAsync(KeyboardEventArgs e, TValue current)
+    {
+        var index = Options.ToList().FindIndex(o => EqualityComparer<TValue>.Default.Equals(o.Value, current));
+        var next = e.Key switch
+        {
+            "ArrowRight" or "ArrowDown" => (index + 1) % Options.Count,
+            "ArrowLeft" or "ArrowUp" => (index - 1 + Options.Count) % Options.Count,
+            _ => -1,
+        };
+        return next < 0 ? Task.CompletedTask : SelectAsync(Options[next].Value);
+    }
+}

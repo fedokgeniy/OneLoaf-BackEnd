@@ -1,0 +1,18 @@
+@* Test host: OlTextField bound inside an EditForm with DataAnnotations, as pages use it. *@
+@using Microsoft.AspNetCore.Components.Forms
+@using OneLoaf.Web.Shared.Ui
+
+<EditForm Model="Model">
+    <DataAnnotationsValidator />
+    <OlTextField Label="@Label" Help="@Help" Suffix="@Suffix" @bind-Value="Model.Email" />
+</EditForm>
+
+@code {
+    [Parameter] public TextFieldModel Model { get; set; } = new();
+
+    [Parameter] public string Label { get; set; } = "E-mail";
+
+    [Parameter] public string? Help { get; set; }
+
+    [Parameter] public string? Suffix { get; set; }
+}

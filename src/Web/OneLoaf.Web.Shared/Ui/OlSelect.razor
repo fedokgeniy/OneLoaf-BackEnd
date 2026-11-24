@@ -1,0 +1,55 @@
+@* Select (.ol-select) bound to a string value (codes and ids); messages and aria wiring as OlTextField. *@
+@inherits InputBase<string?>
+@{
+    _errors = EditContext is null ? [] : EditContext.GetValidationMessages(FieldIdentifier).ToArray();
+}
+
+<div class="ol-field">
+    <label class="@(HideLabel ? "ol-visually-hidden" : "ol-field__label")" for="@_id">@Label</label>
+    <div class="ol-field__control">
+        <select id="@_id" class="ol-select" aria-invalid="@(_errors.Length > 0 ? "true" : null)"
+                aria-describedby="@(_errors.Length > 0 ? _id + "-error" : null)" @bind="CurrentValueAsString" @attributes="AdditionalAttributes">
+            @if (Placeholder is not null)
+            {
+                <option value="">@Placeholder</option>
+            }
+            @foreach (var option in Options)
+            {
+                <option value="@option.Value">@option.Text</option>
+            }
+        </select>
+    </div>
+    @if (_errors.Length > 0)
+    {
+        <span id="@(_id + "-error")" class="ol-field__error">
+            <OlIcon Name="IconName.Alert" Size="IconSize.Sm" />
+            <span>@string.Join(" ", _errors)</span>
+        </span>
+    }
+</div>
+
+@code {
+    private readonly string _id = ElementIds.Next("select");
+    private string[] _errors = [];
+
+    /// <summary>Label.</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+
+    /// <summary>Label read by screen readers only.</summary>
+    [Parameter] public bool HideLabel { get; set; }
+
+    /// <summary>Options.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<SelectOption> Options { get; set; } = [];
+
+    /// <summary>Empty first option, e.g. "Choose an ingredient".</summary>
+    [Parameter] public string? Placeholder { get; set; }
+
+    /// <inheritdoc />
+    protected override bool TryParseValueFromString(
+        string? value, out string? result, [System.Diagnostics.CodeAnalysis.NotNullWhen(false)] out string? validationErrorMessage)
+    {
+        result = string.IsNullOrEmpty(value) ? null : value;
+        validationErrorMessage = null;
+        return true;
+    }
+}

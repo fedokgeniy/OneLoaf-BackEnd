@@ -1,0 +1,28 @@
+@* Page title: the browser tab ("Recipes · OneLoaf") and the top bar of the shell, with an optional back link and
+   actions (Calculator-* boards: Back · title · Plan a batch · Edit). *@
+<PageTitle>@Text · OneLoaf</PageTitle>
+<SectionContent SectionName="@PageTitleSection.Name">@Text</SectionContent>
+@if (BackHref is not null)
+{
+    <SectionContent SectionName="@PageTitleSection.Back">
+        <a class="ol-icon-btn app-back" href="@BackHref" aria-label="@BackLabel"><OlIcon Name="IconName.ChevronLeft" /></a>
+    </SectionContent>
+}
+@if (Actions is not null)
+{
+    <SectionContent SectionName="@PageTitleSection.Actions">@Actions</SectionContent>
+}
+
+@code {
+    /// <summary>Title of the page.</summary>
+    [Parameter, EditorRequired] public string Text { get; set; } = string.Empty;
+
+    /// <summary>Where the back link goes; no back link when null.</summary>
+    [Parameter] public string? BackHref { get; set; }
+
+    /// <summary>Accessible name of the back link.</summary>
+    [Parameter] public string BackLabel { get; set; } = "Back";
+
+    /// <summary>Buttons shown in the top bar.</summary>
+    [Parameter] public RenderFragment? Actions { get; set; }
+}

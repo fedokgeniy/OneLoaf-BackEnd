@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <!-- Shared layer of the web client: API pipeline, contracts, auth, global state, device context, design-system
+       components (Ol*), forms and formatting. References no feature and no host (architecture.md §2). -->
+  <PropertyGroup>
+    <RootNamespace>OneLoaf.Web.Shared</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Authorization" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <PackageReference Include="Fluxor.Blazor.Web" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="OneLoaf.Web.UnitTests" />
+  </ItemGroup>
+
+</Project>

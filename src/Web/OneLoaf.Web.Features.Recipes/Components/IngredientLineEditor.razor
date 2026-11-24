@@ -1,0 +1,58 @@
+@* One ingredient line of the recipe editor: ingredient, amount in its unit, optional flag, Move up / Move down / Remove
+   (keyboard and screen-reader friendly reordering, no drag-only interaction). *@
+@using OneLoaf.Web.Features.Recipes.Models
+@using OneLoaf.Web.Shared.Contracts.Core
+
+<li class="line">
+    <span class="line__no ol-num" aria-hidden="true">@(Index + 1)</span>
+    <div class="line__fields">
+        <OlSelect Label="@($"Ingredient {Index + 1}")" HideLabel="true" Options="Options" Placeholder="Choose an ingredient"
+                  @bind-Value="Line.IngredientId" />
+        <OlNumberField TValue="decimal?" Label="@($"Amount of {Name}")" HideLabel="true" Suffix="@Unit" @bind-Value="Line.Quantity" />
+        <OlCheckbox @bind-Value="Line.IsOptional">Optional</OlCheckbox>
+        @if (Line.IsInherited)
+        {
+            <span class="ol-badge ol-badge--neutral line__inherited">Inherited</span>
+        }
+    </div>
+    <div class="line__actions">
+        <OlIconButton Icon="IconName.ChevronUp" Label="@($"Move {Name} up")" Disabled="@(Index == 0)" OnClick="OnMoveUp" />
+        <OlIconButton Icon="IconName.ChevronDown" Label="@($"Move {Name} down")" Disabled="@(Index == Count - 1)" OnClick="OnMoveDown" />
+        <OlIconButton Icon="IconName.Trash" Label="@($"Remove {Name}")" Danger="true" OnClick="OnRemove" />
+    </div>
+</li>
+
+@code {
+    /// <summary>The line being edited.</summary>
+    [Parameter, EditorRequired] public IngredientLineForm Line { get; set; } = default!;
+
+    /// <summary>Position in the list.</summary>
+    [Parameter] public int Index { get; set; }
+
+    /// <summary>Number of lines.</summary>
+    [Parameter] public int Count { get; set; }
+
+    /// <summary>The caller's ingredient catalog.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<IngredientDto> Ingredients { get; set; } = [];
+
+    /// <summary>Options built once by the page.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<SelectOption> Options { get; set; } = [];
+
+    /// <summary>Move up.</summary>
+    [Parameter] public EventCallback OnMoveUp { get; set; }
+
+    /// <summary>Move down.</summary>
+    [Parameter] public EventCallback OnMoveDown { get; set; }
+
+    /// <summary>Remove.</summary>
+    [Parameter] public EventCallback OnRemove { get; set; }
+
+    private IngredientDto? Selected => Ingredients.FirstOrDefault(i => i.Id.ToString() == Line.IngredientId);
+
+    /// <summary>Option text is "Name (unit)"; used when the ingredient is not on the loaded catalog page.</summary>
+    private SelectOption? SelectedOption => Options.FirstOrDefault(o => o.Value == Line.IngredientId);
+
+    private string Name => Selected?.Name ?? SelectedOption?.Text.Split(" (")[0] ?? $"ingredient {Index + 1}";
+
+    private string? Unit => Selected?.UnitCode ?? SelectedOption?.Text.Split(" (").LastOrDefault()?.TrimEnd(')');
+}

@@ -1,0 +1,91 @@
+@* Root component: Fluxor store, authentication state, router with route guard, focus on navigation, toasts. *@
+@using System.Reflection
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.WebAssembly.Services
+@using OneLoaf.Web.Pages
+@using OneLoaf.Web.Shared.Device
+@using OneLoaf.Web.Shared.State
+@implements IAsyncDisposable
+@inject SessionMonitor SessionMonitor
+@inject DeviceContext Device
+@inject LazyAssemblyLoader AssemblyLoader
+@inject LazyFeatureRegistry LazyFeatures
+@inject ILogger<App> Logger
+
+<Fluxor.Blazor.Web.StoreInitializer />
+<CascadingAuthenticationState>
+    <Router AppAssembly="typeof(App).Assembly" AdditionalAssemblies="_assemblies" OnNavigateAsync="LoadFeatures" NotFoundPage="typeof(NotFoundPage)">
+        <Navigating>
+            <div class="ol-container" aria-busy="true">
+                <OlSkeleton Variant="SkeletonVariant.Card" />
+            </div>
+        </Navigating>
+        <Found Context="routeData">
+            <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+                <NotAuthorized>
+                    @if (context.User.Identity?.IsAuthenticated == true)
+                    {
+                        <ForbiddenView />
+                    }
+                    else
+                    {
+                        <RedirectToLogin />
+                    }
+                </NotAuthorized>
+                <Authorizing>
+                    <div class="ol-container" aria-busy="true">
+                        <OlSkeleton />
+                    </div>
+                </Authorizing>
+            </AuthorizeRouteView>
+            <FocusOnNavigate RouteData="routeData" Selector="h1" />
+        </Found>
+    </Router>
+</CascadingAuthenticationState>
+<OlToastHost />
+
+@code {
+    private readonly List<Assembly> _assemblies = [.. FeatureAssemblies.Pages];
+    private readonly HashSet<string> _loaded = [];
+
+    /// <summary>Downloads the lazy feature a route needs (once), registers its state and adds its pages to the router.</summary>
+    private async Task LoadFeatures(NavigationContext context)
+    {
+        var files = FeatureAssemblies.FilesFor(context.Path.Split('?', '#')[0].Trim('/')).Where(f => !_loaded.Contains(f)).ToList();
+        if (files.Count == 0)
+        {
+            return;
+        }
+
+        try
+        {
+            foreach (var assembly in await AssemblyLoader.LoadAssembliesAsync(files))
+            {
+                LazyFeatures.Register(assembly);
+                _assemblies.Add(assembly);
+            }
+
+            _loaded.UnionWith(files);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            // Offline before the feature was ever loaded: the router shows Not found; the offline banner explains.
+            Logger.LogWarning("Feature {Files} could not be loaded: {Message}", string.Join(", ", files), ex.Message);
+        }
+    }
+
+    /// <inheritdoc />
+    protected override void OnInitialized() => SessionMonitor.Start();
+
+    /// <inheritdoc />
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await Device.StartAsync();
+        }
+    }
+
+    /// <inheritdoc />
+    public async ValueTask DisposeAsync() => await Device.DisposeAsync();
+}

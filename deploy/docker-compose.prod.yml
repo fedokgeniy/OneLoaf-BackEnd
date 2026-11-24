@@ -1,5 +1,6 @@
 # Production stack on one VM. Images come from GitHub Container Registry; every secret comes from the server's .env
-# (written by the deploy job from GitHub Environment secrets, see .env.example). Only Caddy publishes ports.
+# (written by .github/workflows/deploy.yml from the GitHub Environment secret, see .env.example). Only Caddy publishes
+# ports.
 #
 #   docker compose -f docker-compose.prod.yml pull
 #   docker compose -f docker-compose.prod.yml run --rm migrator
@@ -35,12 +36,17 @@ services:
     ports: ["80:80", "443:443"]
     environment:
       DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
+      ACME_EMAIL: ${ACME_EMAIL:-admin@example.com}
       GRAFANA_BASIC_AUTH_HASH: ${GRAFANA_BASIC_AUTH_HASH}
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
       - caddy-data:/data
       - caddy-config:/config
-    depends_on: [core-api, assistant, notification, grafana]
+    depends_on: [web, core-api, assistant, notification, grafana]
+
+  web:
+    <<: *service
+    image: ghcr.io/${GHCR_OWNER}/oneloaf-web:${IMAGE_TAG:-latest}
 
   db:
     <<: *service
@@ -216,18 +222,21 @@ services:
       PGPASSWORD: ${ONELOAF_ADMIN_PASSWORD}
       ONELOAF_DB: ${ONELOAF_DB:-oneloaf}
       BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
-    # Daily custom-format dump; dumps older than BACKUP_KEEP_DAYS are removed.
+    # Daily custom-format dump and an archive of the bake photos; files older than BACKUP_KEEP_DAYS are removed.
     entrypoint:
       - /bin/sh
       - -c
       - >
         while true; do
-        pg_dump -h db -U app_admin -d "$$ONELOAF_DB" -Fc -f "/backups/oneloaf-$$(date +%Y%m%d-%H%M).dump" &&
-        find /backups -name 'oneloaf-*.dump' -mtime +$$BACKUP_KEEP_DAYS -delete;
+        stamp="$$(date +%Y%m%d-%H%M)";
+        pg_dump -h db -U app_admin -d "$$ONELOAF_DB" -Fc -f "/backups/oneloaf-$$stamp.dump" &&
+        tar -czf "/backups/photos-$$stamp.tar.gz" -C /photos . &&
+        find /backups \( -name 'oneloaf-*.dump' -o -name 'photos-*.tar.gz' \) -mtime +$$BACKUP_KEEP_DAYS -delete;
         sleep 86400;
         done
     volumes:
       - ./backups:/backups
+      - photos:/photos:ro
     depends_on:
       db: { condition: service_healthy }
 

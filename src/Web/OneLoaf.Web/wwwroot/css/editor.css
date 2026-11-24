@@ -1,0 +1,63 @@
+/* Editable list rows of the editors (IngredientLineEditor, StageLineEditor, batch items). Global because the rows are
+   rendered by several feature components and contain child Ol* components that CSS isolation does not reach.
+   Tokens only; breakpoints in em. */
+.line-list { display: flex; flex-direction: column; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+.line { display: grid; grid-template-columns: auto 1fr; gap: var(--space-2) var(--space-3); padding: var(--space-3); border: 1px solid var(--border-hairline); border-radius: var(--radius-md); background: var(--surface); }
+.line__no { grid-row: span 2; min-width: 1.5rem; padding-top: var(--space-3); color: var(--ink-muted); font-weight: 600; text-align: right; }
+.line__marker { grid-row: span 3; }
+.line__fields { display: grid; grid-template-columns: 1fr; gap: var(--space-2) var(--space-3); align-items: end; min-width: 0; }
+/* Phones: stage name and type full width, min and max side by side. */
+.line__fields--stage { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.line__fields--stage > :nth-child(-n+2) { grid-column: 1 / -1; }
+.line__actions { grid-column: 2; display: flex; gap: var(--space-1); justify-content: flex-end; }
+.line__more { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.line__details { flex-basis: 100%; display: grid; grid-template-columns: 1fr; gap: var(--space-3); padding-top: var(--space-2); }
+.line__details[hidden] { display: none; }
+.line__checks { display: flex; flex-wrap: wrap; gap: 0 var(--space-4); }
+.line__proof { display: flex; flex-direction: column; gap: var(--space-2); }
+.line__inherited { justify-self: start; }
+.line__toggle { padding-inline: var(--space-3); }
+
+@media (min-width: 37.5em) {
+  .line { grid-template-columns: auto 1fr auto; align-items: start; }
+  .line__actions { grid-column: 3; grid-row: 1; padding-top: var(--space-1); }
+  .line__fields { grid-template-columns: minmax(0, 2fr) minmax(7rem, 1fr) auto; }
+  .line__fields--stage { grid-template-columns: minmax(0, 2fr) minmax(0, 1.5fr) minmax(6rem, 1fr) minmax(6rem, 1fr); }
+  .line__fields--stage > :nth-child(-n+2) { grid-column: auto; }
+  .line__details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .line__checks, .line__proof, .line__details .ol-field:has(textarea) { grid-column: 1 / -1; }
+}
+
+.editor { display: flex; flex-direction: column; gap: var(--space-5); padding-block: var(--space-5); max-width: var(--content-max); }
+.editor__card { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-5); }
+.editor__card-title { margin: 0; }
+.editor__general { display: grid; grid-template-columns: 1fr; gap: var(--space-4); }
+.editor__foot { position: sticky; bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom)); z-index: 1; display: flex; justify-content: flex-end; gap: var(--space-3); padding: var(--space-3) 0; background: linear-gradient(to top, var(--bg) 75%, transparent); }
+@media (min-width: 37.5em) {
+  .editor__general { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .editor__general .editor__wide { grid-column: 1 / -1; }
+  .editor__foot { bottom: 0; }
+}
+
+/* Form layouts used inside EditForm (whose <form> element CSS isolation of a page cannot reach). */
+.form-stack { display: flex; flex-direction: column; gap: var(--space-4); margin: 0; }
+.form-grid { display: grid; grid-template-columns: 1fr; gap: var(--space-3) var(--space-4); align-items: end; margin: 0; }
+.form-grid > .ol-alert, .form-grid__wide { grid-column: 1 / -1; }
+@media (min-width: 37.5em) {
+  .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .form-grid__end { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
+}
+
+/* New batch (NewBatch-* boards): the form, and the live preview beside it on desktop. */
+.new-batch { display: grid; grid-template-columns: 1fr; gap: var(--space-5); padding-block: var(--space-5); margin: 0 auto; }
+.new-batch__form { display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
+.new-batch__mode { display: flex; flex-direction: column; gap: var(--space-2); }
+.new-batch__item-head { display: flex; align-items: flex-end; gap: var(--space-2); }
+.new-batch__item-head > .ol-field { flex: 1; }
+.new-batch__remind { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+.new-batch__item { list-style: none; }
+.new-batch__preview { gap: var(--space-4); }
+@media (min-width: 64em) {
+  .new-batch { grid-template-columns: minmax(0, 3fr) minmax(18rem, 2fr); align-items: start; }
+  .new-batch__preview { position: sticky; top: calc(var(--topbar-height) + var(--space-5)); }
+}

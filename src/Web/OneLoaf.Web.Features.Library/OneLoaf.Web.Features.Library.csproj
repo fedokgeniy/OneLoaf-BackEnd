@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <!-- Feature module: public catalog, detail, comments, reactions, copy, publish, moderation (lazy-loaded in F5). Depends only on OneLoaf.Web.Shared. -->
+  <PropertyGroup>
+    <RootNamespace>OneLoaf.Web.Features.Library</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OneLoaf.Web.Shared\OneLoaf.Web.Shared.csproj" />
+  </ItemGroup>
+
+</Project>

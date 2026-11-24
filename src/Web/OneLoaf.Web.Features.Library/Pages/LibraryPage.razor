@@ -1,0 +1,101 @@
+@page "/library"
+@attribute [AllowAnonymous]
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Library.State
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+@inject IState<LibraryState> State
+@inject IDispatcher Dispatcher
+
+<PageTitle>Public library · OneLoaf</PageTitle>
+<ShellTitle Text="Public library" />
+
+<div class="ol-container library">
+    <h2 class="h2 library__heading">Public library</h2>
+    <AuthorizeView>
+        <NotAuthorized>
+            <OlAlert Kind="AlertKind.Info" Title="Sign in to copy and comment">
+                <p>Everyone can read the library. With an account you can copy a recipe, react and comment.</p>
+                <OlButton Href="@($"login?returnUrl={Uri.EscapeDataString("/library")}")" Variant="ButtonVariant.Secondary">Sign in</OlButton>
+            </OlAlert>
+        </NotAuthorized>
+    </AuthorizeView>
+
+    <form class="library__search" role="search" @onsubmit="Search" @onsubmit:preventDefault>
+        <label class="ol-visually-hidden" for="library-search">Search the public library</label>
+        <input id="library-search" class="ol-input" type="search" placeholder="Search the public library" autocomplete="off" @bind="_search" />
+        <OlButton Type="submit" Variant="ButtonVariant.Secondary" Icon="IconName.Search">Search</OlButton>
+    </form>
+
+    <section aria-label="Publications" aria-busy="@(State.Value.List is Loadable<PagedList<LibraryItemDto>>.Loading ? "true" : "false")">
+        <p class="ol-visually-hidden" role="status">@(State.Value.List.Value is { } found ? $"{found.TotalCount} recipes" : null)</p>
+        @switch (State.Value.List)
+        {
+            case Loadable<PagedList<LibraryItemDto>>.Failed { Error: var error }:
+                <OlAlert Kind="AlertKind.Danger" Title="The library could not be loaded." CorrelationId="@error.CorrelationId">
+                    <p>@error.Message</p>
+                    <OlButton Variant="ButtonVariant.Secondary" OnClick="Search">Try again</OlButton>
+                </OlAlert>
+                break;
+            case { Value: null }:
+                <OlSkeleton Variant="SkeletonVariant.Card" Count="6" />
+                break;
+            case { Value: { Items.Count: 0 } }:
+                <OlEmptyState Title="Nothing found" Icon="IconName.Library"
+                              Text="@(string.IsNullOrWhiteSpace(State.Value.Search) ? "Nobody has published a recipe yet. Publish yours from its recipe page." : "Try another word.")" />
+                break;
+            case { Value: { } list }:
+                <div class="ol-cards">
+                    @foreach (var item in list.Items)
+                    {
+                        <a @key="item.Id" class="ol-card ol-card--interactive" href="@($"library/{item.Id}")">
+                            <div class="ol-card__body">
+                                <span class="ol-card__overline">by @item.AuthorName · @DisplayFormat.Date(item.PublishedAt)</span>
+                                <h3 class="ol-card__title">@item.Title</h3>
+                                @if (!string.IsNullOrWhiteSpace(item.Description))
+                                {
+                                    <p class="library__description">@item.Description</p>
+                                }
+                                <div class="ol-card__meta">
+                                    @if (item.YieldLoaves is { } loaves)
+                                    {
+                                        <span class="ol-num">@DisplayFormat.Loaves(loaves)</span>
+                                    }
+                                    <span>@item.IngredientCount ingredients · @item.StageCount stages</span>
+                                </div>
+                                <div class="ol-card__foot library__counts">
+                                    <span>@item.ReactionCount @(item.ReactionCount == 1 ? "reaction" : "reactions")</span>
+                                    <span>@item.CommentCount @(item.CommentCount == 1 ? "comment" : "comments")</span>
+                                </div>
+                            </div>
+                        </a>
+                    }
+                </div>
+                @if (list.HasMore)
+                {
+                    <div class="library__more">
+                        <OlButton Variant="ButtonVariant.Secondary" Loading="State.Value.LoadingMore" OnClick="() => Dispatcher.Dispatch(new LoadMoreLibrary())">Show more recipes</OlButton>
+                    </div>
+                }
+                break;
+        }
+    </section>
+</div>
+
+@code {
+    private string? _search;
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        _search = State.Value.Search;
+        if (State.Value.List is Loadable<PagedList<LibraryItemDto>>.NotAsked)
+        {
+            Dispatcher.Dispatch(new SearchLibrary(null));
+        }
+    }
+
+    private void Search() => Dispatcher.Dispatch(new SearchLibrary(string.IsNullOrWhiteSpace(_search) ? null : _search.Trim()));
+}

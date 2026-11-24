@@ -1,0 +1,67 @@
+@* Tab list (.ol-tabs) with roving tabindex: Left/Right/Home/End move and select. Panels are rendered by the page with
+   ids "{IdPrefix}-panel-{tab id}" and aria-labelledby "{IdPrefix}-tab-{tab id}". *@
+<div class="ol-tabs @Class" role="tablist" aria-label="@Label">
+    @foreach (var tab in Tabs)
+    {
+        var selected = tab.Id == ActiveId;
+        <button type="button" class="ol-tab" role="tab" id="@TabId(tab.Id)" aria-selected="@(selected ? "true" : "false")"
+                aria-controls="@PanelId(tab.Id)" tabindex="@(selected ? 0 : -1)"
+                @onclick="() => SelectAsync(tab.Id)" @onkeydown="e => OnKeyDownAsync(e, tab.Id)" @ref="_buttons[tab.Id]">
+            @tab.Label
+        </button>
+    }
+</div>
+
+@code {
+    private readonly Dictionary<string, ElementReference> _buttons = [];
+
+    /// <summary>Accessible name of the tab list.</summary>
+    [Parameter, EditorRequired] public string Label { get; set; } = string.Empty;
+
+    /// <summary>Tabs in order.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<TabItem> Tabs { get; set; } = [];
+
+    /// <summary>Selected tab id.</summary>
+    [Parameter] public string? ActiveId { get; set; }
+
+    /// <summary>Raised with the newly selected tab id.</summary>
+    [Parameter] public EventCallback<string> ActiveIdChanged { get; set; }
+
+    /// <summary>Prefix of the tab and panel element ids.</summary>
+    [Parameter] public string IdPrefix { get; set; } = "tabs";
+
+    /// <summary>Extra class on the tab list.</summary>
+    [Parameter] public string? Class { get; set; }
+
+    /// <summary>Element id of a tab button.</summary>
+    public string TabId(string id) => $"{IdPrefix}-tab-{id}";
+
+    /// <summary>Element id of a panel.</summary>
+    public string PanelId(string id) => $"{IdPrefix}-panel-{id}";
+
+    private Task SelectAsync(string id) => id == ActiveId ? Task.CompletedTask : ActiveIdChanged.InvokeAsync(id);
+
+    private async Task OnKeyDownAsync(KeyboardEventArgs e, string current)
+    {
+        var index = Tabs.ToList().FindIndex(t => t.Id == current);
+        var next = e.Key switch
+        {
+            "ArrowRight" => (index + 1) % Tabs.Count,
+            "ArrowLeft" => (index - 1 + Tabs.Count) % Tabs.Count,
+            "Home" => 0,
+            "End" => Tabs.Count - 1,
+            _ => -1,
+        };
+        if (next < 0)
+        {
+            return;
+        }
+
+        var id = Tabs[next].Id;
+        await SelectAsync(id);
+        if (_buttons.TryGetValue(id, out var button))
+        {
+            await button.FocusAsync();
+        }
+    }
+}

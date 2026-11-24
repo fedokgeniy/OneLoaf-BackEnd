@@ -1,0 +1,59 @@
+@* Preview of the batch as the API would save it: ready window, total cost, per recipe starter and kneading. *@
+@using OneLoaf.Web.Features.Production.State
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+
+@switch (Preview)
+{
+    case Loadable<BatchPreview>.Failed { Error: var error }:
+        <OlAlert Kind="AlertKind.Warning" Title="@error.Title" CorrelationId="@error.CorrelationId">@(error.Detail ?? error.Message)</OlAlert>
+        break;
+    case { Value: { } preview }:
+        var batch = preview.Batch;
+        @if (preview.Window is { } window)
+        {
+            <p class="preview__window">Possible start @DisplayFormat.TimeWindow(window.From, window.To, window.From) on @DisplayFormat.Date(window.From); planned at the latest start, so the dough waits least.</p>
+        }
+        <div class="ol-stats">
+            <OlStatTile Label="Start" Value="@DisplayFormat.Time(batch.PlannedStartAt)" Hint="@DisplayFormat.Date(batch.PlannedStartAt)" />
+            <OlStatTile Label="Ready" Value="@(batch.PlannedReadyFrom is { } from && batch.PlannedReadyTo is { } to ? DisplayFormat.TimeWindow(from, to, batch.PlannedStartAt) : "—")" />
+            <OlStatTile Label="Total cost" Value="@(batch.TotalCost is { } cost ? DisplayFormat.Money(cost, batch.Currency) : "incomplete")"
+                        Hint="@(batch.TotalCost is null ? "prices missing" : $"prices as of {DisplayFormat.Date(batch.PriceDate)}")" />
+        </div>
+        <ul class="preview__items">
+            @foreach (var item in batch.Items)
+            {
+                <li class="preview__item" @key="item.Id">
+                    <span class="preview__item-title">@item.RecipeTitle · @DisplayFormat.Loaves(item.Loaves)</span>
+                    <span class="preview__item-meta">
+                        @(item.StarterAmountG is { } starter ? $"Starter {DisplayFormat.Grams(starter)}" : "No starter")
+                        · @(item.KneadingCycles switch { null => "kneading: set the mixer bowl", 1 => "1 kneading cycle", var n => $"{n} kneading cycles" })
+                        · @(item.Stages.Count == 1 ? "1 stage" : $"{item.Stages.Count} stages")
+                    </span>
+                </li>
+            }
+        </ul>
+        break;
+    default:
+        @if (CanPreview)
+        {
+            <OlSkeleton Variant="SkeletonVariant.Stat" Count="3" />
+        }
+        else
+        {
+            <p class="preview__hint">Choose a recipe and a time to see the plan, the cost and when it is ready.</p>
+        }
+        break;
+}
+
+@code {
+    /// <summary>Preview state.</summary>
+    [Parameter, EditorRequired] public Loadable<BatchPreview> Preview { get; set; } = Loadable<BatchPreview>.Idle;
+
+    /// <summary>The form is complete enough for a preview.</summary>
+    [Parameter] public bool CanPreview { get; set; }
+
+    /// <summary>Planned backwards from a ready-by time.</summary>
+    [Parameter] public bool ReadyBy { get; set; }
+}

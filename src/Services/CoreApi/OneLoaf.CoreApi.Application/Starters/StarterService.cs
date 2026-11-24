@@ -1,0 +1,102 @@
+using Microsoft.Extensions.Logging;
+using OneLoaf.CoreApi.Application.Catalog;
+using OneLoaf.CoreApi.Application.Common;
+using OneLoaf.Messaging;
+using OneLoaf.Messaging.Contracts;
+using OneLoaf.SharedKernel.Exceptions;
+using OneLoaf.SharedKernel.Security;
+
+namespace OneLoaf.CoreApi.Application.Starters;
+
+/// <summary>Sourdough starters and feedings of the current user (US-27, US-28, US-30).</summary>
+public sealed partial class StarterService(
+    IStarterRepository starters,
+    IFlourRepository flours,
+    IEventPublisher events,
+    TimeProvider timeProvider,
+    ICurrentUser currentUser,
+    ILogger<StarterService> logger)
+{
+    /// <summary>Message for a missing starter.</summary>
+    public const string NotFoundMessage = "The starter was not found.";
+
+    /// <summary>Message for a duplicate name.</summary>
+    public const string NameTakenMessage = "A starter with this name already exists.";
+
+    /// <summary>Page of starters with their schedule.</summary>
+    public Task<PagedResult<StarterDto>> ListAsync(PageQuery query, CancellationToken cancellationToken) =>
+        starters.ListAsync(currentUser.Id, query, cancellationToken);
+
+    /// <summary>One starter.</summary>
+    public async Task<StarterDto> GetAsync(Guid id, CancellationToken cancellationToken) =>
+        await starters.GetAsync(currentUser.Id, id, cancellationToken) ?? throw new NotFoundException(NotFoundMessage);
+
+    /// <summary>Creates a starter (US-27).</summary>
+    public async Task<StarterDto> CreateAsync(StarterRequest request, CancellationToken cancellationToken)
+    {
+        var normalized = await PrepareAsync(request, null, cancellationToken);
+        var id = await starters.CreateAsync(currentUser.Id, normalized, cancellationToken);
+        return await GetAsync(id, cancellationToken);
+    }
+
+    /// <summary>Replaces a starter.</summary>
+    public async Task<StarterDto> UpdateAsync(Guid id, StarterRequest request, CancellationToken cancellationToken)
+    {
+        var normalized = await PrepareAsync(request, id, cancellationToken);
+        if (!await starters.UpdateAsync(currentUser.Id, id, normalized, cancellationToken))
+        {
+            throw new NotFoundException(NotFoundMessage);
+        }
+
+        return await GetAsync(id, cancellationToken);
+    }
+
+    /// <summary>Deletes a starter; batches keep their items without it.</summary>
+    public async Task DeleteAsync(Guid id, CancellationToken cancellationToken)
+    {
+        if (!await starters.DeleteAsync(currentUser.Id, id, cancellationToken))
+        {
+            throw new NotFoundException(NotFoundMessage);
+        }
+    }
+
+    /// <summary>Feeding log, newest first (US-28).</summary>
+    public async Task<PagedResult<FeedingDto>> GetFeedingsAsync(Guid id, PageQuery query, CancellationToken cancellationToken) =>
+        await starters.GetFeedingsAsync(currentUser.Id, id, query, cancellationToken) ?? throw new NotFoundException(NotFoundMessage);
+
+    /// <summary>Records a feeding; the database computes the next feeding and the peak (US-28, US-30). Publishes <c>starter.fed</c>.</summary>
+    public async Task<FeedingDto> AddFeedingAsync(Guid id, FeedingRequest request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        if (!await starters.ExistsAsync(currentUser.Id, id, cancellationToken))
+        {
+            throw new NotFoundException(NotFoundMessage);
+        }
+
+        var feeding = await starters.AddFeedingAsync(id, request, cancellationToken);
+        LogFed(logger, id, currentUser.Id);
+        await events.PublishAsync(new StarterFed(id, currentUser.Id, feeding.FedAt, feeding.NextFeedingAt, feeding.ExpectedPeakAt,
+            timeProvider.GetUtcNow()), cancellationToken);
+        return feeding;
+    }
+
+    private async Task<StarterRequest> PrepareAsync(StarterRequest request, Guid? id, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var normalized = request with { Name = request.Name.Trim() };
+        if (normalized.FlourId is { } flourId && await flours.GetAsync(currentUser.Id, flourId, cancellationToken) is null)
+        {
+            throw ValidationFailures.For("flourId", FlourService.NotFoundMessage);
+        }
+
+        if (await starters.NameExistsAsync(currentUser.Id, normalized.Name, id, cancellationToken))
+        {
+            throw new ConflictException(NameTakenMessage);
+        }
+
+        return normalized;
+    }
+
+    [LoggerMessage(Level = LogLevel.Information, Message = "Starter {StarterId} fed by {UserId}")]
+    private static partial void LogFed(ILogger logger, Guid starterId, Guid userId);
+}

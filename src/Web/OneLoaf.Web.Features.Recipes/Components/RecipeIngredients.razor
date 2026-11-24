@@ -1,0 +1,62 @@
+@* Ingredient list for the chosen number of loaves (GET /scaled, US-06); quantities as returned by the API. *@
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+
+@switch (Scaled)
+{
+    case Loadable<ScaledRecipeDto>.Failed { Error: var error }:
+        <OlAlert Kind="AlertKind.Danger" Title="Quantities could not be calculated." CorrelationId="@error.CorrelationId">@error.Message</OlAlert>
+        break;
+    case { Value: { } scaled }:
+        @if (scaled.Ingredients.Count == 0)
+        {
+            <OlEmptyState Title="No ingredients" Icon="IconName.Recipes" Text="Add ingredients in the recipe editor.">
+                <Action><OlButton Href="@($"recipes/{Recipe.Id}/edit")" Variant="ButtonVariant.Secondary">Edit recipe</OlButton></Action>
+            </OlEmptyState>
+        }
+        else
+        {
+            <div class="ol-table-wrap">
+                <table class="ol-table">
+                    <caption class="ol-visually-hidden">Ingredients for @DisplayFormat.Loaves(scaled.Loaves)</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Ingredient · @DisplayFormat.Loaves(scaled.Loaves)</th>
+                            <th scope="col" class="ol-num">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var line in scaled.Ingredients)
+                        {
+                            <tr @key="line.LineId">
+                                <td>
+                                    @line.IngredientName
+                                    @if (line.IsOptional)
+                                    {
+                                        <span class="ingredients__note"> · optional</span>
+                                    }
+                                </td>
+                                <td class="ol-num">@DisplayFormat.Quantity(line.Quantity, line.UnitCode)</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        break;
+    default:
+        <OlSkeleton Variant="SkeletonVariant.Row" Count="@Math.Max(3, Recipe.Ingredients.Count)" />
+        break;
+}
+
+@code {
+    /// <summary>The recipe (for the edit link and the skeleton size).</summary>
+    [Parameter, EditorRequired] public RecipeDto Recipe { get; set; } = default!;
+
+    /// <summary>Scaled quantities.</summary>
+    [Parameter, EditorRequired] public Loadable<ScaledRecipeDto> Scaled { get; set; } = Loadable<ScaledRecipeDto>.Idle;
+
+    /// <summary>Loaves currently chosen.</summary>
+    [Parameter] public int Loaves { get; set; }
+}

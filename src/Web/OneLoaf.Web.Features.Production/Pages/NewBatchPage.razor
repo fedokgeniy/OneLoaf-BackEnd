@@ -1,0 +1,113 @@
+@page "/batches/new"
+@inherits FluxorComponent
+@using OneLoaf.Web.Features.Production.Models
+@using OneLoaf.Web.Features.Production.State
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.Forms
+@using OneLoaf.Web.Shared.State
+
+<ShellTitle Text="New batch" BackHref="batches" BackLabel="Back to the calendar">
+    <Actions>
+        @if (_editContext is not null)
+        {
+            <OlButton Type="submit" form="batch-form" Loading="@State.Value.Saving" class="app-hide-compact">Save batch</OlButton>
+        }
+    </Actions>
+</ShellTitle>
+
+@switch (State.Value.Data)
+{
+    case Loadable<NewBatchData>.Failed { Error: var error }:
+        <div class="ol-container editor">
+            <OlAlert Kind="AlertKind.Danger" Title="Recipes and starters could not be loaded." CorrelationId="@error.CorrelationId">
+                <p>@error.Message</p>
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => Dispatcher.Dispatch(new OpenNewBatch())">Try again</OlButton>
+            </OlAlert>
+        </div>
+        break;
+    case { Value: { } data } when _editContext is not null:
+        @if (data.Recipes.Count == 0)
+        {
+            <div class="ol-container editor">
+                <OlEmptyState Title="No recipes yet" Icon="IconName.Recipes" Text="A batch bakes one or more of your recipes. Write a recipe first.">
+                    <Action><OlButton Href="recipes/new" Icon="IconName.Plus">New recipe</OlButton></Action>
+                </OlEmptyState>
+            </div>
+            break;
+        }
+        <EditForm id="batch-form" EditContext="_editContext" OnValidSubmit="Save" OnInvalidSubmit="() => _summary = InvalidText" class="ol-container new-batch" novalidate>
+            <ObjectGraphValidation />
+            <ServerValidation @ref="_server" />
+            <div class="new-batch__form">
+                <div aria-live="assertive">
+                    @if (_summary is not null)
+                    {
+                        <OlAlert Kind="AlertKind.Danger" CorrelationId="@_summaryReference">@_summary</OlAlert>
+                    }
+                </div>
+                <section class="ol-card editor__card" aria-label="When">
+                    <OlTextField Label="Batch name" Placeholder="Saturday market" @bind-Value="_form.Name" />
+                    <div class="new-batch__mode">
+                        <span class="ol-field__label">Plan by</span>
+                        <OlSegmented TValue="PlanMode" Label="Plan by" Options="ModeOptions" Value="_form.Mode" ValueChanged="SetMode" />
+                    </div>
+                    <div class="editor__general">
+                        <OlTextField Label="Date" Type="date" @bind-Value="_form.Date" />
+                        <OlTextField Label="@(_form.Mode == PlanMode.StartAt ? "Start" : "Ready by")" Type="time" @bind-Value="_form.Time" />
+                    </div>
+                </section>
+
+                <ol class="line-list" aria-label="Recipes in the batch">
+                    @for (var i = 0; i < _form.Items.Count; i++)
+                    {
+                        var index = i;
+                        var item = _form.Items[index];
+                        <li class="ol-card editor__card new-batch__item" @key="item">
+                            <div class="new-batch__item-head">
+                                <OlSelect Label="@($"Recipe {index + 1}")" Options="RecipeOptions(data)" Placeholder="Choose a recipe" @bind-Value="item.RecipeId" />
+                                <OlIconButton Icon="IconName.Trash" Danger="true" Label="@($"Remove {RecipeTitle(data, item)}")" Disabled="@(_form.Items.Count == 1)"
+                                              OnClick="() => RemoveItem(index)" />
+                            </div>
+                            <div class="editor__general">
+                                <div>
+                                    <OlNumberStepper Label="Loaves" Value="item.Loaves" Min="1" Max="1000" DecreaseLabel="Fewer loaves" IncreaseLabel="More loaves"
+                                                     ValueChanged="n => SetLoaves(item, n)" />
+                                    <OlFieldMessage Model="item" Field="@nameof(BatchItemForm.Loaves)" />
+                                </div>
+                                <OlSelect Label="Starter" Options="StarterOptions(data)" Placeholder="No starter" @bind-Value="item.StarterId" />
+                            </div>
+                            @if (!string.IsNullOrEmpty(item.StarterId))
+                            {
+                                <div class="new-batch__remind">
+                                    <OlSwitch @bind-Value="item.Remind">Remind me to feed the starter before kneading</OlSwitch>
+                                    @if (item.Remind)
+                                    {
+                                        <OlSegmented TValue="int" Label="Minutes before kneading" Options="ReminderOptions" Value="item.ReminderMinutes"
+                                                     ValueChanged="m => SetReminder(item, m)" />
+                                    }
+                                </div>
+                            }
+                        </li>
+                    }
+                </ol>
+                <div>
+                    <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Plus" OnClick="AddItem">Add recipe</OlButton>
+                </div>
+                <section class="ol-card editor__card">
+                    <OlTextArea Label="Notes" Rows="2" @bind-Value="_form.Notes" />
+                </section>
+            </div>
+
+            <aside class="ol-card editor__card new-batch__preview" aria-labelledby="preview-title" aria-live="polite" aria-busy="@(State.Value.Preview is Loadable<BatchPreview>.Loading ? "true" : "false")">
+                <h2 class="h3 editor__card-title" id="preview-title">Plan preview</h2>
+                <BatchPreviewPanel Preview="State.Value.Preview" CanPreview="_form.CanPreview" ReadyBy="_form.Mode == PlanMode.ReadyBy" />
+                <OlButton Type="submit" Block="true" Large="true" Loading="@State.Value.Saving">Save batch</OlButton>
+            </aside>
+        </EditForm>
+        break;
+    default:
+        <div class="ol-container editor" aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Row" Count="6" /></div>
+        break;
+}

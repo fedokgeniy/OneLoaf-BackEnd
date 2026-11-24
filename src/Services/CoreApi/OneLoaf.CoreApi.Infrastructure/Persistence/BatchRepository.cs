@@ -41,7 +41,12 @@ public sealed class BatchRepository(OneLoafDbContext db) : IBatchRepository
             .Skip(Paging.Skip(query.Page, query.PageSize)).Take(query.PageSize)
             .Select(b => new
             {
-                b.Id, b.Name, b.Status, b.PlannedStartAt, b.PlannedReadyFrom, b.PlannedReadyTo,
+                b.Id,
+                b.Name,
+                b.Status,
+                b.PlannedStartAt,
+                b.PlannedReadyFrom,
+                b.PlannedReadyTo,
                 Loaves = b.Items.Sum(i => i.Loaves),
             })
             .ToListAsync(cancellationToken);

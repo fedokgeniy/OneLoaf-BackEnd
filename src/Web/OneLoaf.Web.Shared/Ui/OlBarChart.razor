@@ -1,0 +1,38 @@
+@* Horizontal bar chart of one measure across categories (one hue, --brand-terra: validated for contrast and lightness
+   on the light and dark surfaces). Every bar is labelled with its name and its formatted value, so nothing depends on
+   colour; screen readers read the list, the bars are decoration. Values come from the API: the component only scales
+   bar lengths to the largest value. Hovering or focusing a row highlights it and shows the optional detail. *@
+<figure class="ol-bars">
+    <figcaption class="ol-bars__caption">@Caption</figcaption>
+    <ul class="ol-bars__list">
+        @foreach (var item in Items)
+        {
+            <li class="ol-bars__row" tabindex="0" title="@(item.Detail ?? $"{item.Label}: {item.ValueText}")">
+                <span class="ol-bars__label">@item.Label</span>
+                <span class="ol-bars__track" aria-hidden="true">
+                    @* Inline width: the bar length is computed per row (value / largest value) and cannot be a class. *@
+                    <span class="ol-bars__bar" style="width: @Width(item.Value)"></span>
+                </span>
+                <span class="ol-bars__value ol-num">@item.ValueText</span>
+                @if (item.Detail is not null)
+                {
+                    <span class="ol-visually-hidden">, @item.Detail</span>
+                }
+            </li>
+        }
+    </ul>
+</figure>
+
+@code {
+    /// <summary>What the chart shows, e.g. "Bakes per recipe".</summary>
+    [Parameter, EditorRequired] public string Caption { get; set; } = string.Empty;
+
+    /// <summary>Rows in display order.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<BarDatum> Items { get; set; } = [];
+
+    private decimal Max => Items.Count == 0 ? 0 : Items.Max(i => i.Value);
+
+    // Bar length in percent of the track; a non-zero value keeps a visible stub.
+    private string Width(decimal value) =>
+        Max <= 0 || value <= 0 ? "0%" : string.Create(System.Globalization.CultureInfo.InvariantCulture, $"{Math.Max(2m, Math.Round(value / Max * 100m, 1)):0.#}%");
+}

@@ -1,0 +1,37 @@
+@* Layout of the signed-in app: the shell (navigation per size class) around the page, inside the error boundary.
+   Anonymous visitors of public pages (library, not found) get the page without the app navigation. *@
+@inherits LayoutComponentBase
+
+<AuthorizeView>
+    <Authorized>
+        <AppShell>
+            <AppErrorBoundary @ref="_boundary">
+                <ChildContent>@Body</ChildContent>
+                <ErrorContent Context="exception">
+                    <OlAlert Kind="AlertKind.Danger" Title="Something went wrong on this page.">
+                        <p>Try again. If it keeps happening, reload the page.</p>
+                        <OlButton Variant="ButtonVariant.Secondary" OnClick="Recover">Try again</OlButton>
+                    </OlAlert>
+                </ErrorContent>
+            </AppErrorBoundary>
+        </AppShell>
+    </Authorized>
+    <NotAuthorized>
+        <div class="public-page">
+            <header class="public-page__bar">
+                <a href="" class="public-page__home"><BrandMark Class="brand--sm" /></a>
+                <OlButton Variant="ButtonVariant.Secondary" Href="login">Sign in</OlButton>
+            </header>
+            <main id="main" class="ol-container public-page__main" tabindex="-1">@Body</main>
+        </div>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    private AppErrorBoundary? _boundary;
+
+    /// <inheritdoc />
+    protected override void OnParametersSet() => _boundary?.Recover();
+
+    private void Recover() => _boundary?.Recover();
+}

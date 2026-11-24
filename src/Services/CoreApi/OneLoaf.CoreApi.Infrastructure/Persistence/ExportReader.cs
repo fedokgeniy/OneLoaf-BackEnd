@@ -15,10 +15,15 @@ public sealed class ExportReader(OneLoafDbContext db) : IExportReader
             .OrderBy(r => r.Title)
             .Select(r => new
             {
-                r.Title, IsVariant = r.ParentRecipeId != null, r.YieldLoaves, r.LoafWeightG,
+                r.Title,
+                IsVariant = r.ParentRecipeId != null,
+                r.YieldLoaves,
+                r.LoafWeightG,
                 Ingredients = db.RecipeIngredients.Count(i => i.RecipeId == r.Id),
                 Stages = db.RecipeStages.Count(s => s.RecipeId == r.Id),
-                r.IsArchived, r.CreatedAt, r.UpdatedAt,
+                r.IsArchived,
+                r.CreatedAt,
+                r.UpdatedAt,
             })
             .ToListAsync(cancellationToken);
         return rows.Select(r => new RecipeExportRow(r.Title, r.IsVariant, r.YieldLoaves, r.LoafWeightG, r.Ingredients, r.Stages, r.IsArchived,
@@ -33,7 +38,12 @@ public sealed class ExportReader(OneLoafDbContext db) : IExportReader
             .OrderByDescending(b => b.BakedOn).ThenByDescending(b => b.CreatedAt)
             .Select(b => new
             {
-                b.BakedOn, b.TotalLoaves, b.TotalCost, b.Currency, b.Rating, b.Comment,
+                b.BakedOn,
+                b.TotalLoaves,
+                b.TotalCost,
+                b.Currency,
+                b.Rating,
+                b.Comment,
                 Items = b.Items.Select(i => new { Title = i.RecipeTitle, i.Loaves }).ToList(),
             })
             .ToListAsync(cancellationToken);

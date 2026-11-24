@@ -17,6 +17,8 @@ on:
       - "global.json"
       - ".github/workflows/assistant.yml"
       - "docs/api/reference/**"
+      - "!src/Web/**"
+      - "!tests/OneLoaf.Web.*/**"
   pull_request:
     paths:
       - "src/Services/Assistant/**"
@@ -32,6 +34,8 @@ on:
       - "global.json"
       - ".github/workflows/assistant.yml"
       - "docs/api/reference/**"
+      - "!src/Web/**"
+      - "!tests/OneLoaf.Web.*/**"
   workflow_dispatch:
 
 permissions:
