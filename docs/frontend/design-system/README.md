@@ -90,7 +90,7 @@ below 1rem; line length is capped at `--reading-max` (42rem).
 ## Logo
 
 The OneLoaf wordmark is set in Cormorant Garamond 600 as “One L♥af”: the heart from the original site replaces the
-second “o” (group **Logos**: `heart-terra.svg` on light grounds, `heart-blush.svg` on espresso). On phones the top bar
+second “o” (group **Logos**: `heart-terra.svg`; inside the wordmark the heart is drawn inline, terra on light grounds and blush on espresso). On phones the top bar
 shows the wordmark at 1.375rem; on watch-size screens only the heart.
 
 ## Voice and content
