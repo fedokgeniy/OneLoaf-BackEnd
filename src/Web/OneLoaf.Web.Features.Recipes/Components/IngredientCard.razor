@@ -1,0 +1,172 @@
+@* Card of the selected ingredient (US-10–12 and the stock): flour details, photo, and two tabs with the price history
+   and the stock movements. It shows what it is given and raises events; the page talks to the state. *@
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.State
+
+<div class="ol-card ingredients__card">
+    <div class="ingredients__card-head">
+        <h2 class="h3 ingredients__title">@Ingredient.Name</h2>
+        <div class="ingredients__card-actions">
+            <OlIconButton Icon="IconName.Edit" Label="@($"Edit {Ingredient.Name}")" OnClick="OnEdit" />
+            <OlIconButton Icon="IconName.Trash" Label="@($"Delete {Ingredient.Name}")" Danger="true" OnClick="OnDelete" />
+        </div>
+    </div>
+    <span class="ol-card__meta">@CategoryName · unit: @Ingredient.UnitCode</span>
+    @if (Ingredient.FlourName is not null)
+    {
+        <div class="ol-stats">
+            <OlStatTile Label="Flour" Value="@Ingredient.FlourName" />
+            <OlStatTile Label="Protein" Value="@(Ingredient.ProteinPercent is { } p ? DisplayFormat.Percent(p) : "—")" />
+            @if (Flour?.Grind is { } grind)
+            {
+                <OlStatTile Label="Grind" Value="@grind" />
+            }
+        </div>
+        @if (Flour is { } flour)
+        {
+            <div class="ingredients__inline-actions">
+                <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Edit" OnClick="() => OnEditFlour.InvokeAsync(flour)">Edit flour details</OlButton>
+                <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Trash" OnClick="() => OnDeleteFlour.InvokeAsync(flour)">Delete flour details</OlButton>
+            </div>
+        }
+    }
+
+    @if (Ingredient.StarterId is { } starterId)
+    {
+        <OlAlert Kind="AlertKind.Info" Title="This ingredient is your starter">
+            <p>Its stock is the ripe starter: it grows when a feeding has ripened and is used by batches. <OlLink Href="@($"starters/{starterId}/edit")">Open the starter</OlLink></p>
+        </OlAlert>
+    }
+
+    <OlPhotoPicker Src="@PhotoSrc" Loading="PhotoLoading" Busy="PhotoBusy"
+                   Alt="@($"Photo of {Ingredient.Name}")" AddLabel="Add a photo of the pack"
+                   OnSelected="OnPhotoSelected"
+                   OnRemove="OnPhotoRemove" />
+
+    <div class="ingredients__inline-actions">
+        <OlButton Icon="IconName.Plus" OnClick="OnAddRecord">Add record</OlButton>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="OnAdjust">Correct stock</OlButton>
+    </div>
+
+    <OlTabs Label="Ingredient sections" Tabs="DetailTabs" ActiveId="@_tab" ActiveIdChanged="t => _tab = t" IdPrefix="ingredient" />
+
+    <section class="@PanelClass("prices")" id="ingredient-panel-prices" role="tabpanel" aria-labelledby="ingredient-tab-prices">
+        <h3 class="ol-card__overline">Price history</h3>
+        @switch (Prices)
+        {
+            case Loadable<IReadOnlyList<PriceDto>>.Failed { Error: var priceError }:
+                <OlAlert Kind="AlertKind.Danger" CorrelationId="@priceError.CorrelationId">@priceError.Message</OlAlert>
+                break;
+            case { Value: { } prices } when prices.Count == 0:
+                <p class="ingredients__empty">No price yet. Recipe costs stay incomplete until you add a record with what you paid.</p>
+                break;
+            case { Value: { } prices }:
+                <div class="ol-table-wrap">
+                    <table class="ol-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Effective from</th>
+                                <th scope="col" class="ol-num">Price</th>
+                                <th scope="col" class="ol-num">Per unit</th>
+                                <th scope="col" class="ol-num">Change</th>
+                                <th scope="col"><span class="ol-visually-hidden">Actions</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var price in prices)
+                            {
+                                <tr @key="price.Id">
+                                    <td>@DisplayFormat.Date(price.EffectiveFrom)</td>
+                                    <td class="ol-num">@DisplayFormat.Money(price.Price, price.Currency) / @DisplayFormat.Quantity(price.PerQuantity, Ingredient.UnitCode)</td>
+                                    <td class="ol-num">@DisplayFormat.UnitPrice(price.UnitPrice, Ingredient.UnitCode)</td>
+                                    <td class="ol-num">@(price.ChangePercent is { } change ? (change > 0 ? "+" : string.Empty) + DisplayFormat.Percent(change) : "—")</td>
+                                    <td class="ingredients__row-actions">
+                                        <OlIconButton Icon="IconName.Edit" Label="@($"Edit the price from {DisplayFormat.Date(price.EffectiveFrom)}")" OnClick="() => OnEditPrice.InvokeAsync(price)" />
+                                        <OlIconButton Icon="IconName.Trash" Label="@($"Delete the price from {DisplayFormat.Date(price.EffectiveFrom)}")" Danger="true" OnClick="() => OnDeletePrice.InvokeAsync(price)" />
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                break;
+            default:
+                <OlSkeleton Variant="SkeletonVariant.Row" Count="3" />
+                break;
+        }
+
+    </section>
+
+    <section class="@PanelClass("stock")" id="ingredient-panel-stock" role="tabpanel" aria-labelledby="ingredient-tab-stock">
+        @if (Ingredient.Stock is { } inStock)
+        {
+            <div class="ol-stats">
+                <OlStatTile Label="In stock" Value="@DisplayFormat.Quantity(inStock, Ingredient.UnitCode)" />
+                <OlStatTile Label="Reorder level" Value="@(Ingredient.ReorderLevel is { } level ? DisplayFormat.Quantity(level, Ingredient.UnitCode) : "—")" />
+            </div>
+            @if (Ingredient.IsLowStock)
+            {
+                <OlAlert Kind="AlertKind.Warning" Title="Low stock">
+                    <p>@(Ingredient.ReorderLevel is null ? "The stock is below zero: record a purchase or correct the stock." : "The stock is below the reorder level.")</p>
+                </OlAlert>
+            }
+        }
+        else
+        {
+            <p class="ingredients__empty">
+                The stock of this ingredient is not kept: batches and starter feedings do not take from it.
+                Add a record of what you bought, or correct the stock, to start keeping it.
+            </p>
+        }
+
+        <h3 class="ol-card__overline">Stock movements</h3>
+        @switch (Movements)
+        {
+            case Loadable<PagedResult<StockMovementDto>>.Failed { Error: var movementsError }:
+                <OlAlert Kind="AlertKind.Danger" CorrelationId="@movementsError.CorrelationId">@movementsError.Message</OlAlert>
+                break;
+            case { Value: { } movements } when movements.Items.Count == 0:
+                <p class="ingredients__empty">Nothing recorded yet. Add a record of your first purchase to start.</p>
+                break;
+            case { Value: { } movements }:
+                <div class="ol-table-wrap">
+                    <table class="ol-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">What</th>
+                                <th scope="col" class="ol-num">Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var movement in movements.Items)
+                            {
+                                <tr @key="movement.Id">
+                                    <td>@DisplayFormat.Date(movement.OccurredOn)</td>
+                                    <td>
+                                        @MovementTitle(movement)
+                                        @if (MovementDetail(movement) is { } detail)
+                                        {
+                                            <span class="ingredients__movement-detail">@detail</span>
+                                        }
+                                    </td>
+                                    <td class="ol-num">@(movement.Quantity > 0 ? "+" : string.Empty)@DisplayFormat.Quantity(movement.Quantity, Ingredient.UnitCode)</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                @if (movements.TotalCount > movements.Items.Count)
+                {
+                    <p class="ingredients__more">Showing the latest @movements.Items.Count of @movements.TotalCount movements.</p>
+                }
+                break;
+            default:
+                <OlSkeleton Variant="SkeletonVariant.Row" Count="3" />
+                break;
+        }
+    </section>
+</div>

@@ -1,0 +1,68 @@
+@* Dialog that adds or edits an ingredient (US-10): name, category, unit, flour details and the stock switch. *@
+@inherits FormDialogBase
+@using OneLoaf.Web.Features.Recipes.Models
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Forms
+
+<OlDialog Open="Form is not null" Title="@Title" OnClose="OnClose">
+    <ChildContent>
+        @if (Form is not null)
+        {
+            <EditForm id="ingredient-form" Model="Form" OnValidSubmit="SubmitAsync" class="form-stack" novalidate>
+                <ObjectGraphValidation />
+                <ServerValidation @ref="Server" />
+                <OlTextField Label="Name" @bind-Value="Form.Name" />
+                <OlSelect Label="Category" Options="Categories" Placeholder="Choose a category" @bind-Value="Form.CategoryCode" />
+                <OlSelect Label="Unit" Options="Units" @bind-Value="Form.UnitCode" />
+                @if (IsFlourCategory(Form.CategoryCode))
+                {
+                    <OlSelect Label="Flour details" Options="Flours" Placeholder="No flour details" @bind-Value="Form.FlourId" />
+                    <div class="ingredient-form__actions">
+                        <OlButton Variant="ButtonVariant.Secondary" Icon="IconName.Plus" OnClick="OnAddFlour">Add flour</OlButton>
+                    </div>
+                }
+                <OlSwitch @bind-Value="Form.TrackStock">Keep the stock of this ingredient</OlSwitch>
+                @if (Form.TrackStock)
+                {
+                    <OlNumberField TValue="decimal?" Label="Reorder level" Suffix="@Form.UnitCode"
+                                   Help="Below this stock the ingredient is marked as low. Leave empty for no warning." @bind-Value="Form.ReorderLevel" />
+                }
+                @if (Alert is not null)
+                {
+                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@Alert.CorrelationId">@Alert.Message</OlAlert>
+                }
+            </EditForm>
+        }
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="OnClose">Cancel</OlButton>
+        <OlButton Type="submit" form="ingredient-form" Loading="@Busy">Save</OlButton>
+    </Footer>
+</OlDialog>
+
+@code {
+    /// <summary>The form the page owns; null closes the dialog.</summary>
+    [Parameter] public IngredientForm? Form { get; set; }
+
+    /// <summary>Heading: "New ingredient" or "Edit …".</summary>
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+
+    /// <summary>Categories of the reference data.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<SelectOption> Categories { get; set; } = [];
+
+    /// <summary>Units of the reference data.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<SelectOption> Units { get; set; } = [];
+
+    /// <summary>Flours of the catalog.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<SelectOption> Flours { get; set; } = [];
+
+    /// <summary>Tells whether a category is a flour, so the flour details are offered.</summary>
+    [Parameter, EditorRequired] public Func<string?, bool> IsFlourCategory { get; set; } = _ => false;
+
+    /// <summary>Raised when the baker wants to add a flour to the catalog from this form.</summary>
+    [Parameter] public EventCallback OnAddFlour { get; set; }
+
+    /// <inheritdoc />
+    protected override string? ConflictField => nameof(IngredientForm.Name);
+}

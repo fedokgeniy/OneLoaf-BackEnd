@@ -46,6 +46,7 @@ shown on the `Components-States` board, and has a bUnit test for the states that
 | `OlTable` | CostTable · `.ol-table-wrap` `.ol-table` | columns + rows template; stacked rows on compact | header `scope`, caption (visually hidden) |
 | `OlStageItem` | StageItem · `.ol-stage` `.is-running/.is-done/.is-skipped` | stage view model, `OnStart`, `OnComplete`, `OnExtend` | upcoming, running, done, skipped; actions one full-width row |
 | `OlDialog` | Dialog · `.ol-dialog` `.ol-scrim` `__handle` | `Open`, `Title`, `OnClose`, `Foot` | bottom sheet on compact, centred on medium+; focus trap, Esc, return focus |
+| `OlConfirmDialog` | Dialog · on top of `OlDialog` | `Open`, `Title`, `ConfirmText`, `Busy`, `OnConfirm`, `OnClose` | confirmation of a destructive action: what is removed, *Keep it* and the danger button |
 | `OlEmptyState` | EmptyState · `.ol-empty` | `Title`, `Text`, `Action` | |
 | `OlSkeleton` | Skeleton · `.ol-skeleton` | `Variant` (text, card, row, stat, chat) , `Count` | `aria-hidden`, parent has `aria-busy="true"` |
 | `OlTopBar` | TopBar · `.ol-topbar` | `Title`, `Back`, `Actions` | |
