@@ -29,6 +29,18 @@ public sealed class CorsTests
     }
 
     [Fact]
+    public void ReadOrigins_ArrayAndEnvironmentValue_ReturnsBoth()
+    {
+        var configuration = Build(new Dictionary<string, string?>
+        {
+            ["Cors:AllowedOrigins:0"] = "http://localhost:5090",
+            ["Cors:AllowedOrigins"] = "http://localhost:5091",
+        });
+
+        Assert.Equal(["http://localhost:5090", "http://localhost:5091"], CorsExtensions.ReadOrigins(configuration));
+    }
+
+    [Fact]
     public void ReadOrigins_NotConfigured_IsEmpty() =>
         Assert.Empty(CorsExtensions.ReadOrigins(Build([])));
 

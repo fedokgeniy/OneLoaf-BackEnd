@@ -41,9 +41,10 @@ public static class CorsExtensions
     {
         ArgumentNullException.ThrowIfNull(configuration);
         var section = configuration.GetSection(AllowedOriginsKey);
-        var values = section.GetChildren().Any()
-            ? section.GetChildren().Select(c => c.Value)
-            : (section.Value ?? string.Empty).Split([',', ';'], StringSplitOptions.None);
+        // An array (appsettings) and a delimited string (environment variable) can both be present: use both, so a
+        // variable set for the container is not silently ignored when the settings file also lists origins.
+        var values = section.GetChildren().Select(c => c.Value)
+            .Concat((section.Value ?? string.Empty).Split([',', ';'], StringSplitOptions.None));
         return values
             .Select(v => v?.Trim().TrimEnd('/'))
             .Where(v => !string.IsNullOrEmpty(v))
