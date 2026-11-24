@@ -52,10 +52,13 @@ public sealed record CurrentPriceDto(decimal Price, decimal PerQuantity, decimal
 /// <param name="Stock">Stock in the ingredient unit; null when the stock is not kept.</param>
 /// <param name="ReorderLevel">Stock level below which the ingredient is low.</param>
 /// <param name="IsLowStock">True when the stock is below the reorder level, or below zero without a level.</param>
+/// <param name="HasPhoto">True when <c>GET /ingredients/{id}/photo</c> returns an image.</param>
+/// <param name="StarterId">The starter this ingredient belongs to; its stock is the ripe starter.</param>
 public sealed record IngredientDto(
     Guid Id, string Name, string CategoryCode, string UnitCode, Guid? FlourId, string? FlourName, decimal? ProteinPercent,
     CurrentPriceDto? CurrentPrice, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt,
-    bool TrackStock = false, decimal? Stock = null, decimal? ReorderLevel = null, bool IsLowStock = false);
+    bool TrackStock = false, decimal? Stock = null, decimal? ReorderLevel = null, bool IsLowStock = false,
+    bool HasPhoto = false, Guid? StarterId = null);
 
 /// <summary>Body of <c>POST/PUT /ingredients</c>.</summary>
 /// <param name="Name">Name.</param>
@@ -174,10 +177,10 @@ public interface IIngredientRepository
         Guid ownerId, Guid ingredientId, StockMovementListQuery query, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Stores a purchase in one transaction: the stock movement, the price of the purchase date (created or replaced)
-    /// and the stock switch of the ingredient. Returns the id of the movement.
+    /// Stores a record in one transaction: the price of its date (created or replaced) and, unless the record is
+    /// price only, the stock movement and the stock switch of the ingredient.
     /// </summary>
-    Task<Guid> AddPurchaseAsync(Guid ingredientId, PurchaseRequest purchase, CancellationToken cancellationToken);
+    Task AddRecordAsync(Guid ingredientId, IngredientRecordRequest record, CancellationToken cancellationToken);
 
     /// <summary>Stores a correction of the stock and switches the stock of the ingredient on; returns the id of the movement.</summary>
     Task<Guid> AddAdjustmentAsync(Guid ingredientId, decimal quantity, DateOnly occurredOn, string note, CancellationToken cancellationToken);

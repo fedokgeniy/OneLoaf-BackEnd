@@ -31,4 +31,4 @@ public enum ReactionType { Like, Love, WantToBake }
 
 public enum ReportStatus { Open, Resolved, Rejected }
 
-public enum StockMovementType { Purchase, BatchConsumption, BatchReturn, StarterFeeding, Adjustment }
+public enum StockMovementType { Purchase, BatchConsumption, BatchReturn, StarterFeeding, Adjustment, StarterRipened, StarterRefed }

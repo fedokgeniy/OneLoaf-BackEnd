@@ -14,10 +14,14 @@ namespace OneLoaf.CoreApi.Application.Starters;
 /// <param name="Notes">Notes.</param>
 /// <param name="FlourIngredientId">Ingredient whose stock a feeding takes the flour from.</param>
 /// <param name="WaterIngredientId">Ingredient whose stock a feeding takes the water from.</param>
+/// <param name="UsableShare">
+/// Share of the fed starter that can go into dough once it is ripe, 0.05-1; the rest stays for the next feeding.
+/// Defaults to two thirds.
+/// </param>
 public sealed record StarterRequest(
     string Name, decimal HydrationPercent, FeedingMode FeedingMode, int FeedingIntervalHours, Guid? FlourId = null,
     decimal? RiseHours = null, bool IsActive = true, string? Notes = null, Guid? FlourIngredientId = null,
-    Guid? WaterIngredientId = null);
+    Guid? WaterIngredientId = null, decimal? UsableShare = null);
 
 /// <summary>A starter with its schedule from the last feeding (US-27, US-28, US-30).</summary>
 /// <param name="Id">Id.</param>
@@ -37,11 +41,16 @@ public sealed record StarterRequest(
 /// <param name="FlourIngredientId">Ingredient whose stock a feeding takes the flour from.</param>
 /// <param name="WaterIngredientId">Ingredient whose stock a feeding takes the water from.</param>
 /// <param name="AmountG">Starter after the last feeding, g: flour + water + starter kept.</param>
+/// <param name="IngredientId">The starter as an ingredient of the catalog: recipes use it, its stock is the ripe starter.</param>
+/// <param name="UsableShare">Share of the fed starter that becomes stock when it is ripe.</param>
+/// <param name="UsableG">Ripe starter in stock now, g; 0 while the starter is ripening.</param>
+/// <param name="SuggestedKeptG">Starter left for the next feeding, g: the reserve plus what was not used.</param>
 public sealed record StarterDto(
     Guid Id, string Name, Guid? FlourId, decimal HydrationPercent, FeedingMode FeedingMode, int FeedingIntervalHours,
     decimal? RiseHours, bool IsActive, string? Notes, DateTimeOffset? LastFedAt, DateTimeOffset? NextFeedingAt,
     DateTimeOffset? ExpectedPeakAt, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt, Guid? FlourIngredientId = null,
-    Guid? WaterIngredientId = null, decimal? AmountG = null);
+    Guid? WaterIngredientId = null, decimal? AmountG = null, Guid? IngredientId = null, decimal UsableShare = StarterLimits.DefaultUsableShare,
+    decimal? UsableG = null, decimal? SuggestedKeptG = null);
 
 /// <summary>Body of <c>POST /starters/{id}/feedings</c> (US-28).</summary>
 /// <param name="FedAt">Feeding time.</param>

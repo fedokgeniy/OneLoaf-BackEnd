@@ -60,6 +60,7 @@ public static class DependencyInjection
         services.AddScoped<IBakeRecordRepository, BakeRecordRepository>();
         services.AddScoped<ILibraryRepository, LibraryRepository>();
         services.AddScoped<IBakeRecordPhotoRepository, BakeRecordPhotoRepository>();
+        services.AddScoped<IPhotoSlotRepository, PhotoSlotRepository>();
         services.AddValidatedOptions<PhotoStorageOptions>(PhotoStorageOptions.SectionName);
         services.AddSingleton<IPhotoStorage, LocalPhotoStorage>();
         services.AddScoped<Application.Export.IExportReader, ExportReader>();

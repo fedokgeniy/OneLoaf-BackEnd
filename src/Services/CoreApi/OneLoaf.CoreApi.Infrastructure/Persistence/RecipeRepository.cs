@@ -50,7 +50,7 @@ public sealed class RecipeRepository(OneLoafDbContext db) : IRecipeRepository
         var items = await recipes.OrderBy(r => r.Title).ThenBy(r => r.Id)
             .Skip(Paging.Skip(query.Page, query.PageSize)).Take(query.PageSize)
             .Select(r => new RecipeSummaryDto(r.Id, r.Title, r.ParentRecipeId, r.YieldLoaves, r.IsArchived,
-                new DateTimeOffset(r.UpdatedAt, TimeSpan.Zero)))
+                new DateTimeOffset(r.UpdatedAt, TimeSpan.Zero), r.PhotoKey != null))
             .ToListAsync(cancellationToken);
         return new PagedResult<RecipeSummaryDto>(items, query.Page, query.PageSize, total);
     }
@@ -59,7 +59,7 @@ public sealed class RecipeRepository(OneLoafDbContext db) : IRecipeRepository
     public async Task<RecipeDto?> GetEffectiveAsync(Guid ownerId, Guid id, CancellationToken cancellationToken)
     {
         var recipe = await db.Recipes.AsNoTracking().Where(r => r.OwnerId == ownerId && r.Id == id)
-            .Select(r => new { r.ParentRecipeId, r.IsArchived, r.CreatedAt, r.UpdatedAt })
+            .Select(r => new { r.ParentRecipeId, r.IsArchived, r.CreatedAt, r.UpdatedAt, HasPhoto = r.PhotoKey != null })
             .SingleOrDefaultAsync(cancellationToken);
         if (recipe is null)
         {
@@ -103,7 +103,7 @@ public sealed class RecipeRepository(OneLoafDbContext db) : IRecipeRepository
             stages.Select(s => new RecipeStageDto(s.LineId, s.SortOrder, s.Name, s.StageTypeCode, s.MinDurationMinutes,
                 s.MaxDurationMinutes, s.ActiveMinutes, s.ProofMode is null ? null : ProofModes[s.ProofMode], s.TemperatureC,
                 s.UsesOven, s.UsesMixer, s.IsOptional, s.Instructions, s.OriginRecipeId != id)).ToList(),
-            new DateTimeOffset(recipe.CreatedAt, TimeSpan.Zero), new DateTimeOffset(recipe.UpdatedAt, TimeSpan.Zero));
+            new DateTimeOffset(recipe.CreatedAt, TimeSpan.Zero), new DateTimeOffset(recipe.UpdatedAt, TimeSpan.Zero), recipe.HasPhoto);
     }
 
     /// <inheritdoc />

@@ -163,9 +163,13 @@ public sealed class IngredientRepository(OneLoafDbContext db) : IIngredientRepos
         await db.IngredientPrices.Where(p => p.IngredientId == ingredientId && p.Id == priceId).ExecuteDeleteAsync(cancellationToken) > 0;
 
     /// <inheritdoc />
-    public async Task<decimal> GetStockAsync(Guid ingredientId, CancellationToken cancellationToken) =>
-        await db.StockMovements.AsNoTracking().Where(m => m.IngredientId == ingredientId)
+    public async Task<decimal> GetStockAsync(Guid ingredientId, CancellationToken cancellationToken)
+    {
+        var now = DateTime.UtcNow;
+        return await db.StockMovements.AsNoTracking()
+            .Where(m => m.IngredientId == ingredientId && (m.AvailableAt == null || m.AvailableAt <= now))
             .SumAsync(m => (decimal?)m.Quantity, cancellationToken) ?? 0m;
+    }
 
     /// <inheritdoc />
     public async Task<PagedResult<StockMovementDto>?> ListMovementsAsync(
@@ -185,43 +189,48 @@ public sealed class IngredientRepository(OneLoafDbContext db) : IIngredientRepos
     }
 
     /// <inheritdoc />
-    public async Task<Guid> AddPurchaseAsync(Guid ingredientId, PurchaseRequest purchase, CancellationToken cancellationToken)
+    public async Task AddRecordAsync(Guid ingredientId, IngredientRecordRequest record, CancellationToken cancellationToken)
     {
-        ArgumentNullException.ThrowIfNull(purchase);
+        ArgumentNullException.ThrowIfNull(record);
         await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
-        var quantity = purchase.PackCount * purchase.PackSize;
-        var movement = new StockMovement
+        var quantity = record.PackCount * record.PackSize;
+        if (!record.PriceOnly)
         {
-            IngredientId = ingredientId,
-            MovementType = StockMovementType.Purchase,
-            Quantity = quantity,
-            OccurredOn = purchase.PurchasedOn,
-            PackCount = purchase.PackCount,
-            PackSize = purchase.PackSize,
-            TotalCost = purchase.TotalCost,
-            Currency = purchase.Currency,
-            Note = purchase.Note,
-        };
-        db.StockMovements.Add(movement);
+            db.StockMovements.Add(new StockMovement
+            {
+                IngredientId = ingredientId,
+                MovementType = StockMovementType.Purchase,
+                Quantity = quantity,
+                OccurredOn = record.Date,
+                PackCount = record.PackCount,
+                PackSize = record.PackSize,
+                TotalCost = record.TotalCost,
+                Currency = record.Currency,
+                Note = record.Note,
+            });
+        }
 
-        // One price per ingredient and date: a purchase on a date that already has a price replaces it.
+        // One price per ingredient and date: a record on a date that already has a price replaces it.
         var price = await db.IngredientPrices
-            .SingleOrDefaultAsync(p => p.IngredientId == ingredientId && p.EffectiveFrom == purchase.PurchasedOn, cancellationToken);
+            .SingleOrDefaultAsync(p => p.IngredientId == ingredientId && p.EffectiveFrom == record.Date, cancellationToken);
         if (price is null)
         {
-            price = new IngredientPrice { IngredientId = ingredientId, EffectiveFrom = purchase.PurchasedOn };
+            price = new IngredientPrice { IngredientId = ingredientId, EffectiveFrom = record.Date };
             db.IngredientPrices.Add(price);
         }
 
-        price.Price = purchase.TotalCost;
+        price.Price = record.TotalCost;
         price.PerQuantity = quantity;
-        price.Currency = purchase.Currency;
+        price.Currency = record.Currency;
         await db.SaveChangesAsync(cancellationToken);
-        await db.Ingredients.Where(i => i.Id == ingredientId)
-            .ExecuteUpdateAsync(s => s.SetProperty(i => i.TrackStock, true), cancellationToken);
+        if (!record.PriceOnly)
+        {
+            await db.Ingredients.Where(i => i.Id == ingredientId)
+                .ExecuteUpdateAsync(s => s.SetProperty(i => i.TrackStock, true), cancellationToken);
+        }
+
         await transaction.CommitAsync(cancellationToken);
         db.ChangeTracker.Clear();
-        return movement.Id;
     }
 
     /// <inheritdoc />
@@ -255,11 +264,12 @@ public sealed class IngredientRepository(OneLoafDbContext db) : IIngredientRepos
             m.Batch == null ? null : m.Batch.Name, m.PackCount, m.PackSize, m.TotalCost, m.Currency, m.Note,
             new DateTimeOffset(m.CreatedAt, TimeSpan.Zero)));
 
-    private static IQueryable<IngredientDto> Project(IQueryable<Ingredient> ingredients) =>
+    private IQueryable<IngredientDto> Project(IQueryable<Ingredient> ingredients) =>
         ingredients.Select(i => new IngredientDto(i.Id, i.Name, i.CategoryCode, i.UnitCode, i.FlourId,
             i.Flour == null ? null : i.Flour.Name, i.Flour == null ? null : i.Flour.ProteinPercent, null,
             new DateTimeOffset(i.CreatedAt, TimeSpan.Zero), new DateTimeOffset(i.UpdatedAt, TimeSpan.Zero),
-            i.TrackStock, null, i.ReorderLevel, false));
+            i.TrackStock, null, i.ReorderLevel, false, i.PhotoKey != null,
+            db.Starters.Where(s => s.IngredientId == i.Id).Select(s => (Guid?)s.Id).FirstOrDefault()));
 
     /// <summary>Adds the stock of the ingredients whose stock is kept; low = below the reorder level, or below zero without one.</summary>
     private async Task<List<IngredientDto>> WithStockAsync(List<IngredientDto> rows, CancellationToken cancellationToken)
@@ -270,7 +280,10 @@ public sealed class IngredientRepository(OneLoafDbContext db) : IIngredientRepos
             return rows;
         }
 
-        var stock = await db.StockMovements.AsNoTracking().Where(m => ids.Contains(m.IngredientId))
+        // Starter that is still ripening is in the ledger with a later available_at and is not stock yet.
+        var now = DateTime.UtcNow;
+        var stock = await db.StockMovements.AsNoTracking()
+            .Where(m => ids.Contains(m.IngredientId) && (m.AvailableAt == null || m.AvailableAt <= now))
             .GroupBy(m => m.IngredientId).Select(g => new { g.Key, Sum = g.Sum(m => m.Quantity) })
             .ToDictionaryAsync(g => g.Key, g => g.Sum, cancellationToken);
         return rows.Select(r =>

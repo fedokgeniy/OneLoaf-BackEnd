@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using OneLoaf.CoreApi.Application.Calculations;
 using OneLoaf.CoreApi.Application.Common;
+using OneLoaf.CoreApi.Application.History;
 using OneLoaf.CoreApi.Application.Recipes;
 using OneLoaf.ServiceDefaults.Constants;
 using OneLoaf.ServiceDefaults.Validation;
@@ -10,6 +12,9 @@ namespace OneLoaf.CoreApi.Endpoints;
 /// <summary>Recipes, variants and the calculator of the current user (US-05 - US-08, US-14 - US-18, US-52).</summary>
 public static class RecipeEndpoints
 {
+    // Multipart boundaries and headers around the image.
+    private const long PhotoUploadOverheadBytes = 64 * 1024;
+
     /// <summary>Route of the recipes.</summary>
     public const string GroupRoute = Routes.ApiV1 + "/recipes";
 
@@ -40,6 +45,19 @@ public static class RecipeEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status409Conflict)
             .WithName("DeleteRecipe").WithSummary("Delete a recipe")
             .WithDescription("US-05. A recipe with variants or used in batches cannot be deleted (409); archive it instead.");
+        recipes.MapPut("/{id:guid}/photo", SetPhotoAsync)
+            .DisableAntiforgery()
+            .Accepts<IFormFile>("multipart/form-data")
+            .WithMetadata(new RequestSizeLimitAttribute(PhotoLimits.MaxBytes + PhotoUploadOverheadBytes))
+            .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+            .WithName("SetRecipePhoto").WithSummary("Upload the photo of a recipe")
+            .WithDescription("multipart/form-data with the image in the field 'file'; JPEG, PNG or WebP (checked by content), " +
+                             "up to 5 MB. Replaces the previous photo. A variant has its own photo.");
+        recipes.MapGet("/{id:guid}/photo", GetPhotoAsync).ProducesProblem(StatusCodes.Status404NotFound)
+            .Produces<FileStreamHttpResult>(StatusCodes.Status200OK, "image/jpeg", "image/png", "image/webp")
+            .WithName("GetRecipePhoto").WithSummary("The photo of a recipe").WithDescription("Only the owner; 404 without a photo.");
+        recipes.MapDelete("/{id:guid}/photo", DeletePhotoAsync).ProducesProblem(StatusCodes.Status404NotFound)
+            .WithName("DeleteRecipePhoto").WithSummary("Remove the photo of a recipe").WithDescription("204 also when there was none.");
         recipes.MapPost("/{id:guid}/archive", (Guid id, RecipeService s, CancellationToken ct) => SetArchivedAsync(id, true, s, ct))
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithName("ArchiveRecipe").WithSummary("Archive a recipe").WithDescription("US-05. Hidden from the default list.");
@@ -73,6 +91,25 @@ public static class RecipeEndpoints
             .WithName("GetProductionFigures").WithSummary("Dough weight, kneading cycles and starter amount")
             .WithDescription("US-17, US-18. From fn_dough_weight_g, fn_kneading_cycles, fn_starter_amount_g.");
         return app;
+    }
+
+    private static async Task<NoContent> SetPhotoAsync(Guid id, IFormFile file, EntityPhotoService photos, CancellationToken ct)
+    {
+        await using var content = file.OpenReadStream();
+        await photos.SetAsync(PhotoOwnerKind.Recipe, id, content, file.Length, ct);
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<FileStreamHttpResult> GetPhotoAsync(Guid id, EntityPhotoService photos, CancellationToken ct)
+    {
+        var photo = await photos.OpenAsync(PhotoOwnerKind.Recipe, id, ct);
+        return TypedResults.Stream(photo.Content, photo.ContentType);
+    }
+
+    private static async Task<NoContent> DeletePhotoAsync(Guid id, EntityPhotoService photos, CancellationToken ct)
+    {
+        await photos.DeleteAsync(PhotoOwnerKind.Recipe, id, ct);
+        return TypedResults.NoContent();
     }
 
     private static async Task<Ok<PagedResult<RecipeSummaryDto>>> ListAsync(

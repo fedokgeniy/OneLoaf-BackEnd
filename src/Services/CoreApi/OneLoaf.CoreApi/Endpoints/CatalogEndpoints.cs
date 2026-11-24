@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using OneLoaf.CoreApi.Application.Catalog;
 using OneLoaf.CoreApi.Application.Common;
+using OneLoaf.CoreApi.Application.History;
 using OneLoaf.ServiceDefaults.Constants;
 using OneLoaf.ServiceDefaults.Validation;
 
@@ -9,6 +11,9 @@ namespace OneLoaf.CoreApi.Endpoints;
 /// <summary>Flours, ingredients, price history and stock of the current user (US-10, US-11, US-12).</summary>
 public static class CatalogEndpoints
 {
+    // Multipart boundaries and headers around the image.
+    private const long PhotoUploadOverheadBytes = 64 * 1024;
+
     /// <summary>Route of the flours.</summary>
     public const string FloursRoute = Routes.ApiV1 + "/flours";
 
@@ -69,11 +74,24 @@ public static class CatalogEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithName("ListStockMovements").WithSummary("Stock ledger of an ingredient")
             .WithDescription("Purchases, batch consumption and returns, starter feedings and corrections; newest first, paged.");
-        ingredients.MapPost("/{id:guid}/purchases", AddPurchaseAsync).WithValidation<PurchaseRequest>()
+        ingredients.MapPost("/{id:guid}/records", AddRecordAsync).WithValidation<IngredientRecordRequest>()
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithName("AddIngredientPurchase").WithSummary("Record a purchase")
-            .WithDescription("Packs of a size bought for an amount: the stock grows, the price of the purchase date is created " +
-                             "or replaced, and the stock of the ingredient is kept from now on.");
+            .WithName("AddIngredientRecord").WithSummary("Record what was bought: price and quantity")
+            .WithDescription("Packs of a size bought for an amount: the price of the date is created or replaced and the stock " +
+                             "grows; the stock of the ingredient is kept from now on. priceOnly=true records only the price.");
+        ingredients.MapPut("/{id:guid}/photo", SetPhotoAsync)
+            .DisableAntiforgery()
+            .Accepts<IFormFile>("multipart/form-data")
+            .WithMetadata(new RequestSizeLimitAttribute(PhotoLimits.MaxBytes + PhotoUploadOverheadBytes))
+            .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status422UnprocessableEntity)
+            .WithName("SetIngredientPhoto").WithSummary("Upload the photo of an ingredient or its pack")
+            .WithDescription("multipart/form-data with the image in the field 'file'; JPEG, PNG or WebP (checked by content), " +
+                             "up to 5 MB. Replaces the previous photo.");
+        ingredients.MapGet("/{id:guid}/photo", GetPhotoAsync).ProducesProblem(StatusCodes.Status404NotFound)
+            .Produces<FileStreamHttpResult>(StatusCodes.Status200OK, "image/jpeg", "image/png", "image/webp")
+            .WithName("GetIngredientPhoto").WithSummary("The photo of an ingredient").WithDescription("Only the owner; 404 without a photo.");
+        ingredients.MapDelete("/{id:guid}/photo", DeletePhotoAsync).ProducesProblem(StatusCodes.Status404NotFound)
+            .WithName("DeleteIngredientPhoto").WithSummary("Remove the photo of an ingredient").WithDescription("204 also when there was none.");
         ingredients.MapPost("/{id:guid}/stock-adjustments", AdjustStockAsync).WithValidation<StockAdjustmentRequest>()
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithName("AdjustIngredientStock").WithSummary("Correct the stock to the counted quantity")
@@ -151,9 +169,28 @@ public static class CatalogEndpoints
         Guid id, [AsParameters] StockMovementListQuery query, StockService stock, CancellationToken ct) =>
         TypedResults.Ok(await stock.ListAsync(id, query, ct));
 
-    private static async Task<Created<StockMovementDto>> AddPurchaseAsync(
-        Guid id, PurchaseRequest request, StockService stock, CancellationToken ct) =>
-        TypedResults.Created($"{IngredientsRoute}/{id}/stock-movements", await stock.AddPurchaseAsync(id, request, ct));
+    private static async Task<Ok<IngredientDto>> AddRecordAsync(
+        Guid id, IngredientRecordRequest request, StockService stock, CancellationToken ct) =>
+        TypedResults.Ok(await stock.AddRecordAsync(id, request, ct));
+
+    private static async Task<NoContent> SetPhotoAsync(Guid id, IFormFile file, EntityPhotoService photos, CancellationToken ct)
+    {
+        await using var content = file.OpenReadStream();
+        await photos.SetAsync(PhotoOwnerKind.Ingredient, id, content, file.Length, ct);
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<FileStreamHttpResult> GetPhotoAsync(Guid id, EntityPhotoService photos, CancellationToken ct)
+    {
+        var photo = await photos.OpenAsync(PhotoOwnerKind.Ingredient, id, ct);
+        return TypedResults.Stream(photo.Content, photo.ContentType);
+    }
+
+    private static async Task<NoContent> DeletePhotoAsync(Guid id, EntityPhotoService photos, CancellationToken ct)
+    {
+        await photos.DeleteAsync(PhotoOwnerKind.Ingredient, id, ct);
+        return TypedResults.NoContent();
+    }
 
     private static async Task<Created<StockMovementDto>> AdjustStockAsync(
         Guid id, StockAdjustmentRequest request, StockService stock, CancellationToken ct) =>

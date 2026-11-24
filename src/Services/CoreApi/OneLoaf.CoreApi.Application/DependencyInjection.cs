@@ -34,6 +34,7 @@ public static class DependencyInjection
         services.AddScoped<Export.ExportService>();
         services.AddScoped<Batches.BatchVariantService>();
         services.AddScoped<History.BakeRecordPhotoService>();
+        services.AddScoped<History.EntityPhotoService>();
         services.AddScoped<CalculationService>();
         services.AddScoped<WarningsService>();
         services.AddScoped<BatchService>();

@@ -178,18 +178,30 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
             new { price = 4.5m, perQuantity = 1000m, currency = "EUR", effectiveFrom = priceFrom });
         await api.CallAsync("UpdateIngredientPrice", "price not found", HttpMethod.Put, $"/api/v1/ingredients/{seeds}/prices/{Missing}",
             new { price = 4.5m, perQuantity = 1000m, currency = "EUR", effectiveFrom = priceFrom });
-        await api.CallAsync("AddIngredientPurchase", "two packs of 250 g", HttpMethod.Post, $"/api/v1/ingredients/{seeds}/purchases",
+        await api.CallAsync("AddIngredientRecord", "two packs of 250 g", HttpMethod.Post, $"/api/v1/ingredients/{seeds}/records",
             new
             {
                 packCount = 2,
                 packSize = 250m,
                 totalCost = 3.20m,
                 currency = "EUR",
-                purchasedOn = today.AddDays(-2).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                date = today.AddDays(-2).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
                 note = "Market",
+                priceOnly = false,
             });
-        await api.CallAsync("AddIngredientPurchase", "no packs", HttpMethod.Post, $"/api/v1/ingredients/{seeds}/purchases",
-            new { packCount = 0, packSize = 250m, totalCost = 3.20m, currency = "EUR", purchasedOn = priceFrom, note = (string?)null });
+        await api.CallAsync("AddIngredientRecord", "price only", HttpMethod.Post, $"/api/v1/ingredients/{salt}/records",
+            new
+            {
+                packCount = 1,
+                packSize = 1000m,
+                totalCost = 0.85m,
+                currency = "EUR",
+                date = today.AddDays(-3).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                note = (string?)null,
+                priceOnly = true,
+            });
+        await api.CallAsync("AddIngredientRecord", "no packs", HttpMethod.Post, $"/api/v1/ingredients/{seeds}/records",
+            new { packCount = 0, packSize = 250m, totalCost = 3.20m, currency = "EUR", date = priceFrom, note = (string?)null, priceOnly = false });
         await api.CallAsync("GetIngredient", "with kept stock", HttpMethod.Get, $"/api/v1/ingredients/{seeds}");
         await api.CallAsync("AdjustIngredientStock", "typical", HttpMethod.Post, $"/api/v1/ingredients/{seeds}/stock-adjustments",
             new { actualQuantity = 430m, note = "Counted the shelf" });
@@ -311,7 +323,7 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
             new { fedAt = DateTimeOffset.UtcNow.AddHours(-1), flourG = 50m, waterG = 50m, starterKeptG = 20m, temperatureC = 24m });
         await api.CallAsync("ListFeedings", "typical", HttpMethod.Get, $"/api/v1/starters/{starter}/feedings");
         var spareStarter = Id(await api.CallAsync("CreateStarter", "fridge starter", HttpMethod.Post, "/api/v1/starters",
-            new { name = "Fridge levain", hydrationPercent = 80m, feedingMode = "fridge", feedingIntervalHours = 168 }));
+            new { name = "Fridge levain", hydrationPercent = 80m, feedingMode = "fridge", feedingIntervalHours = 168, riseHours = 10m, usableShare = 0.5m }));
         await api.CallAsync("DeleteStarter", "typical", HttpMethod.Delete, $"/api/v1/starters/{spareStarter}");
 
         // Batches: one is baked through to the end, one shows the stage controls and is cancelled
