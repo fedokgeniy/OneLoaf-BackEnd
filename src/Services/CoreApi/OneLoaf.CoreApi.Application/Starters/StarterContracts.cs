@@ -59,9 +59,11 @@ public sealed record StarterDto(
 /// <param name="StarterKeptG">Starter kept, g.</param>
 /// <param name="TemperatureC">Room temperature.</param>
 /// <param name="Note">Note.</param>
+/// <param name="FlourIngredientId">Flour ingredient of this feeding; the usual flour of the starter when null.</param>
+/// <param name="WaterIngredientId">Water ingredient of this feeding; the usual water of the starter when null.</param>
 public sealed record FeedingRequest(
     DateTimeOffset FedAt, decimal FlourG, decimal WaterG, decimal? StarterKeptG = null, decimal? TemperatureC = null,
-    string? Note = null);
+    string? Note = null, Guid? FlourIngredientId = null, Guid? WaterIngredientId = null);
 
 /// <summary>A feeding with the schedule computed by the database.</summary>
 /// <param name="Id">Id.</param>
@@ -73,9 +75,11 @@ public sealed record FeedingRequest(
 /// <param name="NextFeedingAt">Next feeding (US-28).</param>
 /// <param name="ExpectedPeakAt">Expected peak (US-30).</param>
 /// <param name="Note">Note.</param>
+/// <param name="FlourIngredientId">Flour ingredient the feeding used.</param>
+/// <param name="WaterIngredientId">Water ingredient the feeding used.</param>
 public sealed record FeedingDto(
     Guid Id, DateTimeOffset FedAt, decimal FlourG, decimal WaterG, decimal? StarterKeptG, decimal? TemperatureC,
-    DateTimeOffset? NextFeedingAt, DateTimeOffset? ExpectedPeakAt, string? Note);
+    DateTimeOffset? NextFeedingAt, DateTimeOffset? ExpectedPeakAt, string? Note, Guid? FlourIngredientId = null, Guid? WaterIngredientId = null);
 
 /// <summary>Query of <c>GET /starters</c> and <c>GET /starters/{id}/feedings</c>.</summary>
 /// <param name="Page">Page, from 1.</param>

@@ -23,6 +23,45 @@ public sealed class StockTests(ApiFixture fixture)
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
 
     [Fact]
+    public async Task Feeding_NamesItsFlour_TakesItFromTheStockAndPricesTheStarter()
+    {
+        using var anna = fixture.CreateClientAs(Seed.Anna);
+        async Task<IngredientDto> Bought(string name, decimal totalCost)
+        {
+            var created = await (await anna.PostAsJsonAsync(Ingredients, new IngredientRequest(name, "flour", "g", null),
+                CoreApiFactory.Json, Ct)).ReadAsync<IngredientDto>();
+            return await (await anna.PostAsJsonAsync($"{Ingredients}/{created.Id}/records",
+                new IngredientRecordRequest(1, 1000, totalCost, "EUR", new DateOnly(2026, 11, 20)), CoreApiFactory.Json, Ct)).ReadAsync<IngredientDto>();
+        }
+
+        var wheat = await Bought("Feeding test wheat", 2m);
+        var rye = await Bought("Feeding test rye", 4m);
+        var starter = await (await anna.PostAsJsonAsync("/api/v1/starters",
+            new StarterRequest("Feeding test starter", 100, FeedingMode.Regular, 24, RiseHours: 6, FlourIngredientId: wheat.Id),
+            CoreApiFactory.Json, Ct)).ReadAsync<StarterDto>();
+        async Task<IngredientDto> Ingredient(Guid id) => await (await anna.GetAsync($"{Ingredients}/{id}", Ct)).ReadAsync<IngredientDto>();
+
+        // The usual flour: 50 g of wheat at 0.002 per gram and 50 g of tap water make 100 g of starter for 0.10.
+        var usual = await (await anna.PostAsJsonAsync($"/api/v1/starters/{starter.Id}/feedings",
+            new FeedingRequest(DateTimeOffset.UtcNow.AddHours(-2), 50, 50), CoreApiFactory.Json, Ct)).ReadAsync<FeedingDto>();
+        Assert.Equal(wheat.Id, usual.FlourIngredientId);
+        Assert.Equal(950m, (await Ingredient(wheat.Id)).Stock);
+        Assert.Equal(0.001m, (await Ingredient(starter.IngredientId!.Value)).CurrentPrice!.UnitPrice);
+
+        // Another flour for one feeding: 100 g of rye at 0.004 and 100 g of water, with 100 g of starter kept at 0.001.
+        var other = await (await anna.PostAsJsonAsync($"/api/v1/starters/{starter.Id}/feedings",
+            new FeedingRequest(DateTimeOffset.UtcNow.AddHours(-1), 100, 100, 100, FlourIngredientId: rye.Id), CoreApiFactory.Json, Ct)).ReadAsync<FeedingDto>();
+        Assert.Equal(rye.Id, other.FlourIngredientId);
+        Assert.Equal(900m, (await Ingredient(rye.Id)).Stock);
+        Assert.Equal(950m, (await Ingredient(wheat.Id)).Stock);
+        Assert.Equal(Math.Round(0.5m / 300m, 6), Math.Round((await Ingredient(starter.IngredientId.Value)).CurrentPrice!.UnitPrice, 6));
+
+        using var foreign = await anna.PostAsJsonAsync($"/api/v1/starters/{starter.Id}/feedings",
+            new FeedingRequest(DateTimeOffset.UtcNow, 10, 10, FlourIngredientId: Guid.NewGuid()), CoreApiFactory.Json, Ct);
+        Assert.Equal(HttpStatusCode.BadRequest, foreign.StatusCode);
+    }
+
+    [Fact]
     public async Task Stock_PurchaseBatchFeedingAndCorrection_KeepTheLedger()
     {
         using var anna = fixture.CreateClientAs(Seed.Anna);

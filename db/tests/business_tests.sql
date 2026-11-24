@@ -279,12 +279,22 @@ SELECT pg_temp.check_equal('the next feeding returns the ripe starter to the jar
     (SELECT string_agg(movement_type || ' ' || trim_scale(quantity), ', ' ORDER BY created_at, quantity)
      FROM stock_movements WHERE ingredient_id = (SELECT ingredient_id FROM starters WHERE id = :mother)),
     'starter_refed -80.04, starter_ripened 80.04, starter_ripened 80.04');
+SELECT pg_temp.check_equal('a feeding uses the usual flour of its starter unless another is named',
+    (SELECT count(*) FROM starter_feedings WHERE starter_id = :mother AND flour_ingredient_id = :flour), 3::bigint);
+SELECT pg_temp.check_equal('a starter costs what it was fed: equal parts of flour and free water are half the flour price',
+    (SELECT round(sp.price / sp.per_quantity / (fp.price / fp.per_quantity / u.factor_to_base), 3)
+     FROM starters s
+     CROSS JOIN LATERAL fn_price_on_date(s.ingredient_id, (now() + interval '14 hours')::date) sp
+     CROSS JOIN LATERAL fn_price_on_date(:flour, current_date) fp
+     JOIN ingredients i ON i.id = :flour JOIN units u ON u.code = i.unit_code
+     WHERE s.id = :mother), 0.5::numeric);
 UPDATE starters SET name = 'Rye mother renamed' WHERE id = :mother;
 SELECT pg_temp.check_equal('renaming a starter renames its ingredient',
     (SELECT i.name FROM starters s JOIN ingredients i ON i.id = s.ingredient_id WHERE s.id = :mother), 'Rye mother renamed');
 UPDATE starters SET name = 'Rye mother' WHERE id = :mother;
 
 DELETE FROM starter_feedings WHERE id IN (SELECT feeding_id FROM stock_movements WHERE feeding_id IS NOT NULL);
+DELETE FROM ingredient_prices WHERE ingredient_id IN (SELECT ingredient_id FROM starters WHERE owner_id = :anna);
 DELETE FROM stock_movements WHERE ingredient_id = :flour OR ingredient_id IN (SELECT ingredient_id FROM starters WHERE owner_id = :anna);
 UPDATE starters SET flour_ingredient_id = NULL WHERE owner_id = :anna;
 UPDATE ingredients SET track_stock = false, reorder_level = NULL WHERE id = :flour;

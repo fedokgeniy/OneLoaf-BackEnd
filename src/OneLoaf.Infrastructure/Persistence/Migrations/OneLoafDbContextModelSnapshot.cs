@@ -2229,6 +2229,10 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .HasColumnType("numeric(8,1)")
                         .HasColumnName("flour_g");
 
+                    b.Property<Guid?>("FlourIngredientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("flour_ingredient_id");
+
                     b.Property<DateTime?>("NextFeedingAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("next_feeding_at");
@@ -2257,8 +2261,18 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .HasColumnType("numeric(8,1)")
                         .HasColumnName("water_g");
 
+                    b.Property<Guid?>("WaterIngredientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("water_ingredient_id");
+
                     b.HasKey("Id")
                         .HasName("pk_starter_feedings");
+
+                    b.HasIndex("FlourIngredientId")
+                        .HasDatabaseName("ix_starter_feedings_flour_ingredient_id");
+
+                    b.HasIndex("WaterIngredientId")
+                        .HasDatabaseName("ix_starter_feedings_water_ingredient_id");
 
                     b.HasIndex("StarterId", "FedAt")
                         .HasDatabaseName("ix_starter_feedings_starter_id_fed_at");
@@ -3080,6 +3094,12 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("OneLoaf.Domain.Entities.StarterFeeding", b =>
                 {
+                    b.HasOne("OneLoaf.Domain.Entities.Ingredient", "FlourIngredient")
+                        .WithMany()
+                        .HasForeignKey("FlourIngredientId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_starter_feedings_ingredients_flour_ingredient_id");
+
                     b.HasOne("OneLoaf.Domain.Entities.Starter", "Starter")
                         .WithMany("Feedings")
                         .HasForeignKey("StarterId")
@@ -3087,7 +3107,17 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_starter_feedings_starters_starter_id");
 
+                    b.HasOne("OneLoaf.Domain.Entities.Ingredient", "WaterIngredient")
+                        .WithMany()
+                        .HasForeignKey("WaterIngredientId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_starter_feedings_ingredients_water_ingredient_id");
+
+                    b.Navigation("FlourIngredient");
+
                     b.Navigation("Starter");
+
+                    b.Navigation("WaterIngredient");
                 });
 
             modelBuilder.Entity("OneLoaf.Domain.Entities.StockMovement", b =>

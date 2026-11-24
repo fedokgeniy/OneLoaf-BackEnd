@@ -45,12 +45,18 @@ public class StarterFeeding
     public decimal FlourG { get; set; }
     public decimal WaterG { get; set; }
     public decimal? StarterKeptG { get; set; }
+    /// <summary>Flour ingredient this feeding used; the usual flour of the starter when not chosen.</summary>
+    public Guid? FlourIngredientId { get; set; }
+    /// <summary>Water ingredient this feeding used; the usual water of the starter when not chosen.</summary>
+    public Guid? WaterIngredientId { get; set; }
     public decimal? TemperatureC { get; set; }
     public DateTime? NextFeedingAt { get; set; }
     public DateTime? ExpectedPeakAt { get; set; }
     public string? Note { get; set; }
 
     public Starter Starter { get; set; } = null!;
+    public Ingredient? FlourIngredient { get; set; }
+    public Ingredient? WaterIngredient { get; set; }
 }
 
 /// <summary>E6, US-29. Scheduled notification, processed by the Notification service.</summary>

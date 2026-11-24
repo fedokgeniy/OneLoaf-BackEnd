@@ -77,6 +77,9 @@ public sealed partial class StarterService(
             throw new NotFoundException(NotFoundMessage);
         }
 
+        // A starter can be fed with another flour or water than usual; the price of the starter follows what it was fed.
+        await EnsureIngredientAsync(request.FlourIngredientId, "flourIngredientId", cancellationToken);
+        await EnsureIngredientAsync(request.WaterIngredientId, "waterIngredientId", cancellationToken);
         var feeding = await starters.AddFeedingAsync(id, request, cancellationToken);
         LogFed(logger, id, currentUser.Id);
         await events.PublishAsync(new StarterFed(id, currentUser.Id, feeding.FedAt, feeding.NextFeedingAt, feeding.ExpectedPeakAt,

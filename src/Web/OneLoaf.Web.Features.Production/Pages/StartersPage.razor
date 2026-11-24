@@ -97,7 +97,7 @@
                                                 {
                                                     <li @key="feeding.Id">
                                                         <span class="ol-num">@When(feeding.FedAt)</span>
-                                                        <span>@DisplayFormat.Grams(feeding.FlourG) flour · @DisplayFormat.Grams(feeding.WaterG) water@(feeding.StarterKeptG is { } kept ? $" · kept {DisplayFormat.Grams(kept)}" : null)@(feeding.TemperatureC is { } t ? $" · {DisplayFormat.Number(t, 1)} °C" : null)</span>
+                                                        <span>@DisplayFormat.Grams(feeding.FlourG) @(IngredientName(feeding.FlourIngredientId) ?? "flour") · @DisplayFormat.Grams(feeding.WaterG) @(IngredientName(feeding.WaterIngredientId) ?? "water")@(feeding.StarterKeptG is { } kept ? $" · kept {DisplayFormat.Grams(kept)}" : null)@(feeding.TemperatureC is { } t ? $" · {DisplayFormat.Number(t, 1)} °C" : null)</span>
                                                     </li>
                                                 }
                                             </ul>
@@ -127,8 +127,11 @@
                 <ObjectGraphValidation />
                 <ServerValidation @ref="_server" />
                 <div class="form-grid__wide"><OlTextField Label="Fed at" Type="datetime-local" @bind-Value="_feeding.FedAt" /></div>
+                <OlSelect Label="Fed with flour" Options="@IngredientOptions("flour")" Placeholder="Not specified" @bind-Value="_feeding.FlourIngredientId" />
                 <OlNumberField TValue="decimal?" Label="Flour" Suffix="g" @bind-Value="_feeding.FlourG" />
+                <OlSelect Label="Fed with water" Options="@IngredientOptions("water")" Placeholder="Tap water, no cost" @bind-Value="_feeding.WaterIngredientId" />
                 <OlNumberField TValue="decimal?" Label="Water" Suffix="g" @bind-Value="_feeding.WaterG" />
+                <p class="ol-field__help form-grid__wide">The starter costs what it is fed: its price is set from the prices of this flour and water.</p>
                 <OlNumberField TValue="decimal?" Label="Starter kept" Suffix="g" Help="What is left in the jar from the last feeding; lower it if you discarded some." @bind-Value="_feeding.StarterKeptG" />
                 <OlNumberField TValue="decimal?" Label="Temperature" Suffix="°C" @bind-Value="_feeding.TemperatureC" />
                 <div class="form-grid__wide"><OlTextField Label="Note" @bind-Value="_feeding.Note" /></div>
@@ -189,6 +192,12 @@
             ? $"ripening until {When(peak)}"
             : DisplayFormat.Grams(starter.UsableG ?? 0m);
 
+    private IReadOnlyList<SelectOption> IngredientOptions(string category) =>
+        State.Value.Ingredients.Where(i => i.CategoryCode == category).OrderBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
+            .Select(i => new SelectOption(i.Id.ToString(), i.Name)).ToList();
+
+    private string? IngredientName(Guid? id) => State.Value.Ingredients.FirstOrDefault(i => i.Id == id)?.Name;
+
     private void OpenFeeding(StarterDto starter)
     {
         _error = null;
@@ -199,6 +208,10 @@
 
             // What the API says is in the jar: the reserve plus the ripe starter no batch has used.
             StarterKeptG = starter.SuggestedKeptG,
+
+            // The usual flour and water of the starter; another one can be chosen for this feeding.
+            FlourIngredientId = starter.FlourIngredientId?.ToString(),
+            WaterIngredientId = starter.WaterIngredientId?.ToString(),
         };
     }
 
