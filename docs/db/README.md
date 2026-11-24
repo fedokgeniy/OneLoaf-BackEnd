@@ -51,7 +51,7 @@ generated from it.
 | Requirement | Where |
 |---|---|
 | Structure created by scripts or migrations, not manually | EF Core migrations and `db/schema.sql`; see [Getting started](#getting-started) |
-| Scripts and migrations in Git | [`src/OneLoaf.Infrastructure/Persistence/Migrations/`](../../src/OneLoaf.Infrastructure/Persistence/Migrations) (11 migrations and their SQL scripts), [`db/`](../../db) |
+| Scripts and migrations in Git | [`src/OneLoaf.Infrastructure/Persistence/Migrations/`](../../src/OneLoaf.Infrastructure/Persistence/Migrations) (12 migrations and their SQL scripts), [`db/`](../../db) |
 | Scripts for reference tables | `InitialSchema` migration (EF Core `HasData`, [`ReferenceData.cs`](../../src/OneLoaf.Infrastructure/Persistence/ReferenceData.cs)); values in the [dictionary](data-dictionary.md#reference-values) |
 | Test data covering edge cases | [`db/seed/test_data.sql`](../../db/seed/test_data.sql) (5 users, every status; the edge cases are listed in the file header); volume data in [`db/seed/volume_data.sql`](../../db/seed/volume_data.sql) |
 
@@ -162,7 +162,7 @@ src/
       ModelConventions.cs             snake_case, enum as text + CHECK, defaults
       ReferenceData.cs                reference data
       Configurations/                 keys, indexes, CHECK, ON DELETE (Fluent API)
-      Migrations/                     11 migrations
+      Migrations/                     12 migrations
         Sql/<Migration>/*.sql         functions, triggers, procedures, views, privileges
   OneLoaf.DbMigrator/                 console application that applies the migrations
 db/

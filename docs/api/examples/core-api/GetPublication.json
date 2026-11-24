@@ -2,17 +2,17 @@
   {
     "case": "anonymous",
     "method": "GET",
-    "path": "/api/v1/library/2e8a953f-51ab-418a-b265-bd2152a57a6d",
+    "path": "/api/v1/library/8ac591d6-0f8a-4cf0-871c-db37438ac6d1",
     "authenticated": false,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "2e8a953f-51ab-418a-b265-bd2152a57a6d",
+      "id": "8ac591d6-0f8a-4cf0-871c-db37438ac6d1",
       "title": "Country sourdough",
       "description": "Open crumb, crisp crust.",
       "authorName": "Docs Baker",
       "status": "published",
-      "publishedAt": "2026-11-24T21:18:04.95695+00:00",
+      "publishedAt": "2026-11-24T23:42:13.745056+00:00",
       "snapshot": {
         "stages": [
           {
@@ -98,7 +98,8 @@
       "commentCount": 0,
       "reactions": {},
       "myReaction": null,
-      "isMine": false
+      "isMine": false,
+      "hasPhoto": false
     }
   },
   {
@@ -114,8 +115,8 @@
       "status": 404,
       "detail": "Publication not found.",
       "instance": "/api/v1/library/00000000-0000-4000-9999-000000000000",
-      "traceId": "00-6ecdcce4b970e39fac506a81d1f7ba7d-f8d2e0866923c143-02",
-      "correlationId": "7576699655614316a47a250f30d77264"
+      "traceId": "00-c4707fbbeb5a4ef1e4539f70658a22ac-7596309f147f3e0f-02",
+      "correlationId": "ca8ed96fe5d04789bd2e8c9d5f1717f3"
     }
   }
 ]

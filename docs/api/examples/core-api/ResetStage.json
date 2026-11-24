@@ -2,12 +2,12 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/batches/e7bf51f2-8140-4a25-8388-e6672123c859/stages/9bab8de0-d25d-4543-9a48-c2693183fdc8/reset",
+    "path": "/api/v1/batches/13eff78d-632b-41b5-890b-c44955c39894/stages/fb45532e-261c-4788-b4bf-52ccd2757a55/reset",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "e7bf51f2-8140-4a25-8388-e6672123c859",
+      "id": "13eff78d-632b-41b5-890b-c44955c39894",
       "name": "Weekday bake",
       "status": "planned",
       "source": "manual",
@@ -16,24 +16,24 @@
       "plannedReadyTo": "2026-11-30T00:20:00+00:00",
       "actualStartAt": null,
       "completedAt": null,
-      "priceDate": "2026-11-24",
+      "priceDate": "2026-11-25",
       "totalCost": 8.95,
       "currency": "EUR",
       "notes": null,
       "items": [
         {
-          "id": "e2c544f7-605a-4544-817c-b46799b84836",
-          "recipeId": "699803e1-119d-4ea6-80fb-0938962fc855",
+          "id": "c69843d7-6ed2-4856-ad0a-211f7c5b87a7",
+          "recipeId": "0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "797cc670-8bdb-4748-9add-b7c0a31fa8cc",
+          "starterId": "172b8904-4aa5-498c-b4df-0d8b7643d345",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
-          "starterReminderMinutes": 60,
+          "starterReminderMinutes": 480,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "20fbc299-0454-4b4a-88a4-3197810dd87a",
+              "id": "2d5a9fb5-957b-44e3-8711-554b862087fe",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
@@ -51,7 +51,7 @@
               "note": null
             },
             {
-              "id": "9bab8de0-d25d-4543-9a48-c2693183fdc8",
+              "id": "fb45532e-261c-4788-b4bf-52ccd2757a55",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
@@ -69,7 +69,7 @@
               "note": null
             },
             {
-              "id": "d6d92e66-f245-4ce8-bde9-a912e9fb5991",
+              "id": "91d0a31b-8c43-4c45-9d73-495c2b99181c",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
@@ -87,7 +87,7 @@
               "note": null
             },
             {
-              "id": "947583e7-6155-4064-b46a-f70b5c0540cd",
+              "id": "053b9286-03f7-4e69-b81a-e74e917fc678",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
@@ -105,7 +105,7 @@
               "note": null
             },
             {
-              "id": "47b874e8-62d5-463a-8ef7-8d403febf0e2",
+              "id": "11edd9df-2bd9-4f2a-bd46-84b7a9ebe655",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",
@@ -133,7 +133,7 @@
   {
     "case": "stage already running",
     "method": "POST",
-    "path": "/api/v1/batches/e7bf51f2-8140-4a25-8388-e6672123c859/stages/20fbc299-0454-4b4a-88a4-3197810dd87a/reset",
+    "path": "/api/v1/batches/13eff78d-632b-41b5-890b-c44955c39894/stages/2d5a9fb5-957b-44e3-8711-554b862087fe/reset",
     "authenticated": true,
     "status": 409,
     "responseContentType": "application/problem+json",
@@ -142,9 +142,9 @@
       "title": "The request conflicts with existing data.",
       "status": 409,
       "detail": "The action is not allowed for the stage in its current state.",
-      "instance": "/api/v1/batches/e7bf51f2-8140-4a25-8388-e6672123c859/stages/20fbc299-0454-4b4a-88a4-3197810dd87a/reset",
-      "traceId": "00-5b36b0ea9cb8698a8132bd1fe5f56338-34275b95e5c0973c-02",
-      "correlationId": "c79bd214a9fe409796713f3bda4b079d"
+      "instance": "/api/v1/batches/13eff78d-632b-41b5-890b-c44955c39894/stages/2d5a9fb5-957b-44e3-8711-554b862087fe/reset",
+      "traceId": "00-5c466234c49e5bd65f83e5152c707b99-32365423d4a669c5-02",
+      "correlationId": "b09306210f1b41d69ed91647e6c3f8af"
     }
   }
 ]

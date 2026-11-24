@@ -9,16 +9,17 @@
     "responseBody": {
       "items": [
         {
-          "id": "2e8a953f-51ab-418a-b265-bd2152a57a6d",
+          "id": "8ac591d6-0f8a-4cf0-871c-db37438ac6d1",
           "title": "Country sourdough",
           "description": "Open crumb, crisp crust.",
           "authorName": "Docs Baker",
-          "publishedAt": "2026-11-24T21:18:04.95695+00:00",
+          "publishedAt": "2026-11-24T23:42:13.745056+00:00",
           "yieldLoaves": 1,
           "ingredientCount": 4,
           "stageCount": 5,
           "commentCount": 0,
-          "reactionCount": 0
+          "reactionCount": 0,
+          "hasPhoto": false
         }
       ],
       "page": 1,

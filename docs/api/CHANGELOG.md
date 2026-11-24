@@ -21,6 +21,12 @@ versions follow [semantic versioning](guides/versioning.md). Dates are UTC.
   `waterIngredientId` (default: the usual ones of the starter) and takes them from the stock. **The price of a starter
   is what it was fed**: after every feeding the cost of the fed starter (flour and water at their prices of that day,
   the kept starter at its previous price) becomes the price of its ingredient, so recipes with a starter have a cost.
+- **Photos in the library and the history**: `GET /library/{id}/photo` (anonymous) returns the photo of the recipe a
+  publication was made from, `hasPhoto` marks such publications; a bake record in the list names its first crumb photo
+  (`coverPhotoId`).
+- **Ingredient choices when a published recipe is copied**: `POST /library/{id}/copy` takes an optional body that, per
+  ingredient of the recipe, names an own ingredient to use instead (same unit) or the quantity of a new one on the shelf;
+  the copy is one transaction.
 - **Photos of ingredients and recipes**: `PUT`, `GET` and `DELETE …/photo` (one photo each, same checks as crumb photos).
 - **Recipe drafts**: `POST /recipes/drafts` creates a recipe together with its missing ingredients in one transaction;
   the assistant proposes such a recipe (`create_recipe` action) and saves it only after the confirmation.
@@ -37,6 +43,10 @@ versions follow [semantic versioning](guides/versioning.md). Dates are UTC.
   cookie, so signing out works with an expired access token.
 - Cancelling or deleting a batch takes `ingredientsUsed`: when false, the ingredients return to the stock.
 - A starter requires its time to peak (`riseHours`).
+- The starter reminder of a batch item is a reminder to **feed** the starter: the request takes `remindToFeedStarter`
+  instead of `starterReminderMinutes`, and the reminder is due the time to peak of the starter before kneading (the
+  response still reports that lead as `starterReminderMinutes`).
+- The assistant uses `claude-haiku-5-5` by default (`Anthropic__Model`), with thinking switched off.
 
 ### Fixed
 

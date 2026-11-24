@@ -27,7 +27,7 @@
       "laborRatePerHour": 12.00,
       "currency": "EUR",
       "timeZone": "Europe/Vilnius",
-      "updatedAt": "2026-11-24T21:18:01.867475+00:00"
+      "updatedAt": "2026-11-24T23:42:10.820184+00:00"
     }
   },
   {
@@ -58,8 +58,8 @@
           "'Time Zone' must be an IANA time zone, for example Europe/Vilnius."
         ]
       },
-      "traceId": "00-b6ac1dc44b0aaba47debf395cb3c9575-9d33fbd13131854e-02",
-      "correlationId": "4d3ae2cab410475096c9902534ace6f7"
+      "traceId": "00-3bf33c9678081c5487adca9a1c1166c9-12dd776738ecbd98-02",
+      "correlationId": "22dfd48a1da84e678a03fa89eaafe820"
     }
   }
 ]

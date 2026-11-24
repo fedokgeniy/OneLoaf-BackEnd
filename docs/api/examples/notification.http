@@ -17,7 +17,7 @@ Authorization: Bearer {{token}}
 Content-Type: application/json
 
 {
-  "endpoint": "https://fcm.googleapis.com/fcm/send/docs-704aa8e28bc648b8a35edbe8c4bb47c9",
+  "endpoint": "https://fcm.googleapis.com/fcm/send/docs-b7e54de68da0454f91a50cdc84b06912",
   "keys": {
     "p256dh": "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM",
     "auth": "tBHItJI5svbpez7KI4CCXg"
@@ -25,7 +25,7 @@ Content-Type: application/json
 }
 
 ### Remove a device
-DELETE {{baseUrl}}/api/v1/push/subscriptions/cec8cb4d-2805-44fd-a32d-8f1f7a56318d
+DELETE {{baseUrl}}/api/v1/push/subscriptions/963df6a3-1c8e-4ee8-9e98-4ad4b82cc74c
 Authorization: Bearer {{token}}
 
 ### Send a test notification to own devices

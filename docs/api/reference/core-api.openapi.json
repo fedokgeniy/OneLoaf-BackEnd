@@ -6028,6 +6028,40 @@
         }
       }
     },
+    "/api/v1/library/{id}/photo": {
+      "get": {
+        "tags": [
+          "Library"
+        ],
+        "summary": "The photo of a published recipe",
+        "description": "Anonymous. The photo of the recipe the publication was made from; 404 without a photo or for a hidden publication.",
+        "operationId": "GetPublicationPhoto",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/library/{id}/comments": {
       "get": {
         "tags": [
@@ -6431,7 +6465,7 @@
           "Library"
         ],
         "summary": "Copy a published recipe into the own workspace",
-        "description": "US-42. Creates an independent recipe; ingredients are matched to the own catalog by name or created.",
+        "description": "US-42. Creates an independent recipe. The optional body says, per ingredient of the published recipe, which own ingredient to use instead (same unit) or how much of a new one is on the shelf; without a choice an ingredient is matched to the own catalog by name or created.",
         "operationId": "CopyPublication",
         "parameters": [
           {
@@ -6445,6 +6479,22 @@
             }
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/CopyPublicationRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
         "responses": {
           "401": {
             "description": "Unauthorized",
@@ -7155,6 +7205,14 @@
             "description": "Crumb photos of the record (US-51).",
             "format": "int32",
             "default": 0
+          },
+          "coverPhotoId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The first photo of the record, shown in the list; null without photos.",
+            "format": "uuid"
           }
         },
         "description": "History record in a list (US-33)."
@@ -7422,7 +7480,7 @@
               "null",
               "integer"
             ],
-            "description": "Starter reminder before kneading, minutes.",
+            "description": "Feeding reminder before kneading, minutes (the time to peak of the starter); null = no reminder.",
             "format": "int32"
           },
           "sortOrder": {
@@ -7465,13 +7523,10 @@
             "description": "Starter of the user.",
             "format": "uuid"
           },
-          "starterReminderMinutes": {
-            "type": [
-              "null",
-              "integer"
-            ],
-            "description": "Minutes before kneading to remind about the starter; null = no reminder.",
-            "format": "int32"
+          "remindToFeedStarter": {
+            "type": "boolean",
+            "description": "Remind to feed the starter early enough to be ripe for kneading: its time to peak before the first kneading stage.",
+            "default": false
           }
         },
         "description": "Item of a batch request: a recipe, a number of loaves and the starter to use."
@@ -7824,6 +7879,51 @@
           }
         },
         "description": "Result of POST /batches/{id}/complete (US-31)."
+      },
+      "CopyIngredientChoice": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the ingredient in the published recipe."
+          },
+          "useIngredientId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Own ingredient to use instead (same unit), so that another name for the same product makes no duplicate; null adds the ingredient to the own catalog.",
+            "format": "uuid"
+          },
+          "stockQuantity": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "For an added ingredient: how much of it is on the shelf, in its unit; null keeps no stock.",
+            "format": "double"
+          }
+        },
+        "description": "What happens to one ingredient of a published recipe when it is copied."
+      },
+      "CopyPublicationRequest": {
+        "type": "object",
+        "properties": {
+          "ingredients": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/CopyIngredientChoice"
+            },
+            "description": "What to do with ingredients of the published recipe."
+          }
+        },
+        "description": "Body of POST /library/{id}/copy (US-42); optional. Without a choice for an ingredient it is matched to the own catalog by name or created."
       },
       "CostBreakdownDto": {
         "required": [
@@ -9054,6 +9154,11 @@
             "type": "integer",
             "description": "Reactions.",
             "format": "int64"
+          },
+          "hasPhoto": {
+            "type": "boolean",
+            "description": "The recipe has a photo (GET /library/{id}/photo).",
+            "default": false
           }
         },
         "description": "A publication in the catalog (v_public_catalog)."
@@ -9884,6 +9989,11 @@
           "isMine": {
             "type": "boolean",
             "description": "The current user is the author."
+          },
+          "hasPhoto": {
+            "type": "boolean",
+            "description": "The recipe has a photo (GET /library/{id}/photo).",
+            "default": false
           }
         },
         "description": "A publication with its snapshot."

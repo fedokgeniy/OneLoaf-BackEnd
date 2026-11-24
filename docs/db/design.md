@@ -201,6 +201,7 @@ The database structure is created and changed **only by EF Core migrations** sto
 | 9 | `StarterIngredients` | A starter is a kind of ingredient (`starters.ingredient_id`, one name kept in step by triggers, usable share); ripened starter becomes stock at its peak (`stock_movements.available_at`, `fn_stock_balance_at`); the batch stock check uses the stock at the planned start; photo columns of ingredients and recipes |
 | 10 | `RefreshTokens` | Table `refresh_tokens`: SHA-256 hashes of the rotating refresh tokens with the family of one sign-in, the expiry and the rotation and revocation times; `sp_anonymize_user` also deletes the tokens of the user |
 | 11 | `StarterFeedingIngredients` | A feeding names the flour and the water it used (`starter_feedings.flour_ingredient_id`, `water_ingredient_id`, default: the usual ones of the starter); `fn_starter_feeding_cost` and the feeding trigger store the cost of the fed starter as the price of its ingredient |
+| 12 | `StarterFeedingReminder` | The reminder of a batch item with a starter tells the baker to feed it: `sp_build_batch_plan` writes it for the time to peak of the starter before the first kneading stage (the lead the Core API stores in `batch_items.starter_reminder_minutes`) |
 
 **Rules**
 

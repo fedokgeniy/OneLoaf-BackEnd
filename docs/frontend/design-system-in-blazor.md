@@ -44,7 +44,8 @@ shown on the `Components-States` board, and has a bUnit test for the states that
 | `OlCard` | RecipeCard · `.ol-card` `__media` `__body` `__overline` `__title` `__meta` `__foot`, `--interactive` | `Href`, `Media`, slots | media 3:2 with `object-fit: cover`; whole card is one link |
 | `OlStatTile`, `OlStats` | StatTile · `.ol-stat` | `Label`, `Value`, `Hint` | skeleton variant |
 | `OlTable` | CostTable · `.ol-table-wrap` `.ol-table` | columns + rows template; stacked rows on compact | header `scope`, caption (visually hidden) |
-| `OlStageItem` | StageItem · `.ol-stage` `.is-running/.is-done/.is-skipped` | stage view model, `OnStart`, `OnComplete`, `OnExtend` | upcoming, running, done, skipped; actions one full-width row |
+| `OlStageItem` | StageItem · `.ol-stage` `.is-running/.is-done/.is-skipped` | stage view model, `OnStart`, `OnComplete`, `OnSkip`, `OnAdjust` (stage + minutes), `OnReset` | upcoming, running, done, skipped; the main action on the left, *Adjust* on the right, a time slider under them |
+| `OlCardPhoto` | Card · `.ol-card__media` | `Src`, `Loading` | photo of a card (3:2) or a quiet placeholder, so the cards of a grid keep one height |
 | `OlDialog` | Dialog · `.ol-dialog` `.ol-scrim` `__handle` | `Open`, `Title`, `OnClose`, `Foot` | bottom sheet on compact, centred on medium+; focus trap, Esc, return focus |
 | `OlConfirmDialog` | Dialog · on top of `OlDialog` | `Open`, `Title`, `ConfirmText`, `Busy`, `OnConfirm`, `OnClose` | confirmation of a destructive action: what is removed, *Keep it* and the danger button |
 | `OlEmptyState` | EmptyState · `.ol-empty` | `Title`, `Text`, `Action` | |
