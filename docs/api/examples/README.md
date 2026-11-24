@@ -11,5 +11,5 @@ The exchanges were recorded against the real services (PostgreSQL, RabbitMQ and 
 a scripted stub), so status codes and bodies are what the API really returns. Ids, timestamps and correlation ids differ
 on every run; access tokens are redacted.
 
-Every one of the 102 operations has at least one example; most also show an error case (validation, not found,
+Every one of the 116 operations has at least one example; most also show an error case (validation, not found,
 conflict, wrong state, missing token).

@@ -2,12 +2,12 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/recipes/6c9969ad-cecd-4df5-9c64-616f46e999c3/start-window?readyAt=2026-11-27T08%3A00%3A00%2B02%3A00",
+    "path": "/api/v1/recipes/b8713bc1-2834-4a1a-b594-ff73be15e7b8/start-window?readyAt=2026-11-27T08%3A00%3A00%2B02%3A00",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "recipeId": "6c9969ad-cecd-4df5-9c64-616f46e999c3",
+      "recipeId": "b8713bc1-2834-4a1a-b594-ff73be15e7b8",
       "readyAt": "2026-11-27T08:00:00+02:00",
       "startFrom": "2026-11-26T13:40:00+02:00",
       "startTo": "2026-11-26T16:55:00+02:00"

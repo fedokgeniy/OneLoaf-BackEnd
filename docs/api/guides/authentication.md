@@ -72,11 +72,14 @@ endpoints by its path (`Jwt__RefreshCookiePath`). The token never appears in a r
 |---|---|
 | `POST /api/v1/auth/refresh` (cookie sent by the browser) | `200 {accessToken, expiresAt, user}` and the next refresh cookie |
 | the same with a missing, expired or revoked token | `401`; the cookie is removed |
-| the same with a token that was already exchanged | `401`, and **every token of that sign-in is revoked** |
+| the same with a token that was exchanged more than 30 seconds ago | `401`, and **every token of that sign-in is revoked** |
 
 - **Rotation.** Every exchange replaces the refresh token; the old one is marked as used.
 - **Reuse detection.** A used token that shows up again means it was copied. The whole family (all tokens of that
   sign-in) is revoked, so neither side can continue without the password.
+- **Grace period.** Two tabs of one browser share the cookie and may exchange it at the same moment, and a request can
+  be repeated after a lost answer. A token exchanged less than 30 seconds ago is therefore still accepted and gets its
+  own successor; only a later use counts as reuse.
 - **Storage.** The database keeps only the SHA-256 hash of a token (`refresh_tokens`), with the family, the expiry and
   the rotation and revocation times. Tokens are deleted with the account and when a user is anonymized.
 - **Lifetime.** 30 days from the last exchange (`Jwt__RefreshTokenDays`): a baker who opens the app at least once a

@@ -2,14 +2,14 @@
   {
     "case": "typical",
     "method": "DELETE",
-    "path": "/api/v1/push/subscriptions/5807b824-55ae-4e03-b802-61415c2ff43a",
+    "path": "/api/v1/push/subscriptions/d55754e3-84e3-4d93-99c3-9fcec18e5682",
     "authenticated": true,
     "status": 204
   },
   {
     "case": "not found or another user's",
     "method": "DELETE",
-    "path": "/api/v1/push/subscriptions/5807b824-55ae-4e03-b802-61415c2ff43a",
+    "path": "/api/v1/push/subscriptions/d55754e3-84e3-4d93-99c3-9fcec18e5682",
     "authenticated": true,
     "status": 404,
     "responseContentType": "application/problem+json",
@@ -18,9 +18,9 @@
       "title": "The requested resource was not found.",
       "status": 404,
       "detail": "Push subscription not found.",
-      "instance": "/api/v1/push/subscriptions/5807b824-55ae-4e03-b802-61415c2ff43a",
-      "traceId": "00-ce2c2b3e6c759f247703b7df68066b8e-e1daca69ed4ef6e0-02",
-      "correlationId": "631f3279842348d689f427a71d1b6a18"
+      "instance": "/api/v1/push/subscriptions/d55754e3-84e3-4d93-99c3-9fcec18e5682",
+      "traceId": "00-b0e30d5f5df37380c316e0f488e4144e-25701f5a29069371-02",
+      "correlationId": "bc8e8d2219f945c1ab461f16429d493b"
     }
   }
 ]

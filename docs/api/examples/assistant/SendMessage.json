@@ -2,7 +2,7 @@
   {
     "case": "plans a batch with tools (proposal to confirm)",
     "method": "POST",
-    "path": "/api/v1/conversations/f2edf869-95ab-42d9-9de6-ec57fd04739f/messages",
+    "path": "/api/v1/conversations/6ebfa073-a173-43be-832e-240ff2d969c4/messages",
     "authenticated": true,
     "requestBody": {
       "content": "Plan 2 loaves of my Country sourdough for next Saturday morning."
@@ -11,17 +11,17 @@
     "responseContentType": "application/json",
     "responseBody": {
       "message": {
-        "id": "ee04b6ce-fead-4803-bc03-f28cb127c381",
+        "id": "3c690cc7-c296-493f-a407-a7746744fc28",
         "role": "assistant",
         "content": "I am an AI assistant. I prepared the Saturday bake of Country sourdough; it costs 7.98 EUR. Please confirm it.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T19:45:17.5253427+00:00"
+        "createdAt": "2026-11-24T20:51:28.1852621+00:00"
       },
       "pendingAction": {
-        "actionId": "c089f2bd-a44c-4480-a559-341ead2003b1",
+        "actionId": "aea02813-be5b-4d19-81ab-6e10037ec62d",
         "kind": "create_batch",
-        "expiresAt": "2026-11-24T20:15:17.5089889+00:00",
+        "expiresAt": "2026-11-24T21:21:28.1693392+00:00",
         "plan": {
           "id": "00000000-0000-0000-0000-000000000000",
           "name": "Saturday bake",
@@ -39,7 +39,7 @@
           "items": [
             {
               "id": "00000000-0000-0000-0000-000000000000",
-              "recipeId": "6c9969ad-cecd-4df5-9c64-616f46e999c3",
+              "recipeId": "b8713bc1-2834-4a1a-b594-ff73be15e7b8",
               "recipeTitle": "Country sourdough",
               "loaves": 2,
               "starterId": null,
@@ -168,7 +168,7 @@
   {
     "case": "empty message",
     "method": "POST",
-    "path": "/api/v1/conversations/f2edf869-95ab-42d9-9de6-ec57fd04739f/messages",
+    "path": "/api/v1/conversations/6ebfa073-a173-43be-832e-240ff2d969c4/messages",
     "authenticated": true,
     "requestBody": {
       "content": ""
@@ -179,21 +179,21 @@
       "type": "https://oneloaf.app/problems/validation",
       "title": "One or more validation errors occurred.",
       "status": 400,
-      "instance": "/api/v1/conversations/f2edf869-95ab-42d9-9de6-ec57fd04739f/messages",
+      "instance": "/api/v1/conversations/6ebfa073-a173-43be-832e-240ff2d969c4/messages",
       "errors": {
         "content": [
           "'Content' должно быть заполнено.",
           "Не выполнено указанное условие для 'Content'."
         ]
       },
-      "traceId": "00-16e6a87cfca71d57f53f5d6ff9352e2b-1f24b4589fc4a4b9-02",
-      "correlationId": "6a7af2fd224a423181ff8fe94c50b759"
+      "traceId": "00-4879d6754cbb67a682f9b4843eaf456c-1af8ca50b81c0de6-02",
+      "correlationId": "30a3ae90d2d54997bb7a194e79855940"
     }
   },
   {
     "case": "second proposal",
     "method": "POST",
-    "path": "/api/v1/conversations/f2edf869-95ab-42d9-9de6-ec57fd04739f/messages",
+    "path": "/api/v1/conversations/6ebfa073-a173-43be-832e-240ff2d969c4/messages",
     "authenticated": true,
     "requestBody": {
       "content": "And one loaf on Sunday."
@@ -202,17 +202,17 @@
     "responseContentType": "application/json",
     "responseBody": {
       "message": {
-        "id": "a4a7a322-c310-4074-8cab-5e439c65fb09",
+        "id": "0fa6c484-0be4-4232-b52e-897a11e12ae9",
         "role": "assistant",
         "content": "I prepared the Sunday bake as well. Confirm or decline it.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T19:45:17.6371357+00:00"
+        "createdAt": "2026-11-24T20:51:28.2987399+00:00"
       },
       "pendingAction": {
-        "actionId": "849e8078-961b-4a1d-a207-f68738bd0aed",
+        "actionId": "53e247a9-b47a-4635-8fde-d422b5d77db7",
         "kind": "create_batch",
-        "expiresAt": "2026-11-24T20:15:17.6335986+00:00",
+        "expiresAt": "2026-11-24T21:21:28.2948088+00:00",
         "plan": {
           "id": "00000000-0000-0000-0000-000000000000",
           "name": "Sunday bake",
@@ -230,7 +230,7 @@
           "items": [
             {
               "id": "00000000-0000-0000-0000-000000000000",
-              "recipeId": "6c9969ad-cecd-4df5-9c64-616f46e999c3",
+              "recipeId": "b8713bc1-2834-4a1a-b594-ff73be15e7b8",
               "recipeTitle": "Country sourdough",
               "loaves": 1,
               "starterId": null,
@@ -355,7 +355,7 @@
   {
     "case": "Claude unavailable",
     "method": "POST",
-    "path": "/api/v1/conversations/5909c52b-464d-4ffd-8bf4-515e8c72eac0/messages",
+    "path": "/api/v1/conversations/154b3330-2d40-4ebe-94df-658fc6b9190a/messages",
     "authenticated": true,
     "requestBody": {
       "content": "When should I start for bread at 8 am?"
@@ -367,9 +367,9 @@
       "title": "A required service is temporarily unavailable.",
       "status": 503,
       "detail": "The assistant is temporarily unavailable. Use the planning form or try again later.",
-      "instance": "/api/v1/conversations/5909c52b-464d-4ffd-8bf4-515e8c72eac0/messages",
-      "traceId": "00-1dfdec8464e0fe6a7394703197dd6cb5-a44fb890b3840a07-02",
-      "correlationId": "fb38c99d12684039b005ba6ed055a86e"
+      "instance": "/api/v1/conversations/154b3330-2d40-4ebe-94df-658fc6b9190a/messages",
+      "traceId": "00-db2cbe3dd660b4e6f57ffa4f8263e41a-196a726060354834-02",
+      "correlationId": "7f937196d4b54ce59b8f88d99b4626b0"
     }
   }
 ]

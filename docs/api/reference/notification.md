@@ -55,8 +55,8 @@ Response `401` `application/problem+json`:
   "title": "A valid bearer token is required.",
   "status": 401,
   "instance": "/api/v1/reminders",
-  "traceId": "00-36b30c359a43eeb4407bba4a71af3846-5192a472bdb1793e-02",
-  "correlationId": "fc12add26d4c4ce684f4c52081529ace"
+  "traceId": "00-9437939faeb3fa0fee5ce546f04d9b1c-b578580656c159a8-02",
+  "correlationId": "2d01d1c4ea8349e3851ee9e84076eb00"
 }
 ```
 
@@ -74,16 +74,16 @@ Response `200` `application/json`:
 ```json
 [
   {
-    "id": "2a3b0ed4-6928-4ec3-a48f-20ccbf8b597a",
+    "id": "0fdfd98e-230c-4004-a4b8-1225490567db",
     "kind": "starter_feeding",
     "channel": "push",
     "status": "scheduled",
     "message": "Time to feed starter \"Rye mother\"",
-    "dueAt": "2026-11-25T06:45:14.944872+00:00",
+    "dueAt": "2026-11-25T07:51:25.510855+00:00",
     "sentAt": null,
     "attempts": 0,
     "batchId": null,
-    "starterId": "609bbc5d-57a5-477b-a0a0-fa40d4ab50dd"
+    "starterId": "fae70786-7876-45d5-b23f-21932c1a83a6"
   }
 ]
 ```
@@ -114,7 +114,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "publicKey": "BD4YQZEAHnSqdQX5fotV_WafycmxWWbWjjukjaGfWD6rQzmAFkqyzJz8vywuXl5DUU5HGSaZZ8dB9ti0qDbDHzM"
+  "publicKey": "BGn61TN8uQ_-lC7CWsUCNlLtBGk5laX94ZzyycqB7YNW-JJVzFA5YiquUfnCjnY58I7Qt3dZe7emILvNVXLwP08"
 }
 ```
 
@@ -144,7 +144,7 @@ Authorization: Bearer <access token>
 Content-Type: application/json
 
 {
-  "endpoint": "https://fcm.googleapis.com/fcm/send/docs-9097b07b8c6d4e058ddf1dec40bcf4f9",
+  "endpoint": "https://fcm.googleapis.com/fcm/send/docs-d6d1c52c907f41cf9adf6daf28adf98e",
   "keys": {
     "p256dh": "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM",
     "auth": "tBHItJI5svbpez7KI4CCXg"
@@ -156,9 +156,9 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "5807b824-55ae-4e03-b802-61415c2ff43a",
-  "endpoint": "https://fcm.googleapis.com/fcm/send/docs-9097b07b8c6d4e058ddf1dec40bcf4f9",
-  "createdAt": "2026-11-24T19:45:17.9264+00:00"
+  "id": "d55754e3-84e3-4d93-99c3-9fcec18e5682",
+  "endpoint": "https://fcm.googleapis.com/fcm/send/docs-d6d1c52c907f41cf9adf6daf28adf98e",
+  "createdAt": "2026-11-24T20:51:28.67751+00:00"
 }
 ```
 
@@ -172,7 +172,7 @@ Authorization: Bearer <access token>
 Content-Type: application/json
 
 {
-  "endpoint": "https://fcm.googleapis.com/fcm/send/docs-9097b07b8c6d4e058ddf1dec40bcf4f9",
+  "endpoint": "https://fcm.googleapis.com/fcm/send/docs-d6d1c52c907f41cf9adf6daf28adf98e",
   "keys": {
     "p256dh": "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM",
     "auth": "tBHItJI5svbpez7KI4CCXg"
@@ -184,9 +184,9 @@ Response `200` `application/json`:
 
 ```json
 {
-  "id": "5807b824-55ae-4e03-b802-61415c2ff43a",
-  "endpoint": "https://fcm.googleapis.com/fcm/send/docs-9097b07b8c6d4e058ddf1dec40bcf4f9",
-  "createdAt": "2026-11-24T19:45:17.9264+00:00"
+  "id": "d55754e3-84e3-4d93-99c3-9fcec18e5682",
+  "endpoint": "https://fcm.googleapis.com/fcm/send/docs-d6d1c52c907f41cf9adf6daf28adf98e",
+  "createdAt": "2026-11-24T20:51:28.67751+00:00"
 }
 ```
 
@@ -221,8 +221,8 @@ Response `400` `application/problem+json`:
       "endpoint must be an absolute https URL."
     ]
   },
-  "traceId": "00-ec323634bae12a6bcf8afd84292909d2-d06645175fdac5bb-02",
-  "correlationId": "0a72198a8b0f4c089345b44f5e156f24"
+  "traceId": "00-f71aa8e9acb0ce938118e6a95b9b86a2-c73abc9745d3948d-02",
+  "correlationId": "08f08a87dce647dfbfc18a756cf4a576"
 }
 ```
 
@@ -248,7 +248,7 @@ Only own devices; another user's id gives 404.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-DELETE /api/v1/push/subscriptions/5807b824-55ae-4e03-b802-61415c2ff43a
+DELETE /api/v1/push/subscriptions/d55754e3-84e3-4d93-99c3-9fcec18e5682
 Authorization: Bearer <access token>
 ```
 
@@ -261,7 +261,7 @@ _(no body)_
 <details><summary>Example — not found or another user's (404)</summary>
 
 ```http
-DELETE /api/v1/push/subscriptions/5807b824-55ae-4e03-b802-61415c2ff43a
+DELETE /api/v1/push/subscriptions/d55754e3-84e3-4d93-99c3-9fcec18e5682
 Authorization: Bearer <access token>
 ```
 
@@ -273,9 +273,9 @@ Response `404` `application/problem+json`:
   "title": "The requested resource was not found.",
   "status": 404,
   "detail": "Push subscription not found.",
-  "instance": "/api/v1/push/subscriptions/5807b824-55ae-4e03-b802-61415c2ff43a",
-  "traceId": "00-ce2c2b3e6c759f247703b7df68066b8e-e1daca69ed4ef6e0-02",
-  "correlationId": "631f3279842348d689f427a71d1b6a18"
+  "instance": "/api/v1/push/subscriptions/d55754e3-84e3-4d93-99c3-9fcec18e5682",
+  "traceId": "00-b0e30d5f5df37380c316e0f488e4144e-25701f5a29069371-02",
+  "correlationId": "bc8e8d2219f945c1ab461f16429d493b"
 }
 ```
 

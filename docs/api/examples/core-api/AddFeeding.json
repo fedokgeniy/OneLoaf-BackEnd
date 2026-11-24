@@ -2,10 +2,10 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/starters/609bbc5d-57a5-477b-a0a0-fa40d4ab50dd/feedings",
+    "path": "/api/v1/starters/fae70786-7876-45d5-b23f-21932c1a83a6/feedings",
     "authenticated": true,
     "requestBody": {
-      "fedAt": "2026-11-24T18:45:14.944872+00:00",
+      "fedAt": "2026-11-24T19:51:25.5108558+00:00",
       "flourG": 50,
       "waterG": 50,
       "starterKeptG": 20,
@@ -14,14 +14,14 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "bfc0ad7d-5703-4e3a-984c-086376df81f8",
-      "fedAt": "2026-11-24T18:45:14.944872+00:00",
+      "id": "794330b5-ab71-44f6-9ebc-55e115eba1ad",
+      "fedAt": "2026-11-24T19:51:25.510855+00:00",
       "flourG": 50.0,
       "waterG": 50.0,
       "starterKeptG": 20.0,
       "temperatureC": 24.0,
-      "nextFeedingAt": "2026-11-25T06:45:14.944872+00:00",
-      "expectedPeakAt": "2026-11-25T02:45:14.944872+00:00",
+      "nextFeedingAt": "2026-11-25T07:51:25.510855+00:00",
+      "expectedPeakAt": "2026-11-25T03:51:25.510855+00:00",
       "note": null
     }
   }

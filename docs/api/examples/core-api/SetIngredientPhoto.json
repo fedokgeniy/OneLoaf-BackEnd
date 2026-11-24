@@ -1,0 +1,46 @@
+[
+  {
+    "case": "typical",
+    "method": "PUT",
+    "path": "/api/v1/ingredients/119f5b95-f180-4aa8-a18b-dd442fa267b9/photo",
+    "authenticated": true,
+    "requestBody": {
+      "multipart/form-data": {
+        "file": "<pack.png, image/png, 29 bytes>"
+      }
+    },
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "The ingredient was not found.",
+      "instance": "/api/v1/ingredients/119f5b95-f180-4aa8-a18b-dd442fa267b9/photo",
+      "traceId": "00-9aa62ce4874b10a2dec041b0a38dbf55-7eaa0f6f43a9f23b-02",
+      "correlationId": "9126535d39dc44b4bf8788d8f6311639"
+    }
+  },
+  {
+    "case": "not an image",
+    "method": "PUT",
+    "path": "/api/v1/ingredients/119f5b95-f180-4aa8-a18b-dd442fa267b9/photo",
+    "authenticated": true,
+    "requestBody": {
+      "multipart/form-data": {
+        "file": "<notes.png, image/png, 10 bytes>"
+      }
+    },
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "The ingredient was not found.",
+      "instance": "/api/v1/ingredients/119f5b95-f180-4aa8-a18b-dd442fa267b9/photo",
+      "traceId": "00-1effd8e4e777bbf9c4e28ceb4f06f506-16c850f777a687c7-02",
+      "correlationId": "7f71bc0d04ce457ea5d798ef3169fc36"
+    }
+  }
+]

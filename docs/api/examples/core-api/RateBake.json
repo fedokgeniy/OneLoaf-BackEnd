@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "PATCH",
-    "path": "/api/v1/bake-records/08daff53-8408-4c10-91da-fefc5bc37abb",
+    "path": "/api/v1/bake-records/155c5a9c-9ec8-4bdb-b0ba-bd27ef417f8f",
     "authenticated": true,
     "requestBody": {
       "rating": 4,
@@ -11,8 +11,8 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "08daff53-8408-4c10-91da-fefc5bc37abb",
-      "batchId": "a49536f9-1aaf-426c-b6be-bed4391c52de",
+      "id": "155c5a9c-9ec8-4bdb-b0ba-bd27ef417f8f",
+      "batchId": "0fb16bf6-49f5-41f1-ae9a-b9d2c88f3ccb",
       "bakedOn": "2026-11-24",
       "totalLoaves": 3,
       "totalCost": 8.95,
@@ -23,22 +23,22 @@
       "analysisAt": null,
       "items": [
         {
-          "id": "589ad600-40f2-456e-87f1-a1511f63d383",
-          "recipeId": "6c9969ad-cecd-4df5-9c64-616f46e999c3",
+          "id": "c3e30ebf-0471-4d01-9ecf-eb89e806e114",
+          "recipeId": "b8713bc1-2834-4a1a-b594-ff73be15e7b8",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
           "cost": 8.95
         }
       ],
-      "createdAt": "2026-11-24T19:45:15.701033+00:00",
-      "updatedAt": "2026-11-24T19:45:16.064623+00:00",
+      "createdAt": "2026-11-24T20:51:26.222581+00:00",
+      "updatedAt": "2026-11-24T20:51:26.585883+00:00",
       "photos": []
     }
   },
   {
     "case": "rating out of range",
     "method": "PATCH",
-    "path": "/api/v1/bake-records/08daff53-8408-4c10-91da-fefc5bc37abb",
+    "path": "/api/v1/bake-records/155c5a9c-9ec8-4bdb-b0ba-bd27ef417f8f",
     "authenticated": true,
     "requestBody": {
       "rating": 9,
@@ -50,14 +50,14 @@
       "type": "https://oneloaf.app/problems/validation",
       "title": "One or more validation errors occurred.",
       "status": 400,
-      "instance": "/api/v1/bake-records/08daff53-8408-4c10-91da-fefc5bc37abb",
+      "instance": "/api/v1/bake-records/155c5a9c-9ec8-4bdb-b0ba-bd27ef417f8f",
       "errors": {
         "rating": [
           "'Rating' должно быть в диапазоне от 1 до 5. Введенное значение: 9."
         ]
       },
-      "traceId": "00-6088385fa3fe234b4c9beffe0a8b03e8-4022f1b658d9f09f-02",
-      "correlationId": "4ff1b0d2f110470e9c6ab95025c53c25"
+      "traceId": "00-9cfbbd1f663f557247028f105aa0c936-8ea6b8afc9202e76-02",
+      "correlationId": "fb043eaef8e54ec485360186065c3efb"
     }
   }
 ]

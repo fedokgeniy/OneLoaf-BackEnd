@@ -47,7 +47,7 @@
     "responseContentType": "application/json",
     "responseBody": {
       "recipe": {
-        "id": "108d38c2-40a0-49b3-aa68-f4a094e3cff4",
+        "id": "b3c69088-125a-435d-904e-625df57b2ce5",
         "parentRecipeId": null,
         "title": "Beginner sourdough",
         "description": "A simple first loaf.",
@@ -57,8 +57,8 @@
         "isArchived": false,
         "ingredients": [
           {
-            "lineId": "b78b8a14-c202-43da-98d6-49cdafd5a0ae",
-            "ingredientId": "879ad763-82ab-47e4-8a07-7f7675e431f8",
+            "lineId": "d2b8fe12-935c-4806-9b3d-317ef195fcdf",
+            "ingredientId": "5ce60ee2-b8a7-4bf6-9019-641e7722995c",
             "ingredientName": "Whole wheat flour",
             "categoryCode": "flour",
             "unitCode": "g",
@@ -70,8 +70,8 @@
             "isInherited": false
           },
           {
-            "lineId": "5671dec7-d14e-4e07-ba1d-6abfc2da62f6",
-            "ingredientId": "df5f8d76-debf-4f7f-b88b-7dff696c4a29",
+            "lineId": "f2ce701e-4e05-402b-8cba-282530eb6dff",
+            "ingredientId": "d73327ae-dfb2-4d3f-ae59-6f2a653041e9",
             "ingredientName": "Honey",
             "categoryCode": "sweetener",
             "unitCode": "g",
@@ -85,7 +85,7 @@
         ],
         "stages": [
           {
-            "lineId": "7409329a-1bba-415f-b2c9-bcd55a991152",
+            "lineId": "8fc2a339-ac05-4fe3-9794-6a081b4ef2e8",
             "sortOrder": 1,
             "name": "Mix",
             "stageTypeCode": "mix",
@@ -101,7 +101,7 @@
             "isInherited": false
           },
           {
-            "lineId": "642416af-8771-42fd-823c-f314d43e6b2c",
+            "lineId": "3ff63873-8072-42c0-986c-29bed3e5a6bc",
             "sortOrder": 2,
             "name": "Bake",
             "stageTypeCode": "bake",
@@ -117,8 +117,8 @@
             "isInherited": false
           }
         ],
-        "createdAt": "2026-11-24T19:45:14.254837+00:00",
-        "updatedAt": "2026-11-24T19:45:14.254837+00:00",
+        "createdAt": "2026-11-24T20:51:24.867347+00:00",
+        "updatedAt": "2026-11-24T20:51:24.867347+00:00",
         "hasPhoto": false
       },
       "createdIngredients": [
@@ -169,8 +169,8 @@
           "Unknown stage type 'nap'."
         ]
       },
-      "traceId": "00-a23dc0d2a396109363b5a55f676f6d58-649e21985d6869b6-02",
-      "correlationId": "b195b452e32a4ce0964e8f6a3cb2368e"
+      "traceId": "00-11d551a786052142e512dc1060c60638-c42649b257388fbc-02",
+      "correlationId": "6f4f69e2a77b4019807fffac416c676e"
     }
   }
 ]

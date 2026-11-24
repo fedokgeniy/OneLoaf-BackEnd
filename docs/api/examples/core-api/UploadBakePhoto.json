@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/bake-records/08daff53-8408-4c10-91da-fefc5bc37abb/photos",
+    "path": "/api/v1/bake-records/155c5a9c-9ec8-4bdb-b0ba-bd27ef417f8f/photos",
     "authenticated": true,
     "requestBody": {
       "multipart/form-data": {
@@ -12,16 +12,16 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "6238717d-ed8e-45ca-9d5b-b5cdcb947ac9",
+      "id": "c308b1bd-359e-4e33-bd8b-004fc6081533",
       "contentType": "image/png",
-      "url": "/api/v1/bake-records/08daff53-8408-4c10-91da-fefc5bc37abb/photos/6238717d-ed8e-45ca-9d5b-b5cdcb947ac9",
-      "createdAt": "2026-11-24T19:45:16.144956+00:00"
+      "url": "/api/v1/bake-records/155c5a9c-9ec8-4bdb-b0ba-bd27ef417f8f/photos/c308b1bd-359e-4e33-bd8b-004fc6081533",
+      "createdAt": "2026-11-24T20:51:26.663613+00:00"
     }
   },
   {
     "case": "not an image",
     "method": "POST",
-    "path": "/api/v1/bake-records/08daff53-8408-4c10-91da-fefc5bc37abb/photos",
+    "path": "/api/v1/bake-records/155c5a9c-9ec8-4bdb-b0ba-bd27ef417f8f/photos",
     "authenticated": true,
     "requestBody": {
       "multipart/form-data": {
@@ -35,15 +35,15 @@
       "title": "The request violates a business rule.",
       "status": 422,
       "detail": "Only JPEG, PNG and WebP images are accepted.",
-      "instance": "/api/v1/bake-records/08daff53-8408-4c10-91da-fefc5bc37abb/photos",
-      "traceId": "00-12277c2c3d30cbe3e6ca82c8faa97e7e-11a6d928261aa6a8-02",
-      "correlationId": "31e1de919f4342c5b0efdd0a040d3245"
+      "instance": "/api/v1/bake-records/155c5a9c-9ec8-4bdb-b0ba-bd27ef417f8f/photos",
+      "traceId": "00-978b110c8fd912e5406551a0dd2bb40a-92eb5b1ae4e591bc-02",
+      "correlationId": "8ff1327e6aa24c65afa1e1cfba850676"
     }
   },
   {
     "case": "second photo",
     "method": "POST",
-    "path": "/api/v1/bake-records/08daff53-8408-4c10-91da-fefc5bc37abb/photos",
+    "path": "/api/v1/bake-records/155c5a9c-9ec8-4bdb-b0ba-bd27ef417f8f/photos",
     "authenticated": true,
     "requestBody": {
       "multipart/form-data": {
@@ -53,10 +53,10 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "4045754b-cf06-4411-b723-9f6c561e274a",
+      "id": "44e07e91-ef9c-4e8b-a420-e9aeb00777ff",
       "contentType": "image/png",
-      "url": "/api/v1/bake-records/08daff53-8408-4c10-91da-fefc5bc37abb/photos/4045754b-cf06-4411-b723-9f6c561e274a",
-      "createdAt": "2026-11-24T19:45:16.202462+00:00"
+      "url": "/api/v1/bake-records/155c5a9c-9ec8-4bdb-b0ba-bd27ef417f8f/photos/44e07e91-ef9c-4e8b-a420-e9aeb00777ff",
+      "createdAt": "2026-11-24T20:51:26.731013+00:00"
     }
   }
 ]

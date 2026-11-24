@@ -1,7 +1,7 @@
 # The design system in Blazor
 
 Source of truth: `docs/frontend/design-system/` — `tokens.json` (all values), `tokens.css` (generated custom properties,
-light + dark), `components.css` (all `ol-*` classes), `icons/*.svg` (31 icons), `logos/*.svg`, guideline pages
+light + dark), `components.css` (all `ol-*` classes), `icons/*.svg` (35 icons), `logos/*.svg`, guideline pages
 (`README.md`, `layout-and-devices.md`, `accessibility-and-settings.md`, `requirements-compliance.md`) and one page per
 component (`components/*.md`). Mockups (`mockups/*.html`) show every screen built from exactly these classes — copy the
 markup structure, not the inline `style` attributes (the boards use some inline layout for the static drawing; in the

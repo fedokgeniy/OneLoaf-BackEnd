@@ -2,7 +2,7 @@
 
 The full contract lives in `docs/api/`: OpenAPI 3.1 per service (`reference/*.openapi.json`, readable version in
 `reference/*.md`), guides (`guides/authentication.md`, `errors.md`, `pagination.md`, `assistant.md`, `idempotency.md`) and
-**recorded real exchanges** for all 102 operations (`examples/<service>/<OperationId>.json`: method, path, request body,
+**recorded real exchanges** for all 116 operations (`examples/<service>/<OperationId>.json`: method, path, request body,
 status, response body, typical case + edge cases). This file says how the Blazor client uses them.
 
 ## 1. Services and base URLs

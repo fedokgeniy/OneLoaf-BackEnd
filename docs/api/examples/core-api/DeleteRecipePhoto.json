@@ -1,0 +1,19 @@
+[
+  {
+    "case": "typical",
+    "method": "DELETE",
+    "path": "/api/v1/recipes/b8713bc1-2834-4a1a-b594-ff73be15e7b8/photo",
+    "authenticated": true,
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "The recipe was not found.",
+      "instance": "/api/v1/recipes/b8713bc1-2834-4a1a-b594-ff73be15e7b8/photo",
+      "traceId": "00-90f003d2fc224f2e86ed55697394b112-9450a7acce8b6cf2-02",
+      "correlationId": "01c9b5e8c0564f6b8ff79f4ae15bee58"
+    }
+  }
+]
