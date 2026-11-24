@@ -10,8 +10,11 @@
 
 <ShellTitle Text="Assistant">
     <Actions>
-        <OlButton Variant="ButtonVariant.Ghost" class="app-hide-expanded" OnClick="() => _listOpen = true">Conversations</OlButton>
-        <OlButton Href="assistant" Icon="IconName.Plus" Variant="ButtonVariant.Secondary">New chat</OlButton>
+        @* Phones keep icon actions only (Assistant-Phone): two labelled buttons do not fit next to the brand and account. *@
+        <OlIconButton Icon="IconName.Menu" Label="Conversations" class="app-show-compact" OnClick="() => _listOpen = true" />
+        <OlIconButton Icon="IconName.Plus" Label="New chat" class="app-show-compact" OnClick="@(() => Navigation.NavigateTo("assistant"))" />
+        <OlButton Variant="ButtonVariant.Ghost" class="app-hide-compact app-hide-expanded" OnClick="() => _listOpen = true">Conversations</OlButton>
+        <OlButton Href="assistant" Icon="IconName.Plus" Variant="ButtonVariant.Secondary" class="app-hide-compact">New chat</OlButton>
     </Actions>
 </ShellTitle>
 
