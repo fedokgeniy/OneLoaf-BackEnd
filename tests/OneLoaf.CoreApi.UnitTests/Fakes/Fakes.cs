@@ -121,3 +121,58 @@ internal sealed class FixedTimeProvider(DateTimeOffset now) : TimeProvider
 {
     public override DateTimeOffset GetUtcNow() => now;
 }
+
+internal sealed class FakeRefreshTokenStore : OneLoaf.CoreApi.Application.Auth.IRefreshTokenStore
+{
+    public List<Row> Tokens { get; } = [];
+
+    public Task AddAsync(Guid userId, Guid familyId, string tokenHash, DateTimeOffset expiresAt, CancellationToken cancellationToken)
+    {
+        Tokens.Add(new Row { Id = Guid.NewGuid(), UserId = userId, FamilyId = familyId, Hash = tokenHash, ExpiresAt = expiresAt });
+        return Task.CompletedTask;
+    }
+
+    public Task<OneLoaf.CoreApi.Application.Auth.StoredRefreshToken?> FindAsync(string tokenHash, CancellationToken cancellationToken) =>
+        Task.FromResult(Tokens.Find(t => t.Hash == tokenHash) is { } t
+            ? new OneLoaf.CoreApi.Application.Auth.StoredRefreshToken(t.Id, t.UserId, t.FamilyId, t.ExpiresAt, t.RotatedAt, t.RevokedAt)
+            : null);
+
+    public Task<bool> MarkRotatedAsync(Guid id, DateTimeOffset at, CancellationToken cancellationToken)
+    {
+        var token = Tokens.Find(t => t.Id == id);
+        if (token is null || token.RotatedAt is not null || token.RevokedAt is not null)
+        {
+            return Task.FromResult(false);
+        }
+
+        token.RotatedAt = at;
+        return Task.FromResult(true);
+    }
+
+    public Task RevokeFamilyAsync(Guid familyId, DateTimeOffset at, CancellationToken cancellationToken)
+    {
+        foreach (var token in Tokens.Where(t => t.FamilyId == familyId))
+        {
+            token.RevokedAt ??= at;
+        }
+
+        return Task.CompletedTask;
+    }
+
+    internal sealed class Row
+    {
+        public Guid Id { get; init; }
+
+        public Guid UserId { get; init; }
+
+        public Guid FamilyId { get; init; }
+
+        public string Hash { get; init; } = string.Empty;
+
+        public DateTimeOffset ExpiresAt { get; init; }
+
+        public DateTimeOffset? RotatedAt { get; set; }
+
+        public DateTimeOffset? RevokedAt { get; set; }
+    }
+}

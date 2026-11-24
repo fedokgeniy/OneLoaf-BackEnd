@@ -68,6 +68,9 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordHasher, PasswordHasherAdapter>();
         services.AddValidatedOptions<JwtIssuerOptions>(JwtIssuerOptions.SectionName);
         services.AddSingleton<IAccessTokenIssuer, JwtTokenIssuer>();
+        services.AddSingleton(provider => new SessionOptions(TimeSpan.FromDays(
+            provider.GetRequiredService<Microsoft.Extensions.Options.IOptions<JwtIssuerOptions>>().Value.RefreshTokenDays)));
+        services.AddScoped<IRefreshTokenStore, RefreshTokenStore>();
         return services;
     }
 }
