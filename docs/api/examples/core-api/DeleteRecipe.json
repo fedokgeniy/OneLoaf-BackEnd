@@ -2,7 +2,7 @@
   {
     "case": "has variants",
     "method": "DELETE",
-    "path": "/api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9",
+    "path": "/api/v1/recipes/6c9969ad-cecd-4df5-9c64-616f46e999c3",
     "authenticated": true,
     "status": 409,
     "responseContentType": "application/problem+json",
@@ -11,9 +11,9 @@
       "title": "The request conflicts with existing data.",
       "status": 409,
       "detail": "The recipe has variants or is used in batches; archive it instead.",
-      "instance": "/api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9",
-      "traceId": "00-62873ff1341de322396480e8c90ec5d0-effd83f468259c76-02",
-      "correlationId": "0269eeb212874b4db65144b6a633f3ce"
+      "instance": "/api/v1/recipes/6c9969ad-cecd-4df5-9c64-616f46e999c3",
+      "traceId": "00-e418bb19019a54e0281c20fb1d55949b-6d491836cd5a172b-02",
+      "correlationId": "41300d4ea9c6417a912f1553e3330f9f"
     }
   }
 ]

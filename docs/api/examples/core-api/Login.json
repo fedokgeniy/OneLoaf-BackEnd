@@ -5,21 +5,21 @@
     "path": "/api/v1/auth/login",
     "authenticated": false,
     "requestBody": {
-      "email": "docs.baker.e6e34d070@example.com",
+      "email": "docs.baker.9e18dccd6@example.com",
       "password": "Rye-Bread-2026!"
     },
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
       "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.<payload>.<signature>",
-      "expiresAt": "2026-11-24T20:27:03.9542542+00:00",
+      "expiresAt": "2026-11-24T20:45:12.7341391+00:00",
       "user": {
-        "id": "779e2ba6-7490-4998-8e54-60465d7319e3",
-        "email": "docs.baker.e6e34d070@example.com",
+        "id": "e6abf10d-d1cc-4b27-8179-7ca8a77fd02b",
+        "email": "docs.baker.9e18dccd6@example.com",
         "displayName": "Docs Baker",
         "role": "user",
-        "createdAt": "2026-11-24T19:27:03.723295+00:00",
-        "lastLoginAt": "2026-11-24T19:27:03.9374766+00:00"
+        "createdAt": "2026-11-24T19:45:12.461556+00:00",
+        "lastLoginAt": "2026-11-24T19:45:12.7107566+00:00"
       }
     }
   },
@@ -29,7 +29,7 @@
     "path": "/api/v1/auth/login",
     "authenticated": false,
     "requestBody": {
-      "email": "docs.baker.e6e34d070@example.com",
+      "email": "docs.baker.9e18dccd6@example.com",
       "password": "Wrong-Password-1"
     },
     "status": 401,
@@ -39,8 +39,8 @@
       "title": "Invalid e-mail or password.",
       "status": 401,
       "instance": "/api/v1/auth/login",
-      "traceId": "00-9ab35ccc0812921f1bf0615973693da5-2f70df8454fb3d9a-02",
-      "correlationId": "31857e1f79974db18620e6c45209e5d3"
+      "traceId": "00-b99b0eeaa95964fae96fc57c354e6c6c-a2e6c124788f412f-02",
+      "correlationId": "3f4e11d25ebd4443a6c8984bc85e4f7b"
     }
   },
   {
@@ -49,21 +49,21 @@
     "path": "/api/v1/auth/login",
     "authenticated": false,
     "requestBody": {
-      "email": "leaving.e37c5284@example.com",
+      "email": "leaving.dff54a0f@example.com",
       "password": "Rye-Bread-2026!"
     },
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
       "accessToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.<payload>.<signature>",
-      "expiresAt": "2026-11-24T20:27:07.6678708+00:00",
+      "expiresAt": "2026-11-24T20:45:16.8639907+00:00",
       "user": {
-        "id": "67e2155f-16aa-49cc-81ff-0bd409ac330d",
-        "email": "leaving.e37c5284@example.com",
+        "id": "466ae5e2-700d-4293-bd9f-2714d54f034f",
+        "email": "leaving.dff54a0f@example.com",
         "displayName": "Leaving Baker",
         "role": "user",
-        "createdAt": "2026-11-24T19:27:07.599479+00:00",
-        "lastLoginAt": "2026-11-24T19:27:07.6658395+00:00"
+        "createdAt": "2026-11-24T19:45:16.784666+00:00",
+        "lastLoginAt": "2026-11-24T19:45:16.8578894+00:00"
       }
     }
   }

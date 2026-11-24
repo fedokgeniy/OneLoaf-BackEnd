@@ -69,3 +69,22 @@ public class PushSubscriptionConfiguration : IEntityTypeConfiguration<PushSubscr
         b.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
     }
 }
+
+public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
+{
+    public void Configure(EntityTypeBuilder<RefreshToken> b)
+    {
+        b.ToTable("refresh_tokens", t =>
+        {
+            t.HasComment("E1, US-02. Hashes of the refresh tokens of signed-in browsers; a family is the chain of one sign-in.");
+            t.HasCheckConstraint("ck_refresh_tokens_token_hash", "token_hash ~ '^[0-9a-f]{64}$'");
+            t.HasCheckConstraint("ck_refresh_tokens_expires_after_created", "expires_at > created_at");
+        });
+        b.HasKey(x => x.Id);
+        b.Property(x => x.TokenHash).HasMaxLength(64).IsFixedLength().IsRequired();
+        b.HasIndex(x => x.TokenHash).IsUnique();
+        b.HasIndex(x => x.UserId);
+        b.HasIndex(x => x.FamilyId);
+        b.HasOne(x => x.User).WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Cascade);
+    }
+}

@@ -185,11 +185,12 @@ publication.
 ```mermaid
 stateDiagram-v2
     [*] --> Anonymous
-    Anonymous --> SignedIn: login 200
+    Anonymous --> SignedIn: login 200 (access token + refresh cookie)
+    Anonymous --> SignedIn: app start, POST /auth/refresh 200
     SignedIn --> SignedIn: API 2xx / 4xx (not 401)
-    SignedIn --> Expiring: 1 min before exp
-    Expiring --> Anonymous: exp reached → toast, keep returnUrl
-    SignedIn --> Anonymous: any 401 → toast "session ended"
-    SignedIn --> Anonymous: Sign out (POST /auth/logout, clear token, clear SW cache)
+    SignedIn --> Refreshing: 1 min before exp, or a 401
+    Refreshing --> SignedIn: POST /auth/refresh 200 → new access token
+    Refreshing --> Anonymous: refresh 401 → toast "session ended", keep returnUrl
+    SignedIn --> Anonymous: Sign out (POST /auth/logout revokes the refresh token, clear token, clear SW cache)
     SignedIn --> Anonymous: Delete account confirmed
 ```

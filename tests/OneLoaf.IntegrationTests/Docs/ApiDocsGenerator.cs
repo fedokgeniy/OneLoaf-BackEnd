@@ -94,6 +94,9 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
         var login = await api.CallAsync("Login", "typical", HttpMethod.Post, "/api/v1/auth/login", new { email, password = Password });
         await api.CallAsync("Login", "wrong password", HttpMethod.Post, "/api/v1/auth/login", new { email, password = "Wrong-Password-1" });
         var token = login!["accessToken"]!.GetValue<string>();
+        // The refresh token travels only as an HttpOnly cookie, which this recorder does not keep: the recorded case is
+        // the answer without it (the successful exchange is covered by RefreshTokenTests).
+        await api.CallAsync("RefreshSession", "without refresh cookie", HttpMethod.Post, "/api/v1/auth/refresh");
         await api.CallAsync("GetMe", "without token", HttpMethod.Get, "/api/v1/me");
         api.As(token);
         await api.CallAsync("GetMe", "typical", HttpMethod.Get, "/api/v1/me");

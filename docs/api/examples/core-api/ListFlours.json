@@ -9,14 +9,14 @@
     "responseBody": {
       "items": [
         {
-          "id": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+          "id": "fec271fe-1480-4f5f-97f7-32d36f7fe0ac",
           "name": "Bread flour T550",
           "flourTypeCode": "wheat",
           "proteinPercent": 12.5,
           "grind": "fine",
           "notes": null,
-          "createdAt": "2026-11-24T19:27:04.345891+00:00",
-          "updatedAt": "2026-11-24T19:27:04.345891+00:00"
+          "createdAt": "2026-11-24T19:45:13.232249+00:00",
+          "updatedAt": "2026-11-24T19:45:13.232249+00:00"
         }
       ],
       "page": 1,

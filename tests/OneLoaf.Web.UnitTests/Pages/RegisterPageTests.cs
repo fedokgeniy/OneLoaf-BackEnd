@@ -74,6 +74,7 @@ public sealed class RegisterPageTests : BunitContext
         Services.AddSingleton(NullLogger<ApiClient>.Instance);
         Services.AddScoped<ApiClientFactory>();
         Services.AddScoped<AccountApi>();
+        Services.AddScoped<OneLoaf.Web.Account.SessionRefresher>();
         Services.AddScoped<DeviceContext>();
         Services.AddFluxor(o => o.ScanAssemblies(typeof(RegisterPage).Assembly, typeof(SessionState).Assembly));
         Services.GetRequiredService<NavigationManager>().NavigateTo("register");

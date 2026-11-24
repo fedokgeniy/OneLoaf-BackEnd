@@ -241,7 +241,7 @@ flowchart LR
     svc[RecipesApi] --> client[ApiClient.GetAsync&lt;T&gt;]
     client --> h1[CorrelationIdHandler<br/>X-Correlation-ID]
     h1 --> h2[AuthTokenHandler<br/>Bearer from TokenStore]
-    h2 --> h3[ProblemDetailsHandler<br/>non-2xx → ApiError,<br/>401 → SessionExpired]
+    h2 --> h3[ProblemDetailsHandler<br/>non-2xx → ApiError,<br/>401 → RefreshSession]
     h3 --> h4[LoggingHandler<br/>method, path, status, ms]
     h4 --> net[(fetch)]
 ```
@@ -254,7 +254,7 @@ HTTP error. Details: `api-client.md`.
 
 | Concern | Implementation |
 |---|---|
-| Authentication | `JwtAuthenticationStateProvider` reads claims from the token in `TokenStore` (memory + `sessionStorage`), checks `exp`; a timer dispatches `SessionExpired` 1 min before expiry ("Session ends soon — sign in again") — there is no refresh token by design |
+| Authentication | `JwtAuthenticationStateProvider` reads claims from the token in `TokenStore` (memory + `sessionStorage`), checks `exp`; `SessionMonitor` dispatches `RefreshSession` 1 min before expiry and after a 401, `SessionRefresher` exchanges the HttpOnly refresh cookie for a new access token (`POST auth/refresh`, also at start-up when the tab has no token); `SessionExpired` follows only when the exchange fails (ADR-F07) |
 | Errors | handler pipeline → `ApiError`; `ErrorBoundary` in `MainLayout` with "Something went wrong — reload" and the correlation id; `Notifications` toasts |
 | Logging | `ILogger<T>`; `builder.Logging.SetMinimumLevel(Information)` in Release, `Debug` in Development; never logs tokens or bodies |
 | Device / adaptive | `DeviceContext` (Shared/Device) + `device.js` → `Display` slice; CSS does the layout, C# only switches the navigation component and pane count |

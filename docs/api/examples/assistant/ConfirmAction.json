@@ -2,19 +2,19 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/conversations/9c1a9074-f34b-47cc-b556-629b300c9042/actions/6038120e-4232-4ad2-9a96-77fdf8819f75/confirm",
+    "path": "/api/v1/conversations/f2edf869-95ab-42d9-9de6-ec57fd04739f/actions/c089f2bd-a44c-4480-a559-341ead2003b1/confirm",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "batchId": "f5aca8c6-b33d-41e0-9317-9c412d4c3050",
+      "batchId": "524eb8bd-d9f6-46bc-9736-8fc1ce96a1a4",
       "recipeId": null
     }
   },
   {
     "case": "already used",
     "method": "POST",
-    "path": "/api/v1/conversations/9c1a9074-f34b-47cc-b556-629b300c9042/actions/6038120e-4232-4ad2-9a96-77fdf8819f75/confirm",
+    "path": "/api/v1/conversations/f2edf869-95ab-42d9-9de6-ec57fd04739f/actions/c089f2bd-a44c-4480-a559-341ead2003b1/confirm",
     "authenticated": true,
     "status": 409,
     "responseContentType": "application/problem+json",
@@ -23,9 +23,9 @@
       "title": "The request conflicts with existing data.",
       "status": 409,
       "detail": "The proposal has expired or was already used.",
-      "instance": "/api/v1/conversations/9c1a9074-f34b-47cc-b556-629b300c9042/actions/6038120e-4232-4ad2-9a96-77fdf8819f75/confirm",
-      "traceId": "00-942ca0499c2046d06a55463ae4c2ab27-37f39954df876066-02",
-      "correlationId": "a8c097dbc0724cc6b9cb86d73ef2cf9c"
+      "instance": "/api/v1/conversations/f2edf869-95ab-42d9-9de6-ec57fd04739f/actions/c089f2bd-a44c-4480-a559-341ead2003b1/confirm",
+      "traceId": "00-0cbad0249454814944ff04ea83caf7f1-d09d5568180b7239-02",
+      "correlationId": "32b11c240b4247a3be33b11d20b9ea82"
     }
   }
 ]

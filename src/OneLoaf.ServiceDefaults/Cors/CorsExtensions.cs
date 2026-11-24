@@ -30,6 +30,9 @@ public static class CorsExtensions
                 .WithOrigins(origins)
                 .AllowAnyHeader()
                 .AllowAnyMethod()
+                // The refresh token is an HttpOnly cookie of the Core API: a client on another origin (development)
+                // must be allowed to send it. Origins are listed explicitly, never a wildcard.
+                .AllowCredentials()
                 // The client shows the correlation id in error messages and waits Retry-After on 429/503.
                 .WithExposedHeaders(Headers.CorrelationId, "Retry-After"));
         });

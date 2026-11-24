@@ -26,4 +26,15 @@ public sealed class JwtIssuerOptions
     /// <summary>Lifetime of an access token, minutes.</summary>
     [Range(5, 1440)]
     public int AccessTokenMinutes { get; set; } = 60;
+
+    /// <summary>Lifetime of a refresh token, days; every exchange starts a new lifetime.</summary>
+    [Range(1, 365)]
+    public int RefreshTokenDays { get; set; } = 30;
+
+    /// <summary>
+    /// Path of the refresh token cookie as the browser sees it. Behind the reverse proxy the Core API is under a
+    /// prefix, so production sets <c>/core/api/v1/auth</c>; the default sends the cookie to the whole origin.
+    /// </summary>
+    [Required]
+    public string RefreshCookiePath { get; set; } = "/";
 }

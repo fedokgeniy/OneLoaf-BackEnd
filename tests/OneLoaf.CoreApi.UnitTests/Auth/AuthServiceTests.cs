@@ -14,10 +14,14 @@ public sealed class AuthServiceTests
     private readonly FakeUserRepository _users = new();
     private readonly FakePasswordHasher _hasher = new();
     private readonly FakeTokenIssuer _tokens = new();
+    private readonly FakeRefreshTokenStore _refresh = new();
     private readonly AuthService _service;
 
-    public AuthServiceTests() =>
-        _service = new AuthService(_users, _hasher, _tokens, new FixedTimeProvider(Now), NullLogger<AuthService>.Instance);
+    public AuthServiceTests() => _service = Service(Now);
+
+    private AuthService Service(DateTimeOffset now) =>
+        new(_users, _hasher, _tokens, _refresh, new SessionOptions(TimeSpan.FromDays(30)), new FixedTimeProvider(now),
+            NullLogger<AuthService>.Instance);
 
     [Fact]
     public async Task US01_RegisterNewEmail_CreatesUserWithEmptyWorkspace()
@@ -63,9 +67,11 @@ public sealed class AuthServiceTests
             TestContext.Current.CancellationToken);
 
         Assert.NotNull(response);
-        Assert.Equal("token-for-" + user.Id, response.AccessToken);
-        Assert.Equal(user.Id, response.User.Id);
-        Assert.Equal(Now, response.User.LastLoginAt);
+        Assert.Equal("token-for-" + user.Id, response.Response.AccessToken);
+        Assert.Equal(user.Id, response.Response.User.Id);
+        Assert.Equal(Now, response.Response.User.LastLoginAt);
+        Assert.Equal(Now.AddDays(30), response.RefreshToken.ExpiresAt);
+        Assert.Equal(RefreshTokenValues.Hash(response.RefreshToken.Value), Assert.Single(_refresh.Tokens).Hash);
         Assert.Equal((user.Id, Now, (string?)null), Assert.Single(_users.Logins));
         Assert.Equal(new TokenSubject(user.Id, "anna@example.com", "Anna", UserRole.User), _tokens.LastSubject);
     }
@@ -105,5 +111,53 @@ public sealed class AuthServiceTests
         Assert.Null(response);
         Assert.Equal(1, _hasher.VerifyCalls);
         Assert.Null(_tokens.LastSubject);
+    }
+
+    [Fact]
+    public async Task US02_Refresh_RotatesTheTokenAndKeepsTheFamily()
+    {
+        _users.Seed("anna@example.com", FakePasswordHasher.Prefix + "secret-pass");
+        var login = await _service.LoginAsync(new LoginRequest("anna@example.com", "secret-pass"), TestContext.Current.CancellationToken);
+
+        var refreshed = await Service(Now.AddHours(2)).RefreshAsync(login!.RefreshToken.Value, TestContext.Current.CancellationToken);
+
+        Assert.NotNull(refreshed);
+        Assert.NotEqual(login.RefreshToken.Value, refreshed.RefreshToken.Value);
+        Assert.Equal(Now.AddHours(2).AddDays(30), refreshed.RefreshToken.ExpiresAt);
+        Assert.Equal(2, _refresh.Tokens.Count);
+        Assert.Single(_refresh.Tokens.Select(t => t.FamilyId).Distinct());
+        Assert.NotNull(_refresh.Tokens[0].RotatedAt);
+        Assert.Null(_refresh.Tokens[1].RotatedAt);
+    }
+
+    [Fact]
+    public async Task US02_Refresh_ExchangedTokenUsedAgain_RevokesTheWholeSignIn()
+    {
+        _users.Seed("anna@example.com", FakePasswordHasher.Prefix + "secret-pass");
+        var ct = TestContext.Current.CancellationToken;
+        var login = await _service.LoginAsync(new LoginRequest("anna@example.com", "secret-pass"), ct);
+        var next = await _service.RefreshAsync(login!.RefreshToken.Value, ct);
+
+        var stolen = await _service.RefreshAsync(login.RefreshToken.Value, ct);
+        var owner = await _service.RefreshAsync(next!.RefreshToken.Value, ct);
+
+        Assert.Null(stolen);
+        Assert.Null(owner);
+        Assert.All(_refresh.Tokens, t => Assert.NotNull(t.RevokedAt));
+    }
+
+    [Fact]
+    public async Task US02_Refresh_ExpiredUnknownOrSignedOutToken_ReturnsNull()
+    {
+        _users.Seed("anna@example.com", FakePasswordHasher.Prefix + "secret-pass");
+        var ct = TestContext.Current.CancellationToken;
+        var login = await _service.LoginAsync(new LoginRequest("anna@example.com", "secret-pass"), ct);
+
+        Assert.Null(await _service.RefreshAsync(null, ct));
+        Assert.Null(await _service.RefreshAsync("not-a-token", ct));
+        Assert.Null(await Service(Now.AddDays(31)).RefreshAsync(login!.RefreshToken.Value, ct));
+
+        await _service.LogoutAsync(login.RefreshToken.Value, ct);
+        Assert.Null(await _service.RefreshAsync(login.RefreshToken.Value, ct));
     }
 }
