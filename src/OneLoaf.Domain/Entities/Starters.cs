@@ -7,6 +7,10 @@ public class Starter
     public Guid OwnerId { get; set; }
     public string Name { get; set; } = string.Empty;
     public Guid? FlourId { get; set; }
+    /// <summary>Ingredient whose stock a feeding takes the flour from; null = feedings do not change the stock.</summary>
+    public Guid? FlourIngredientId { get; set; }
+    /// <summary>Ingredient whose stock a feeding takes the water from.</summary>
+    public Guid? WaterIngredientId { get; set; }
     public decimal HydrationPercent { get; set; }
     public FeedingMode FeedingMode { get; set; } = FeedingMode.Regular;
     public int FeedingIntervalHours { get; set; }
@@ -19,6 +23,8 @@ public class Starter
 
     public User Owner { get; set; } = null!;
     public Flour? Flour { get; set; }
+    public Ingredient? FlourIngredient { get; set; }
+    public Ingredient? WaterIngredient { get; set; }
     public ICollection<StarterFeeding> Feedings { get; set; } = new List<StarterFeeding>();
 }
 

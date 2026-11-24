@@ -103,6 +103,27 @@ internal sealed class FakeBatchRepository : IBatchRepository
         return Task.CompletedTask;
     }
 
+    public Task CancelAsync(Guid ownerId, Guid id, bool returnStock, CancellationToken cancellationToken)
+    {
+        if (returnStock)
+        {
+            Calls.Add("return-stock");
+        }
+
+        return SetStatusAsync(ownerId, id, BatchStatus.Cancelled, cancellationToken);
+    }
+
+    public Task<bool> DeleteAsync(Guid ownerId, Guid id, bool returnStock, CancellationToken cancellationToken)
+    {
+        if (returnStock)
+        {
+            Calls.Add("return-stock");
+        }
+
+        Calls.Add("delete");
+        return Task.FromResult(Batches.Remove(id));
+    }
+
     public Task<Guid?> GetBakeRecordIdAsync(Guid batchId, CancellationToken cancellationToken) => Task.FromResult(BakeRecordId);
 
     public Task RefreshStatisticsAsync(CancellationToken cancellationToken)

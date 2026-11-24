@@ -44,6 +44,7 @@ public sealed class BatchRequestValidator : AbstractValidator<BatchRequest>
         RuleFor(x => x.PlannedStartAt).NotEqual(default(DateTimeOffset));
         RuleFor(x => x.Notes).MaximumLength(BatchLimits.NotesMaxLength);
         RuleFor(x => x.Source).IsInEnum();
+        RuleFor(x => x.IngredientScale).InclusiveBetween(BatchStockPlanner.MinScale, 1m);
         RuleFor(x => x.Items).NotNull().NotEmpty().Must(i => i.Count <= BatchLimits.MaxItems);
         RuleForEach(x => x.Items).ChildRules(item =>
         {
@@ -127,6 +128,9 @@ public sealed partial class BatchService(
     /// <summary>Message for a stage action not allowed in the stage's state.</summary>
     public const string StageStateMessage = "The action is not allowed for the stage in its current state.";
 
+    /// <summary>Message when a running batch is deleted.</summary>
+    public const string RunningMessage = "Complete or cancel the running batch before deleting it.";
+
     /// <summary>Message when a stage without its recipe stage is reset.</summary>
     public const string NoRecipeStageMessage = "The recipe stage of this batch stage no longer exists.";
 
@@ -165,8 +169,11 @@ public sealed partial class BatchService(
         return await batches.ReplanAsync(currentUser.Id, id, prepared, cancellationToken) ?? throw new NotFoundException(NotFoundMessage);
     }
 
-    /// <summary>Cancels a planned or running batch; the database cancels its reminders.</summary>
-    public async Task CancelAsync(Guid id, CancellationToken cancellationToken)
+    /// <summary>
+    /// Cancels a planned or running batch; the database cancels its reminders. The ingredients the batch took stay
+    /// consumed when <paramref name="ingredientsUsed"/> is true and go back to the stock otherwise.
+    /// </summary>
+    public async Task CancelAsync(Guid id, bool ingredientsUsed, CancellationToken cancellationToken)
     {
         var status = await batches.GetStatusAsync(currentUser.Id, id, cancellationToken) ?? throw new NotFoundException(NotFoundMessage);
         if (status is not (BatchStatus.Planned or BatchStatus.InProgress))
@@ -174,7 +181,25 @@ public sealed partial class BatchService(
             throw new ConflictException(NotActiveMessage);
         }
 
-        await batches.SetStatusAsync(currentUser.Id, id, BatchStatus.Cancelled, cancellationToken);
+        await batches.CancelAsync(currentUser.Id, id, returnStock: !ingredientsUsed, cancellationToken);
+    }
+
+    /// <summary>
+    /// Deletes a batch that is not running. The history record of a completed batch stays. The ingredients the batch
+    /// took stay consumed when <paramref name="ingredientsUsed"/> is true and go back to the stock otherwise.
+    /// </summary>
+    public async Task DeleteAsync(Guid id, bool ingredientsUsed, CancellationToken cancellationToken)
+    {
+        var status = await batches.GetStatusAsync(currentUser.Id, id, cancellationToken) ?? throw new NotFoundException(NotFoundMessage);
+        if (status == BatchStatus.InProgress)
+        {
+            throw new ConflictException(RunningMessage);
+        }
+
+        if (!await batches.DeleteAsync(currentUser.Id, id, returnStock: !ingredientsUsed, cancellationToken))
+        {
+            throw new NotFoundException(NotFoundMessage);
+        }
     }
 
     /// <summary>
@@ -296,7 +321,7 @@ public sealed partial class BatchService(
         var settings = await kitchen.GetAsync(cancellationToken);
         var priceDate = request.PriceDate ?? await TodayInKitchenAsync(cancellationToken);
         return new NewBatch(request.Name.Trim(), request.Source, request.PlannedStartAt, priceDate, settings.Currency,
-            string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim(), request.Items);
+            string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim(), request.Items, request.IngredientScale ?? 1m);
     }
 
     private async Task<DateOnly> TodayInKitchenAsync(CancellationToken cancellationToken)

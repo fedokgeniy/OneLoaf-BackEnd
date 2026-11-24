@@ -233,6 +233,13 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .HasColumnName("currency")
                         .IsFixedLength();
 
+                    b.Property<decimal>("IngredientScale")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(5, 4)
+                        .HasColumnType("numeric(5,4)")
+                        .HasDefaultValue(1m)
+                        .HasColumnName("ingredient_scale");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -306,6 +313,8 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("ck_batches_completed_after_start", "completed_at >= actual_start_at");
 
                             t.HasCheckConstraint("ck_batches_done_has_completed_at", "status <> 'done' OR completed_at IS NOT NULL");
+
+                            t.HasCheckConstraint("ck_batches_ingredient_scale", "ingredient_scale > 0 AND ingredient_scale <= 1");
 
                             t.HasCheckConstraint("ck_batches_name_not_blank", "length(btrim(name)) > 0");
 
@@ -932,6 +941,17 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("owner_id");
 
+                    b.Property<decimal?>("ReorderLevel")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("numeric(12,3)")
+                        .HasColumnName("reorder_level");
+
+                    b.Property<bool>("TrackStock")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false)
+                        .HasColumnName("track_stock");
+
                     b.Property<string>("UnitCode")
                         .IsRequired()
                         .HasColumnType("character varying(16)")
@@ -962,6 +982,8 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                     b.ToTable("ingredients", null, t =>
                         {
                             t.HasComment("E3, US-10. Ingredient catalog of a user, with a unit of measure.");
+
+                            t.HasCheckConstraint("ck_ingredients_reorder_level", "reorder_level >= 0");
                         });
                 });
 
@@ -2012,6 +2034,10 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("flour_id");
 
+                    b.Property<Guid?>("FlourIngredientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("flour_ingredient_id");
+
                     b.Property<decimal>("HydrationPercent")
                         .HasPrecision(5, 1)
                         .HasColumnType("numeric(5,1)")
@@ -2047,11 +2073,21 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("now()");
 
+                    b.Property<Guid?>("WaterIngredientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("water_ingredient_id");
+
                     b.HasKey("Id")
                         .HasName("pk_starters");
 
                     b.HasIndex("FlourId")
                         .HasDatabaseName("ix_starters_flour_id");
+
+                    b.HasIndex("FlourIngredientId")
+                        .HasDatabaseName("ix_starters_flour_ingredient_id");
+
+                    b.HasIndex("WaterIngredientId")
+                        .HasDatabaseName("ix_starters_water_ingredient_id");
 
                     b.HasIndex("OwnerId", "Name")
                         .IsUnique()
@@ -2139,6 +2175,103 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("ck_starter_feedings_starter_kept_g", "starter_kept_g >= 0");
 
                             t.HasCheckConstraint("ck_starter_feedings_water_g", "water_g >= 0");
+                        });
+                });
+
+            modelBuilder.Entity("OneLoaf.Domain.Entities.StockMovement", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("gen_random_uuid()");
+
+                    b.Property<Guid?>("BatchId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("batch_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<string>("Currency")
+                        .HasMaxLength(3)
+                        .HasColumnType("character(3)")
+                        .HasColumnName("currency")
+                        .IsFixedLength();
+
+                    b.Property<Guid?>("FeedingId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("feeding_id");
+
+                    b.Property<Guid>("IngredientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ingredient_id");
+
+                    b.Property<string>("MovementType")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)")
+                        .HasColumnName("movement_type");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("note");
+
+                    b.Property<DateOnly>("OccurredOn")
+                        .HasColumnType("date")
+                        .HasColumnName("occurred_on");
+
+                    b.Property<int?>("PackCount")
+                        .HasColumnType("integer")
+                        .HasColumnName("pack_count");
+
+                    b.Property<decimal?>("PackSize")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("numeric(12,3)")
+                        .HasColumnName("pack_size");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(12, 3)
+                        .HasColumnType("numeric(12,3)")
+                        .HasColumnName("quantity");
+
+                    b.Property<decimal?>("TotalCost")
+                        .HasPrecision(12, 4)
+                        .HasColumnType("numeric(12,4)")
+                        .HasColumnName("total_cost");
+
+                    b.HasKey("Id")
+                        .HasName("pk_stock_movements");
+
+                    b.HasIndex("BatchId")
+                        .HasDatabaseName("ix_stock_movements_batch_id");
+
+                    b.HasIndex("Currency")
+                        .HasDatabaseName("ix_stock_movements_currency");
+
+                    b.HasIndex("FeedingId")
+                        .HasDatabaseName("ix_stock_movements_feeding_id");
+
+                    b.HasIndex("IngredientId", "OccurredOn")
+                        .HasDatabaseName("ix_stock_movements_ingredient_id_occurred_on");
+
+                    b.ToTable("stock_movements", null, t =>
+                        {
+                            t.HasComment("E3. Stock ledger of ingredients: purchases, batch consumption and returns, starter feedings, corrections. The stock is the sum of quantity.");
+
+                            t.HasCheckConstraint("ck_stock_movements_adjustment_note", "movement_type <> 'adjustment' OR length(btrim(note)) > 0");
+
+                            t.HasCheckConstraint("ck_stock_movements_movement_type", "movement_type IN ('purchase', 'batch_consumption', 'batch_return', 'starter_feeding', 'adjustment')");
+
+                            t.HasCheckConstraint("ck_stock_movements_purchase_fields", "movement_type <> 'purchase' OR (pack_count > 0 AND pack_size > 0 AND total_cost >= 0 AND currency IS NOT NULL)");
+
+                            t.HasCheckConstraint("ck_stock_movements_quantity_not_zero", "quantity <> 0");
+
+                            t.HasCheckConstraint("ck_stock_movements_quantity_sign", "(movement_type IN ('purchase', 'batch_return') AND quantity > 0) OR (movement_type IN ('batch_consumption', 'starter_feeding') AND quantity < 0) OR movement_type = 'adjustment'");
                         });
                 });
 
@@ -2791,6 +2924,12 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_starters_flours_flour_id");
 
+                    b.HasOne("OneLoaf.Domain.Entities.Ingredient", "FlourIngredient")
+                        .WithMany()
+                        .HasForeignKey("FlourIngredientId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_starters_ingredients_flour_ingredient_id");
+
                     b.HasOne("OneLoaf.Domain.Entities.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
@@ -2798,9 +2937,19 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasConstraintName("fk_starters_users_owner_id");
 
+                    b.HasOne("OneLoaf.Domain.Entities.Ingredient", "WaterIngredient")
+                        .WithMany()
+                        .HasForeignKey("WaterIngredientId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_starters_ingredients_water_ingredient_id");
+
                     b.Navigation("Flour");
 
+                    b.Navigation("FlourIngredient");
+
                     b.Navigation("Owner");
+
+                    b.Navigation("WaterIngredient");
                 });
 
             modelBuilder.Entity("OneLoaf.Domain.Entities.StarterFeeding", b =>
@@ -2813,6 +2962,40 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .HasConstraintName("fk_starter_feedings_starters_starter_id");
 
                     b.Navigation("Starter");
+                });
+
+            modelBuilder.Entity("OneLoaf.Domain.Entities.StockMovement", b =>
+                {
+                    b.HasOne("OneLoaf.Domain.Entities.Batch", "Batch")
+                        .WithMany()
+                        .HasForeignKey("BatchId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_stock_movements_batches_batch_id");
+
+                    b.HasOne("OneLoaf.Domain.Entities.Currency", null)
+                        .WithMany()
+                        .HasForeignKey("Currency")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .HasConstraintName("fk_stock_movements_currencies_currency");
+
+                    b.HasOne("OneLoaf.Domain.Entities.StarterFeeding", "Feeding")
+                        .WithMany()
+                        .HasForeignKey("FeedingId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("fk_stock_movements_starter_feedings_feeding_id");
+
+                    b.HasOne("OneLoaf.Domain.Entities.Ingredient", "Ingredient")
+                        .WithMany()
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_stock_movements_ingredients_ingredient_id");
+
+                    b.Navigation("Batch");
+
+                    b.Navigation("Feeding");
+
+                    b.Navigation("Ingredient");
                 });
 
             modelBuilder.Entity("OneLoaf.Domain.Entities.BakeRecord", b =>

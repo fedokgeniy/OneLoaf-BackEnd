@@ -11,6 +11,7 @@ public sealed class RecipeService(
     IRecipeRepository recipes,
     IIngredientRepository ingredients,
     ReferenceGuard reference,
+    IWorkspaceTransaction transaction,
     ICurrentUser currentUser)
 {
     /// <summary>Message for a missing recipe.</summary>
@@ -40,6 +41,49 @@ public sealed class RecipeService(
         var stageTypes = await ValidateContentAsync(request, cancellationToken);
         var id = await recipes.CreateAsync(currentUser.Id, null, RecipePlanner.PlanBase(request, null, stageTypes), cancellationToken);
         return await GetAsync(id, cancellationToken);
+    }
+
+    /// <summary>
+    /// Creates a recipe whose ingredients are given by name: an ingredient of the user with the same name is reused,
+    /// a missing one is created without a price. Everything is stored in one transaction, so a rejected recipe leaves
+    /// no new ingredients behind.
+    /// </summary>
+    public async Task<RecipeDraftResponse> CreateDraftAsync(RecipeDraftRequest request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var names = request.Ingredients.Select(i => i.Name.Trim()).ToList();
+        var existing = await ingredients.FindByNamesAsync(currentUser.Id, names, cancellationToken);
+        for (var i = 0; i < request.Ingredients.Count; i++)
+        {
+            if (!existing.ContainsKey(names[i]))
+            {
+                await reference.EnsureIngredientCategoryAsync(request.Ingredients[i].CategoryCode, $"ingredients[{i}].categoryCode", cancellationToken);
+                await reference.EnsureUnitAsync(request.Ingredients[i].UnitCode, $"ingredients[{i}].unitCode", cancellationToken);
+            }
+        }
+
+        return await transaction.ExecuteAsync(async ct =>
+        {
+            var created = new List<string>();
+            var lines = new List<RecipeIngredientInput>(request.Ingredients.Count);
+            for (var i = 0; i < request.Ingredients.Count; i++)
+            {
+                var draft = request.Ingredients[i];
+                if (!existing.TryGetValue(names[i], out var ingredientId))
+                {
+                    ingredientId = await ingredients.CreateAsync(currentUser.Id,
+                        new IngredientRequest(names[i], draft.CategoryCode, draft.UnitCode, null), ct);
+                    created.Add(names[i]);
+                }
+
+                lines.Add(new RecipeIngredientInput(null, ingredientId, draft.Quantity, draft.IsOptional, draft.Note));
+            }
+
+            var recipe = await CreateAsync(
+                new RecipeRequest(request.Title, request.Description, request.YieldLoaves, request.LoafWeightG, request.Notes,
+                    lines, request.Stages), ct);
+            return new RecipeDraftResponse(recipe, created);
+        }, cancellationToken);
     }
 
     /// <summary>

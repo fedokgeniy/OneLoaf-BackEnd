@@ -84,6 +84,9 @@ public sealed class IngredientService(
     /// <summary>Message for a second price on the same date.</summary>
     public const string PriceDateTakenMessage = "A price for this date already exists.";
 
+    /// <summary>Message for a missing price.</summary>
+    public const string PriceNotFoundMessage = "The price was not found.";
+
     /// <summary>Page of ingredients with today's price.</summary>
     public Task<PagedResult<IngredientDto>> ListAsync(IngredientListQuery query, CancellationToken cancellationToken) =>
         ingredients.ListAsync(currentUser.Id, query, cancellationToken);
@@ -149,6 +152,46 @@ public sealed class IngredientService(
         var id = await ingredients.AddPriceAsync(ingredientId, request, cancellationToken);
         var history = await GetPricesAsync(ingredientId, cancellationToken);
         return history.Single(p => p.Id == id);
+    }
+
+    /// <summary>Replaces a price entered by mistake; the date must stay free of another price.</summary>
+    public async Task<PriceDto> UpdatePriceAsync(Guid ingredientId, Guid priceId, PriceRequest request, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        var existing = await ingredients.GetPricesAsync(currentUser.Id, ingredientId, cancellationToken)
+            ?? throw new NotFoundException(NotFoundMessage);
+        if (existing.All(p => p.Id != priceId))
+        {
+            throw new NotFoundException(PriceNotFoundMessage);
+        }
+
+        await reference.EnsureCurrencyAsync(request.Currency, "currency", cancellationToken);
+        if (existing.Any(p => p.Id != priceId && p.EffectiveFrom == request.EffectiveFrom))
+        {
+            throw new ConflictException(PriceDateTakenMessage);
+        }
+
+        if (!await ingredients.UpdatePriceAsync(ingredientId, priceId, request, cancellationToken))
+        {
+            throw new NotFoundException(PriceNotFoundMessage);
+        }
+
+        var history = await GetPricesAsync(ingredientId, cancellationToken);
+        return history.Single(p => p.Id == priceId);
+    }
+
+    /// <summary>Deletes a price; costs on its dates fall back to the previous price.</summary>
+    public async Task DeletePriceAsync(Guid ingredientId, Guid priceId, CancellationToken cancellationToken)
+    {
+        if (await ingredients.GetPricesAsync(currentUser.Id, ingredientId, cancellationToken) is null)
+        {
+            throw new NotFoundException(NotFoundMessage);
+        }
+
+        if (!await ingredients.DeletePriceAsync(ingredientId, priceId, cancellationToken))
+        {
+            throw new NotFoundException(PriceNotFoundMessage);
+        }
     }
 
     private async Task<IngredientRequest> PrepareAsync(IngredientRequest request, Guid? id, CancellationToken cancellationToken)

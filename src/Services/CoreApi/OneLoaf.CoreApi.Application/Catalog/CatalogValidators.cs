@@ -20,6 +20,12 @@ public static class CatalogLimits
 
     /// <summary>Largest quantity that fits <c>numeric(12,3)</c>.</summary>
     public const decimal MaxQuantity = 999_999_999m;
+
+    /// <summary>Largest number of packs in one purchase.</summary>
+    public const int MaxPackCount = 10_000;
+
+    /// <summary><c>stock_movements.note</c>.</summary>
+    public const int StockNoteMaxLength = 500;
 }
 
 /// <summary>Validates <see cref="FlourRequest"/>.</summary>
@@ -57,6 +63,42 @@ public sealed class IngredientRequestValidator : AbstractValidator<IngredientReq
         RuleFor(x => x.CategoryCode).NotEmpty();
         RuleFor(x => x.UnitCode).NotEmpty();
         RuleFor(x => x.FlourId).NotEqual(Guid.Empty);
+        RuleFor(x => x.ReorderLevel).GreaterThanOrEqualTo(0).LessThan(CatalogLimits.MaxQuantity);
+    }
+}
+
+/// <summary>Validates <see cref="StockMovementListQuery"/>.</summary>
+public sealed class StockMovementListQueryValidator : AbstractValidator<StockMovementListQuery>
+{
+    /// <summary>Creates the rules.</summary>
+    public StockMovementListQueryValidator() => this.AddPagingRules(x => x.Page, x => x.PageSize);
+}
+
+/// <summary>Validates <see cref="PurchaseRequest"/>.</summary>
+public sealed class PurchaseRequestValidator : AbstractValidator<PurchaseRequest>
+{
+    /// <summary>Creates the rules.</summary>
+    public PurchaseRequestValidator()
+    {
+        RuleFor(x => x.PackCount).InclusiveBetween(1, CatalogLimits.MaxPackCount);
+        RuleFor(x => x.PackSize).GreaterThan(0).LessThan(CatalogLimits.MaxQuantity);
+        RuleFor(x => x.PackSize * x.PackCount).LessThan(CatalogLimits.MaxQuantity).OverridePropertyName("packSize")
+            .WithMessage("The purchased quantity is too large.");
+        RuleFor(x => x.TotalCost).GreaterThanOrEqualTo(0).LessThan(CatalogLimits.MaxPrice);
+        RuleFor(x => x.Currency).NotEmpty().Length(3);
+        RuleFor(x => x.PurchasedOn).NotEqual(default(DateOnly));
+        RuleFor(x => x.Note).MaximumLength(CatalogLimits.StockNoteMaxLength);
+    }
+}
+
+/// <summary>Validates <see cref="StockAdjustmentRequest"/>.</summary>
+public sealed class StockAdjustmentRequestValidator : AbstractValidator<StockAdjustmentRequest>
+{
+    /// <summary>Creates the rules.</summary>
+    public StockAdjustmentRequestValidator()
+    {
+        RuleFor(x => x.ActualQuantity).GreaterThanOrEqualTo(0).LessThan(CatalogLimits.MaxQuantity);
+        RuleFor(x => x.Note).NotEmpty().Must(n => !string.IsNullOrWhiteSpace(n)).MaximumLength(CatalogLimits.StockNoteMaxLength);
     }
 }
 

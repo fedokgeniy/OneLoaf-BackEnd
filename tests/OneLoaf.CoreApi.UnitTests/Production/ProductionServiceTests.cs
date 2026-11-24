@@ -108,11 +108,24 @@ public sealed class ProductionServiceTests
         var done = _batches.Add(Me, BatchStatus.Done);
         var service = Batches();
 
-        await service.CancelAsync(planned, Ct);
+        await service.CancelAsync(planned, ingredientsUsed: false, Ct);
 
-        Assert.Contains("status:Cancelled", _batches.Calls);
-        await Assert.ThrowsAsync<ConflictException>(() => service.CancelAsync(done, Ct));
-        await Assert.ThrowsAsync<NotFoundException>(() => service.CancelAsync(Guid.NewGuid(), Ct));
+        Assert.Equal(["return-stock", "status:Cancelled"], _batches.Calls);
+        await Assert.ThrowsAsync<ConflictException>(() => service.CancelAsync(done, ingredientsUsed: true, Ct));
+        await Assert.ThrowsAsync<NotFoundException>(() => service.CancelAsync(Guid.NewGuid(), ingredientsUsed: true, Ct));
+    }
+
+    [Fact]
+    public async Task Delete_RunningBatch_IsRefusedAndUsedIngredientsStayConsumed()
+    {
+        var running = _batches.Add(Me, BatchStatus.InProgress);
+        var done = _batches.Add(Me, BatchStatus.Done);
+        var service = Batches();
+
+        await Assert.ThrowsAsync<ConflictException>(() => service.DeleteAsync(running, ingredientsUsed: false, Ct));
+        await service.DeleteAsync(done, ingredientsUsed: true, Ct);
+
+        Assert.Equal(["delete"], _batches.Calls);
     }
 
     [Fact]
@@ -256,7 +269,7 @@ public sealed class ProductionServiceTests
     {
         var flours = new FakeFlourRepository();
         var flourId = await flours.CreateAsync(Me, new FlourRequest("Rye", "rye", null, null, null), Ct);
-        var service = new StarterService(_starters, flours, _events, new FixedTimeProvider(Now), new FakeCurrentUser(Me),
+        var service = new StarterService(_starters, flours, new FakeIngredientRepository(), _events, new FixedTimeProvider(Now), new FakeCurrentUser(Me),
             NullLogger<StarterService>.Instance);
 
         var created = await service.CreateAsync(new StarterRequest(" Rye ", 100, FeedingMode.Regular, 24, flourId, 12), Ct);
@@ -288,7 +301,7 @@ public sealed class ProductionServiceTests
         _starters.Add(Me, "Rye");
         var flours = new FakeFlourRepository();
         var foreignFlour = await flours.CreateAsync(Other, new FlourRequest("Theirs", "rye", null, null, null), Ct);
-        var service = new StarterService(_starters, flours, _events, TimeProvider.System, new FakeCurrentUser(Me),
+        var service = new StarterService(_starters, flours, new FakeIngredientRepository(), _events, TimeProvider.System, new FakeCurrentUser(Me),
             NullLogger<StarterService>.Instance);
 
         await Assert.ThrowsAsync<ConflictException>(() => service.CreateAsync(new StarterRequest("Rye", 100, FeedingMode.Regular, 24), Ct));

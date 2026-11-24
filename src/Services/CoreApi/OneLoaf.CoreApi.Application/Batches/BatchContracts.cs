@@ -17,9 +17,37 @@ public sealed record BatchItemRequest(Guid RecipeId, int Loaves, Guid? StarterId
 /// <param name="PriceDate">Date of the prices for the planned cost; defaults to today in the kitchen time zone.</param>
 /// <param name="Notes">Notes.</param>
 /// <param name="Source">manual (form) or assistant (confirmed proposal, US-34).</param>
+/// <param name="IngredientScale">
+/// Share of the recipe quantities to use, 0.01-1; below 1 the loaves stay and the dough shrinks (baking from what is
+/// in stock). Defaults to 1.
+/// </param>
 public sealed record BatchRequest(
     string Name, DateTimeOffset PlannedStartAt, IReadOnlyList<BatchItemRequest> Items, DateOnly? PriceDate = null,
-    string? Notes = null, BatchSource Source = BatchSource.Manual);
+    string? Notes = null, BatchSource Source = BatchSource.Manual, decimal? IngredientScale = null);
+
+/// <summary>An ingredient the stock does not cover for a batch.</summary>
+/// <param name="IngredientId">Ingredient.</param>
+/// <param name="Name">Name.</param>
+/// <param name="UnitCode">Unit of the quantities.</param>
+/// <param name="Needed">Quantity the batch takes with its ingredient scale.</param>
+/// <param name="Available">Stock before the batch.</param>
+/// <param name="Missing">Needed minus available.</param>
+public sealed record StockShortageDto(Guid IngredientId, string Name, string UnitCode, decimal Needed, decimal Available, decimal Missing);
+
+/// <summary>Stock check of a batch plan: what is missing and what the stock is enough for.</summary>
+/// <param name="Shortages">Ingredients with kept stock that do not cover the batch; empty when the stock is enough.</param>
+/// <param name="MaxLoaves">Largest number of loaves the stock covers at full quantities; only for a batch of one item.</param>
+/// <param name="MaxScale">Largest ingredient scale the stock covers with the planned loaves; null when nothing can be baked.</param>
+public sealed record BatchStockDto(IReadOnlyList<StockShortageDto> Shortages, int? MaxLoaves, decimal? MaxScale);
+
+/// <summary>A stock-kept ingredient of a batch as returned by <c>fn_batch_stock_check</c>.</summary>
+/// <param name="IngredientId">Ingredient.</param>
+/// <param name="Name">Name.</param>
+/// <param name="UnitCode">Unit.</param>
+/// <param name="NeededFull">Quantity for the full recipe.</param>
+/// <param name="Needed">Quantity with the ingredient scale of the batch.</param>
+/// <param name="Available">Stock.</param>
+public sealed record BatchStockRow(Guid IngredientId, string Name, string UnitCode, decimal NeededFull, decimal Needed, decimal Available);
 
 /// <summary>Planned and actual data of a batch stage.</summary>
 /// <param name="Id">Stage id.</param>
@@ -75,11 +103,13 @@ public sealed record BatchItemDto(
 /// <param name="Notes">Notes.</param>
 /// <param name="Items">Items with stages.</param>
 /// <param name="BakeRecordId">History record of a completed batch.</param>
+/// <param name="IngredientScale">Share of the recipe quantities that is used, 0-1.</param>
+/// <param name="Stock">Stock check, returned by preview, create and re-plan when a stock-kept ingredient is used.</param>
 public sealed record BatchDto(
     Guid Id, string Name, BatchStatus Status, BatchSource Source, DateTimeOffset PlannedStartAt,
     DateTimeOffset? PlannedReadyFrom, DateTimeOffset? PlannedReadyTo, DateTimeOffset? ActualStartAt,
     DateTimeOffset? CompletedAt, DateOnly PriceDate, decimal? TotalCost, string Currency, string? Notes,
-    IReadOnlyList<BatchItemDto> Items, Guid? BakeRecordId);
+    IReadOnlyList<BatchItemDto> Items, Guid? BakeRecordId, decimal IngredientScale = 1m, BatchStockDto? Stock = null);
 
 /// <summary>Batch in the calendar (US-26).</summary>
 /// <param name="Id">Batch id.</param>
@@ -149,9 +179,10 @@ public sealed record KneadingPlanDto(Guid BatchId, IReadOnlyList<KneadingGroupDt
 /// <param name="Currency">Currency of the kitchen.</param>
 /// <param name="Notes">Notes.</param>
 /// <param name="Items">Items.</param>
+/// <param name="IngredientScale">Share of the recipe quantities to use.</param>
 public sealed record NewBatch(
     string Name, BatchSource Source, DateTimeOffset PlannedStartAt, DateOnly PriceDate, string Currency, string? Notes,
-    IReadOnlyList<BatchItemRequest> Items);
+    IReadOnlyList<BatchItemRequest> Items, decimal IngredientScale = 1m);
 
 /// <summary>What the stage actions need to check.</summary>
 /// <param name="StageId">Stage.</param>
@@ -182,7 +213,8 @@ public interface IBatchRepository
 
     /// <summary>
     /// Inserts the batch and its items and runs <c>sp_build_batch_plan</c> in one transaction; with
-    /// <paramref name="save"/> = false the transaction is rolled back and only the plan is returned.
+    /// <paramref name="save"/> = false the transaction is rolled back and only the plan is returned. A saved batch
+    /// takes its ingredients from the stock (<c>sp_apply_batch_stock</c>); the plan carries the stock check.
     /// </summary>
     Task<BatchDto> PlanAsync(Guid ownerId, NewBatch batch, bool save, CancellationToken cancellationToken);
 
@@ -194,6 +226,15 @@ public interface IBatchRepository
 
     /// <summary>Changes the status (the database checks the life cycle and creates the history record on done).</summary>
     Task SetStatusAsync(Guid ownerId, Guid id, BatchStatus status, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Cancels the batch; with <paramref name="returnStock"/> the ingredients it took go back to the stock
+    /// (<c>sp_return_batch_stock</c>) in the same transaction.
+    /// </summary>
+    Task CancelAsync(Guid ownerId, Guid id, bool returnStock, CancellationToken cancellationToken);
+
+    /// <summary>Deletes the batch, first returning its ingredients to the stock when asked; false when not found.</summary>
+    Task<bool> DeleteAsync(Guid ownerId, Guid id, bool returnStock, CancellationToken cancellationToken);
 
     /// <summary>History record of a batch.</summary>
     Task<Guid?> GetBakeRecordIdAsync(Guid batchId, CancellationToken cancellationToken);

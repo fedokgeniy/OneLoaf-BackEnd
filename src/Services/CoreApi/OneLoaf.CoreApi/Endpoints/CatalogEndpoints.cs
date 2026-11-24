@@ -6,7 +6,7 @@ using OneLoaf.ServiceDefaults.Validation;
 
 namespace OneLoaf.CoreApi.Endpoints;
 
-/// <summary>Flours, ingredients and price history of the current user (US-10, US-11, US-12).</summary>
+/// <summary>Flours, ingredients, price history and stock of the current user (US-10, US-11, US-12).</summary>
 public static class CatalogEndpoints
 {
     /// <summary>Route of the flours.</summary>
@@ -57,6 +57,27 @@ public static class CatalogEndpoints
             .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status409Conflict)
             .WithName("AddIngredientPrice").WithSummary("Add a price with an effective date")
             .WithDescription("US-12. Older prices are kept; a second price on the same date is a 409.");
+        ingredients.MapPut("/{id:guid}/prices/{priceId:guid}", UpdatePriceAsync).WithValidation<PriceRequest>()
+            .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status409Conflict)
+            .WithName("UpdateIngredientPrice").WithSummary("Replace a price")
+            .WithDescription("US-12. Corrects a price entered by mistake; another price on the new date is a 409.");
+        ingredients.MapDelete("/{id:guid}/prices/{priceId:guid}", DeletePriceAsync)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithName("DeleteIngredientPrice").WithSummary("Delete a price")
+            .WithDescription("US-12. Costs on the dates of the deleted price fall back to the previous price.");
+        ingredients.MapGet("/{id:guid}/stock-movements", ListMovementsAsync).WithValidation<StockMovementListQuery>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithName("ListStockMovements").WithSummary("Stock ledger of an ingredient")
+            .WithDescription("Purchases, batch consumption and returns, starter feedings and corrections; newest first, paged.");
+        ingredients.MapPost("/{id:guid}/purchases", AddPurchaseAsync).WithValidation<PurchaseRequest>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithName("AddIngredientPurchase").WithSummary("Record a purchase")
+            .WithDescription("Packs of a size bought for an amount: the stock grows, the price of the purchase date is created " +
+                             "or replaced, and the stock of the ingredient is kept from now on.");
+        ingredients.MapPost("/{id:guid}/stock-adjustments", AdjustStockAsync).WithValidation<StockAdjustmentRequest>()
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithName("AdjustIngredientStock").WithSummary("Correct the stock to the counted quantity")
+            .WithDescription("Writes the difference between the counted quantity and the stock to the ledger; a note is required.");
         return app;
     }
 
@@ -115,4 +136,26 @@ public static class CatalogEndpoints
         var price = await ingredients.AddPriceAsync(id, request, ct);
         return TypedResults.Created($"{IngredientsRoute}/{id}/prices", price);
     }
+
+    private static async Task<Ok<PriceDto>> UpdatePriceAsync(
+        Guid id, Guid priceId, PriceRequest request, IngredientService ingredients, CancellationToken ct) =>
+        TypedResults.Ok(await ingredients.UpdatePriceAsync(id, priceId, request, ct));
+
+    private static async Task<NoContent> DeletePriceAsync(Guid id, Guid priceId, IngredientService ingredients, CancellationToken ct)
+    {
+        await ingredients.DeletePriceAsync(id, priceId, ct);
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<Ok<PagedResult<StockMovementDto>>> ListMovementsAsync(
+        Guid id, [AsParameters] StockMovementListQuery query, StockService stock, CancellationToken ct) =>
+        TypedResults.Ok(await stock.ListAsync(id, query, ct));
+
+    private static async Task<Created<StockMovementDto>> AddPurchaseAsync(
+        Guid id, PurchaseRequest request, StockService stock, CancellationToken ct) =>
+        TypedResults.Created($"{IngredientsRoute}/{id}/stock-movements", await stock.AddPurchaseAsync(id, request, ct));
+
+    private static async Task<Created<StockMovementDto>> AdjustStockAsync(
+        Guid id, StockAdjustmentRequest request, StockService stock, CancellationToken ct) =>
+        TypedResults.Created($"{IngredientsRoute}/{id}/stock-movements", await stock.AdjustAsync(id, request, ct));
 }

@@ -34,6 +34,8 @@ public sealed class StarterRequestValidator : AbstractValidator<StarterRequest>
         RuleFor(x => x.FeedingIntervalHours).InclusiveBetween(1, StarterLimits.MaxIntervalHours);
         RuleFor(x => x.RiseHours).GreaterThan(0).LessThan(1000);
         RuleFor(x => x.FlourId).NotEqual(Guid.Empty);
+        RuleFor(x => x.FlourIngredientId).NotEqual(Guid.Empty);
+        RuleFor(x => x.WaterIngredientId).NotEqual(Guid.Empty);
         RuleFor(x => x.Notes).MaximumLength(StarterLimits.NotesMaxLength);
     }
 }

@@ -28,12 +28,46 @@ public class Ingredient
     /// <summary>Code from units; recipe quantities and prices of this ingredient use this unit.</summary>
     public string UnitCode { get; set; } = string.Empty;
     public Guid? FlourId { get; set; }
+    /// <summary>True when the stock of the ingredient is kept: batches and feedings consume it. Switched on by the first purchase or correction.</summary>
+    public bool TrackStock { get; set; }
+    /// <summary>Stock level, in the ingredient unit, below which the ingredient is reported as low; null = no warning.</summary>
+    public decimal? ReorderLevel { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
     public User Owner { get; set; } = null!;
     public Flour? Flour { get; set; }
     public ICollection<IngredientPrice> Prices { get; set; } = new List<IngredientPrice>();
+}
+
+/// <summary>
+/// Stock ledger of an ingredient: purchases and corrections add, batches and starter feedings take.
+/// <see cref="Quantity"/> is signed and in the ingredient unit; the stock is the sum of the rows.
+/// </summary>
+public class StockMovement
+{
+    public Guid Id { get; set; }
+    public Guid IngredientId { get; set; }
+    public StockMovementType MovementType { get; set; }
+    public decimal Quantity { get; set; }
+    public DateOnly OccurredOn { get; set; }
+    /// <summary>Batch that took or returned the quantity; NULL after the batch is deleted.</summary>
+    public Guid? BatchId { get; set; }
+    /// <summary>Starter feeding that took the quantity.</summary>
+    public Guid? FeedingId { get; set; }
+    /// <summary>Purchase: number of packs.</summary>
+    public int? PackCount { get; set; }
+    /// <summary>Purchase: content of one pack in the ingredient unit.</summary>
+    public decimal? PackSize { get; set; }
+    /// <summary>Purchase: amount paid for all packs.</summary>
+    public decimal? TotalCost { get; set; }
+    public string? Currency { get; set; }
+    public string? Note { get; set; }
+    public DateTime CreatedAt { get; set; }
+
+    public Ingredient Ingredient { get; set; } = null!;
+    public Batch? Batch { get; set; }
+    public StarterFeeding? Feeding { get; set; }
 }
 
 /// <summary>
