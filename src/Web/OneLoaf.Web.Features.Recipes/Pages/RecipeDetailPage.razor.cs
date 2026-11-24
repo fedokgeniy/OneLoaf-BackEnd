@@ -75,12 +75,16 @@ public sealed partial class RecipeDetailPage
     private string StartValue =>
         State.Value.TimelineStart?.ToLocalTime().ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture) ?? string.Empty;
 
+    [Inject]
+    private IState<RecipePhotoState> Photo { get; set; } = default!;
+
     /// <inheritdoc />
     protected override void OnInitialized()
     {
         base.OnInitialized();
         SubscribeToAction<RecipeSaveFailed>(a => _variantError = a.Error);
         SubscribeToAction<RecipeSaved>(_ => _variantForm = null);
+        SubscribeToAction<RecipeLoaded>(loaded => Dispatcher.Dispatch(new LoadRecipePhoto(loaded.Recipe.Id, loaded.Recipe.HasPhoto)));
     }
 
     /// <inheritdoc />
@@ -89,6 +93,10 @@ public sealed partial class RecipeDetailPage
         if (State.Value.RecipeId != Id || State.Value.Recipe is Loadable<RecipeDto>.NotAsked)
         {
             Dispatcher.Dispatch(new OpenRecipe(Id, NextFullHour()));
+        }
+        else if (State.Value.Recipe.Value is { } recipe)
+        {
+            Dispatcher.Dispatch(new LoadRecipePhoto(recipe.Id, recipe.HasPhoto));
         }
     }
 

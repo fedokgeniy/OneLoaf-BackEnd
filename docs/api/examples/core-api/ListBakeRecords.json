@@ -9,11 +9,11 @@
     "responseBody": {
       "items": [
         {
-          "id": "b77babe6-9f9b-4dce-b844-699603e9c3c3",
-          "batchId": "1de1aea8-feae-4b1f-8c15-ca89b41289d2",
+          "id": "6161f51b-d2fb-43d9-b036-064e475ecb8b",
+          "batchId": "3357976d-a4d6-422d-affd-80581c93dbce",
           "bakedOn": "2026-11-24",
           "totalLoaves": 3,
-          "totalCost": 8.94,
+          "totalCost": 8.95,
           "currency": "EUR",
           "rating": null,
           "hasAnalysis": false,

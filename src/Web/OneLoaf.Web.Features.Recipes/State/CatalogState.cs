@@ -31,6 +31,15 @@ public sealed record CatalogState(
     Loadable<PagedResult<StockMovementDto>> Movements,
     bool Busy)
 {
+    /// <summary>Photo of the selected ingredient as a data URL; null without a photo or while it loads.</summary>
+    public string? PhotoSrc { get; init; }
+
+    /// <summary>The photo of the selected ingredient is being loaded.</summary>
+    public bool PhotoLoading { get; init; }
+
+    /// <summary>A photo upload or removal runs.</summary>
+    public bool PhotoBusy { get; init; }
+
     private CatalogState()
         : this(string.Empty, null, Loadable<PagedResult<IngredientDto>>.Idle, Loadable<CatalogReference>.Idle, null,
             Loadable<IReadOnlyList<PriceDto>>.Idle, Loadable<PagedResult<StockMovementDto>>.Idle, false)
@@ -83,8 +92,17 @@ public sealed record PriceChanged(Guid IngredientId);
 /// <summary>Result: the stock ledger of the selected ingredient.</summary>
 public sealed record MovementsLoaded(Guid Id, Loadable<PagedResult<StockMovementDto>> Movements);
 
-/// <summary>Intent: record a purchase (packs of a size for an amount).</summary>
-public sealed record AddPurchase(Guid IngredientId, PurchaseRequest Request);
+/// <summary>Intent: record what was bought: the price and, unless price only, the quantity.</summary>
+public sealed record AddRecord(Guid IngredientId, IngredientRecordRequest Request);
+
+/// <summary>Result: the photo of an ingredient (null = none).</summary>
+public sealed record IngredientPhotoLoaded(Guid Id, string? Src);
+
+/// <summary>Intent: upload the photo of an ingredient or its pack.</summary>
+public sealed record UploadIngredientPhoto(Guid Id, OneLoaf.Web.Shared.Ui.PhotoFile Photo);
+
+/// <summary>Intent: remove the photo of an ingredient.</summary>
+public sealed record RemoveIngredientPhoto(Guid Id);
 
 /// <summary>Intent: set the stock to the counted quantity.</summary>
 public sealed record AdjustStock(Guid IngredientId, StockAdjustmentRequest Request);
@@ -139,6 +157,9 @@ public static class CatalogReducers
                 : action.Id == state.SelectedId ? state.Prices.Reload() : new Loadable<IReadOnlyList<PriceDto>>.Loading(null),
             Movements = action.Id is null ? Loadable<PagedResult<StockMovementDto>>.Idle
                 : action.Id == state.SelectedId ? state.Movements.Reload() : new Loadable<PagedResult<StockMovementDto>>.Loading(null),
+            PhotoSrc = action.Id == state.SelectedId ? state.PhotoSrc : null,
+            PhotoLoading = action.Id is { } selected && selected != state.SelectedId
+                && state.List.Value?.Items.FirstOrDefault(i => i.Id == selected)?.HasPhoto == true,
         };
 
     /// <summary>Stock ledger of the selected ingredient.</summary>
@@ -155,8 +176,21 @@ public static class CatalogReducers
     public static CatalogState OnDeletePrice(CatalogState state) => state with { Busy = true };
 
     /// <summary>A command runs.</summary>
-    [ReducerMethod(typeof(AddPurchase))]
-    public static CatalogState OnAddPurchase(CatalogState state) => state with { Busy = true };
+    [ReducerMethod(typeof(AddRecord))]
+    public static CatalogState OnAddRecord(CatalogState state) => state with { Busy = true };
+
+    /// <summary>Photo of the selected ingredient.</summary>
+    [ReducerMethod]
+    public static CatalogState OnPhoto(CatalogState state, IngredientPhotoLoaded action) =>
+        action.Id == state.SelectedId ? state with { PhotoSrc = action.Src, PhotoLoading = false, PhotoBusy = false } : state;
+
+    /// <summary>A photo command runs.</summary>
+    [ReducerMethod(typeof(UploadIngredientPhoto))]
+    public static CatalogState OnUploadPhoto(CatalogState state) => state with { PhotoBusy = true };
+
+    /// <summary>A photo command runs.</summary>
+    [ReducerMethod(typeof(RemoveIngredientPhoto))]
+    public static CatalogState OnRemovePhoto(CatalogState state) => state with { PhotoBusy = true };
 
     /// <summary>A command runs.</summary>
     [ReducerMethod(typeof(AdjustStock))]
@@ -237,7 +271,7 @@ public static class CatalogReducers
 
     /// <summary>Command failed.</summary>
     [ReducerMethod(typeof(CatalogCommandFailed))]
-    public static CatalogState OnFailed(CatalogState state) => state with { Busy = false };
+    public static CatalogState OnFailed(CatalogState state) => state with { Busy = false, PhotoBusy = false };
 
     /// <summary>A new price changes recipe costs: the recipe detail recalculates on its next visit.</summary>
     [ReducerMethod(typeof(PriceAdded))]
@@ -284,8 +318,54 @@ public sealed class CatalogEffects(ICatalogApi api, IReferenceApi reference, ISt
         {
             var prices = api.GetPricesAsync(id);
             var movements = api.ListMovementsAsync(id);
+            var photo = state.Value.PhotoLoading ? api.GetIngredientPhotoAsync(id) : null;
             dispatcher.Dispatch(new PricesLoaded(id, (await prices).ToLoadable()));
             dispatcher.Dispatch(new MovementsLoaded(id, (await movements).ToLoadable()));
+            if (photo is not null)
+            {
+                dispatcher.Dispatch(new IngredientPhotoLoaded(id, await photo is ApiResult<FileDownload>.Success { Value: var file } ? file.ToDataUrl() : null));
+            }
+        }
+    }
+
+    /// <summary>Uploads the photo and shows it at once: the page already has the bytes.</summary>
+    [EffectMethod]
+    public async Task HandleUploadPhoto(UploadIngredientPhoto action, IDispatcher dispatcher)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+        ArgumentNullException.ThrowIfNull(dispatcher);
+        switch (await api.SetIngredientPhotoAsync(action.Id, action.Photo))
+        {
+            case ApiResult.Failure { Error: var error }:
+                dispatcher.Dispatch(new CatalogCommandFailed(nameof(UploadIngredientPhoto), error));
+                dispatcher.Dispatch(new ShowToast(Toast.Error(error)));
+                break;
+            default:
+                dispatcher.Dispatch(new IngredientPhotoLoaded(action.Id,
+                    new FileDownload(action.Photo.Content, action.Photo.ContentType, action.Photo.FileName).ToDataUrl()));
+                dispatcher.Dispatch(new ShowToast(Toast.Success("Photo saved")));
+                dispatcher.Dispatch(new LoadIngredients(state.Value.Search, state.Value.Category));
+                break;
+        }
+    }
+
+    /// <summary>Removes the photo.</summary>
+    [EffectMethod]
+    public async Task HandleRemovePhoto(RemoveIngredientPhoto action, IDispatcher dispatcher)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+        ArgumentNullException.ThrowIfNull(dispatcher);
+        switch (await api.DeleteIngredientPhotoAsync(action.Id))
+        {
+            case ApiResult.Failure { Error: var error }:
+                dispatcher.Dispatch(new CatalogCommandFailed(nameof(RemoveIngredientPhoto), error));
+                dispatcher.Dispatch(new ShowToast(Toast.Error(error)));
+                break;
+            default:
+                dispatcher.Dispatch(new IngredientPhotoLoaded(action.Id, null));
+                dispatcher.Dispatch(new ShowToast(Toast.Success("Photo removed")));
+                dispatcher.Dispatch(new LoadIngredients(state.Value.Search, state.Value.Category));
+                break;
         }
     }
 
@@ -324,19 +404,20 @@ public sealed class CatalogEffects(ICatalogApi api, IReferenceApi reference, ISt
         }
     }
 
-    /// <summary>Records a purchase; stock, ledger, price history and list come from the server again.</summary>
+    /// <summary>Records what was bought; stock, ledger, price history and list come from the server again.</summary>
     [EffectMethod]
-    public async Task HandleAddPurchase(AddPurchase action, IDispatcher dispatcher)
+    public async Task HandleAddRecord(AddRecord action, IDispatcher dispatcher)
     {
         ArgumentNullException.ThrowIfNull(action);
         ArgumentNullException.ThrowIfNull(dispatcher);
-        switch (await api.AddPurchaseAsync(action.IngredientId, action.Request))
+        switch (await api.AddRecordAsync(action.IngredientId, action.Request))
         {
-            case ApiResult<StockMovementDto>.Failure { Error: var error }:
-                dispatcher.Dispatch(new CatalogCommandFailed(nameof(AddPurchase), error));
+            case ApiResult<IngredientDto>.Failure { Error: var error }:
+                dispatcher.Dispatch(new CatalogCommandFailed(nameof(AddRecord), error));
                 break;
             default:
-                AfterChange(dispatcher, new StockChanged(action.IngredientId), "Purchase recorded", action.IngredientId);
+                AfterChange(dispatcher, new StockChanged(action.IngredientId),
+                    action.Request.PriceOnly ? "Price recorded" : "Purchase recorded", action.IngredientId);
                 break;
         }
     }

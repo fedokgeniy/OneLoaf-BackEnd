@@ -116,6 +116,8 @@ erDiagram
         timestamptz updated_at
         numeric reorder_level
         bool track_stock
+        varchar photo_content_type
+        varchar photo_key
     }
     stock_movements {
         uuid id PK
@@ -131,6 +133,7 @@ erDiagram
         char currency FK
         varchar note
         timestamptz created_at
+        timestamptz available_at
     }
     batches {
         uuid id PK
@@ -153,6 +156,7 @@ erDiagram
         uuid flour_id FK
         uuid flour_ingredient_id FK
         uuid water_ingredient_id FK
+        uuid ingredient_id FK,UK
     }
     users {
         uuid id PK
@@ -165,6 +169,7 @@ erDiagram
     ingredients ||--o{ recipe_ingredients : "ingredient_id"
     flours |o--o{ starters : "flour_id"
     ingredients |o--o{ starters : "flour_ingredient_id"
+    ingredients ||--o| starters : "ingredient_id"
     ingredients |o--o{ starters : "water_ingredient_id"
     batches |o--o{ stock_movements : "batch_id"
     starter_feedings |o--o{ stock_movements : "feeding_id"
@@ -220,6 +225,8 @@ erDiagram
         bool is_archived
         timestamptz created_at
         timestamptz updated_at
+        varchar photo_content_type
+        varchar photo_key
     }
     bake_record_items {
         uuid id PK
@@ -355,6 +362,7 @@ erDiagram
         uuid flour_id FK
         uuid flour_ingredient_id FK
         uuid water_ingredient_id FK
+        uuid ingredient_id FK,UK
     }
     stock_movements {
         uuid id PK
@@ -427,6 +435,8 @@ erDiagram
         timestamptz updated_at
         uuid flour_ingredient_id FK
         uuid water_ingredient_id FK
+        uuid ingredient_id FK,UK
+        numeric usable_share
     }
     batch_items {
         uuid id PK
@@ -471,6 +481,7 @@ erDiagram
     starters ||--o{ starter_feedings : "starter_id"
     flours |o--o{ starters : "flour_id"
     ingredients |o--o{ starters : "flour_ingredient_id"
+    ingredients ||--o| starters : "ingredient_id"
     users ||--o{ starters : "owner_id"
     ingredients |o--o{ starters : "water_ingredient_id"
     starter_feedings |o--o{ stock_movements : "feeding_id"

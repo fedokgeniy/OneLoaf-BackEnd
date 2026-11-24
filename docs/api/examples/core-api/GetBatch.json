@@ -2,12 +2,12 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/batches/1de1aea8-feae-4b1f-8c15-ca89b41289d2",
+    "path": "/api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "1de1aea8-feae-4b1f-8c15-ca89b41289d2",
+      "id": "3357976d-a4d6-422d-affd-80581c93dbce",
       "name": "Weekend bake",
       "status": "planned",
       "source": "manual",
@@ -17,23 +17,23 @@
       "actualStartAt": null,
       "completedAt": null,
       "priceDate": "2026-11-24",
-      "totalCost": 8.94,
+      "totalCost": 8.95,
       "currency": "EUR",
       "notes": null,
       "items": [
         {
-          "id": "38015c75-d8e7-4aa7-ba3a-23a05c948152",
-          "recipeId": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
+          "id": "45c9a726-8b78-4430-b7e8-312822027d94",
+          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "e0f6ccfa-7f1e-499d-a4d8-fdd07579da80",
+          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
           "starterReminderMinutes": 60,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "f9209ab9-90ba-49f2-a1ff-1d26067db2ed",
+              "id": "3340298d-3606-4424-af52-ddce9dbec2ac",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
@@ -51,7 +51,7 @@
               "note": null
             },
             {
-              "id": "0f9f8293-f478-4e29-a879-ed1ca4f3a3e6",
+              "id": "75592e29-c89d-4d12-811c-3975ffba1c74",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
@@ -69,7 +69,7 @@
               "note": null
             },
             {
-              "id": "e454f9ed-8ef5-4961-bb91-2f7ba09582f8",
+              "id": "3398bdc0-81e5-4713-b0c3-ee07a7ea8dd9",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
@@ -87,7 +87,7 @@
               "note": null
             },
             {
-              "id": "156aead2-76b8-4398-a0cd-d6f6a170f41d",
+              "id": "e030d61e-8f5d-4b5a-ae8c-a8660cfb2649",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
@@ -105,7 +105,7 @@
               "note": null
             },
             {
-              "id": "e69941dd-6499-4c52-8170-ceece84b2ea0",
+              "id": "92ede417-668e-47b6-9e3a-fc93bb5474ca",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",
@@ -133,12 +133,12 @@
   {
     "case": "after replanning",
     "method": "GET",
-    "path": "/api/v1/batches/1de1aea8-feae-4b1f-8c15-ca89b41289d2",
+    "path": "/api/v1/batches/3357976d-a4d6-422d-affd-80581c93dbce",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "1de1aea8-feae-4b1f-8c15-ca89b41289d2",
+      "id": "3357976d-a4d6-422d-affd-80581c93dbce",
       "name": "Weekend bake",
       "status": "planned",
       "source": "manual",
@@ -148,23 +148,23 @@
       "actualStartAt": null,
       "completedAt": null,
       "priceDate": "2026-11-24",
-      "totalCost": 8.94,
+      "totalCost": 8.95,
       "currency": "EUR",
       "notes": null,
       "items": [
         {
-          "id": "df674706-85ce-4cfe-84eb-2a0117a206d0",
-          "recipeId": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
+          "id": "2014de74-6b23-4ee2-975b-2b32c4de65c8",
+          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "e0f6ccfa-7f1e-499d-a4d8-fdd07579da80",
+          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
           "starterReminderMinutes": 60,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "15903ba2-adb4-4d9b-92dc-c63e925bb381",
+              "id": "1190c203-b7cf-4cc0-a754-3102d0d71d6f",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
@@ -182,7 +182,7 @@
               "note": null
             },
             {
-              "id": "080b7159-3f82-4560-9a5e-fce52032bdf1",
+              "id": "20dc26da-79ff-4cdc-8c70-26c6dd5daebc",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
@@ -200,7 +200,7 @@
               "note": null
             },
             {
-              "id": "83e3a3c3-f83b-47eb-8e77-93c7789fb168",
+              "id": "81f2ecff-c472-489f-ab8c-36d43728df66",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
@@ -218,7 +218,7 @@
               "note": null
             },
             {
-              "id": "911cc76b-4cd4-4d69-b3b9-f66cc5a49193",
+              "id": "d42272ff-4157-40a7-a566-8165429d29bf",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
@@ -236,7 +236,7 @@
               "note": null
             },
             {
-              "id": "636be6d7-80ea-4e3b-a17d-7f960dfaece7",
+              "id": "930c573c-80f8-4a9b-b0db-b25b06898145",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",
@@ -264,12 +264,12 @@
   {
     "case": "second batch",
     "method": "GET",
-    "path": "/api/v1/batches/91fc4cd7-79a8-4d4b-9bd7-8ff4c66c21fa",
+    "path": "/api/v1/batches/e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "91fc4cd7-79a8-4d4b-9bd7-8ff4c66c21fa",
+      "id": "e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
       "name": "Weekday bake",
       "status": "planned",
       "source": "manual",
@@ -279,23 +279,23 @@
       "actualStartAt": null,
       "completedAt": null,
       "priceDate": "2026-11-24",
-      "totalCost": 8.94,
+      "totalCost": 8.95,
       "currency": "EUR",
       "notes": null,
       "items": [
         {
-          "id": "02d5a232-f7e2-4909-a7d6-4616d56f3568",
-          "recipeId": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
+          "id": "16591114-3cdd-4b5f-aef8-395e09355c9b",
+          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "e0f6ccfa-7f1e-499d-a4d8-fdd07579da80",
+          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
           "starterReminderMinutes": 60,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "2d6c8131-a3c8-4e3f-95aa-dbc303f3d585",
+              "id": "711e6906-d70f-4fad-8fe1-b2ac8d54495c",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
@@ -313,7 +313,7 @@
               "note": null
             },
             {
-              "id": "6810c5ce-495d-4008-9fbd-94a6f5394b13",
+              "id": "2171377b-ad39-48da-b6a4-6c1e07b034dc",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
@@ -331,7 +331,7 @@
               "note": null
             },
             {
-              "id": "492e4194-749d-42e2-bf41-3f59e4e132bd",
+              "id": "dc7024da-5718-4b41-8d41-795ae3b8663f",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
@@ -349,7 +349,7 @@
               "note": null
             },
             {
-              "id": "618b50ee-d6c3-463b-b396-7456c119ec9d",
+              "id": "bdd5da77-94d6-4104-a1b1-dff01c2e4b1f",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
@@ -367,7 +367,7 @@
               "note": null
             },
             {
-              "id": "7a2cd439-1c11-45c9-9a37-1958745a42fa",
+              "id": "616efe87-9f1f-408d-ac7a-0dad9259e56b",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",

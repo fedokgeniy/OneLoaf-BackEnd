@@ -14,7 +14,8 @@ namespace OneLoaf.Web.Features.Recipes.Pages;
 /// <summary>
 /// <c>/ingredients</c> (US-10–12 and the stock): search and category filter, the list with today's price and the
 /// stock, and the selected ingredient with its flour details and two tabs: prices (history, add, correct, delete) and
-/// stock (quantity, purchases, corrections, movements). List and detail side by side on desktop
+/// stock (quantity and movements). One "Add record" enters what was bought: the price and, unless it is price only,
+/// the quantity; the card also holds a photo of the ingredient or its pack. List and detail side by side on desktop
 /// (Ingredients-Desktop), one after the other on smaller screens. Every quantity and price comes from the Core API.
 /// </summary>
 public sealed partial class IngredientsPage
@@ -29,10 +30,6 @@ public sealed partial class IngredientsPage
     private string _search = string.Empty;
     private CancellationTokenSource? _searchDelay;
     private string _tab = PricesTab;
-
-    private PriceForm _priceForm = new();
-    private ServerValidation? _priceServer;
-    private ApiError? _priceError;
 
     private PriceDto? _editingPrice;
     private PriceForm _priceEditForm = new();
@@ -51,10 +48,10 @@ public sealed partial class IngredientsPage
     private ApiError? _flourError;
     private FlourDto? _confirmDeleteFlour;
 
-    private IngredientDto? _purchaseFor;
-    private PurchaseForm _purchaseForm = new();
-    private ServerValidation? _purchaseServer;
-    private ApiError? _purchaseError;
+    private IngredientDto? _recordFor;
+    private IngredientRecordForm _recordForm = new();
+    private ServerValidation? _recordServer;
+    private ApiError? _recordError;
 
     private IngredientDto? _adjustFor;
     private StockAdjustmentForm _adjustForm = new();
@@ -98,15 +95,12 @@ public sealed partial class IngredientsPage
     {
         base.OnInitialized();
         _search = State.Value.Search;
-        ResetPriceForm();
-        if (State.Value.List is Shared.State.Loadable<Shared.Contracts.PagedResult<IngredientDto>>.NotAsked)
-        {
-            Reload();
-        }
+
+        // Always from the server: starters, recipes and the assistant add ingredients in other sections.
+        Reload();
 
         SubscribeToAction<CatalogCommandFailed>(OnCommandFailed);
         SubscribeToAction<IngredientSaved>(_ => CloseIngredientForm());
-        SubscribeToAction<PriceAdded>(_ => ResetPriceForm());
         SubscribeToAction<PriceChanged>(_ =>
         {
             _editingPrice = null;
@@ -114,16 +108,11 @@ public sealed partial class IngredientsPage
         });
         SubscribeToAction<StockChanged>(_ =>
         {
-            _purchaseFor = null;
+            _recordFor = null;
             _adjustFor = null;
         });
         SubscribeToAction<FlourSaved>(OnFlourSaved);
         SubscribeToAction<FlourDeleted>(_ => _confirmDeleteFlour = null);
-        SubscribeToAction<SelectIngredient>(_ =>
-        {
-            _priceError = null;
-            ResetPriceForm();
-        });
     }
 
     /// <inheritdoc />
@@ -197,29 +186,6 @@ public sealed partial class IngredientsPage
         "pcs" => "A box of ten eggs is 10 pcs.",
         _ => $"In {ingredient.UnitCode}, the unit of this ingredient.",
     };
-
-    private void ResetPriceForm()
-    {
-        var prices = State.Value.Prices.Value;
-        var last = prices is { Count: > 0 } ? prices[0] : null;
-        _priceForm = new PriceForm
-        {
-            Currency = last?.Currency ?? Selected?.CurrentPrice?.Currency ?? "EUR",
-            PerQuantity = last?.PerQuantity ?? 1000m,
-            EffectiveFrom = Today,
-        };
-    }
-
-    private void AddPrice(IngredientDto ingredient)
-    {
-        if (State.Value.Busy)
-        {
-            return;
-        }
-
-        _priceError = null;
-        Dispatcher.Dispatch(new AddPrice(ingredient.Id, _priceForm.ToRequest()));
-    }
 
     private void OpenPriceEdit(PriceDto price)
     {
@@ -319,27 +285,29 @@ public sealed partial class IngredientsPage
         }
     }
 
-    private void OpenPurchase(IngredientDto ingredient)
+    /// <summary>The record starts from the last purchase: same currency and pack size (else the quantity of the last price).</summary>
+    private void OpenRecord(IngredientDto ingredient)
     {
-        _purchaseError = null;
-        _purchaseForm = new PurchaseForm
+        _recordError = null;
+        var lastPurchase = State.Value.Movements.Value?.Items.FirstOrDefault(m => m.PackSize is not null);
+        _recordForm = new IngredientRecordForm
         {
             Currency = ingredient.CurrentPrice?.Currency ?? "EUR",
-            PackSize = ingredient.CurrentPrice?.PerQuantity,
-            PurchasedOn = Today,
+            PackSize = lastPurchase?.PackSize ?? ingredient.CurrentPrice?.PerQuantity,
+            Date = Today,
         };
-        _purchaseFor = ingredient;
+        _recordFor = ingredient;
     }
 
-    private void SavePurchase()
+    private void SaveRecord()
     {
-        if (State.Value.Busy || _purchaseFor is null)
+        if (State.Value.Busy || _recordFor is null)
         {
             return;
         }
 
-        _purchaseError = null;
-        Dispatcher.Dispatch(new AddPurchase(_purchaseFor.Id, _purchaseForm.ToRequest()));
+        _recordError = null;
+        Dispatcher.Dispatch(new AddRecord(_recordFor.Id, _recordForm.ToRequest()));
     }
 
     private void OpenAdjust(IngredientDto ingredient)
@@ -369,17 +337,14 @@ public sealed partial class IngredientsPage
         var error = failed.Error;
         switch (failed.Command)
         {
-            case nameof(Recipes.State.AddPrice):
-                _priceError = Unplaced(error, _priceServer, nameof(PriceForm.EffectiveFrom));
-                break;
             case nameof(Recipes.State.UpdatePrice):
                 _priceEditError = Unplaced(error, _priceEditServer, nameof(PriceForm.EffectiveFrom));
                 break;
             case nameof(Recipes.State.SaveIngredient):
                 _ingredientError = Unplaced(error, _ingredientServer, nameof(IngredientForm.Name));
                 break;
-            case nameof(Recipes.State.AddPurchase):
-                _purchaseError = Unplaced(error, _purchaseServer, null);
+            case nameof(Recipes.State.AddRecord):
+                _recordError = Unplaced(error, _recordServer, null);
                 break;
             case nameof(Recipes.State.AdjustStock):
                 _adjustError = Unplaced(error, _adjustServer, null);

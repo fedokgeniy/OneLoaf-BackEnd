@@ -171,6 +171,22 @@ public sealed class StageLineForm : IValidatableObject
     [StringLength(4000, ErrorMessage = "Use at most 4000 characters.")]
     public string? Instructions { get; set; }
 
+    /// <summary>A new stage with the same settings: it is a line of its own, so it has no line id.</summary>
+    public StageLineForm Copy() => new()
+    {
+        Name = Name,
+        StageTypeCode = StageTypeCode,
+        MinDurationMinutes = MinDurationMinutes,
+        MaxDurationMinutes = MaxDurationMinutes,
+        ActiveMinutes = ActiveMinutes,
+        ProofMode = ProofMode,
+        TemperatureC = TemperatureC,
+        UsesOven = UsesOven,
+        UsesMixer = UsesMixer,
+        IsOptional = IsOptional,
+        Instructions = Instructions,
+    };
+
     /// <summary>Inherited from the parent of a variant.</summary>
     public bool IsInherited { get; set; }
 

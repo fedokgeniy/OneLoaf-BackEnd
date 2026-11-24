@@ -6,7 +6,7 @@ using OneLoaf.SharedKernel.Security;
 namespace OneLoaf.CoreApi.Application.Catalog;
 
 /// <summary>
-/// Stock of the ingredients of the current user: purchases, corrections and the ledger. Batches and starter feedings
+/// Stock of the ingredients of the current user: purchase records, corrections and the ledger. Batches and starter feedings
 /// take from the stock in the database (<c>sp_apply_batch_stock</c>, <c>trg_starter_feedings_stock</c>).
 /// </summary>
 public sealed class StockService(
@@ -22,17 +22,17 @@ public sealed class StockService(
         ?? throw new NotFoundException(IngredientService.NotFoundMessage);
 
     /// <summary>
-    /// Stores a purchase: the stock grows by packs x pack size, the price of the purchase date becomes the amount paid
-    /// for that quantity, and the stock of the ingredient is kept from now on.
+    /// Stores what was bought: the price of the record date becomes the amount paid for packs x pack size. Unless the
+    /// record is price only, the stock grows by that quantity and is kept from now on. Returns the ingredient as it is now.
     /// </summary>
-    public async Task<StockMovementDto> AddPurchaseAsync(Guid ingredientId, PurchaseRequest request, CancellationToken cancellationToken)
+    public async Task<IngredientDto> AddRecordAsync(Guid ingredientId, IngredientRecordRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
         await EnsureOwnedAsync(ingredientId, cancellationToken);
         await reference.EnsureCurrencyAsync(request.Currency, "currency", cancellationToken);
         var normalized = request with { Note = string.IsNullOrWhiteSpace(request.Note) ? null : request.Note.Trim() };
-        var id = await ingredients.AddPurchaseAsync(ingredientId, normalized, cancellationToken);
-        return await ingredients.GetMovementAsync(id, cancellationToken);
+        await ingredients.AddRecordAsync(ingredientId, normalized, cancellationToken);
+        return (await ingredients.GetAsync(currentUser.Id, ingredientId, cancellationToken))!;
     }
 
     /// <summary>Sets the stock to the counted quantity by writing the difference to the ledger.</summary>

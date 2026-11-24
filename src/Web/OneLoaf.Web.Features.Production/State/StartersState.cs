@@ -4,15 +4,14 @@ using OneLoaf.Web.Features.Production.Services;
 using OneLoaf.Web.Shared.Api;
 using OneLoaf.Web.Shared.Contracts;
 using OneLoaf.Web.Shared.Contracts.Core;
-using OneLoaf.Web.Shared.Reference;
 using OneLoaf.Web.Shared.State;
 using OneLoaf.Web.Shared.State.Notifications;
 
 namespace OneLoaf.Web.Features.Production.State;
 
 /// <summary>
-/// Starters slice (US-27–30): starters, the selected starter's feeding log, and what the form offers: flours, flour
-/// types and the ingredients a feeding can take from the stock.
+/// Starters slice (US-27–30): starters, the selected starter's feeding log, and what the form offers: the
+/// ingredients a starter is fed with.
 /// </summary>
 [FeatureState(Name = "Starters")]
 public sealed record StartersState(
@@ -29,9 +28,6 @@ public sealed record StartersState(
 
     /// <summary>Ingredients of the catalog for the "fed with" selects.</summary>
     public IReadOnlyList<IngredientDto> Ingredients { get; init; } = [];
-
-    /// <summary>Flour types for the "add flour" dialog.</summary>
-    public IReadOnlyList<FlourTypeDto> FlourTypes { get; init; } = [];
 }
 
 /// <summary>Intent: load the starters (and flours for the form).</summary>
@@ -41,14 +37,7 @@ public sealed record LoadStarters;
 public sealed record StartersLoaded(
     Loadable<IReadOnlyList<StarterDto>> Starters,
     Loadable<IReadOnlyList<FlourDto>> Flours,
-    IReadOnlyList<IngredientDto>? Ingredients = null,
-    IReadOnlyList<FlourTypeDto>? FlourTypes = null);
-
-/// <summary>Intent: add a flour from the starter form (US-11).</summary>
-public sealed record AddStarterFlour(FlourRequest Request);
-
-/// <summary>Result: the flour was added and can be selected.</summary>
-public sealed record StarterFlourAdded(FlourDto Flour);
+    IReadOnlyList<IngredientDto>? Ingredients = null);
 
 /// <summary>Intent: show a starter's feeding log.</summary>
 public sealed record SelectStarter(Guid? Id);
@@ -92,21 +81,6 @@ public static class StartersReducers
             Starters = action.Starters,
             Flours = action.Flours,
             Ingredients = action.Ingredients ?? state.Ingredients,
-            FlourTypes = action.FlourTypes ?? state.FlourTypes,
-        };
-
-    /// <summary>A command runs.</summary>
-    [ReducerMethod(typeof(AddStarterFlour))]
-    public static StartersState OnAddFlour(StartersState state) => state with { Busy = true };
-
-    /// <summary>The new flour joins the list, ordered by name.</summary>
-    [ReducerMethod]
-    public static StartersState OnFlourAdded(StartersState state, StarterFlourAdded action) =>
-        state with
-        {
-            Busy = false,
-            Flours = new Loadable<IReadOnlyList<FlourDto>>.Loaded(
-                [.. (state.Flours.Value ?? []).Append(action.Flour).OrderBy(f => f.Name, StringComparer.OrdinalIgnoreCase)]),
         };
 
     /// <summary>Selection.</summary>
@@ -160,27 +134,9 @@ public static class StartersReducers
 }
 
 /// <summary>Side effects of the starters slice.</summary>
-public sealed class StartersEffects(IProductionApi api, IReferenceApi reference, NavigationManager navigation)
+public sealed class StartersEffects(IProductionApi api, NavigationManager navigation)
 {
-    /// <summary>Adds a flour from the starter form.</summary>
-    [EffectMethod]
-    public async Task HandleAddFlour(AddStarterFlour action, IDispatcher dispatcher)
-    {
-        ArgumentNullException.ThrowIfNull(action);
-        ArgumentNullException.ThrowIfNull(dispatcher);
-        switch (await api.CreateFlourAsync(action.Request))
-        {
-            case ApiResult<FlourDto>.Success { Value: var flour }:
-                dispatcher.Dispatch(new StarterFlourAdded(flour));
-                dispatcher.Dispatch(new ShowToast(Toast.Success("Flour added")));
-                break;
-            case ApiResult<FlourDto>.Failure { Error: var error }:
-                dispatcher.Dispatch(new StarterCommandFailed(nameof(AddStarterFlour), error));
-                break;
-        }
-    }
-
-    /// <summary>Loads starters and what the form offers in parallel; flours, ingredients and flour types are optional.</summary>
+    /// <summary>Loads starters and what the form offers in parallel; flours and ingredients are optional.</summary>
     [EffectMethod(typeof(LoadStarters))]
     public async Task HandleLoad(IDispatcher dispatcher)
     {
@@ -188,7 +144,6 @@ public sealed class StartersEffects(IProductionApi api, IReferenceApi reference,
         var starters = api.ListStartersAsync();
         var flours = api.ListFloursAsync();
         var ingredients = api.ListIngredientsAsync();
-        var flourTypes = reference.GetFlourTypesAsync();
         var startersResult = await starters;
         var floursResult = await flours;
         dispatcher.Dispatch(new StartersLoaded(
@@ -201,8 +156,7 @@ public sealed class StartersEffects(IProductionApi api, IReferenceApi reference,
             floursResult is ApiResult<PagedResult<FlourDto>>.Success { Value: var f }
                 ? new Loadable<IReadOnlyList<FlourDto>>.Loaded(f.Items)
                 : new Loadable<IReadOnlyList<FlourDto>>.Loaded([]),
-            await ingredients is ApiResult<PagedResult<IngredientDto>>.Success { Value: var i } ? i.Items : [],
-            await flourTypes is ApiResult<IReadOnlyList<FlourTypeDto>>.Success { Value: var types } ? types : []));
+            await ingredients is ApiResult<PagedResult<IngredientDto>>.Success { Value: var i } ? i.Items : []));
     }
 
     /// <summary>Loads the feeding log.</summary>

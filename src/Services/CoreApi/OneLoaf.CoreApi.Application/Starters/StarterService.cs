@@ -24,6 +24,9 @@ public sealed partial class StarterService(
     /// <summary>Message for a duplicate name.</summary>
     public const string NameTakenMessage = "A starter with this name already exists.";
 
+    /// <summary>Category of the ingredient a starter is.</summary>
+    public const string StarterCategory = "starter";
+
     /// <summary>Page of starters with their schedule.</summary>
     public Task<PagedResult<StarterDto>> ListAsync(PageQuery query, CancellationToken cancellationToken) =>
         starters.ListAsync(currentUser.Id, query, cancellationToken);
@@ -85,12 +88,28 @@ public sealed partial class StarterService(
     {
         ArgumentNullException.ThrowIfNull(request);
         var normalized = request with { Name = request.Name.Trim() };
-        if (normalized.FlourId is { } flourId && await flours.GetAsync(currentUser.Id, flourId, cancellationToken) is null)
+        if (normalized.FlourIngredientId is { } flourIngredientId)
+        {
+            // The flour of the starter is an ingredient; its flour details (type, protein) come with it.
+            var flourIngredient = await ingredients.GetAsync(currentUser.Id, flourIngredientId, cancellationToken)
+                ?? throw ValidationFailures.For("flourIngredientId", IngredientService.NotFoundMessage);
+            normalized = normalized with { FlourId = flourIngredient.FlourId };
+        }
+        else if (normalized.FlourId is { } flourId && await flours.GetAsync(currentUser.Id, flourId, cancellationToken) is null)
         {
             throw ValidationFailures.For("flourId", FlourService.NotFoundMessage);
         }
 
-        await EnsureIngredientAsync(normalized.FlourIngredientId, "flourIngredientId", cancellationToken);
+        // The starter is an ingredient with the same name: the name must be free among the ingredients as well,
+        // except for the starter's own ingredient and a starter ingredient that is waiting to be adopted.
+        var sameName = await ingredients.FindByNamesAsync(currentUser.Id, [normalized.Name], cancellationToken);
+        if (sameName.TryGetValue(normalized.Name, out var ingredientId)
+            && await ingredients.GetAsync(currentUser.Id, ingredientId, cancellationToken) is { } taken
+            && (taken.StarterId is null ? taken.CategoryCode != StarterCategory : taken.StarterId != id))
+        {
+            throw new ConflictException(IngredientService.NameTakenMessage);
+        }
+
         await EnsureIngredientAsync(normalized.WaterIngredientId, "waterIngredientId", cancellationToken);
         if (await starters.NameExistsAsync(currentUser.Id, normalized.Name, id, cancellationToken))
         {

@@ -137,16 +137,19 @@ message "Add a comment about the result first". 503 → record unchanged, retry 
 
 `/starters` → card "Log feeding" → sheet (compact) / dialog (medium+) with flour, water, kept, temperature, fed at (now)
 → `POST /starters/{id}/feedings` → card shows next feeding, expected peak and the amount after the feeding; reminder is
-created by the backend. When the starter names its flour and water ingredients (starter form, "Fed from the stock"), the
-backend takes the feeding from their stock. Push permission is requested in Settings → Reminders, never automatically.
+created by the backend. *Starter kept* is proposed by the API: the reserve plus the ripe starter no batch has used. The
+backend takes flour and water from the stock of the starter's ingredients. Until the peak the card says *ripening until …*;
+after it the usable share (two thirds unless changed) is the stock of the starter's own ingredient, which recipes and
+batches use. Push permission is requested in Settings → Reminders, never automatically.
 
 ## 6a. Flow — stock: purchase, bake, correct (ST-01 – ST-07)
 
 ```mermaid
 flowchart LR
-    a[/ingredients/] -->|select ingredient → tab Stock| b[Add purchase]
-    b -->|packs × pack size, amount, date| c[POST /ingredients/:id/purchases]
-    c --> d[stock and price of that date from the API; stock is kept from now on]
+    a[/ingredients/] -->|select ingredient| b[Add record]
+    b -->|packs × pack size, amount, date| c[POST /ingredients/:id/records]
+    c --> d[price of that date and stock from the API; stock is kept from now on]
+    b -.Only price.-> c2[price of that date only; the stock is untouched]
     d --> e[/batches/new/]
     e -->|preview| f{stock check<br/>in the preview}
     f -- enough --> g[POST /batches → the API takes the ingredients]

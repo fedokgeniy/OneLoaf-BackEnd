@@ -72,13 +72,28 @@
                 </div>
             </section>
 
+            <section class="ol-card editor__card" aria-labelledby="editor-photo">
+                <h2 class="h3 editor__card-title" id="editor-photo">Photo</h2>
+                @if (Id is { } recipeId)
+                {
+                    <OlPhotoPicker Src="@(Photo.Value.RecipeId == recipeId ? Photo.Value.Src : null)"
+                                   Loading="Photo.Value.RecipeId == recipeId && Photo.Value.Loading" Busy="Photo.Value.Busy"
+                                   Alt="@($"Photo of {_form.Title}")" AddLabel="Add a photo of the loaf"
+                                   OnSelected="photo => Dispatcher.Dispatch(new UploadRecipePhoto(recipeId, photo))"
+                                   OnRemove="() => Dispatcher.Dispatch(new RemoveRecipePhoto(recipeId))" />
+                }
+                else
+                {
+                    <p class="ol-field__help">Create the recipe first; then you can add a photo of the loaf here.</p>
+                }
+            </section>
+
             <section class="ol-card editor__card" aria-labelledby="editor-ingredients">
                 <h2 class="h3 editor__card-title" id="editor-ingredients">Ingredients · for @_form.YieldLoaves @(_form.YieldLoaves == 1 ? "loaf" : "loaves")</h2>
                 @if (data.Ingredients.Count == 0)
                 {
                     <OlAlert Kind="AlertKind.Info" Title="No ingredients yet.">
-                        Add flour, water, salt and your starter to the catalog first.
-                        <OlLink Href="ingredients">Open ingredients</OlLink>
+                        Add flour, water and salt with “New ingredient” below; a starter appears here once you create it in Starters.
                     </OlAlert>
                 }
                 <ol class="line-list">
@@ -92,8 +107,12 @@
                                               OnRemove="() => _form.Ingredients.RemoveAt(index)" />
                     }
                 </ol>
-                <div>
+                <div class="editor__line-actions">
                     <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Plus" OnClick="() => _form.Ingredients.Add(new IngredientLineForm())">Add ingredient</OlButton>
+                    @if (data.Categories is not null && data.Units is not null)
+                    {
+                        <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Plus" OnClick="OpenNewIngredient">New ingredient</OlButton>
+                    }
                 </div>
             </section>
 
@@ -107,7 +126,8 @@
                         <StageLineEditor @key="stage" Line="stage" Index="index" Count="_form.Stages.Count"
                                          StageTypes="data.StageTypes" Options="_stageTypeOptions"
                                          OnMoveUp="() => Move(_form.Stages, index, -1)" OnMoveDown="() => Move(_form.Stages, index, 1)"
-                                         OnRemove="() => _form.Stages.RemoveAt(index)" />
+                                         OnRemove="() => _form.Stages.RemoveAt(index)"
+                                         OnCopy="() => _form.Stages.Insert(index + 1, stage.Copy())" />
                     }
                 </ol>
                 <div>
@@ -127,6 +147,30 @@
         </div>
         break;
 }
+
+<OlDialog Open="_newIngredient is not null" Title="New ingredient" OnClose="() => _newIngredient = null">
+    <ChildContent>
+        @if (_newIngredient is not null)
+        {
+            <EditForm id="editor-ingredient-form" Model="_newIngredient" OnValidSubmit="CreateIngredient" class="form-stack" novalidate>
+                <ObjectGraphValidation />
+                <ServerValidation @ref="_newIngredientServer" />
+                <OlTextField Label="Name" @bind-Value="_newIngredient.Name" />
+                <OlSelect Label="Category" Options="CategoryOptions" Placeholder="Choose a category" @bind-Value="_newIngredient.CategoryCode" />
+                <OlSelect Label="Unit" Options="UnitOptions" @bind-Value="_newIngredient.UnitCode" />
+                <p class="ol-field__help">The price, the stock and the flour details are added on the Ingredients page.</p>
+                @if (_newIngredientError is not null)
+                {
+                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@_newIngredientError.CorrelationId">@_newIngredientError.Message</OlAlert>
+                }
+            </EditForm>
+        }
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _newIngredient = null">Cancel</OlButton>
+        <OlButton Type="submit" form="editor-ingredient-form" Loading="@_creatingIngredient">Add to the recipe</OlButton>
+    </Footer>
+</OlDialog>
 
 <OlDialog Open="_confirmDelete" Title="Delete this recipe?" OnClose="() => _confirmDelete = false">
     <ChildContent>

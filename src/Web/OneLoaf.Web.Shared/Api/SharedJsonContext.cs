@@ -42,7 +42,7 @@ namespace OneLoaf.Web.Shared.Api;
 [JsonSerializable(typeof(FlourRequest))]
 [JsonSerializable(typeof(PagedResult<StockMovementDto>))]
 [JsonSerializable(typeof(StockMovementDto))]
-[JsonSerializable(typeof(PurchaseRequest))]
+[JsonSerializable(typeof(IngredientRecordRequest))]
 [JsonSerializable(typeof(StockAdjustmentRequest))]
 [JsonSerializable(typeof(IReadOnlyList<WarningDto>))]
 [JsonSerializable(typeof(KitchenSettingsDto))]

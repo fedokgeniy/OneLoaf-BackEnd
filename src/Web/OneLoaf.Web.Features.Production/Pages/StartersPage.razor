@@ -51,6 +51,8 @@
                                 {
                                     <dt>Amount after feeding</dt>
                                     <dd class="ol-num">@DisplayFormat.Grams(amount)</dd>
+                                    <dt>Ready for dough</dt>
+                                    <dd class="ol-num">@ReadyText(starter)</dd>
                                 }
                             </dl>
                             <div class="ol-card__foot">
@@ -127,7 +129,7 @@
                 <div class="form-grid__wide"><OlTextField Label="Fed at" Type="datetime-local" @bind-Value="_feeding.FedAt" /></div>
                 <OlNumberField TValue="decimal?" Label="Flour" Suffix="g" @bind-Value="_feeding.FlourG" />
                 <OlNumberField TValue="decimal?" Label="Water" Suffix="g" @bind-Value="_feeding.WaterG" />
-                <OlNumberField TValue="decimal?" Label="Starter kept" Suffix="g" Help="What you kept before feeding." @bind-Value="_feeding.StarterKeptG" />
+                <OlNumberField TValue="decimal?" Label="Starter kept" Suffix="g" Help="What is left in the jar from the last feeding; lower it if you discarded some." @bind-Value="_feeding.StarterKeptG" />
                 <OlNumberField TValue="decimal?" Label="Temperature" Suffix="°C" @bind-Value="_feeding.TemperatureC" />
                 <div class="form-grid__wide"><OlTextField Label="Note" @bind-Value="_feeding.Note" /></div>
                 @if (_error is not null)
@@ -161,10 +163,8 @@
                 _error = a.Error.Kind == Shared.Api.ApiErrorKind.Validation && _server is not null && _server.Display(a.Error.FieldErrors).Count == 0 ? null : a.Error;
             }
         });
-        if (State.Value.Starters is Loadable<IReadOnlyList<StarterDto>>.NotAsked)
-        {
-            Dispatcher.Dispatch(new LoadStarters());
-        }
+        // Always from the server: the ripe starter changes with time and with batches planned elsewhere.
+        Dispatcher.Dispatch(new LoadStarters());
     }
 
     private static string ModeText(StarterDto starter) => starter.FeedingMode switch
@@ -183,11 +183,23 @@
         return $"{day} {local.ToString("HH:mm", CultureInfo.InvariantCulture)}";
     }
 
+    /// <summary>Ripe starter in stock, or when the last feeding ripens; both come from the API.</summary>
+    private string ReadyText(StarterDto starter) =>
+        starter.ExpectedPeakAt is { } peak && peak > Time.GetUtcNow()
+            ? $"ripening until {When(peak)}"
+            : DisplayFormat.Grams(starter.UsableG ?? 0m);
+
     private void OpenFeeding(StarterDto starter)
     {
         _error = null;
         _feedingFor = starter;
-        _feeding = new FeedingForm { FedAt = Time.GetLocalNow().ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture) };
+        _feeding = new FeedingForm
+        {
+            FedAt = Time.GetLocalNow().ToString("yyyy-MM-ddTHH:mm", CultureInfo.InvariantCulture),
+
+            // What the API says is in the jar: the reserve plus the ripe starter no batch has used.
+            StarterKeptG = starter.SuggestedKeptG,
+        };
     }
 
     private void SaveFeeding()

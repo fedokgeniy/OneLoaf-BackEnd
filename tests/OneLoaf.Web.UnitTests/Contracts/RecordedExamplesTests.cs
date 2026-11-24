@@ -43,7 +43,7 @@ public sealed class RecordedExamplesTests
         ["core-api/GetIngredientPrices"] = typeof(IReadOnlyList<PriceDto>),
         ["core-api/UpdateIngredientPrice"] = typeof(PriceDto),
         ["core-api/ListStockMovements"] = typeof(PagedResult<StockMovementDto>),
-        ["core-api/AddIngredientPurchase"] = typeof(StockMovementDto),
+        ["core-api/AddIngredientRecord"] = typeof(IngredientDto),
         ["core-api/AdjustIngredientStock"] = typeof(StockMovementDto),
         ["core-api/AddIngredientPrice"] = typeof(PriceDto),
         ["core-api/ListFlours"] = typeof(PagedResult<FlourDto>),

@@ -79,9 +79,6 @@ public interface IProductionApi
     /// <summary><c>GET flours</c> for the starter form.</summary>
     Task<ApiResult<PagedResult<FlourDto>>> ListFloursAsync(CancellationToken ct = default);
 
-    /// <summary><c>POST flours</c>: adds a flour from the starter form (US-11); 409 duplicate name.</summary>
-    Task<ApiResult<FlourDto>> CreateFlourAsync(FlourRequest request, CancellationToken ct = default);
-
     /// <summary><c>GET ingredients</c>: the ingredients a starter can be fed with.</summary>
     Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(CancellationToken ct = default);
 
@@ -183,10 +180,6 @@ public sealed class ProductionApi(ApiClientFactory api) : IProductionApi
     /// <inheritdoc />
     public Task<ApiResult<PagedResult<FlourDto>>> ListFloursAsync(CancellationToken ct = default) =>
         api.Core.GetAsync<PagedResult<FlourDto>>(Url.Build("api/v1/flours", ("pageSize", 100)), ct);
-
-    /// <inheritdoc />
-    public Task<ApiResult<FlourDto>> CreateFlourAsync(FlourRequest request, CancellationToken ct = default) =>
-        api.Core.PostAsync<FlourRequest, FlourDto>("api/v1/flours", request, ct);
 
     /// <inheritdoc />
     public Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(CancellationToken ct = default) =>

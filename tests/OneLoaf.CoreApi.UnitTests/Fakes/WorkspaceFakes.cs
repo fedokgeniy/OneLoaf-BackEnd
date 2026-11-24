@@ -164,7 +164,7 @@ internal sealed class FakeIngredientRepository : IIngredientRepository
 
     public List<StockMovementDto> Movements { get; } = [];
 
-    public PurchaseRequest? LastPurchase { get; private set; }
+    public IngredientRecordRequest? LastRecord { get; private set; }
 
     public Task<bool> UpdatePriceAsync(Guid ingredientId, Guid priceId, PriceRequest price, CancellationToken cancellationToken)
     {
@@ -190,11 +190,21 @@ internal sealed class FakeIngredientRepository : IIngredientRepository
             ? new PagedResult<StockMovementDto>(Movements, query.Page, query.PageSize, Movements.Count)
             : null);
 
-    public Task<Guid> AddPurchaseAsync(Guid ingredientId, PurchaseRequest purchase, CancellationToken cancellationToken)
+    public Task AddRecordAsync(Guid ingredientId, IngredientRecordRequest record, CancellationToken cancellationToken)
     {
-        LastPurchase = purchase;
-        return Task.FromResult(Record(ingredientId, OneLoaf.Domain.StockMovementType.Purchase,
-            purchase.PackCount * purchase.PackSize, purchase.PurchasedOn, purchase.Note));
+        LastRecord = record;
+        var (owner, ingredient) = Ingredients[ingredientId];
+        var quantity = record.PackCount * record.PackSize;
+        var price = new CurrentPriceDto(record.TotalCost, quantity, record.TotalCost / quantity, record.Currency, record.Date);
+        if (record.PriceOnly)
+        {
+            Ingredients[ingredientId] = (owner, ingredient with { CurrentPrice = price });
+            return Task.CompletedTask;
+        }
+
+        Record(ingredientId, OneLoaf.Domain.StockMovementType.Purchase, quantity, record.Date, record.Note);
+        Ingredients[ingredientId] = (owner, ingredient with { CurrentPrice = price, TrackStock = true, Stock = Stock[ingredientId] });
+        return Task.CompletedTask;
     }
 
     public Task<Guid> AddAdjustmentAsync(

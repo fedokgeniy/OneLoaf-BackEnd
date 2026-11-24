@@ -9,12 +9,13 @@
     "responseBody": {
       "items": [
         {
-          "id": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
+          "id": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
           "title": "Country sourdough",
           "parentRecipeId": null,
           "yieldLoaves": 1,
           "isArchived": false,
-          "updatedAt": "2026-11-24T16:43:51.599892+00:00"
+          "updatedAt": "2026-11-24T19:27:05.242239+00:00",
+          "hasPhoto": false
         }
       ],
       "page": 1,
@@ -32,12 +33,13 @@
     "responseBody": {
       "items": [
         {
-          "id": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
+          "id": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
           "title": "Country sourdough",
           "parentRecipeId": null,
           "yieldLoaves": 1,
           "isArchived": false,
-          "updatedAt": "2026-11-24T16:43:51.599892+00:00"
+          "updatedAt": "2026-11-24T19:27:05.242239+00:00",
+          "hasPhoto": false
         }
       ],
       "page": 1,

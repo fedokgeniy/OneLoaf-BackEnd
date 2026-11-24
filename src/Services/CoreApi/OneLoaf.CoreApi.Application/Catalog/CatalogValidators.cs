@@ -74,11 +74,11 @@ public sealed class StockMovementListQueryValidator : AbstractValidator<StockMov
     public StockMovementListQueryValidator() => this.AddPagingRules(x => x.Page, x => x.PageSize);
 }
 
-/// <summary>Validates <see cref="PurchaseRequest"/>.</summary>
-public sealed class PurchaseRequestValidator : AbstractValidator<PurchaseRequest>
+/// <summary>Validates <see cref="IngredientRecordRequest"/>.</summary>
+public sealed class IngredientRecordRequestValidator : AbstractValidator<IngredientRecordRequest>
 {
     /// <summary>Creates the rules.</summary>
-    public PurchaseRequestValidator()
+    public IngredientRecordRequestValidator()
     {
         RuleFor(x => x.PackCount).InclusiveBetween(1, CatalogLimits.MaxPackCount);
         RuleFor(x => x.PackSize).GreaterThan(0).LessThan(CatalogLimits.MaxQuantity);
@@ -86,7 +86,7 @@ public sealed class PurchaseRequestValidator : AbstractValidator<PurchaseRequest
             .WithMessage("The purchased quantity is too large.");
         RuleFor(x => x.TotalCost).GreaterThanOrEqualTo(0).LessThan(CatalogLimits.MaxPrice);
         RuleFor(x => x.Currency).NotEmpty().Length(3);
-        RuleFor(x => x.PurchasedOn).NotEqual(default(DateOnly));
+        RuleFor(x => x.Date).NotEqual(default(DateOnly));
         RuleFor(x => x.Note).MaximumLength(CatalogLimits.StockNoteMaxLength);
     }
 }

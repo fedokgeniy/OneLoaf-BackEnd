@@ -26,16 +26,19 @@ public sealed class StarterForm
     [Range(1, 720, ErrorMessage = "Enter 1 to 720 hours.")]
     public int? FeedingIntervalHours { get; set; } = 24;
 
-    /// <summary>Flour of the catalog.</summary>
-    public string? FlourId { get; set; }
-
-    /// <summary>Ingredient whose stock a feeding takes the flour from.</summary>
+    /// <summary>Flour the starter is fed with: an ingredient of the catalog; feedings take from its stock.</summary>
     public string? FlourIngredientId { get; set; }
+
+    /// <summary>Share of the fed starter that can go into dough once it is ripe, in percent.</summary>
+    [Required(ErrorMessage = "Enter the usable share.")]
+    [Range(typeof(decimal), "5", "100", ParseLimitsInInvariantCulture = true, ErrorMessage = "Enter 5 to 100 %.")]
+    public decimal? UsablePercent { get; set; } = 66.7m;
 
     /// <summary>Ingredient whose stock a feeding takes the water from.</summary>
     public string? WaterIngredientId { get; set; }
 
-    /// <summary>Hours from feeding to peak (US-30).</summary>
+    /// <summary>Hours from feeding to peak (US-30); the starter cannot be used before it.</summary>
+    [Required(ErrorMessage = "Enter the time from a feeding to the peak.")]
     [Range(typeof(decimal), "0.5", "72", ParseLimitsInInvariantCulture = true, ErrorMessage = "Enter 0.5 to 72 hours.")]
     public decimal? RiseHours { get; set; }
 
@@ -56,8 +59,8 @@ public sealed class StarterForm
             HydrationPercent = starter.HydrationPercent,
             FeedingMode = starter.FeedingMode,
             FeedingIntervalHours = starter.FeedingIntervalHours,
-            FlourId = starter.FlourId?.ToString(),
             FlourIngredientId = starter.FlourIngredientId?.ToString(),
+            UsablePercent = Math.Round(starter.UsableShare * 100m, 1),
             WaterIngredientId = starter.WaterIngredientId?.ToString(),
             RiseHours = starter.RiseHours,
             IsActive = starter.IsActive,
@@ -68,10 +71,11 @@ public sealed class StarterForm
     /// <summary>The request.</summary>
     public StarterRequest ToRequest() => new(
         Name!.Trim(), HydrationPercent!.Value, FeedingMode!, FeedingIntervalHours!.Value,
-        Guid.TryParse(FlourId, CultureInfo.InvariantCulture, out var flour) ? flour : null,
+        null,
         RiseHours, IsActive, string.IsNullOrWhiteSpace(Notes) ? null : Notes.Trim(),
         Guid.TryParse(FlourIngredientId, CultureInfo.InvariantCulture, out var flourIngredient) ? flourIngredient : null,
-        Guid.TryParse(WaterIngredientId, CultureInfo.InvariantCulture, out var waterIngredient) ? waterIngredient : null);
+        Guid.TryParse(WaterIngredientId, CultureInfo.InvariantCulture, out var waterIngredient) ? waterIngredient : null,
+        UsablePercent!.Value / 100m);
 }
 
 /// <summary>Feeding form (US-28); "starter kept" lives here, not on the starter (mockup-vs-api).</summary>

@@ -38,6 +38,8 @@ public class IngredientConfiguration : IEntityTypeConfiguration<Ingredient>
         b.Property(x => x.Name).HasMaxLength(200).IsRequired();
         b.Property(x => x.TrackStock).HasDefaultValue(false);
         b.Property(x => x.ReorderLevel).HasPrecision(12, 3);
+        b.Property(x => x.PhotoKey).HasMaxLength(200);
+        b.Property(x => x.PhotoContentType).HasMaxLength(50);
         b.HasIndex(x => new { x.OwnerId, x.Name }).IsUnique();
         b.HasOne(x => x.Owner).WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Cascade);
         b.HasIndex(x => x.FlourId);
@@ -80,7 +82,7 @@ public class StockMovementConfiguration : IEntityTypeConfiguration<StockMovement
             t.HasComment("E3. Stock ledger of ingredients: purchases, batch consumption and returns, starter feedings, corrections. The stock is the sum of quantity.");
             t.HasCheckConstraint("ck_stock_movements_quantity_not_zero", "quantity <> 0");
             t.HasCheckConstraint("ck_stock_movements_quantity_sign",
-                "(movement_type IN ('purchase', 'batch_return') AND quantity > 0) OR (movement_type IN ('batch_consumption', 'starter_feeding') AND quantity < 0) OR movement_type = 'adjustment'");
+                "(movement_type IN ('purchase', 'batch_return', 'starter_ripened') AND quantity > 0) OR (movement_type IN ('batch_consumption', 'starter_feeding', 'starter_refed') AND quantity < 0) OR movement_type = 'adjustment'");
             t.HasCheckConstraint("ck_stock_movements_purchase_fields",
                 "movement_type <> 'purchase' OR (pack_count > 0 AND pack_size > 0 AND total_cost >= 0 AND currency IS NOT NULL)");
             t.HasCheckConstraint("ck_stock_movements_adjustment_note", "movement_type <> 'adjustment' OR length(btrim(note)) > 0");

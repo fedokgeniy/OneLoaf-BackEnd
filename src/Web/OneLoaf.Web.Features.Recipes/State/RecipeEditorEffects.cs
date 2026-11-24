@@ -22,6 +22,8 @@ public sealed class RecipeEditorEffects(
         var recipeTask = action.Id is { } id ? recipes.GetAsync(id) : null;
         var ingredientsTask = catalog.ListIngredientsAsync(null, null, 1, ICatalogApi.MaxPageSize);
         var stageTypesTask = reference.GetStageTypesAsync();
+        var categoriesTask = reference.GetIngredientCategoriesAsync();
+        var unitsTask = reference.GetUnitsAsync();
         var recipe = recipeTask is null ? null : await recipeTask;
         var ingredients = await ingredientsTask;
         var stageTypes = await stageTypesTask;
@@ -37,8 +39,29 @@ public sealed class RecipeEditorEffects(
             return;
         }
 
+        // Categories and units are only needed to add an ingredient here; without them the editor still works.
         dispatcher.Dispatch(new EditorLoaded(action.Id,
-            new EditorData((recipe as ApiResult<RecipeDto>.Success)?.Value, page.Items, types)));
+            new EditorData((recipe as ApiResult<RecipeDto>.Success)?.Value, page.Items, types,
+                (await categoriesTask as ApiResult<IReadOnlyList<IngredientCategoryDto>>.Success)?.Value,
+                (await unitsTask as ApiResult<IReadOnlyList<UnitDto>>.Success)?.Value)));
+    }
+
+    /// <summary>Adds an ingredient to the catalog from the editor.</summary>
+    [EffectMethod]
+    public async Task HandleCreateIngredient(CreateEditorIngredient action, IDispatcher dispatcher)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+        ArgumentNullException.ThrowIfNull(dispatcher);
+        switch (await catalog.CreateIngredientAsync(action.Request))
+        {
+            case ApiResult<IngredientDto>.Success { Value: var ingredient }:
+                dispatcher.Dispatch(new EditorIngredientCreated(ingredient));
+                dispatcher.Dispatch(new ShowToast(Toast.Success("Ingredient added")));
+                break;
+            case ApiResult<IngredientDto>.Failure { Error: var error }:
+                dispatcher.Dispatch(new EditorIngredientFailed(error));
+                break;
+        }
     }
 
     /// <summary>Creates or updates, then opens the recipe.</summary>

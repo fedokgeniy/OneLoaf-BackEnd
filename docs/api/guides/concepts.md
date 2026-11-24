@@ -22,11 +22,18 @@ cycles (bowl capacity) and oven loading (capacity).
   bake in September stays as it was even after a price change in October. A price entered by mistake can be replaced
   (`PUT …/prices/{priceId}`) or deleted; there is one price per ingredient and date.
 - **Stock** is a ledger per ingredient (`GET /ingredients/{id}/stock-movements`); the stock is the sum of the
-  movements, in the ingredient unit. A **purchase** (`POST …/purchases`: packs × pack size for an amount) adds to the
-  stock and sets the price of its date; a **correction** (`POST …/stock-adjustments`) sets the stock to the counted
+  movements, in the ingredient unit. A **record** (`POST …/records`: packs × pack size for an amount) sets the price of
+  its date and adds to the stock; with `priceOnly` it sets only the price. A **correction** (`POST …/stock-adjustments`) sets the stock to the counted
   quantity. Creating a batch takes its ingredients, re-planning changes the stock by the difference, and cancelling or
   deleting a batch with `ingredientsUsed=false` returns them. A starter feeding takes flour and water from the
-  ingredients named on the starter. Only ingredients with `trackStock = true` are consumed and checked: the first
+  ingredients named on the starter.
+- A **starter is also an ingredient** (`starter.ingredientId`, category `starter`, same name): recipes use it. After a
+  feeding the starter ripens until `expectedPeakAt` (`riseHours` is required); then `usableShare` (two thirds by
+  default) of flour + water + kept becomes the stock of that ingredient, and the rest stays for the next feeding. The
+  next feeding returns the ripe starter that is left: `suggestedKeptG` is the reserve plus what no batch used. A batch
+  is checked against the stock at its planned start, so a starter fed today counts for a batch tomorrow.
+- Ingredients and recipes have one **photo** each (`PUT/GET/DELETE …/photo`, multipart field `file`; `hasPhoto` in the
+  DTOs). Only ingredients with `trackStock = true` are consumed and checked: the first
   purchase or correction switches it on, and `PUT /ingredients/{id}` can switch it off. `isLowStock` and the
   `low_stock` warning report a stock below `reorderLevel` (or below zero).
 - A batch **preview** returns the stock check: `stock.shortages`, `stock.maxLoaves` (loaves the stock covers at full

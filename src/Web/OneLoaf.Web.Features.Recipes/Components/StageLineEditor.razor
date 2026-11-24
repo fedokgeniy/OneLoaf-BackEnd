@@ -15,6 +15,7 @@
     <div class="line__actions">
         <OlIconButton Icon="IconName.ChevronUp" Label="@($"Move {Name} up")" Disabled="@(Index == 0)" OnClick="OnMoveUp" />
         <OlIconButton Icon="IconName.ChevronDown" Label="@($"Move {Name} down")" Disabled="@(Index == Count - 1)" OnClick="OnMoveDown" />
+        <OlIconButton Icon="IconName.Plus" Label="@($"Copy {Name}")" OnClick="OnCopy" />
         <OlIconButton Icon="IconName.Trash" Label="@($"Remove {Name}")" Danger="true" OnClick="OnRemove" />
     </div>
     <div class="line__more">
@@ -78,6 +79,9 @@
 
     /// <summary>Remove.</summary>
     [Parameter] public EventCallback OnRemove { get; set; }
+
+    /// <summary>Raised to add a copy of the stage after it.</summary>
+    [Parameter] public EventCallback OnCopy { get; set; }
 
     private string Name => string.IsNullOrWhiteSpace(Line.Name) ? $"stage {Index + 1}" : Line.Name;
 

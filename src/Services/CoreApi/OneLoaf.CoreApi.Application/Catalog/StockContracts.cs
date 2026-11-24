@@ -25,15 +25,19 @@ public sealed record StockMovementDto(
 /// <param name="PageSize">Page size, 1-100.</param>
 public sealed record StockMovementListQuery(int Page = 1, int PageSize = Paging.DefaultPageSize);
 
-/// <summary>Body of <c>POST /ingredients/{id}/purchases</c>: packs of a size bought for an amount.</summary>
+/// <summary>
+/// Body of <c>POST /ingredients/{id}/records</c>: what was bought and what it cost. The record sets the price of its
+/// date; unless it is price only, it also adds packs x pack size to the stock.
+/// </summary>
 /// <param name="PackCount">Number of packs, 1-10000.</param>
 /// <param name="PackSize">Content of one pack in the ingredient unit (1000 for a 1 kg bag of an ingredient kept in g).</param>
 /// <param name="TotalCost">Amount paid for all packs, at least 0.</param>
 /// <param name="Currency">Currency code.</param>
-/// <param name="PurchasedOn">Date of the purchase; the price applies from this date.</param>
+/// <param name="Date">Date of the purchase; the price applies from this date.</param>
 /// <param name="Note">Note, for example the shop.</param>
-public sealed record PurchaseRequest(
-    int PackCount, decimal PackSize, decimal TotalCost, string Currency, DateOnly PurchasedOn, string? Note = null);
+/// <param name="PriceOnly">True records only the price: the stock does not change and is not switched on.</param>
+public sealed record IngredientRecordRequest(
+    int PackCount, decimal PackSize, decimal TotalCost, string Currency, DateOnly Date, string? Note = null, bool PriceOnly = false);
 
 /// <summary>Body of <c>POST /ingredients/{id}/stock-adjustments</c>: the quantity that is really on the shelf.</summary>
 /// <param name="ActualQuantity">Counted stock in the ingredient unit, at least 0.</param>

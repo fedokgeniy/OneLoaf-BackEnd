@@ -14,6 +14,7 @@ public class StarterConfiguration : IEntityTypeConfiguration<Starter>
             t.HasCheckConstraint("ck_starters_hydration_percent", "hydration_percent > 0");
             t.HasCheckConstraint("ck_starters_feeding_interval_hours", "feeding_interval_hours > 0");
             t.HasCheckConstraint("ck_starters_rise_hours", "rise_hours > 0");
+            t.HasCheckConstraint("ck_starters_usable_share", "usable_share > 0 AND usable_share <= 1");
         });
         b.HasKey(x => x.Id);
         b.Property(x => x.Name).HasMaxLength(100).IsRequired();
@@ -24,6 +25,9 @@ public class StarterConfiguration : IEntityTypeConfiguration<Starter>
         b.HasOne(x => x.Owner).WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Cascade);
         b.HasIndex(x => x.FlourId);
         b.HasOne(x => x.Flour).WithMany().HasForeignKey(x => x.FlourId).OnDelete(DeleteBehavior.SetNull);
+        b.Property(x => x.UsableShare).HasPrecision(4, 3).HasDefaultValue(0.667m);
+        b.HasIndex(x => x.IngredientId).IsUnique();
+        b.HasOne(x => x.Ingredient).WithMany().HasForeignKey(x => x.IngredientId).OnDelete(DeleteBehavior.Cascade);
         b.HasIndex(x => x.FlourIngredientId);
         b.HasIndex(x => x.WaterIngredientId);
         b.HasOne(x => x.FlourIngredient).WithMany().HasForeignKey(x => x.FlourIngredientId).OnDelete(DeleteBehavior.SetNull);

@@ -51,6 +51,40 @@ public sealed class RecipeEditorPageTests : BunitContext
     }
 
     [Fact]
+    public void CopyStage_SecondStage_AddsANewStageWithTheSameSettingsAfterIt()
+    {
+        var cut = Render<RecipeEditorPage>(p => p.Add(page => page.Id, Id));
+        cut.WaitForAssertion(() => cut.Find("form#recipe-editor"));
+
+        cut.Find("button[aria-label='Copy Bulk']").Click();
+        cut.Find("form#recipe-editor").Submit();
+
+        cut.WaitForAssertion(() => Assert.NotNull(_api.LastRequest));
+        var stages = _api.LastRequest!.Stages;
+        Assert.Equal(["Mix", "Bulk", "Bulk"], stages.Select(s => s.Name));
+        Assert.NotNull(stages[1].LineId);
+        Assert.Null(stages[2].LineId);
+        Assert.Equal(stages[1].MaxDurationMinutes, stages[2].MaxDurationMinutes);
+    }
+
+    [Fact]
+    public void NewIngredient_FromTheEditor_IsCreatedAndGetsALineOfItsOwn()
+    {
+        var cut = Render<RecipeEditorPage>(p => p.Add(page => page.Id, Id));
+        cut.WaitForAssertion(() => cut.Find("form#recipe-editor"));
+
+        cut.FindAll("form#recipe-editor button").Single(b => b.TextContent.Contains("New ingredient", StringComparison.Ordinal)).Click();
+        cut.Find("#editor-ingredient-form input").Change("Sea salt");
+        cut.Find("#editor-ingredient-form select").Change("water");
+        cut.Find("#editor-ingredient-form").Submit();
+
+        cut.WaitForAssertion(() => Assert.Equal(3, cut.FindAll("li.line:not(.line--stage)").Count));
+        Assert.Equal("Sea salt", EditorCatalog.Created?.Name);
+        Assert.Empty(cut.FindAll("#editor-ingredient-form"));
+        Assert.Equal(EditorCatalog.CreatedId.ToString(), cut.FindAll("li.line:not(.line--stage)")[2].QuerySelector("select")!.GetAttribute("value"));
+    }
+
+    [Fact]
     public void Submit_EmptyNewRecipe_ShowsRowErrorsAndSendsNothing()
     {
         var cut = Render<RecipeEditorPage>();
@@ -104,7 +138,18 @@ public sealed class RecipeEditorPageTests : BunitContext
 
     private sealed class EditorCatalog : CatalogApiStub
     {
+        public static readonly Guid CreatedId = Guid.NewGuid();
+
+        public static IngredientRequest? Created { get; private set; }
+
         public override Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(string? search, string? category, int page, int pageSize, CancellationToken ct = default) =>
             Task.FromResult(ApiResult<PagedResult<IngredientDto>>.Ok(new PagedResult<IngredientDto>([Flour, Water], 1, 100, 2)));
+
+        public override Task<ApiResult<IngredientDto>> CreateIngredientAsync(IngredientRequest request, CancellationToken ct = default)
+        {
+            Created = request;
+            return Task.FromResult(ApiResult<IngredientDto>.Ok(new IngredientDto(CreatedId, request.Name, request.CategoryCode, request.UnitCode,
+                null, null, null, null, DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch)));
+        }
     }
 }

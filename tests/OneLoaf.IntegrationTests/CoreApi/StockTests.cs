@@ -33,9 +33,9 @@ public sealed class StockTests(ApiFixture fixture)
         async Task<IngredientDto> Flour() => await (await anna.GetAsync($"{Ingredients}/{flour.Id}", Ct)).ReadAsync<IngredientDto>();
 
         // A purchase of two 1 kg bags adds 2000 g, switches the stock on and sets the price of that date.
-        using var purchase = await anna.PostAsJsonAsync($"{Ingredients}/{flour.Id}/purchases",
-            new PurchaseRequest(2, 1000, 3m, "EUR", new DateOnly(2026, 11, 20)), CoreApiFactory.Json, Ct);
-        Assert.Equal(HttpStatusCode.Created, purchase.StatusCode);
+        using var purchase = await anna.PostAsJsonAsync($"{Ingredients}/{flour.Id}/records",
+            new IngredientRecordRequest(2, 1000, 3m, "EUR", new DateOnly(2026, 11, 20)), CoreApiFactory.Json, Ct);
+        Assert.Equal(HttpStatusCode.OK, purchase.StatusCode);
         var bought = await Flour();
         Assert.True(bought.TrackStock);
         Assert.Equal(2000m, bought.Stock);
@@ -76,15 +76,38 @@ public sealed class StockTests(ApiFixture fixture)
         Assert.Equal(0.5m, scaled.IngredientScale);
         Assert.Equal(1000m, (await Flour()).Stock);
 
-        // A feeding takes the flour of the ingredient linked to the starter.
+        // A starter is an ingredient of its own. A feeding takes the flour of the linked ingredient; two thirds of the
+        // fed starter become stock when it is ripe, and a batch planned after the peak can count on it.
         var starter = await (await anna.PostAsJsonAsync("/api/v1/starters",
-            new StarterRequest("Stock test starter", 100, FeedingMode.Regular, 24, FlourIngredientId: flour.Id),
+            new StarterRequest("Stock test starter", 100, FeedingMode.Regular, 24, RiseHours: 6, FlourIngredientId: flour.Id),
             CoreApiFactory.Json, Ct)).ReadAsync<StarterDto>();
-        await anna.PostAsJsonAsync($"/api/v1/starters/{starter.Id}/feedings",
-            new FeedingRequest(Start, 50, 50, 20), CoreApiFactory.Json, Ct);
+        var asIngredient = await (await anna.GetAsync($"{Ingredients}/{starter.IngredientId}", Ct)).ReadAsync<IngredientDto>();
+        Assert.Equal("Stock test starter", asIngredient.Name);
+        Assert.Equal("starter", asIngredient.CategoryCode);
+        Assert.Equal(starter.Id, asIngredient.StarterId);
+
+        var fedAt = DateTimeOffset.UtcNow.AddHours(-1);
+        await anna.PostAsJsonAsync($"/api/v1/starters/{starter.Id}/feedings", new FeedingRequest(fedAt, 50, 50, 20), CoreApiFactory.Json, Ct);
         Assert.Equal(950m, (await Flour()).Stock);
-        var fed = await (await anna.GetAsync($"/api/v1/starters/{starter.Id}", Ct)).ReadAsync<StarterDto>();
-        Assert.Equal(120m, fed.AmountG);
+        var ripening = await (await anna.GetAsync($"/api/v1/starters/{starter.Id}", Ct)).ReadAsync<StarterDto>();
+        Assert.Equal(120m, ripening.AmountG);
+        Assert.Equal(0m, ripening.UsableG);
+        Assert.Equal(120m, ripening.SuggestedKeptG);
+
+        var levain = await (await anna.PostAsJsonAsync("/api/v1/recipes", new RecipeRequest("Stock test levain loaf", null, 1, null, null,
+            [new(null, starter.IngredientId!.Value, 50)], [new(null, "Bake", "bake", 40, 45)]), CoreApiFactory.Json, Ct)).ReadAsync<RecipeDto>();
+        BatchRequest Levain(DateTimeOffset start) => new("Levain test", start, [new(levain.Id, 1)], new DateOnly(2026, 11, 20));
+        var tooEarly = await (await anna.PostAsJsonAsync($"{Batches}/preview", Levain(fedAt.AddHours(2)), CoreApiFactory.Json, Ct)).ReadAsync<BatchDto>();
+        Assert.Equal(50m, Assert.Single(tooEarly.Stock!.Shortages).Missing);
+        var afterPeak = await (await anna.PostAsJsonAsync($"{Batches}/preview", Levain(fedAt.AddHours(7)), CoreApiFactory.Json, Ct)).ReadAsync<BatchDto>();
+        Assert.Empty(afterPeak.Stock!.Shortages);
+
+        // Renaming the starter renames its ingredient: one name for both.
+        await anna.PutAsJsonAsync($"/api/v1/starters/{starter.Id}",
+            new StarterRequest("Stock test levain", 100, FeedingMode.Regular, 24, RiseHours: 6, FlourIngredientId: flour.Id, UsableShare: 0.5m),
+            CoreApiFactory.Json, Ct);
+        Assert.Equal("Stock test levain",
+            (await (await anna.GetAsync($"{Ingredients}/{starter.IngredientId}", Ct)).ReadAsync<IngredientDto>()).Name);
 
         // A correction sets the stock to the counted quantity; below the reorder level the ingredient is low.
         using var adjusted = await anna.PostAsJsonAsync($"{Ingredients}/{flour.Id}/stock-adjustments",

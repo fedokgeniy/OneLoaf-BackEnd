@@ -1,6 +1,7 @@
 using OneLoaf.Web.Shared.Api;
 using OneLoaf.Web.Shared.Contracts;
 using OneLoaf.Web.Shared.Contracts.Core;
+using OneLoaf.Web.Shared.Ui;
 
 namespace OneLoaf.Web.Features.Recipes.Services;
 
@@ -20,6 +21,15 @@ public sealed record RecipeQuery(string Search, bool IncludeArchived, decimal? M
 /// <summary>Typed client of the recipe endpoints of the Core API.</summary>
 public interface IRecipesApi
 {
+    /// <summary><c>GET recipes/{id}/photo</c>: the image with the bearer token.</summary>
+    Task<ApiResult<FileDownload>> GetPhotoAsync(Guid id, CancellationToken ct = default);
+
+    /// <summary><c>PUT recipes/{id}/photo</c>: 422 for a file that is not JPEG, PNG or WebP.</summary>
+    Task<ApiResult> SetPhotoAsync(Guid id, PhotoFile photo, CancellationToken ct = default);
+
+    /// <summary><c>DELETE recipes/{id}/photo</c>.</summary>
+    Task<ApiResult> DeletePhotoAsync(Guid id, CancellationToken ct = default);
+
     /// <summary><c>GET recipes</c>: one page of the caller's recipes.</summary>
     Task<ApiResult<PagedResult<RecipeSummaryDto>>> ListAsync(RecipeQuery query, int page, CancellationToken ct = default);
 
@@ -119,4 +129,20 @@ public sealed class RecipesApi(ApiClientFactory api) : IRecipesApi
     /// <inheritdoc />
     public Task<ApiResult<RecipeComparisonDto>> CompareAsync(Guid id, CancellationToken ct = default) =>
         api.Core.GetAsync<RecipeComparisonDto>($"api/v1/recipes/{id}/comparison", ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<FileDownload>> GetPhotoAsync(Guid id, CancellationToken ct = default) =>
+        api.Core.DownloadAsync($"api/v1/recipes/{id}/photo", ct);
+
+    /// <inheritdoc />
+    public async Task<ApiResult> SetPhotoAsync(Guid id, PhotoFile photo, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(photo);
+        using var stream = new MemoryStream(photo.Content);
+        return await api.Core.PutFileAsync($"api/v1/recipes/{id}/photo", stream, photo.FileName, photo.ContentType, ct);
+    }
+
+    /// <inheritdoc />
+    public Task<ApiResult> DeletePhotoAsync(Guid id, CancellationToken ct = default) =>
+        api.Core.DeleteAsync($"api/v1/recipes/{id}/photo", ct);
 }

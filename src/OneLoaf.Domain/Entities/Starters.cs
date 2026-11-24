@@ -7,6 +7,13 @@ public class Starter
     public Guid OwnerId { get; set; }
     public string Name { get; set; } = string.Empty;
     public Guid? FlourId { get; set; }
+    /// <summary>
+    /// The starter as an ingredient of the catalog (category starter): recipes use it and its stock is the ripe starter.
+    /// Created with the starter; the name is the same in both.
+    /// </summary>
+    public Guid IngredientId { get; set; }
+    /// <summary>Share of the fed starter that can be used for dough once it is ripe, 0-1; the rest stays for the next feeding.</summary>
+    public decimal UsableShare { get; set; } = 0.667m;
     /// <summary>Ingredient whose stock a feeding takes the flour from; null = feedings do not change the stock.</summary>
     public Guid? FlourIngredientId { get; set; }
     /// <summary>Ingredient whose stock a feeding takes the water from.</summary>
@@ -23,6 +30,7 @@ public class Starter
 
     public User Owner { get; set; } = null!;
     public Flour? Flour { get; set; }
+    public Ingredient Ingredient { get; set; } = null!;
     public Ingredient? FlourIngredient { get; set; }
     public Ingredient? WaterIngredient { get; set; }
     public ICollection<StarterFeeding> Feedings { get; set; } = new List<StarterFeeding>();

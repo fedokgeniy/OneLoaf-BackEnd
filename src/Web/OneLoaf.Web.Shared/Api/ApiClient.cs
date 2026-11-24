@@ -57,6 +57,16 @@ public sealed partial class ApiClient(HttpClient http, ApiJsonOptions json, ILog
         return SendAsync<T>(new HttpRequestMessage(HttpMethod.Post, path) { Content = content }, ct);
     }
 
+    /// <summary>PUT of a file as <c>multipart/form-data</c> (field <c>file</c>), no response body (photo of an ingredient or recipe).</summary>
+    public Task<ApiResult> PutFileAsync(string path, Stream file, string fileName, string contentType, CancellationToken ct = default)
+    {
+        var content = new MultipartFormDataContent();
+        var part = new StreamContent(file);
+        part.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
+        content.Add(part, "file", fileName);
+        return SendAsync(new HttpRequestMessage(HttpMethod.Put, path) { Content = content }, ct);
+    }
+
     /// <summary>GET of binary content with its media type (photos, CSV export); the bearer token is sent as for JSON.</summary>
     public async Task<ApiResult<FileDownload>> DownloadAsync(string path, CancellationToken ct = default)
     {

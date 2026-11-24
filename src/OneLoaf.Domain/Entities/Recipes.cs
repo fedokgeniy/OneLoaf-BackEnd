@@ -23,6 +23,9 @@ public class Recipe
     public string? VariantOverrides { get; set; }
     public string? Notes { get; set; }
     public bool IsArchived { get; set; }
+    /// <summary>Photo of the loaf: key in object storage; null = no photo. A variant has its own photo.</summary>
+    public string? PhotoKey { get; set; }
+    public string? PhotoContentType { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 

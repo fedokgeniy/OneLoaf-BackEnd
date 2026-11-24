@@ -10,8 +10,9 @@ namespace OneLoaf.CoreApi.Application.Recipes;
 /// <param name="YieldLoaves">Loaves the quantities are written for.</param>
 /// <param name="IsArchived">Hidden from the default list.</param>
 /// <param name="UpdatedAt">Last change.</param>
+/// <param name="HasPhoto">True when <c>GET /recipes/{id}/photo</c> returns an image.</param>
 public sealed record RecipeSummaryDto(
-    Guid Id, string Title, Guid? ParentRecipeId, int YieldLoaves, bool IsArchived, DateTimeOffset UpdatedAt);
+    Guid Id, string Title, Guid? ParentRecipeId, int YieldLoaves, bool IsArchived, DateTimeOffset UpdatedAt, bool HasPhoto = false);
 
 /// <summary>Effective ingredient line: a variant shows inherited lines with <see cref="IsInherited"/> = true.</summary>
 /// <param name="LineId">Id of the row that defines the line (send it back on update).</param>
@@ -62,10 +63,11 @@ public sealed record RecipeStageDto(
 /// <param name="Stages">Effective stages.</param>
 /// <param name="CreatedAt">Creation time.</param>
 /// <param name="UpdatedAt">Last change.</param>
+/// <param name="HasPhoto">True when <c>GET /recipes/{id}/photo</c> returns an image.</param>
 public sealed record RecipeDto(
     Guid Id, Guid? ParentRecipeId, string Title, string? Description, int YieldLoaves, decimal? LoafWeightG,
     string? Notes, bool IsArchived, IReadOnlyList<RecipeIngredientDto> Ingredients, IReadOnlyList<RecipeStageDto> Stages,
-    DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt);
+    DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt, bool HasPhoto = false);
 
 /// <summary>Ingredient line in a create/update request.</summary>
 /// <param name="LineId">Id of an existing line (from GET) to keep it; null for a new line.</param>

@@ -14,7 +14,7 @@ Every rule is covered by tests (`db/tests/constraint_tests.sql` - 71 checks, `db
 | Entity | `PRIMARY KEY` | Every table; composite for `recipe_reactions` |
 | | `UNIQUE` | E-mail (regardless of case), names within an owner, price per date, one history record per batch, endpoint of a push subscription |
 | | Partial `UNIQUE` | One scheduled feeding reminder per starter; a variant changes a line of the parent at most once |
-| References | `FOREIGN KEY` | 59 foreign keys; delete policy in section 2 |
+| References | `FOREIGN KEY` | 60 foreign keys; delete policy in section 2 |
 | Business rules | Triggers | Workspace isolation, variant rules, life cycles, immutable snapshots - section 3 |
 | Multi-step operations | Transactions and procedures | Section 4 |
 

@@ -182,19 +182,24 @@ public sealed class WorkspaceServiceTests
     // ---- Stock ----
 
     [Fact]
-    public async Task Stock_Purchase_AddsPacksTimesPackSize()
+    public async Task Stock_Record_AddsPacksTimesPackSizeUnlessItIsPriceOnly()
     {
         var id = _ingredients.Add(Me, "Flour");
+        var salt = _ingredients.Add(Me, "Salt");
 
-        var movement = await Stock().AddPurchaseAsync(id, new PurchaseRequest(5, 1000, 6m, "EUR", new DateOnly(2026, 11, 20), "  "), Ct);
+        var bought = await Stock().AddRecordAsync(id, new IngredientRecordRequest(5, 1000, 6m, "EUR", new DateOnly(2026, 11, 20), "  "), Ct);
+        var priced = await Stock().AddRecordAsync(salt, new IngredientRecordRequest(1, 1000, 0.8m, "EUR", new DateOnly(2026, 11, 20), PriceOnly: true), Ct);
 
-        Assert.Equal(5000m, movement.Quantity);
-        Assert.Equal(StockMovementType.Purchase, movement.Type);
-        Assert.Null(_ingredients.LastPurchase!.Note);
+        Assert.Equal(5000m, bought.Stock);
+        Assert.True(bought.TrackStock);
+        Assert.Null(_ingredients.LastRecord!.Note);
+        Assert.Equal(0.8m, priced.CurrentPrice!.Price);
+        Assert.False(priced.TrackStock);
+        Assert.Null(priced.Stock);
         await Assert.ThrowsAsync<ValidationException>(() =>
-            Stock().AddPurchaseAsync(id, new PurchaseRequest(1, 1, 1, "XXX", new DateOnly(2026, 11, 20)), Ct));
+            Stock().AddRecordAsync(id, new IngredientRecordRequest(1, 1, 1, "XXX", new DateOnly(2026, 11, 20)), Ct));
         await Assert.ThrowsAsync<NotFoundException>(() =>
-            Stock().AddPurchaseAsync(_ingredients.Add(Other, "Flour"), new PurchaseRequest(1, 1, 1, "EUR", new DateOnly(2026, 11, 20)), Ct));
+            Stock().AddRecordAsync(_ingredients.Add(Other, "Flour"), new IngredientRecordRequest(1, 1, 1, "EUR", new DateOnly(2026, 11, 20)), Ct));
     }
 
     [Fact]

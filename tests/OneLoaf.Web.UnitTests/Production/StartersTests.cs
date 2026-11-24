@@ -39,10 +39,13 @@ public sealed class StartersTests : BunitContext
         cut.WaitForAssertion(() => cut.Find("form#starter-form"));
 
         cut.Find("input[placeholder='Mother rye']").Change("Wheat levain");
+        cut.FindAll("form#starter-form input[inputmode=decimal]")[1].Change("6");
         cut.Find("form#starter-form").Submit();
 
         cut.WaitForAssertion(() => Assert.Equal("Wheat levain", _api.Created?.Name));
         Assert.Equal(100m, _api.Created!.HydrationPercent);
+        Assert.Equal(6m, _api.Created.RiseHours);
+        Assert.Equal(0.667m, _api.Created.UsableShare);
         Assert.Equal("regular", _api.Created.FeedingMode);
         Assert.True(_api.Created.IsActive);
         Assert.EndsWith("/starters", Services.GetRequiredService<NavigationManager>().Uri, StringComparison.Ordinal);

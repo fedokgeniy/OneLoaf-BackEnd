@@ -109,6 +109,7 @@ public sealed class StarterRepository(OneLoafDbContext db) : IStarterRepository
     {
         entity.Name = starter.Name;
         entity.FlourId = starter.FlourId;
+        entity.UsableShare = starter.UsableShare ?? entity.UsableShare;
         entity.FlourIngredientId = starter.FlourIngredientId;
         entity.WaterIngredientId = starter.WaterIngredientId;
         entity.HydrationPercent = starter.HydrationPercent;
@@ -119,18 +120,38 @@ public sealed class StarterRepository(OneLoafDbContext db) : IStarterRepository
         entity.Notes = string.IsNullOrWhiteSpace(starter.Notes) ? null : starter.Notes.Trim();
     }
 
-    private static IQueryable<StarterRow> Project(IQueryable<Starter> starters) =>
-        starters.Select(s => new StarterRow(s, s.Feedings.OrderByDescending(f => f.FedAt).FirstOrDefault()));
+    private IQueryable<StarterRow> Project(IQueryable<Starter> starters)
+    {
+        var now = DateTime.UtcNow;
+        return starters.Select(s => new StarterRow(
+            s,
+            s.Feedings.OrderByDescending(f => f.FedAt).FirstOrDefault(),
+            db.StockMovements.Where(m => m.IngredientId == s.IngredientId && (m.AvailableAt == null || m.AvailableAt <= now))
+                .Sum(m => (decimal?)m.Quantity) ?? 0m,
+            db.StockMovements.Where(m => m.IngredientId == s.IngredientId).Sum(m => (decimal?)m.Quantity) ?? 0m));
+    }
 
     private static StarterDto ToDto(StarterRow row) => new(
         row.Starter.Id, row.Starter.Name, row.Starter.FlourId, row.Starter.HydrationPercent, row.Starter.FeedingMode,
         row.Starter.FeedingIntervalHours, row.Starter.RiseHours, row.Starter.IsActive, row.Starter.Notes,
         Utc(row.Last?.FedAt), Utc(row.Last?.NextFeedingAt), Utc(row.Last?.ExpectedPeakAt), Utc(row.Starter.CreatedAt),
         Utc(row.Starter.UpdatedAt), row.Starter.FlourIngredientId, row.Starter.WaterIngredientId,
-        row.Last is { } last ? last.FlourG + last.WaterG + (last.StarterKeptG ?? 0m) : null);
+        Amount(row.Last), row.Starter.IngredientId, row.Starter.UsableShare, Math.Max(row.UsableNow, 0m), SuggestedKept(row));
+
+    private static decimal? Amount(StarterFeeding? last) =>
+        last is null ? null : last.FlourG + last.WaterG + (last.StarterKeptG ?? 0m);
+
+    /// <summary>
+    /// What is in the jar for the next feeding: the share that was never stock plus the ripe (or still ripening)
+    /// starter that no batch has taken.
+    /// </summary>
+    private static decimal? SuggestedKept(StarterRow row) =>
+        Amount(row.Last) is { } amount
+            ? Math.Round(amount * (1m - row.Starter.UsableShare) + Math.Max(row.LedgerTotal, 0m), 1, MidpointRounding.AwayFromZero)
+            : null;
 
     private static FeedingDto ToDto(StarterFeeding f) => new(
         f.Id, Utc(f.FedAt), f.FlourG, f.WaterG, f.StarterKeptG, f.TemperatureC, Utc(f.NextFeedingAt), Utc(f.ExpectedPeakAt), f.Note);
 
-    private sealed record StarterRow(Starter Starter, StarterFeeding? Last);
+    private sealed record StarterRow(Starter Starter, StarterFeeding? Last, decimal UsableNow, decimal LedgerTotal);
 }

@@ -1,6 +1,7 @@
 using OneLoaf.Web.Shared.Api;
 using OneLoaf.Web.Shared.Contracts;
 using OneLoaf.Web.Shared.Contracts.Core;
+using OneLoaf.Web.Shared.Ui;
 
 namespace OneLoaf.Web.Features.Recipes.Services;
 
@@ -37,8 +38,19 @@ public interface ICatalogApi
     /// <summary><c>GET ingredients/{id}/stock-movements</c>: the stock ledger, newest first.</summary>
     Task<ApiResult<PagedResult<StockMovementDto>>> ListMovementsAsync(Guid id, CancellationToken ct = default);
 
-    /// <summary><c>POST ingredients/{id}/purchases</c>: adds to the stock and sets the price of the purchase date.</summary>
-    Task<ApiResult<StockMovementDto>> AddPurchaseAsync(Guid id, PurchaseRequest request, CancellationToken ct = default);
+    /// <summary>
+    /// <c>POST ingredients/{id}/records</c>: sets the price of the record date and, unless price only, adds to the stock.
+    /// </summary>
+    Task<ApiResult<IngredientDto>> AddRecordAsync(Guid id, IngredientRecordRequest request, CancellationToken ct = default);
+
+    /// <summary><c>GET ingredients/{id}/photo</c>: the image with the bearer token.</summary>
+    Task<ApiResult<FileDownload>> GetIngredientPhotoAsync(Guid id, CancellationToken ct = default);
+
+    /// <summary><c>PUT ingredients/{id}/photo</c>: 422 for a file that is not JPEG, PNG or WebP.</summary>
+    Task<ApiResult> SetIngredientPhotoAsync(Guid id, PhotoFile photo, CancellationToken ct = default);
+
+    /// <summary><c>DELETE ingredients/{id}/photo</c>.</summary>
+    Task<ApiResult> DeleteIngredientPhotoAsync(Guid id, CancellationToken ct = default);
 
     /// <summary><c>POST ingredients/{id}/stock-adjustments</c>: sets the stock to the counted quantity.</summary>
     Task<ApiResult<StockMovementDto>> AdjustStockAsync(Guid id, StockAdjustmentRequest request, CancellationToken ct = default);
@@ -108,8 +120,24 @@ public sealed class CatalogApi(ApiClientFactory api) : ICatalogApi
             Url.Build($"api/v1/ingredients/{id}/stock-movements", ("pageSize", ICatalogApi.MaxPageSize)), ct);
 
     /// <inheritdoc />
-    public Task<ApiResult<StockMovementDto>> AddPurchaseAsync(Guid id, PurchaseRequest request, CancellationToken ct = default) =>
-        api.Core.PostAsync<PurchaseRequest, StockMovementDto>($"api/v1/ingredients/{id}/purchases", request, ct);
+    public Task<ApiResult<IngredientDto>> AddRecordAsync(Guid id, IngredientRecordRequest request, CancellationToken ct = default) =>
+        api.Core.PostAsync<IngredientRecordRequest, IngredientDto>($"api/v1/ingredients/{id}/records", request, ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<FileDownload>> GetIngredientPhotoAsync(Guid id, CancellationToken ct = default) =>
+        api.Core.DownloadAsync($"api/v1/ingredients/{id}/photo", ct);
+
+    /// <inheritdoc />
+    public async Task<ApiResult> SetIngredientPhotoAsync(Guid id, PhotoFile photo, CancellationToken ct = default)
+    {
+        ArgumentNullException.ThrowIfNull(photo);
+        using var stream = new MemoryStream(photo.Content);
+        return await api.Core.PutFileAsync($"api/v1/ingredients/{id}/photo", stream, photo.FileName, photo.ContentType, ct);
+    }
+
+    /// <inheritdoc />
+    public Task<ApiResult> DeleteIngredientPhotoAsync(Guid id, CancellationToken ct = default) =>
+        api.Core.DeleteAsync($"api/v1/ingredients/{id}/photo", ct);
 
     /// <inheritdoc />
     public Task<ApiResult<StockMovementDto>> AdjustStockAsync(Guid id, StockAdjustmentRequest request, CancellationToken ct = default) =>

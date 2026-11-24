@@ -26,6 +26,8 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
         b.Property(x => x.LoafWeightG).HasPrecision(8, 1);
         b.Property(x => x.VariantOverrides).HasColumnType("jsonb");
         b.Property(x => x.Notes).HasMaxLength(4000);
+        b.Property(x => x.PhotoKey).HasMaxLength(200);
+        b.Property(x => x.PhotoContentType).HasMaxLength(50);
         b.HasIndex(x => new { x.OwnerId, x.Title });
         b.HasIndex(x => x.ParentRecipeId);
         b.HasIndex(x => x.CopiedFromPublishedRecipeId);

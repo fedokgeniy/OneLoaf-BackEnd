@@ -25,6 +25,13 @@ public sealed partial class RecipeEditorPage
     private bool _confirmDelete;
     private IReadOnlyList<SelectOption> _ingredientOptions = [];
     private IReadOnlyList<SelectOption> _stageTypeOptions = [];
+    private IngredientForm? _newIngredient;
+    private ServerValidation? _newIngredientServer;
+    private ApiError? _newIngredientError;
+    private bool _creatingIngredient;
+
+    [Inject]
+    private IState<RecipePhotoState> Photo { get; set; } = default!;
 
     [Inject]
     private IState<RecipeEditorState> State { get; set; } = default!;
@@ -47,6 +54,66 @@ public sealed partial class RecipeEditorPage
     {
         base.OnInitialized();
         SubscribeToAction<RecipeSaveFailed>(a => ShowServerError(a.Error));
+        SubscribeToAction<EditorIngredientCreated>(OnIngredientCreated);
+        SubscribeToAction<EditorIngredientFailed>(OnIngredientFailed);
+    }
+
+    private IReadOnlyList<SelectOption> CategoryOptions =>
+        State.Value.Data.Value?.Categories?.Select(c => new SelectOption(c.Code, c.Name)).ToList() ?? [];
+
+    private IReadOnlyList<SelectOption> UnitOptions =>
+        State.Value.Data.Value?.Units?.Select(u => new SelectOption(u.Code, $"{u.Name} ({u.Code})")).ToList() ?? [];
+
+    private void OpenNewIngredient()
+    {
+        _newIngredientError = null;
+        _newIngredient = new IngredientForm();
+    }
+
+    private void CreateIngredient()
+    {
+        if (_creatingIngredient || _newIngredient is null)
+        {
+            return;
+        }
+
+        _newIngredientError = null;
+        _creatingIngredient = true;
+        Dispatcher.Dispatch(new CreateEditorIngredient(_newIngredient.ToRequest(isFlour: false)));
+    }
+
+    /// <summary>The new ingredient becomes selectable and gets a line of its own, ready for the quantity.</summary>
+    private void OnIngredientCreated(EditorIngredientCreated created)
+    {
+        _creatingIngredient = false;
+        _newIngredient = null;
+        var ingredient = created.Ingredient;
+        _ingredientOptions = [.. _ingredientOptions.Append(new SelectOption(ingredient.Id.ToString(), $"{ingredient.Name} ({ingredient.UnitCode})"))
+            .OrderBy(o => o.Text, StringComparer.CurrentCultureIgnoreCase)];
+        _form?.Ingredients.Add(new IngredientLineForm { IngredientId = ingredient.Id.ToString() });
+        StateHasChanged();
+    }
+
+    private void OnIngredientFailed(EditorIngredientFailed failed)
+    {
+        _creatingIngredient = false;
+        var error = failed.Error;
+        if (error.Kind == ApiErrorKind.Validation && _newIngredientServer is not null && _newIngredientServer.Display(error.FieldErrors).Count == 0)
+        {
+            StateHasChanged();
+            return;
+        }
+
+        if (error.Kind == ApiErrorKind.Conflict && _newIngredientServer is not null)
+        {
+            _newIngredientServer.DisplayFor(nameof(IngredientForm.Name), error.Message);
+        }
+        else
+        {
+            _newIngredientError = error;
+        }
+
+        StateHasChanged();
     }
 
     /// <inheritdoc />
@@ -70,6 +137,11 @@ public sealed partial class RecipeEditorPage
         }
 
         _form = data.Recipe is { } recipe ? RecipeForm.From(recipe) : RecipeForm.New();
+        if (data.Recipe is { } loaded)
+        {
+            Dispatcher.Dispatch(new LoadRecipePhoto(loaded.Id, loaded.HasPhoto));
+        }
+
         // Lines whose ingredient is not on the loaded catalog page (e.g. beyond the first 100) stay selectable.
         var missing = (data.Recipe?.Ingredients ?? [])
             .Where(line => data.Ingredients.All(i => i.Id != line.IngredientId))

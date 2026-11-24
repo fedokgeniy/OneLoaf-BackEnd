@@ -2,21 +2,21 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/starters/e0f6ccfa-7f1e-499d-a4d8-fdd07579da80/feedings",
+    "path": "/api/v1/starters/bb8deeb7-12be-4d49-a321-671525f0b027/feedings",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
       "items": [
         {
-          "id": "9c03efe0-d4aa-4d78-a8d2-cb03be1b3b6a",
-          "fedAt": "2026-11-24T15:43:52.249786+00:00",
+          "id": "df3e2ba3-052f-441e-ab8c-f6cc18ad806f",
+          "fedAt": "2026-11-24T18:27:05.99186+00:00",
           "flourG": 50.0,
           "waterG": 50.0,
           "starterKeptG": 20.0,
           "temperatureC": 24.0,
-          "nextFeedingAt": "2026-11-25T03:43:52.249786+00:00",
-          "expectedPeakAt": "2026-11-24T23:43:52.249786+00:00",
+          "nextFeedingAt": "2026-11-25T06:27:05.99186+00:00",
+          "expectedPeakAt": "2026-11-25T02:27:05.99186+00:00",
           "note": null
         }
       ],

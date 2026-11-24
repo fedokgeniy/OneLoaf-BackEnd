@@ -20,6 +20,12 @@ public static class StarterLimits
 
     /// <summary>Longest feeding interval, hours (four weeks).</summary>
     public const int MaxIntervalHours = 24 * 28;
+
+    /// <summary>Share of the fed starter that is usable when ripe, unless the baker sets another one.</summary>
+    public const decimal DefaultUsableShare = 0.667m;
+
+    /// <summary>Smallest usable share.</summary>
+    public const decimal MinUsableShare = 0.05m;
 }
 
 /// <summary>Validates <see cref="StarterRequest"/>.</summary>
@@ -32,7 +38,9 @@ public sealed class StarterRequestValidator : AbstractValidator<StarterRequest>
         RuleFor(x => x.HydrationPercent).GreaterThan(0).LessThan(10_000);
         RuleFor(x => x.FeedingMode).IsInEnum();
         RuleFor(x => x.FeedingIntervalHours).InclusiveBetween(1, StarterLimits.MaxIntervalHours);
-        RuleFor(x => x.RiseHours).GreaterThan(0).LessThan(1000);
+        // A starter cannot be used before it has ripened, so the time to its peak is required.
+        RuleFor(x => x.RiseHours).NotNull().WithMessage("Enter the time from a feeding to the peak.").GreaterThan(0).LessThan(1000);
+        RuleFor(x => x.UsableShare).InclusiveBetween(StarterLimits.MinUsableShare, 1m);
         RuleFor(x => x.FlourId).NotEqual(Guid.Empty);
         RuleFor(x => x.FlourIngredientId).NotEqual(Guid.Empty);
         RuleFor(x => x.WaterIngredientId).NotEqual(Guid.Empty);

@@ -941,6 +941,16 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("owner_id");
 
+                    b.Property<string>("PhotoContentType")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("photo_content_type");
+
+                    b.Property<string>("PhotoKey")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("photo_key");
+
                     b.Property<decimal?>("ReorderLevel")
                         .HasPrecision(12, 3)
                         .HasColumnType("numeric(12,3)")
@@ -1437,6 +1447,16 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                     b.Property<Guid?>("ParentRecipeId")
                         .HasColumnType("uuid")
                         .HasColumnName("parent_recipe_id");
+
+                    b.Property<string>("PhotoContentType")
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("photo_content_type");
+
+                    b.Property<string>("PhotoKey")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("photo_key");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -2043,6 +2063,10 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .HasColumnType("numeric(5,1)")
                         .HasColumnName("hydration_percent");
 
+                    b.Property<Guid>("IngredientId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("ingredient_id");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean")
                         .HasColumnName("is_active");
@@ -2073,6 +2097,13 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .HasColumnName("updated_at")
                         .HasDefaultValueSql("now()");
 
+                    b.Property<decimal>("UsableShare")
+                        .ValueGeneratedOnAdd()
+                        .HasPrecision(4, 3)
+                        .HasColumnType("numeric(4,3)")
+                        .HasDefaultValue(0.667m)
+                        .HasColumnName("usable_share");
+
                     b.Property<Guid?>("WaterIngredientId")
                         .HasColumnType("uuid")
                         .HasColumnName("water_ingredient_id");
@@ -2085,6 +2116,10 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("FlourIngredientId")
                         .HasDatabaseName("ix_starters_flour_ingredient_id");
+
+                    b.HasIndex("IngredientId")
+                        .IsUnique()
+                        .HasDatabaseName("ux_starters_ingredient_id");
 
                     b.HasIndex("WaterIngredientId")
                         .HasDatabaseName("ix_starters_water_ingredient_id");
@@ -2104,6 +2139,8 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("ck_starters_hydration_percent", "hydration_percent > 0");
 
                             t.HasCheckConstraint("ck_starters_rise_hours", "rise_hours > 0");
+
+                            t.HasCheckConstraint("ck_starters_usable_share", "usable_share > 0 AND usable_share <= 1");
                         });
                 });
 
@@ -2186,6 +2223,10 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<DateTime?>("AvailableAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("available_at");
+
                     b.Property<Guid?>("BatchId")
                         .HasColumnType("uuid")
                         .HasColumnName("batch_id");
@@ -2265,13 +2306,13 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
 
                             t.HasCheckConstraint("ck_stock_movements_adjustment_note", "movement_type <> 'adjustment' OR length(btrim(note)) > 0");
 
-                            t.HasCheckConstraint("ck_stock_movements_movement_type", "movement_type IN ('purchase', 'batch_consumption', 'batch_return', 'starter_feeding', 'adjustment')");
+                            t.HasCheckConstraint("ck_stock_movements_movement_type", "movement_type IN ('purchase', 'batch_consumption', 'batch_return', 'starter_feeding', 'adjustment', 'starter_ripened', 'starter_refed')");
 
                             t.HasCheckConstraint("ck_stock_movements_purchase_fields", "movement_type <> 'purchase' OR (pack_count > 0 AND pack_size > 0 AND total_cost >= 0 AND currency IS NOT NULL)");
 
                             t.HasCheckConstraint("ck_stock_movements_quantity_not_zero", "quantity <> 0");
 
-                            t.HasCheckConstraint("ck_stock_movements_quantity_sign", "(movement_type IN ('purchase', 'batch_return') AND quantity > 0) OR (movement_type IN ('batch_consumption', 'starter_feeding') AND quantity < 0) OR movement_type = 'adjustment'");
+                            t.HasCheckConstraint("ck_stock_movements_quantity_sign", "(movement_type IN ('purchase', 'batch_return', 'starter_ripened') AND quantity > 0) OR (movement_type IN ('batch_consumption', 'starter_feeding', 'starter_refed') AND quantity < 0) OR movement_type = 'adjustment'");
                         });
                 });
 
@@ -2930,6 +2971,13 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("fk_starters_ingredients_flour_ingredient_id");
 
+                    b.HasOne("OneLoaf.Domain.Entities.Ingredient", "Ingredient")
+                        .WithMany()
+                        .HasForeignKey("IngredientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_starters_ingredients_ingredient_id");
+
                     b.HasOne("OneLoaf.Domain.Entities.User", "Owner")
                         .WithMany()
                         .HasForeignKey("OwnerId")
@@ -2946,6 +2994,8 @@ namespace OneLoaf.Infrastructure.Persistence.Migrations
                     b.Navigation("Flour");
 
                     b.Navigation("FlourIngredient");
+
+                    b.Navigation("Ingredient");
 
                     b.Navigation("Owner");
 

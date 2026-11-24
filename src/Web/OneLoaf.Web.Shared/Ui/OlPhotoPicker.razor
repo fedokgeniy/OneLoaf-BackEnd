@@ -1,0 +1,81 @@
+@* One photo of an item (ingredient pack, loaf of a recipe): shows the image, or a placeholder, with the actions to add,
+   replace and remove it. The page loads the image and saves the chosen file; this component only shows and collects. *@
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="ol-photo">
+    @if (Src is not null)
+    {
+        <img class="ol-photo__img" src="@Src" alt="@Alt" />
+    }
+    else if (Loading)
+    {
+        <span class="ol-skeleton ol-photo__img" aria-hidden="true"></span>
+    }
+    else
+    {
+        <span class="ol-photo__empty" aria-hidden="true"><OlIcon Name="IconName.Plus" /></span>
+    }
+    <div class="ol-photo__actions">
+        <label class="ol-btn ol-btn--secondary" for="@_inputId" aria-disabled="@(Busy ? "true" : null)">
+            <OlIcon Name="IconName.Plus" /> @(Busy ? "Uploading…" : Src is null && !Loading ? AddLabel : "Replace photo")
+        </label>
+        <InputFile id="@_inputId" class="ol-visually-hidden" accept="image/jpeg,image/png,image/webp" OnChange="Choose" disabled="@Busy" />
+        @if (Src is not null)
+        {
+            <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Trash" Disabled="Busy" OnClick="OnRemove">Remove photo</OlButton>
+        }
+    </div>
+    <p class="ol-photo__help">JPEG, PNG or WebP, up to 5 MB.</p>
+    @if (_error is not null)
+    {
+        <p class="ol-field__error" role="alert">@_error</p>
+    }
+</div>
+
+@code {
+    /// <summary>Largest photo the Core API accepts.</summary>
+    public const long MaxBytes = 5 * 1024 * 1024;
+
+    private readonly string _inputId = ElementIds.Next("photo");
+    private string? _error;
+
+    /// <summary>Image source (a data URL); null shows the placeholder.</summary>
+    [Parameter] public string? Src { get; set; }
+
+    /// <summary>Text alternative of the image.</summary>
+    [Parameter, EditorRequired] public string Alt { get; set; } = string.Empty;
+
+    /// <summary>Label of the button while there is no photo.</summary>
+    [Parameter] public string AddLabel { get; set; } = "Add photo";
+
+    /// <summary>The image is being loaded.</summary>
+    [Parameter] public bool Loading { get; set; }
+
+    /// <summary>An upload or removal is running.</summary>
+    [Parameter] public bool Busy { get; set; }
+
+    /// <summary>Raised with the chosen file.</summary>
+    [Parameter] public EventCallback<PhotoFile> OnSelected { get; set; }
+
+    /// <summary>Raised when the photo is removed.</summary>
+    [Parameter] public EventCallback OnRemove { get; set; }
+
+    private async Task Choose(InputFileChangeEventArgs e)
+    {
+        _error = null;
+        var file = e.File;
+        if (file.Size > MaxBytes)
+        {
+            _error = "The photo is larger than 5 MB.";
+            return;
+        }
+
+        using var buffer = new MemoryStream();
+        await using (var stream = file.OpenReadStream(MaxBytes))
+        {
+            await stream.CopyToAsync(buffer);
+        }
+
+        await OnSelected.InvokeAsync(new PhotoFile(buffer.ToArray(), file.Name, file.ContentType));
+    }
+}

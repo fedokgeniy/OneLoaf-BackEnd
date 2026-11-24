@@ -230,7 +230,7 @@ public sealed class ProductionTests(ApiFixture fixture)
         Assert.Single(log.Items);
 
         using var duplicate = await client.PostAsJsonAsync("/api/v1/starters",
-            new StarterRequest("Rye mother", 100, FeedingMode.Regular, 24), CoreApiFactory.Json, Ct);
+            new StarterRequest("Rye mother", 100, FeedingMode.Regular, 24, RiseHours: 12), CoreApiFactory.Json, Ct);
         Assert.Equal(HttpStatusCode.Conflict, duplicate.StatusCode);
 
         using var delete = await client.DeleteAsync($"/api/v1/starters/{starter.Id}", Ct);

@@ -5,7 +5,7 @@
     "path": "/api/v1/push/subscriptions",
     "authenticated": true,
     "requestBody": {
-      "endpoint": "https://fcm.googleapis.com/fcm/send/docs-39b6e46ee37a48ba8780068ff5cfb3b3",
+      "endpoint": "https://fcm.googleapis.com/fcm/send/docs-2014077a74ab46cfa02173bf898cf901",
       "keys": {
         "p256dh": "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM",
         "auth": "tBHItJI5svbpez7KI4CCXg"
@@ -14,9 +14,9 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "75037ae1-4ab9-4272-9f8a-0f6090f4c8ce",
-      "endpoint": "https://fcm.googleapis.com/fcm/send/docs-39b6e46ee37a48ba8780068ff5cfb3b3",
-      "createdAt": "2026-11-24T16:43:54.884645+00:00"
+      "id": "9717536d-947c-4e9b-b4fc-7623c99760e7",
+      "endpoint": "https://fcm.googleapis.com/fcm/send/docs-2014077a74ab46cfa02173bf898cf901",
+      "createdAt": "2026-11-24T19:27:08.731411+00:00"
     }
   },
   {
@@ -25,7 +25,7 @@
     "path": "/api/v1/push/subscriptions",
     "authenticated": true,
     "requestBody": {
-      "endpoint": "https://fcm.googleapis.com/fcm/send/docs-39b6e46ee37a48ba8780068ff5cfb3b3",
+      "endpoint": "https://fcm.googleapis.com/fcm/send/docs-2014077a74ab46cfa02173bf898cf901",
       "keys": {
         "p256dh": "BNcRdreALRFXTkOOUHK1EtK2wtaz5Ry4YfYCA_0QTpQtUbVlUls0VJXg7A8u-Ts1XbjhazAkj7I99e8QcYP7DkM",
         "auth": "tBHItJI5svbpez7KI4CCXg"
@@ -34,9 +34,9 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "75037ae1-4ab9-4272-9f8a-0f6090f4c8ce",
-      "endpoint": "https://fcm.googleapis.com/fcm/send/docs-39b6e46ee37a48ba8780068ff5cfb3b3",
-      "createdAt": "2026-11-24T16:43:54.884645+00:00"
+      "id": "9717536d-947c-4e9b-b4fc-7623c99760e7",
+      "endpoint": "https://fcm.googleapis.com/fcm/send/docs-2014077a74ab46cfa02173bf898cf901",
+      "createdAt": "2026-11-24T19:27:08.731411+00:00"
     }
   },
   {
@@ -63,8 +63,8 @@
           "endpoint must be an absolute https URL."
         ]
       },
-      "traceId": "00-09a4adc1cff8b91e75a73cd7f2f42e1f-bf892a710114f824-02",
-      "correlationId": "d91958faaee7410a8a87dd78c49acbc5"
+      "traceId": "00-19a3e28bb7bed6305d14631acef874c2-99dbe46f5781e9e5-02",
+      "correlationId": "eb973a7abc10414abca03f55bb62b3b0"
     }
   }
 ]

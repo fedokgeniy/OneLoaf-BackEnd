@@ -32,6 +32,9 @@ public class Ingredient
     public bool TrackStock { get; set; }
     /// <summary>Stock level, in the ingredient unit, below which the ingredient is reported as low; null = no warning.</summary>
     public decimal? ReorderLevel { get; set; }
+    /// <summary>Photo of the ingredient or its pack: key in object storage; null = no photo.</summary>
+    public string? PhotoKey { get; set; }
+    public string? PhotoContentType { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 
@@ -53,8 +56,13 @@ public class StockMovement
     public DateOnly OccurredOn { get; set; }
     /// <summary>Batch that took or returned the quantity; NULL after the batch is deleted.</summary>
     public Guid? BatchId { get; set; }
-    /// <summary>Starter feeding that took the quantity.</summary>
+    /// <summary>Starter feeding that took, gave back or produced the quantity.</summary>
     public Guid? FeedingId { get; set; }
+    /// <summary>
+    /// Moment from which the quantity counts as stock; null = at once. Ripened starter is written at the feeding and
+    /// becomes available at the expected peak.
+    /// </summary>
+    public DateTime? AvailableAt { get; set; }
     /// <summary>Purchase: number of packs.</summary>
     public int? PackCount { get; set; }
     /// <summary>Purchase: content of one pack in the ingredient unit.</summary>

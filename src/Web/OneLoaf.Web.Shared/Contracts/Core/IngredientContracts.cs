@@ -18,7 +18,9 @@ public sealed record IngredientDto(
     bool TrackStock = false,
     decimal? Stock = null,
     decimal? ReorderLevel = null,
-    bool IsLowStock = false);
+    bool IsLowStock = false,
+    bool HasPhoto = false,
+    Guid? StarterId = null);
 
 /// <summary>Price valid today.</summary>
 public sealed record CurrentPriceDto(decimal Price, decimal PerQuantity, decimal UnitPrice, string Currency, DateOnly EffectiveFrom);
@@ -48,8 +50,12 @@ public sealed record StockMovementDto(
     string? Note,
     DateTimeOffset CreatedAt);
 
-/// <summary><c>POST /ingredients/{id}/purchases</c> body: <see cref="PackCount"/> packs of <see cref="PackSize"/> units for <see cref="TotalCost"/>.</summary>
-public sealed record PurchaseRequest(int PackCount, decimal PackSize, decimal TotalCost, string Currency, DateOnly PurchasedOn, string? Note);
+/// <summary>
+/// <c>POST /ingredients/{id}/records</c> body: <see cref="PackCount"/> packs of <see cref="PackSize"/> units bought for
+/// <see cref="TotalCost"/>. The record sets the price of its date and, unless <see cref="PriceOnly"/>, adds to the stock.
+/// </summary>
+public sealed record IngredientRecordRequest(
+    int PackCount, decimal PackSize, decimal TotalCost, string Currency, DateOnly Date, string? Note, bool PriceOnly);
 
 /// <summary><c>POST /ingredients/{id}/stock-adjustments</c> body: the counted quantity and why it is corrected.</summary>
 public sealed record StockAdjustmentRequest(decimal ActualQuantity, string Note);
