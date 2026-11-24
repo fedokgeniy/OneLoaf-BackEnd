@@ -5,7 +5,7 @@ namespace OneLoaf.Web.Shared.Auth;
 
 /// <summary>
 /// Holds the access token in memory and mirrors it to <c>sessionStorage</c> so that a reload keeps the session; never
-/// <c>localStorage</c> (ADR-F07). There is no refresh token: an expired token is simply dropped.
+/// <c>localStorage</c> (ADR-F07). The refresh token is an HttpOnly cookie this code never sees: an expired access token is simply dropped.
 /// </summary>
 public sealed class TokenStore(IJSRuntime js, TimeProvider time)
 {

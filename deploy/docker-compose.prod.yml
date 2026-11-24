@@ -114,6 +114,9 @@ services:
       <<: *dotnet-env
       Jwt__SigningKeyPem: ${Jwt__SigningKeyPem}
       Jwt__AccessTokenMinutes: ${Jwt__AccessTokenMinutes:-60}
+      Jwt__RefreshTokenDays: ${Jwt__RefreshTokenDays:-30}
+      # The browser reaches the Core API under /core (Caddy), so the refresh cookie is limited to its auth endpoints.
+      Jwt__RefreshCookiePath: /core/api/v1/auth
       Storage__PhotosPath: /data/photos
     volumes:
       - photos:/data/photos

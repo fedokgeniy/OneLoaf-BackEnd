@@ -88,6 +88,14 @@ DESCRIPTIONS = {
         "labor_rate_per_hour": "Hourly rate of the baker's own work (US-49); NULL - labor is not included.",
         "time_zone": "IANA time zone for showing the plan and reminders.",
     },
+    "refresh_tokens": {
+        "user_id": "User who signed in.",
+        "family_id": "Sign-in the token belongs to: all tokens of one chain of exchanges; revoked together.",
+        "token_hash": "SHA-256 hash of the token in hex; the token itself is never stored.",
+        "expires_at": "Moment after which the token is not accepted.",
+        "rotated_at": "When the token was exchanged for the next one; a later use revokes the family.",
+        "revoked_at": "When the token was revoked (sign-out or reuse detection); NULL - still valid.",
+    },
     "push_subscriptions": {
         "user_id": "Owner of the device.",
         "endpoint": "URL of the browser push service; unique.",

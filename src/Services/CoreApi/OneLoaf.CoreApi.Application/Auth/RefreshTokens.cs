@@ -4,7 +4,8 @@ namespace OneLoaf.CoreApi.Application.Auth;
 
 /// <summary>How long a sign-in lasts without the password being entered again.</summary>
 /// <param name="RefreshTokenLifetime">Lifetime of a refresh token; each use issues a new token with a new lifetime.</param>
-public sealed record SessionOptions(TimeSpan RefreshTokenLifetime);
+/// <param name="RefreshCookiePath">Path the browser sends the refresh token cookie to: the auth endpoints as the browser sees them.</param>
+public sealed record SessionOptions(TimeSpan RefreshTokenLifetime, string RefreshCookiePath = "/");
 
 /// <summary>A refresh token as stored: only its hash is kept.</summary>
 /// <param name="Id">Row id.</param>

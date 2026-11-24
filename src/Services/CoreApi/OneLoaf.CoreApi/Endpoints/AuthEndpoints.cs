@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.Extensions.Options;
 using OneLoaf.CoreApi.Application.Auth;
-using OneLoaf.CoreApi.Infrastructure.Auth;
 using OneLoaf.CoreApi.RateLimiting;
 using OneLoaf.ServiceDefaults.Constants;
 using OneLoaf.ServiceDefaults.Errors;
 using OneLoaf.ServiceDefaults.Validation;
+using SessionOptions = OneLoaf.CoreApi.Application.Auth.SessionOptions;
 
 namespace OneLoaf.CoreApi.Endpoints;
 
@@ -74,7 +73,7 @@ public static class AuthEndpoints
     }
 
     private static async Task<Results<Ok<LoginResponse>, ProblemHttpResult>> LoginAsync(
-        LoginRequest request, AuthService auth, HttpContext http, IOptions<JwtIssuerOptions> options,
+        LoginRequest request, AuthService auth, HttpContext http, SessionOptions options,
         CancellationToken cancellationToken)
     {
         var tokens = await auth.LoginAsync(request, cancellationToken);
@@ -84,41 +83,41 @@ public static class AuthEndpoints
                 type: ProblemTypes.Unauthorized);
         }
 
-        SetRefreshCookie(http, options.Value, tokens.RefreshToken);
+        SetRefreshCookie(http, options, tokens.RefreshToken);
         return TypedResults.Ok(tokens.Response);
     }
 
     private static async Task<Results<Ok<LoginResponse>, ProblemHttpResult>> RefreshAsync(
-        AuthService auth, HttpContext http, IOptions<JwtIssuerOptions> options, CancellationToken cancellationToken)
+        AuthService auth, HttpContext http, SessionOptions options, CancellationToken cancellationToken)
     {
         var tokens = await auth.RefreshAsync(http.Request.Cookies[RefreshCookieName], cancellationToken);
         if (tokens is null)
         {
-            http.Response.Cookies.Delete(RefreshCookieName, RefreshCookie(http, options.Value, null));
+            http.Response.Cookies.Delete(RefreshCookieName, RefreshCookie(http, options, null));
             return TypedResults.Problem(statusCode: StatusCodes.Status401Unauthorized, title: SessionEndedTitle,
                 type: ProblemTypes.Unauthorized);
         }
 
-        SetRefreshCookie(http, options.Value, tokens.RefreshToken);
+        SetRefreshCookie(http, options, tokens.RefreshToken);
         return TypedResults.Ok(tokens.Response);
     }
 
     private static async Task<NoContent> LogoutAsync(
-        AuthService auth, HttpContext http, IOptions<JwtIssuerOptions> options, CancellationToken cancellationToken)
+        AuthService auth, HttpContext http, SessionOptions options, CancellationToken cancellationToken)
     {
         await auth.LogoutAsync(http.Request.Cookies[RefreshCookieName], cancellationToken);
-        http.Response.Cookies.Delete(RefreshCookieName, RefreshCookie(http, options.Value, null));
+        http.Response.Cookies.Delete(RefreshCookieName, RefreshCookie(http, options, null));
         return TypedResults.NoContent();
     }
 
-    private static void SetRefreshCookie(HttpContext http, JwtIssuerOptions options, IssuedRefreshToken token) =>
+    private static void SetRefreshCookie(HttpContext http, SessionOptions options, IssuedRefreshToken token) =>
         http.Response.Cookies.Append(RefreshCookieName, token.Value, RefreshCookie(http, options, token.ExpiresAt));
 
     /// <summary>
     /// The cookie is not readable by scripts (HttpOnly), is sent only to the auth endpoints of this site
     /// (path, SameSite=Strict) and only over HTTPS when the site is served over HTTPS.
     /// </summary>
-    private static CookieOptions RefreshCookie(HttpContext http, JwtIssuerOptions options, DateTimeOffset? expires) => new()
+    private static CookieOptions RefreshCookie(HttpContext http, SessionOptions options, DateTimeOffset? expires) => new()
     {
         HttpOnly = true,
         Secure = http.Request.IsHttps,
