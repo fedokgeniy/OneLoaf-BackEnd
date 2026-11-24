@@ -96,20 +96,26 @@ public sealed class DocClient(string service, HttpMessageHandler handler, Uri ba
     }
 
     /// <summary>Uploads a file as multipart/form-data and records the exchange (the request body is described, not embedded).</summary>
-    public async Task<JsonNode?> UploadAsync(string operationId, string caseName, string path, string field, string fileName, string contentType, byte[] content)
+    public Task<JsonNode?> UploadAsync(string operationId, string caseName, string path, string field, string fileName, string contentType, byte[] content) =>
+        UploadAsync(operationId, caseName, HttpMethod.Post, path, field, fileName, contentType, content);
+
+    /// <summary>The same with another method (PUT replaces the one photo of an ingredient or a recipe).</summary>
+    public async Task<JsonNode?> UploadAsync(
+        string operationId, string caseName, HttpMethod method, string path, string field, string fileName, string contentType, byte[] content)
     {
         using var form = new MultipartFormDataContent();
         var file = new ByteArrayContent(content);
         file.Headers.ContentType = new MediaTypeHeaderValue(contentType);
         form.Add(file, field, fileName);
-        using var response = await _http.PostAsync(path, form, TestContext.Current.CancellationToken);
+        using var request = new HttpRequestMessage(method, path) { Content = form };
+        using var response = await _http.SendAsync(request, TestContext.Current.CancellationToken);
         var text = await response.Content.ReadAsStringAsync(TestContext.Current.CancellationToken);
         var json = text.Length > 0 ? JsonNode.Parse(text) : null;
         var description = new JsonObject
         {
             ["multipart/form-data"] = new JsonObject { [field] = $"<{fileName}, {contentType}, {content.Length} bytes>" },
         };
-        store.Add(service, operationId, new RecordedExchange(caseName, "POST", path, _http.DefaultRequestHeaders.Authorization is not null,
+        store.Add(service, operationId, new RecordedExchange(caseName, method.Method, path, _http.DefaultRequestHeaders.Authorization is not null,
             description, (int)response.StatusCode, response.Content.Headers.ContentType?.MediaType, json?.DeepClone()));
         return json;
     }

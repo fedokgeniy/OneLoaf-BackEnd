@@ -138,12 +138,28 @@ public sealed class AuthServiceTests
         var login = await _service.LoginAsync(new LoginRequest("anna@example.com", "secret-pass"), ct);
         var next = await _service.RefreshAsync(login!.RefreshToken.Value, ct);
 
-        var stolen = await _service.RefreshAsync(login.RefreshToken.Value, ct);
-        var owner = await _service.RefreshAsync(next!.RefreshToken.Value, ct);
+        var later = Service(Now.AddMinutes(5));
+        var stolen = await later.RefreshAsync(login.RefreshToken.Value, ct);
+        var owner = await later.RefreshAsync(next!.RefreshToken.Value, ct);
 
         Assert.Null(stolen);
         Assert.Null(owner);
         Assert.All(_refresh.Tokens, t => Assert.NotNull(t.RevokedAt));
+    }
+
+    [Fact]
+    public async Task US02_Refresh_SecondTabExchangesTheSameTokenAtOnce_KeepsTheSignIn()
+    {
+        _users.Seed("anna@example.com", FakePasswordHasher.Prefix + "secret-pass");
+        var ct = TestContext.Current.CancellationToken;
+        var login = await _service.LoginAsync(new LoginRequest("anna@example.com", "secret-pass"), ct);
+
+        var firstTab = await _service.RefreshAsync(login!.RefreshToken.Value, ct);
+        var secondTab = await Service(Now.AddSeconds(5)).RefreshAsync(login.RefreshToken.Value, ct);
+
+        Assert.NotNull(firstTab);
+        Assert.NotNull(secondTab);
+        Assert.All(_refresh.Tokens, t => Assert.Null(t.RevokedAt));
     }
 
     [Fact]

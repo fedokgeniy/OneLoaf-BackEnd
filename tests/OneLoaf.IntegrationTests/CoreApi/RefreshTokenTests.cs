@@ -18,7 +18,7 @@ public sealed class RefreshTokenTests(ApiFixture fixture)
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
 
     [Fact]
-    public async Task US02_Refresh_RotatesTheCookieAndRejectsTheOldOne()
+    public async Task US02_Refresh_RotatesTheCookieAndAcceptsASecondTabAtOnce()
     {
         using var client = fixture.Api.CreateClient(new WebApplicationFactoryClientOptions { HandleCookies = false });
         var user = await fixture.Api.RegisterAsync();
@@ -41,11 +41,12 @@ public sealed class RefreshTokenTests(ApiFixture fixture)
         var second = CookieValue(refreshed.Headers.GetValues("Set-Cookie").Single(c => c.StartsWith(CookieName + "=", StringComparison.Ordinal)));
         Assert.NotEqual(first, second);
 
-        // The exchanged token is used again: the whole sign-in is revoked, the newest token included.
-        using var reused = await SendAsync(client, Refresh, first);
-        Assert.Equal(HttpStatusCode.Unauthorized, reused.StatusCode);
-        using var afterReuse = await SendAsync(client, Refresh, second);
-        Assert.Equal(HttpStatusCode.Unauthorized, afterReuse.StatusCode);
+        // A second tab of the same browser exchanges the same cookie a moment later: the sign-in continues. A use after
+        // the grace period revokes the whole sign-in (AuthServiceTests, with a clock).
+        using var secondTab = await SendAsync(client, Refresh, first);
+        Assert.Equal(HttpStatusCode.OK, secondTab.StatusCode);
+        using var current = await SendAsync(client, Refresh, second);
+        Assert.Equal(HttpStatusCode.OK, current.StatusCode);
     }
 
     [Fact]

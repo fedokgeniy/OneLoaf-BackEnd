@@ -5,7 +5,14 @@ namespace OneLoaf.CoreApi.Application.Auth;
 /// <summary>How long a sign-in lasts without the password being entered again.</summary>
 /// <param name="RefreshTokenLifetime">Lifetime of a refresh token; each use issues a new token with a new lifetime.</param>
 /// <param name="RefreshCookiePath">Path the browser sends the refresh token cookie to: the auth endpoints as the browser sees them.</param>
-public sealed record SessionOptions(TimeSpan RefreshTokenLifetime, string RefreshCookiePath = "/");
+public sealed record SessionOptions(TimeSpan RefreshTokenLifetime, string RefreshCookiePath = "/")
+{
+    /// <summary>
+    /// How long an exchanged token is still accepted. Two tabs of one browser share the cookie and may exchange it at
+    /// the same moment, and a request can be repeated after a lost answer; only a later use counts as a copied token.
+    /// </summary>
+    public TimeSpan RotationGrace { get; init; } = TimeSpan.FromSeconds(30);
+}
 
 /// <summary>A refresh token as stored: only its hash is kept.</summary>
 /// <param name="Id">Row id.</param>
@@ -27,8 +34,8 @@ public interface IRefreshTokenStore
     Task<StoredRefreshToken?> FindAsync(string tokenHash, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Marks the token as exchanged; false when another request exchanged it first, so the same token is never
-    /// exchanged twice.
+    /// Marks the token as exchanged, keeping the time of the first exchange; false when another request exchanged it
+    /// first.
     /// </summary>
     Task<bool> MarkRotatedAsync(Guid id, DateTimeOffset at, CancellationToken cancellationToken);
 

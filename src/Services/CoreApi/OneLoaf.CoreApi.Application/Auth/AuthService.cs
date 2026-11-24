@@ -111,11 +111,18 @@ public sealed partial class AuthService(
             return null;
         }
 
-        if (stored.RotatedAt is not null || !await refreshTokens.MarkRotatedAsync(stored.Id, now, cancellationToken))
+        if (stored.RotatedAt is { } rotatedAt && now - rotatedAt > session.RotationGrace)
         {
             await refreshTokens.RevokeFamilyAsync(stored.FamilyId, now, cancellationToken);
             LogReuse(logger, stored.UserId);
             return null;
+        }
+
+        if (stored.RotatedAt is null)
+        {
+            // False when a parallel request exchanged the token a moment ago: the same case as the grace period above
+            // (two tabs of one browser, a repeated request), so the sign-in continues.
+            await refreshTokens.MarkRotatedAsync(stored.Id, now, cancellationToken);
         }
 
         var credentials = await users.FindByIdAsync(stored.UserId, cancellationToken);

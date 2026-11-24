@@ -453,6 +453,18 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
         await api.CallAsync("RemovePublication", "typical", HttpMethod.Post, $"/api/v1/admin/library/{second2}/remove",
             new { reason = "Duplicate of an earlier publication." });
 
+        // One photo per ingredient and per recipe; both are removed again, so the workspace stays as recorded above.
+        byte[] picture = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2, 0, 0, 0];
+        await api.UploadAsync("SetIngredientPhoto", "typical", HttpMethod.Put, $"/api/v1/ingredients/{seeds}/photo", "file", "pack.png", "image/png", picture);
+        await api.UploadAsync("SetIngredientPhoto", "not an image", HttpMethod.Put, $"/api/v1/ingredients/{seeds}/photo", "file", "notes.png", "image/png", "plain text"u8.ToArray());
+        await api.CallAsync("GetIngredientPhoto", "typical", HttpMethod.Get, $"/api/v1/ingredients/{seeds}/photo");
+        await api.CallAsync("DeleteIngredientPhoto", "typical", HttpMethod.Delete, $"/api/v1/ingredients/{seeds}/photo");
+        await api.CallAsync("GetIngredientPhoto", "no photo", HttpMethod.Get, $"/api/v1/ingredients/{seeds}/photo");
+        await api.UploadAsync("SetRecipePhoto", "typical", HttpMethod.Put, $"/api/v1/recipes/{recipe}/photo", "file", "loaf.png", "image/png", picture);
+        await api.CallAsync("GetRecipePhoto", "typical", HttpMethod.Get, $"/api/v1/recipes/{recipe}/photo");
+        await api.CallAsync("DeleteRecipePhoto", "typical", HttpMethod.Delete, $"/api/v1/recipes/{recipe}/photo");
+        await api.CallAsync("GetRecipePhoto", "no photo", HttpMethod.Get, $"/api/v1/recipes/{recipe}/photo");
+
         // Account (a separate throw-away account, so the workspace above stays for the other services)
         api.As(null);
         var throwaway = $"leaving.{Guid.NewGuid():N}"[..16] + "@example.com";
