@@ -102,7 +102,8 @@
 
             <aside class="ol-card editor__card new-batch__preview" aria-labelledby="preview-title" aria-live="polite" aria-busy="@(State.Value.Preview is Loadable<BatchPreview>.Loading ? "true" : "false")">
                 <h2 class="h3 editor__card-title" id="preview-title">Plan preview</h2>
-                <BatchPreviewPanel Preview="State.Value.Preview" CanPreview="_form.CanPreview" ReadyBy="_form.Mode == PlanMode.ReadyBy" />
+                <BatchPreviewPanel Preview="State.Value.Preview" CanPreview="_form.CanPreview" ReadyBy="_form.Mode == PlanMode.ReadyBy"
+                                   OnUseLoaves="UseLoaves" OnUseScale="UseScale" OnUseFull="UseFullRecipe" />
                 <OlButton Type="submit" Block="true" Large="true" Loading="@State.Value.Saving">Save batch</OlButton>
             </aside>
         </EditForm>

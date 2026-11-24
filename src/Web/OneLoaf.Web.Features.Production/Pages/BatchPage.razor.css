@@ -102,3 +102,9 @@
         top: calc(var(--topbar-height) + var(--space-5));
     }
 }
+
+.batch__hint {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--ink-muted);
+}

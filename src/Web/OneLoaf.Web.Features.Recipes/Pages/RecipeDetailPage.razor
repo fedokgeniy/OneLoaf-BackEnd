@@ -112,7 +112,7 @@
                             <OlStatTile Label="Dough" Loading="@(State.Value.Figures.Value is null && State.Value.Figures is not Loadable<ProductionFiguresDto>.Failed)"
                                         Value="@(Figures is { } f ? DisplayFormat.Grams(f.DoughWeightG) : null)" Error="@ErrorOf(State.Value.Figures)" />
                             <OlStatTile Label="Kneading" Loading="@(State.Value.Figures.Value is null && State.Value.Figures is not Loadable<ProductionFiguresDto>.Failed)"
-                                        Value="@KneadingText" Hint="@(Figures is { KneadingCycles: null } ? "set the mixer bowl in Kitchen" : null)" Error="@ErrorOf(State.Value.Figures)" />
+                                        Value="@KneadingText" Hint="@(Figures is { KneadingCycles: null } ? "set the mixer bowl in My kitchen" : null)" Error="@ErrorOf(State.Value.Figures)" />
                             <OlStatTile Label="Starter" Loading="@(State.Value.Figures.Value is null && State.Value.Figures is not Loadable<ProductionFiguresDto>.Failed)"
                                         Value="@(Figures is { } s ? DisplayFormat.Grams(s.StarterAmountG) : null)" Error="@ErrorOf(State.Value.Figures)" />
                             <OlStatTile Label="Ready" Loading="@(State.Value.Timeline.Value is null && State.Value.Timeline is not Loadable<TimelineDto>.Failed)"
@@ -126,7 +126,7 @@
                                     <p>@costError.Message</p>
                                     @if (costError.Kind == ApiErrorKind.BusinessRule)
                                     {
-                                        <OlLink Href="settings/kitchen">Open kitchen settings</OlLink>
+                                        <OlLink Href="settings/kitchen">Open My kitchen</OlLink>
                                     }
                                 </OlAlert>
                                 break;

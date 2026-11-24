@@ -47,6 +47,11 @@
                                 <dd class="ol-num">@(starter.ExpectedPeakAt is { } peak ? When(peak) : "—")</dd>
                                 <dt>Last fed</dt>
                                 <dd class="ol-num">@(starter.LastFedAt is { } fed ? When(fed) : "not yet")</dd>
+                                @if (starter.AmountG is { } amount)
+                                {
+                                    <dt>Amount after feeding</dt>
+                                    <dd class="ol-num">@DisplayFormat.Grams(amount)</dd>
+                                }
                             </dl>
                             <div class="ol-card__foot">
                                 @if (starter.IsActive)

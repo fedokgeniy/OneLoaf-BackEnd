@@ -49,4 +49,22 @@ public sealed record ToolCallDto(string Name, bool Succeeded);
 public sealed record TurnUsageDto(int InputTokens, int OutputTokens, decimal CostUsd);
 
 /// <summary><c>POST …/actions/{actionId}/confirm</c> response: the saved batch.</summary>
-public sealed record ConfirmActionResponse(Guid BatchId);
+public sealed record ConfirmActionResponse(Guid? BatchId, Guid? RecipeId = null);
+
+/// <summary>
+/// A recipe the assistant proposes (plan of a <c>create_recipe</c> action). The quantities are the assistant's
+/// suggestion; <see cref="RecipeProposalIngredient.IsNew"/> marks ingredients that will be added without a price.
+/// </summary>
+public sealed record RecipeProposalDto(
+    string Title,
+    string? Description,
+    int YieldLoaves,
+    decimal? LoafWeightG,
+    IReadOnlyList<RecipeProposalIngredient> Ingredients,
+    IReadOnlyList<RecipeProposalStage> Stages);
+
+/// <summary>Ingredient line of a proposed recipe; the quantity is in <see cref="UnitCode"/>.</summary>
+public sealed record RecipeProposalIngredient(string Name, string CategoryCode, string UnitCode, decimal Quantity, bool IsOptional, bool IsNew);
+
+/// <summary>Stage of a proposed recipe.</summary>
+public sealed record RecipeProposalStage(string Name, string StageTypeCode, int MinDurationMinutes, int MaxDurationMinutes);

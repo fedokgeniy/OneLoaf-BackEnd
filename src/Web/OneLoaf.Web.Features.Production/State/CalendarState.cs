@@ -94,6 +94,10 @@ public static class CalendarReducers
     public static CalendarState OnBatchCompleted(CalendarState state) => state with { Plan = Loadable<WeekPlan>.Idle };
 
     /// <summary>Cancelled batches change their status.</summary>
+    [ReducerMethod(typeof(BatchDeleted))]
+    public static CalendarState OnBatchDeleted(CalendarState state) => state with { Plan = Loadable<WeekPlan>.Idle };
+
+    /// <summary>A cancelled batch changes the week.</summary>
     [ReducerMethod(typeof(BatchCancelled))]
     public static CalendarState OnBatchCancelled(CalendarState state) => state with { Plan = Loadable<WeekPlan>.Idle };
 }

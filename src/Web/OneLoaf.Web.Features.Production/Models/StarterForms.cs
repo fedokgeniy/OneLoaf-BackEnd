@@ -29,6 +29,12 @@ public sealed class StarterForm
     /// <summary>Flour of the catalog.</summary>
     public string? FlourId { get; set; }
 
+    /// <summary>Ingredient whose stock a feeding takes the flour from.</summary>
+    public string? FlourIngredientId { get; set; }
+
+    /// <summary>Ingredient whose stock a feeding takes the water from.</summary>
+    public string? WaterIngredientId { get; set; }
+
     /// <summary>Hours from feeding to peak (US-30).</summary>
     [Range(typeof(decimal), "0.5", "72", ParseLimitsInInvariantCulture = true, ErrorMessage = "Enter 0.5 to 72 hours.")]
     public decimal? RiseHours { get; set; }
@@ -51,6 +57,8 @@ public sealed class StarterForm
             FeedingMode = starter.FeedingMode,
             FeedingIntervalHours = starter.FeedingIntervalHours,
             FlourId = starter.FlourId?.ToString(),
+            FlourIngredientId = starter.FlourIngredientId?.ToString(),
+            WaterIngredientId = starter.WaterIngredientId?.ToString(),
             RiseHours = starter.RiseHours,
             IsActive = starter.IsActive,
             Notes = starter.Notes,
@@ -61,7 +69,9 @@ public sealed class StarterForm
     public StarterRequest ToRequest() => new(
         Name!.Trim(), HydrationPercent!.Value, FeedingMode!, FeedingIntervalHours!.Value,
         Guid.TryParse(FlourId, CultureInfo.InvariantCulture, out var flour) ? flour : null,
-        RiseHours, IsActive, string.IsNullOrWhiteSpace(Notes) ? null : Notes.Trim());
+        RiseHours, IsActive, string.IsNullOrWhiteSpace(Notes) ? null : Notes.Trim(),
+        Guid.TryParse(FlourIngredientId, CultureInfo.InvariantCulture, out var flourIngredient) ? flourIngredient : null,
+        Guid.TryParse(WaterIngredientId, CultureInfo.InvariantCulture, out var waterIngredient) ? waterIngredient : null);
 }
 
 /// <summary>Feeding form (US-28); "starter kept" lives here, not on the starter (mockup-vs-api).</summary>

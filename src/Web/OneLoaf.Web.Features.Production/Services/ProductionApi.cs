@@ -20,8 +20,13 @@ public interface IProductionApi
     /// <summary><c>POST batches</c>.</summary>
     Task<ApiResult<BatchDto>> CreateBatchAsync(BatchRequest request, CancellationToken ct = default);
 
-    /// <summary><c>POST batches/{id}/cancel</c>.</summary>
-    Task<ApiResult> CancelBatchAsync(Guid id, CancellationToken ct = default);
+    /// <summary>
+    /// <c>POST batches/{id}/cancel?ingredientsUsed=</c>: false returns the ingredients the batch took to the stock.
+    /// </summary>
+    Task<ApiResult> CancelBatchAsync(Guid id, bool ingredientsUsed, CancellationToken ct = default);
+
+    /// <summary><c>DELETE batches/{id}?ingredientsUsed=</c>: 409 while the batch is running.</summary>
+    Task<ApiResult> DeleteBatchAsync(Guid id, bool ingredientsUsed, CancellationToken ct = default);
 
     /// <summary><c>POST batches/{id}/complete</c> (US-31).</summary>
     Task<ApiResult<CompleteBatchResponse>> CompleteBatchAsync(Guid id, CancellationToken ct = default);
@@ -74,6 +79,12 @@ public interface IProductionApi
     /// <summary><c>GET flours</c> for the starter form.</summary>
     Task<ApiResult<PagedResult<FlourDto>>> ListFloursAsync(CancellationToken ct = default);
 
+    /// <summary><c>POST flours</c>: adds a flour from the starter form (US-11); 409 duplicate name.</summary>
+    Task<ApiResult<FlourDto>> CreateFlourAsync(FlourRequest request, CancellationToken ct = default);
+
+    /// <summary><c>GET ingredients</c>: the ingredients a starter can be fed with.</summary>
+    Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(CancellationToken ct = default);
+
     /// <summary>Notification <c>GET reminders?status=scheduled&amp;from=&amp;to=</c> (US-29).</summary>
     Task<ApiResult<IReadOnlyList<ReminderDto>>> ListRemindersAsync(DateTimeOffset from, DateTimeOffset to, CancellationToken ct = default);
 }
@@ -98,8 +109,12 @@ public sealed class ProductionApi(ApiClientFactory api) : IProductionApi
         api.Core.PostAsync<BatchRequest, BatchDto>("api/v1/batches", request, ct);
 
     /// <inheritdoc />
-    public Task<ApiResult> CancelBatchAsync(Guid id, CancellationToken ct = default) =>
-        api.Core.PostAsync($"api/v1/batches/{id}/cancel", ct);
+    public Task<ApiResult> CancelBatchAsync(Guid id, bool ingredientsUsed, CancellationToken ct = default) =>
+        api.Core.PostAsync(Url.Build($"api/v1/batches/{id}/cancel", ("ingredientsUsed", ingredientsUsed ? "true" : "false")), ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult> DeleteBatchAsync(Guid id, bool ingredientsUsed, CancellationToken ct = default) =>
+        api.Core.DeleteAsync(Url.Build($"api/v1/batches/{id}", ("ingredientsUsed", ingredientsUsed ? "true" : "false")), ct);
 
     /// <inheritdoc />
     public Task<ApiResult<CompleteBatchResponse>> CompleteBatchAsync(Guid id, CancellationToken ct = default) =>
@@ -168,6 +183,14 @@ public sealed class ProductionApi(ApiClientFactory api) : IProductionApi
     /// <inheritdoc />
     public Task<ApiResult<PagedResult<FlourDto>>> ListFloursAsync(CancellationToken ct = default) =>
         api.Core.GetAsync<PagedResult<FlourDto>>(Url.Build("api/v1/flours", ("pageSize", 100)), ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<FlourDto>> CreateFlourAsync(FlourRequest request, CancellationToken ct = default) =>
+        api.Core.PostAsync<FlourRequest, FlourDto>("api/v1/flours", request, ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(CancellationToken ct = default) =>
+        api.Core.GetAsync<PagedResult<IngredientDto>>(Url.Build("api/v1/ingredients", ("pageSize", 100)), ct);
 
     /// <inheritdoc />
     public Task<ApiResult<IReadOnlyList<ReminderDto>>> ListRemindersAsync(DateTimeOffset from, DateTimeOffset to, CancellationToken ct = default) =>

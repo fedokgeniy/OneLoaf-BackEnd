@@ -8,7 +8,8 @@ namespace OneLoaf.Web.Features.Production.Pages;
 
 /// <summary>
 /// <c>/batches/{id}</c> (US-21–25, US-31): progress, the current stage with its actions, figures per recipe, the kneading
-/// plan explanation, all stages, and the batch actions (complete, cancel, save as variant).
+/// plan explanation, all stages, and the batch actions (complete, cancel, delete, save as variant). Cancel and
+/// delete ask whether the ingredients were used, so the stock is right afterwards.
 /// </summary>
 public sealed partial class BatchPage
 {
@@ -16,6 +17,8 @@ public sealed partial class BatchPage
     private int _adjustMin;
     private int _adjustMax;
     private bool _confirmCancel;
+    private bool _confirmDelete;
+    private bool _ingredientsUsed;
     private string? _variantTitle;
 
     [Inject]
@@ -24,9 +27,25 @@ public sealed partial class BatchPage
     [Inject]
     private IDispatcher Dispatcher { get; set; } = default!;
 
+    [Inject]
+    private NavigationManager Navigation { get; set; } = default!;
+
     /// <summary>Batch id.</summary>
     [Parameter]
     public Guid Id { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        SubscribeToAction<BatchDeleted>(deleted =>
+        {
+            if (deleted.Id == Id)
+            {
+                Navigation.NavigateTo("batches");
+            }
+        });
+    }
 
     /// <inheritdoc />
     protected override void OnParametersSet()
@@ -95,10 +114,34 @@ public sealed partial class BatchPage
         _adjust = null;
     }
 
+    private string StockHint => _ingredientsUsed
+        ? "What the batch took from the stock stays taken."
+        : "What the batch took from the stock is returned.";
+
     private void CancelBatch(BatchDto batch)
     {
         _confirmCancel = false;
-        Dispatcher.Dispatch(new CancelBatch(batch.Id));
+        Dispatcher.Dispatch(new CancelBatch(batch.Id, _ingredientsUsed));
+    }
+
+    /// <summary>A batch that has started has usually used its ingredients; a planned one has not.</summary>
+    private void AskCancel(BatchDto batch)
+    {
+        _ingredientsUsed = batch.Status == BatchStatuses.InProgress;
+        _confirmCancel = true;
+    }
+
+    /// <summary>A planned or cancelled batch has usually not touched the shelf; a baked one has.</summary>
+    private void AskDelete(BatchDto batch)
+    {
+        _ingredientsUsed = batch.Status == BatchStatuses.Done;
+        _confirmDelete = true;
+    }
+
+    private void DeleteBatch(BatchDto batch)
+    {
+        _confirmDelete = false;
+        Dispatcher.Dispatch(new DeleteBatch(batch.Id, _ingredientsUsed));
     }
 
     private void SaveVariant(BatchDto batch)

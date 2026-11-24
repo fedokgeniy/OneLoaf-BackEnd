@@ -1,7 +1,8 @@
 @* App shell (.ol-shell): exactly one main navigation per size class — bottom bar (phone), rail (tablet, phone
    landscape), sidebar (desktop) — plus the top bar with the page title and the profile menu. Before device.js reports
-   the size class, all three are rendered and CSS shows the one that fits, so nothing jumps. Sign out is reachable in
-   all three patterns (avatar menu, bottom of the rail, bottom of the sidebar). *@
+   the size class, all three are rendered and CSS shows the one that fits, so nothing jumps. The rail and the sidebar
+   pin Ingredients, My kitchen and Settings to the bottom. Sign out is reachable in all three patterns (avatar menu,
+   bottom of the rail, bottom of the sidebar). *@
 @inherits FluxorComponent
 @inject IState<DisplayState> Display
 @inject IState<SessionState> Session
@@ -20,7 +21,10 @@
                 <NavItem Destination="item" />
             }
             <span class="ol-nav__spacer"></span>
-            <NavItem Destination="NavDestinations.Settings" />
+            @foreach (var item in NavDestinations.Pinned)
+            {
+                <NavItem Destination="item" />
+            }
             <button type="button" class="ol-nav__item" @onclick="SignOut">
                 <OlIcon Name="IconName.Logout" />
                 <span class="ol-nav__label">Sign out</span>
@@ -38,7 +42,10 @@
                 <NavItem Destination="item" />
             }
             <span class="ol-nav__spacer"></span>
-            <NavItem Destination="NavDestinations.Settings" />
+            @foreach (var item in NavDestinations.Pinned)
+            {
+                <NavItem Destination="item" />
+            }
             <button type="button" class="ol-nav__item" @onclick="SignOut">
                 <OlIcon Name="IconName.Logout" />
                 <span class="ol-nav__label">Sign out</span>
@@ -121,11 +128,14 @@
 
     private string SkipHref => Navigation.ToBaseRelativePath(Navigation.Uri).Split('#')[0] + "#main";
 
-    /// <summary>On phones the menu holds everything the bottom bar has no room for; elsewhere only settings pages.</summary>
+    /// <summary>
+    /// On phones the menu holds everything the bottom bar has no room for; with a rail or a sidebar, Ingredients and
+    /// My kitchen are in the main navigation and the menu keeps the account settings.
+    /// </summary>
     private IReadOnlyList<NavDestination> MenuItems =>
         Display.Value.Device.SizeClass is SizeClass.Unknown or SizeClass.Compact or SizeClass.Watch
         ? NavDestinations.AccountMenu
-        : [NavDestinations.Ingredients, NavDestinations.Kitchen, NavDestinations.Settings];
+        : [NavDestinations.Settings];
 
     /// <summary>True when the reported size class is one of <paramref name="classes"/>, or nothing was reported yet.</summary>
     private bool Shows(params SizeClass[] classes) =>

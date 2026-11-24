@@ -31,7 +31,8 @@ public sealed record ChatEntry(
     ProposalStatus Status = ProposalStatus.Pending,
     Guid? BatchId = null,
     string? Disclaimer = null,
-    IReadOnlyList<string>? UnverifiedNumbers = null);
+    IReadOnlyList<string>? UnverifiedNumbers = null,
+    Guid? RecipeId = null);
 
 /// <summary>Assistant slice: conversations, the open chat, sending, proposals, usage.</summary>
 [FeatureState(Name = "Assistant")]
@@ -85,7 +86,7 @@ public sealed record ConfirmProposal(Guid ActionId);
 public sealed record DeclineProposal(Guid ActionId);
 
 /// <summary>Result: a proposal changed status.</summary>
-public sealed record ProposalSettled(Guid ActionId, ProposalStatus Status, Guid? BatchId);
+public sealed record ProposalSettled(Guid ActionId, ProposalStatus Status, Guid? BatchId, Guid? RecipeId = null);
 
 /// <summary>Result: confirm or decline failed for another reason than expiry.</summary>
 public sealed record ProposalFailed(Guid ActionId, ApiError Error);
@@ -173,7 +174,7 @@ public static class AssistantReducers
         ActingOn = null,
         Messages = state.Messages.Value is { } messages
             ? new Loadable<ImmutableList<ChatEntry>>.Loaded(messages.ConvertAll(m =>
-                m.Proposal?.ActionId == action.ActionId ? m with { Status = action.Status, BatchId = action.BatchId } : m))
+                m.Proposal?.ActionId == action.ActionId ? m with { Status = action.Status, BatchId = action.BatchId, RecipeId = action.RecipeId } : m))
             : state.Messages,
     };
 
@@ -262,7 +263,7 @@ public sealed class AssistantEffects(IAssistantApi api, IState<AssistantState> s
         dispatcher.Dispatch(new UsageLoaded((await api.GetUsageAsync()).ToLoadable()));
     }
 
-    /// <summary>Confirms: the batch is saved by the API, the other features reload and a toast links to it.</summary>
+    /// <summary>Confirms: the batch or recipe is saved by the API, the other features reload and a toast links to it.</summary>
     [EffectMethod]
     public async Task HandleConfirm(ConfirmProposal action, IDispatcher dispatcher)
     {
@@ -276,10 +277,21 @@ public sealed class AssistantEffects(IAssistantApi api, IState<AssistantState> s
         switch (await api.ConfirmAsync(id, action.ActionId))
         {
             case ApiResult<ConfirmActionResponse>.Success { Value: var confirmed }:
-                var name = state.Value.Messages.Value?.FirstOrDefault(m => m.Proposal?.ActionId == action.ActionId)?.Proposal?.Batch?.Name ?? "Batch";
-                dispatcher.Dispatch(new ProposalSettled(action.ActionId, ProposalStatus.Confirmed, confirmed.BatchId));
-                dispatcher.Dispatch(new BatchCreated(confirmed.BatchId, name));
-                dispatcher.Dispatch(new ShowToast(Toast.Success($"{name} saved", "Open batch", $"batches/{confirmed.BatchId}")));
+                var proposal = state.Value.Messages.Value?.FirstOrDefault(m => m.Proposal?.ActionId == action.ActionId)?.Proposal;
+                dispatcher.Dispatch(new ProposalSettled(action.ActionId, ProposalStatus.Confirmed, confirmed.BatchId, confirmed.RecipeId));
+                if (confirmed.RecipeId is { } recipeId)
+                {
+                    var title = proposal?.Recipe?.Title ?? "Recipe";
+                    dispatcher.Dispatch(new RecipesChanged());
+                    dispatcher.Dispatch(new ShowToast(Toast.Success($"{title} saved", "Open recipe", $"recipes/{recipeId}")));
+                }
+                else if (confirmed.BatchId is { } batchId)
+                {
+                    var name = proposal?.Batch?.Name ?? "Batch";
+                    dispatcher.Dispatch(new BatchCreated(batchId, name));
+                    dispatcher.Dispatch(new ShowToast(Toast.Success($"{name} saved", "Open batch", $"batches/{batchId}")));
+                }
+
                 break;
             case ApiResult<ConfirmActionResponse>.Failure { Error.Kind: ApiErrorKind.Conflict }:
                 dispatcher.Dispatch(new ProposalSettled(action.ActionId, ProposalStatus.Expired, null));

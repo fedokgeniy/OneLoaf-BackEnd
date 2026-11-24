@@ -1,5 +1,6 @@
-@* Plan card of an assistant proposal (US-34, rule 2): every figure comes from the plan the Core API calculated for the
-   assistant; nothing is saved until Confirm. After it is settled the card says what happened. *@
+@* Plan card of an assistant proposal (US-34, rule 2). A batch plan shows the figures the Core API calculated; a recipe
+   proposal shows the recipe the assistant wrote, with the ingredients that will be added. Nothing is saved until
+   Confirm. After it is settled the card says what happened. *@
 @using OneLoaf.Web.Features.Assistant.Services
 @using OneLoaf.Web.Features.Assistant.State
 @using OneLoaf.Web.Shared.Formatting
@@ -37,6 +38,18 @@
                 <dd>@DisplayFormat.Money(cost, batch.Currency)</dd>
             }
         </dl>
+        @if (batch.Stock is { Shortages.Count: > 0 } stock)
+        {
+            <OlAlert Kind="AlertKind.Warning" Title="Not enough in stock">
+                <ul class="plan-card__list">
+                    @foreach (var shortage in stock.Shortages)
+                    {
+                        <li>@shortage.Name: @DisplayFormat.Quantity(shortage.Missing, shortage.UnitCode) missing</li>
+                    }
+                </ul>
+                <p>Confirming plans the batch anyway. To bake less, decline and ask for fewer loaves, or plan it in the batch form.</p>
+            </OlAlert>
+        }
         <details class="plan-card__stages">
             <summary>Stages</summary>
             <ol>
@@ -50,6 +63,52 @@
             </ol>
         </details>
     }
+    else if (Proposal.Recipe is { } recipe)
+    {
+        <h3 class="ol-plan__title" id="@TitleId">New recipe · @recipe.Title</h3>
+        @if (!string.IsNullOrWhiteSpace(recipe.Description))
+        {
+            <p class="plan-card__note">@recipe.Description</p>
+        }
+        <dl class="ol-plan__rows">
+            <dt>Makes</dt>
+            <dd>@DisplayFormat.Loaves(recipe.YieldLoaves)</dd>
+            @foreach (var ingredient in recipe.Ingredients)
+            {
+                <dt>
+                    @ingredient.Name
+                    @if (ingredient.IsOptional)
+                    {
+                        <span class="plan-card__tag">optional</span>
+                    }
+                    @if (ingredient.IsNew)
+                    {
+                        <span class="ol-badge ol-badge--planned">New ingredient</span>
+                    }
+                </dt>
+                <dd>@DisplayFormat.Quantity(ingredient.Quantity, ingredient.UnitCode)</dd>
+            }
+        </dl>
+        <details class="plan-card__stages" open>
+            <summary>Stages</summary>
+            <ol>
+                @foreach (var stage in recipe.Stages)
+                {
+                    <li>
+                        <span>@stage.Name</span>
+                        <span class="ol-num">@DisplayFormat.DurationRange(stage.MinDurationMinutes, stage.MaxDurationMinutes)</span>
+                    </li>
+                }
+            </ol>
+        </details>
+        <p class="plan-card__note">
+            The quantities are the assistant's suggestion: check them and edit the recipe after saving.
+            @if (recipe.Ingredients.Any(i => i.IsNew))
+            {
+                <span>New ingredients are added to your catalog without a price.</span>
+            }
+        </p>
+    }
     else
     {
         <h3 class="ol-plan__title" id="@TitleId">Proposal</h3>
@@ -58,6 +117,12 @@
 
     @switch (Status)
     {
+        case ProposalStatus.Confirmed when RecipeId is { } savedRecipe:
+            <p class="plan-card__result" role="status"><OlIcon Name="IconName.CheckCircle" /> Saved as a recipe.
+                <a class="ol-link" href="@($"recipes/{savedRecipe}")">Open the recipe</a>
+                <a class="ol-link" href="ingredients">Add prices</a>
+            </p>
+            break;
         case ProposalStatus.Confirmed:
             <p class="plan-card__result" role="status"><OlIcon Name="IconName.CheckCircle" /> Saved as a batch.
                 @if (BatchId is { } id)
@@ -70,7 +135,7 @@
             <p class="plan-card__result" role="status">Declined. Tell the assistant what to change.</p>
             break;
         case ProposalStatus.Expired:
-            <p class="plan-card__result" role="status"><OlIcon Name="IconName.Alert" /> This proposal has expired or was already used. Ask for a new plan.</p>
+            <p class="plan-card__result" role="status"><OlIcon Name="IconName.Alert" /> This proposal has expired or was already used. Ask for a new one.</p>
             break;
         default:
             <p class="plan-card__note">Nothing is saved until you confirm. Valid until @DisplayFormat.Time(Proposal.ExpiresAt).</p>
@@ -78,6 +143,10 @@
                 @if (Proposal.Batch is not null)
                 {
                     <OlButton Icon="IconName.Check" Loading="Busy" Disabled="Busy" OnClick="OnConfirm">Confirm plan</OlButton>
+                }
+                else if (Proposal.Recipe is not null)
+                {
+                    <OlButton Icon="IconName.Check" Loading="Busy" Disabled="Busy" OnClick="OnConfirm">Save recipe</OlButton>
                 }
                 <OlButton Variant="ButtonVariant.Secondary" Disabled="Busy" OnClick="OnDecline">Decline</OlButton>
             </div>
@@ -88,7 +157,7 @@
 @code {
     private string TitleId => $"plan-{Proposal.ActionId}";
 
-    /// <summary>The proposal with its mapped batch.</summary>
+    /// <summary>The proposal with its mapped batch or recipe.</summary>
     [Parameter, EditorRequired] public BatchProposal Proposal { get; set; } = default!;
 
     /// <summary>Status of the proposal.</summary>
@@ -96,6 +165,9 @@
 
     /// <summary>Saved batch after Confirm.</summary>
     [Parameter] public Guid? BatchId { get; set; }
+
+    /// <summary>Saved recipe after Confirm.</summary>
+    [Parameter] public Guid? RecipeId { get; set; }
 
     /// <summary>Confirm or decline is running.</summary>
     [Parameter] public bool Busy { get; set; }

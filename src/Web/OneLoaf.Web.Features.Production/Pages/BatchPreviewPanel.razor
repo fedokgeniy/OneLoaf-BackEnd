@@ -1,4 +1,5 @@
-@* Preview of the batch as the API would save it: ready window, total cost, per recipe starter and kneading. *@
+@* Preview of the batch as the API would save it: ready window, total cost, per recipe starter and kneading, and the
+   stock check with the two offers the API calculated (fewer loaves, or the same loaves from what is in stock). *@
 @using OneLoaf.Web.Features.Production.State
 @using OneLoaf.Web.Shared.Contracts.Core
 @using OneLoaf.Web.Shared.Formatting
@@ -21,6 +22,39 @@
             <OlStatTile Label="Total cost" Value="@(batch.TotalCost is { } cost ? DisplayFormat.Money(cost, batch.Currency) : "incomplete")"
                         Hint="@(batch.TotalCost is null ? "prices missing" : $"prices as of {DisplayFormat.Date(batch.PriceDate)}")" />
         </div>
+        @if (batch.IngredientScale < 1m)
+        {
+            <OlAlert Kind="AlertKind.Info" Title="@($"Baking from what is in stock: {DisplayFormat.Percent(batch.IngredientScale * 100m)} of the recipe")">
+                <p>The loaves stay, each one gets less dough. Starter, kneading and ingredient cost above are for the reduced quantities.</p>
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="OnUseFull">Use the full recipe</OlButton>
+            </OlAlert>
+        }
+        @if (batch.Stock is { Shortages.Count: > 0 } stock)
+        {
+            <OlAlert Kind="AlertKind.Warning" Title="Not enough in stock">
+                <ul class="preview__shortages">
+                    @foreach (var shortage in stock.Shortages)
+                    {
+                        <li @key="shortage.IngredientId">
+                            @shortage.Name: needs @DisplayFormat.Quantity(shortage.Needed, shortage.UnitCode),
+                            @DisplayFormat.Quantity(shortage.Available, shortage.UnitCode) in stock,
+                            <strong>@DisplayFormat.Quantity(shortage.Missing, shortage.UnitCode) missing</strong>
+                        </li>
+                    }
+                </ul>
+                <div class="preview__offers">
+                    @if (stock.MaxLoaves is { } loaves)
+                    {
+                        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => OnUseLoaves.InvokeAsync(loaves)">Reduce to @DisplayFormat.Loaves(loaves)</OlButton>
+                    }
+                    @if (stock.MaxScale is { } scale)
+                    {
+                        <OlButton Variant="ButtonVariant.Secondary" OnClick="() => OnUseScale.InvokeAsync(scale)">Bake from what is in stock</OlButton>
+                    }
+                </div>
+                <p>You can also plan the batch as it is: the stock then goes below zero until you record a purchase.</p>
+            </OlAlert>
+        }
         <ul class="preview__items">
             @foreach (var item in batch.Items)
             {
@@ -56,4 +90,13 @@
 
     /// <summary>Planned backwards from a ready-by time.</summary>
     [Parameter] public bool ReadyBy { get; set; }
+
+    /// <summary>The baker takes the offer to bake the number of loaves the stock covers.</summary>
+    [Parameter] public EventCallback<int> OnUseLoaves { get; set; }
+
+    /// <summary>The baker takes the offer to keep the loaves and bake with the share of the dough the stock covers.</summary>
+    [Parameter] public EventCallback<decimal> OnUseScale { get; set; }
+
+    /// <summary>The baker goes back to the full recipe quantities.</summary>
+    [Parameter] public EventCallback OnUseFull { get; set; }
 }

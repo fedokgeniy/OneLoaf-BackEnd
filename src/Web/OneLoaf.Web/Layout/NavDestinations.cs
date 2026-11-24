@@ -35,8 +35,8 @@ public static class NavDestinations
     /// <summary>Ingredients.</summary>
     public static readonly NavDestination Ingredients = new("ingredients", "Ingredients", IconName.Calculator);
 
-    /// <summary>Kitchen settings.</summary>
-    public static readonly NavDestination Kitchen = new("settings/kitchen", "Kitchen", IconName.Settings);
+    /// <summary>Kitchen settings: oven, mixer, tariffs and the other figures the calculator uses.</summary>
+    public static readonly NavDestination Kitchen = new("settings/kitchen", "My kitchen", IconName.Kitchen);
 
     /// <summary>Settings.</summary>
     public static readonly NavDestination Settings = new("settings", "Settings", IconName.Settings);
@@ -44,8 +44,11 @@ public static class NavDestinations
     /// <summary>Phone bottom bar: five items.</summary>
     public static IReadOnlyList<NavDestination> BottomBar { get; } = [Home, Recipes, Batches, Starters, Assistant];
 
-    /// <summary>Tablet rail and desktop sidebar: the seven main items (Settings and Sign out are pinned below).</summary>
+    /// <summary>Tablet rail and desktop sidebar: the seven main items at the top.</summary>
     public static IReadOnlyList<NavDestination> Main { get; } = [Home, Recipes, Batches, Starters, Assistant, Library, History];
+
+    /// <summary>Tablet rail and desktop sidebar: the workspace set-up pinned to the bottom, above Sign out.</summary>
+    public static IReadOnlyList<NavDestination> Pinned { get; } = [Ingredients, Kitchen, Settings];
 
     /// <summary>Phone avatar menu: what does not fit in the bottom bar.</summary>
     public static IReadOnlyList<NavDestination> AccountMenu { get; } = [Library, History, Ingredients, Kitchen, Settings];

@@ -39,7 +39,17 @@ public sealed record BatchSummaryDto(
 
 /// <summary><c>POST /batches</c>, <c>/batches/preview</c>, <c>PUT /batches/{id}</c> body (US-20). <see cref="Source"/>: manual or assistant.</summary>
 public sealed record BatchRequest(
-    string Name, DateTimeOffset PlannedStartAt, IReadOnlyList<BatchItemRequest> Items, DateOnly? PriceDate, string? Notes, string? Source);
+    string Name, DateTimeOffset PlannedStartAt, IReadOnlyList<BatchItemRequest> Items, DateOnly? PriceDate, string? Notes, string? Source,
+    decimal? IngredientScale = null);
+
+/// <summary>An ingredient the stock does not cover for a batch; quantities in <see cref="UnitCode"/>.</summary>
+public sealed record StockShortageDto(Guid IngredientId, string Name, string UnitCode, decimal Needed, decimal Available, decimal Missing);
+
+/// <summary>
+/// Stock check of a batch plan. <see cref="MaxLoaves"/>: loaves the stock covers at full quantities (one-item batches);
+/// <see cref="MaxScale"/>: share of the dough the stock covers with the planned loaves. Both come from the server.
+/// </summary>
+public sealed record BatchStockDto(IReadOnlyList<StockShortageDto> Shortages, int? MaxLoaves, decimal? MaxScale);
 
 /// <summary>One recipe of a batch; a starter reminder is sent <see cref="StarterReminderMinutes"/> before kneading (US-29).</summary>
 public sealed record BatchItemRequest(Guid RecipeId, int Loaves, Guid? StarterId, int? StarterReminderMinutes);
@@ -60,7 +70,9 @@ public sealed record BatchDto(
     string Currency,
     string? Notes,
     IReadOnlyList<BatchItemDto> Items,
-    Guid? BakeRecordId);
+    Guid? BakeRecordId,
+    decimal IngredientScale = 1m,
+    BatchStockDto? Stock = null);
 
 /// <summary>One recipe of a batch with its figures and stages.</summary>
 public sealed record BatchItemDto(
@@ -138,12 +150,15 @@ public sealed record StarterDto(
     DateTimeOffset? NextFeedingAt,
     DateTimeOffset? ExpectedPeakAt,
     DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    Guid? FlourIngredientId = null,
+    Guid? WaterIngredientId = null,
+    decimal? AmountG = null);
 
-/// <summary><c>POST/PUT /starters</c> body.</summary>
+/// <summary><c>POST/PUT /starters</c> body; feedings take flour and water from the stock of the two ingredients.</summary>
 public sealed record StarterRequest(
     string Name, decimal HydrationPercent, string FeedingMode, int FeedingIntervalHours, Guid? FlourId, decimal? RiseHours,
-    bool IsActive, string? Notes);
+    bool IsActive, string? Notes, Guid? FlourIngredientId = null, Guid? WaterIngredientId = null);
 
 /// <summary>A feeding of a starter (US-28).</summary>
 public sealed record FeedingDto(
