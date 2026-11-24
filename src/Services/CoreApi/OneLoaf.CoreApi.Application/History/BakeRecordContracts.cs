@@ -14,9 +14,10 @@ namespace OneLoaf.CoreApi.Application.History;
 /// <param name="HasAnalysis">The assistant analysed the result.</param>
 /// <param name="RecipeTitles">Recipe titles of the items.</param>
 /// <param name="PhotoCount">Crumb photos of the record (US-51).</param>
+/// <param name="CoverPhotoId">The first photo of the record, shown in the list; null without photos.</param>
 public sealed record BakeRecordSummaryDto(
     Guid Id, Guid? BatchId, DateOnly BakedOn, int TotalLoaves, decimal? TotalCost, string Currency, short? Rating,
-    bool HasAnalysis, IReadOnlyList<string> RecipeTitles, int PhotoCount = 0);
+    bool HasAnalysis, IReadOnlyList<string> RecipeTitles, int PhotoCount = 0, Guid? CoverPhotoId = null);
 
 /// <summary>Item of a history record.</summary>
 /// <param name="Id">Id.</param>

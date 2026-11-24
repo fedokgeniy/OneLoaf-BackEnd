@@ -12,6 +12,7 @@ public partial class LibraryDetailPage : FluxorComponent
     private bool _signedIn;
     private string? _comment;
     private string? _commentError;
+    private bool _copyOpen;
     private bool _reportOpen;
     private Guid? _reportComment;
     private string? _reportReason;
@@ -36,6 +37,14 @@ public partial class LibraryDetailPage : FluxorComponent
     {
         await base.OnInitializedAsync();
         SubscribeToAction<PublicationCopied>(a => Navigation.NavigateTo($"recipes/{a.RecipeId}"));
+        SubscribeToAction<PublicationCommandDone>(done =>
+        {
+            // A failed save keeps the page; the dialog closes and the toast says why.
+            if (done.Command == nameof(CopyPublication))
+            {
+                _copyOpen = false;
+            }
+        });
         SubscribeToAction<PublicationUnpublished>(_ => Navigation.NavigateTo("library"));
         SubscribeToAction<ContentReported>(_ => _reportOpen = false);
         SubscribeToAction<CommentAdded>(_ => _comment = null);
@@ -123,4 +132,11 @@ public partial class LibraryDetailPage : FluxorComponent
         "want_to_bake" => "Want to bake",
         _ => code,
     };
+
+    /// <summary>Opens the dialog that matches the ingredients of the recipe to the own ones.</summary>
+    private void OpenCopy()
+    {
+        _copyOpen = true;
+        Dispatcher.Dispatch(new PrepareCopy());
+    }
 }

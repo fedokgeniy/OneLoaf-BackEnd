@@ -58,7 +58,8 @@
         <ul class="preview__items">
             @foreach (var item in batch.Items)
             {
-                <li class="preview__item" @key="item.Id">
+                @* No key: the items of a preview are not saved yet, so they all have the empty id. *@
+                <li class="preview__item">
                     <span class="preview__item-title">@item.RecipeTitle · @DisplayFormat.Loaves(item.Loaves)</span>
                     <span class="preview__item-meta">
                         @(item.StarterAmountG is { } starter ? $"Starter {DisplayFormat.Grams(starter)}" : "No starter")

@@ -21,9 +21,10 @@ public sealed record LibraryListQuery(string? Search = null, int Page = 1, int P
 /// <param name="StageCount">Stages in the snapshot.</param>
 /// <param name="CommentCount">Visible comments.</param>
 /// <param name="ReactionCount">Reactions.</param>
+/// <param name="HasPhoto">The recipe has a photo (<c>GET /library/{id}/photo</c>).</param>
 public sealed record LibraryItemDto(
     Guid Id, string Title, string? Description, string AuthorName, DateTimeOffset PublishedAt, int? YieldLoaves,
-    int IngredientCount, int StageCount, long CommentCount, long ReactionCount);
+    int IngredientCount, int StageCount, long CommentCount, long ReactionCount, bool HasPhoto = false);
 
 /// <summary>A publication with its snapshot.</summary>
 /// <param name="Id">Publication.</param>
@@ -37,9 +38,11 @@ public sealed record LibraryItemDto(
 /// <param name="Reactions">Count per reaction.</param>
 /// <param name="MyReaction">Reaction of the current user.</param>
 /// <param name="IsMine">The current user is the author.</param>
+/// <param name="HasPhoto">The recipe has a photo (<c>GET /library/{id}/photo</c>).</param>
 public sealed record PublishedRecipeDto(
     Guid Id, string Title, string? Description, string AuthorName, PublicationStatus Status, DateTimeOffset PublishedAt,
-    JsonElement Snapshot, long CommentCount, IReadOnlyDictionary<ReactionType, int> Reactions, ReactionType? MyReaction, bool IsMine);
+    JsonElement Snapshot, long CommentCount, IReadOnlyDictionary<ReactionType, int> Reactions, ReactionType? MyReaction, bool IsMine,
+    bool HasPhoto = false);
 
 /// <summary>Response of <c>POST /recipes/{id}/publish</c>.</summary>
 /// <param name="PublishedRecipeId">The new publication.</param>
@@ -131,3 +134,19 @@ public sealed record ReportState(Guid? PublishedRecipeId, Guid? CommentId, Repor
 /// <param name="Description">Description.</param>
 /// <param name="Snapshot">Snapshot JSON.</param>
 public sealed record PublicationSnapshot(string Title, string? Description, string Snapshot);
+
+/// <summary>
+/// Body of <c>POST /library/{id}/copy</c> (US-42); optional. Without a choice for an ingredient it is matched to the
+/// own catalog by name or created.
+/// </summary>
+/// <param name="Ingredients">What to do with ingredients of the published recipe.</param>
+public sealed record CopyPublicationRequest(IReadOnlyList<CopyIngredientChoice>? Ingredients = null);
+
+/// <summary>What happens to one ingredient of a published recipe when it is copied.</summary>
+/// <param name="Name">Name of the ingredient in the published recipe.</param>
+/// <param name="UseIngredientId">
+/// Own ingredient to use instead (same unit), so that another name for the same product makes no duplicate; null adds
+/// the ingredient to the own catalog.
+/// </param>
+/// <param name="StockQuantity">For an added ingredient: how much of it is on the shelf, in its unit; null keeps no stock.</param>
+public sealed record CopyIngredientChoice(string Name, Guid? UseIngredientId = null, decimal? StockQuantity = null);

@@ -3,6 +3,7 @@ using Fluxor;
 using Microsoft.AspNetCore.Components;
 using OneLoaf.Web.Features.Production.State;
 using OneLoaf.Web.Shared.Contracts.Core;
+using OneLoaf.Web.Shared.Ui;
 
 namespace OneLoaf.Web.Features.Production.Pages;
 
@@ -13,9 +14,6 @@ namespace OneLoaf.Web.Features.Production.Pages;
 /// </summary>
 public sealed partial class BatchPage
 {
-    private BatchStageDto? _adjust;
-    private int _adjustMin;
-    private int _adjustMax;
     private bool _confirmCancel;
     private bool _confirmDelete;
     private bool _ingredientsUsed;
@@ -94,24 +92,22 @@ public sealed partial class BatchPage
         }
     }
 
-    private void OpenAdjust(BatchStageDto stage)
+    /// <summary>
+    /// More time for a running stage is an extension (US-24): the API moves what follows. A stage that has not started
+    /// gets new planned durations for this batch (US-21), both moved by the chosen minutes.
+    /// </summary>
+    private void Adjust(BatchDto batch, StageAdjustment adjustment)
     {
-        _adjust = stage;
-        _adjustMin = stage.PlannedMinMinutes;
-        _adjustMax = stage.PlannedMaxMinutes;
-    }
-
-    private void SubmitAdjust(BatchDto batch, bool reset)
-    {
-        if (_adjust is not { } stage)
+        if (State.Value.BusyStageId is not null)
         {
             return;
         }
 
-        Dispatcher.Dispatch(reset
-            ? new RunStageCommand(batch.Id, stage.Id, StageCommandKind.Reset)
-            : new RunStageCommand(batch.Id, stage.Id, StageCommandKind.Adjust, new StageDurationRequest(_adjustMin, _adjustMax)));
-        _adjust = null;
+        var (stage, minutes) = adjustment;
+        Dispatcher.Dispatch(stage.Status == StageStatuses.Running && minutes > 0
+            ? new RunStageCommand(batch.Id, stage.Id, StageCommandKind.Extend, Minutes: minutes)
+            : new RunStageCommand(batch.Id, stage.Id, StageCommandKind.Adjust,
+                new StageDurationRequest(Math.Max(0, stage.PlannedMinMinutes + minutes), Math.Max(0, stage.PlannedMaxMinutes + minutes))));
     }
 
     private string StockHint => _ingredientsUsed

@@ -1,8 +1,8 @@
 @* App shell (.ol-shell): exactly one main navigation per size class — bottom bar (phone), rail (tablet, phone
-   landscape), sidebar (desktop) — plus the top bar with the page title and the profile menu. Before device.js reports
-   the size class, all three are rendered and CSS shows the one that fits, so nothing jumps. The rail and the sidebar
-   pin Ingredients, My kitchen and Settings to the bottom. Sign out is reachable in all three patterns (avatar menu,
-   bottom of the rail, bottom of the sidebar). *@
+   landscape), sidebar (desktop) — plus the top bar with the page title, the actions of the page and the profile menu.
+   Before device.js reports the size class, all three are rendered and CSS shows the one that fits, so nothing jumps.
+   The rail and the sidebar pin Ingredients and My kitchen to the bottom. Settings and Sign out are in the profile menu
+   in all three patterns. *@
 @inherits FluxorComponent
 @inject IState<DisplayState> Display
 @inject IState<SessionState> Session
@@ -25,10 +25,6 @@
             {
                 <NavItem Destination="item" />
             }
-            <button type="button" class="ol-nav__item" @onclick="SignOut">
-                <OlIcon Name="IconName.Logout" />
-                <span class="ol-nav__label">Sign out</span>
-            </button>
         </nav>
     }
     @if (Shows(SizeClass.Medium))
@@ -46,10 +42,6 @@
             {
                 <NavItem Destination="item" />
             }
-            <button type="button" class="ol-nav__item" @onclick="SignOut">
-                <OlIcon Name="IconName.Logout" />
-                <span class="ol-nav__label">Sign out</span>
-            </button>
         </nav>
     }
 

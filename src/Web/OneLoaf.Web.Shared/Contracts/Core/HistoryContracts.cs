@@ -11,7 +11,8 @@ public sealed record BakeRecordSummaryDto(
     int? Rating,
     bool HasAnalysis,
     IReadOnlyList<string> RecipeTitles,
-    int PhotoCount);
+    int PhotoCount,
+    Guid? CoverPhotoId = null);
 
 /// <summary>Statistics per recipe (<c>GET /bake-records/statistics</c>).</summary>
 public sealed record BakeStatisticsDto(

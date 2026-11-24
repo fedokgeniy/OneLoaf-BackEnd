@@ -9,6 +9,12 @@ public interface ILibraryRepository
     /// <summary>Publishes the effective recipe (<c>CALL sp_publish_recipe</c>); returns the publication id.</summary>
     Task<Guid> PublishAsync(Guid recipeId, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// The photo of the recipe a publication was made from; null when the publication is not published or the recipe
+    /// has no photo (or no longer exists).
+    /// </summary>
+    Task<History.PhotoSlot?> GetPhotoAsync(Guid publicationId, CancellationToken cancellationToken);
+
     /// <summary>Published recipes matching the title part, newest first.</summary>
     Task<PagedResult<LibraryItemDto>> SearchAsync(LibraryListQuery query, CancellationToken cancellationToken);
 

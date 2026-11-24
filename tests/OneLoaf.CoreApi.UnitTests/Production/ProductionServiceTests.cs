@@ -42,7 +42,7 @@ public sealed class ProductionServiceTests
     }
 
     private BatchRequest Request(Guid? starterId = null, DateOnly? priceDate = null) =>
-        new(" Weekend ", Now.AddDays(1), [new(_recipeId, 3, starterId, 60)], priceDate, "  ");
+        new(" Weekend ", Now.AddDays(1), [new(_recipeId, 3, starterId, true)], priceDate, "  ");
 
     // ---- Batches ----
 
@@ -58,6 +58,9 @@ public sealed class ProductionServiceTests
         Assert.Null(_batches.LastPlanned.Notes);
         Assert.Equal("EUR", _batches.LastPlanned.Currency);
         Assert.Equal(new DateOnly(2026, 11, 15), _batches.LastPlanned.PriceDate);
+
+        // The feeding reminder comes the time to peak of the starter (6 h) before kneading.
+        Assert.Equal(360, Assert.Single(_batches.LastPlanned.Items).StarterReminderMinutes);
         var planned = Assert.IsType<BatchPlanned>(Assert.Single(_events.Published));
         Assert.Equal(batch.Id, planned.BatchId);
         Assert.Equal(Now.AddDays(1).AddMinutes(30), planned.FirstReminderAt);
@@ -346,7 +349,7 @@ public sealed class ProductionServiceTests
     {
         Assert.True(new BatchRequestValidator().Validate(Request()).IsValid);
         Assert.False(new BatchRequestValidator().Validate(new BatchRequest("", default, [])).IsValid);
-        Assert.False(new BatchRequestValidator().Validate(Request() with { Items = [new(Guid.Empty, 0, Guid.Empty, -1)] }).IsValid);
+        Assert.False(new BatchRequestValidator().Validate(Request() with { Items = [new(Guid.Empty, 0, Guid.Empty, false)] }).IsValid);
         Assert.False(new BatchListQueryValidator().Validate(new BatchListQuery(Now, Now.AddDays(-1))).IsValid);
         Assert.True(new BatchListQueryValidator().Validate(new BatchListQuery(Now, Now.AddDays(7))).IsValid);
         Assert.False(new StageActionRequestValidator().Validate(new StageActionRequest(400, null)).IsValid);

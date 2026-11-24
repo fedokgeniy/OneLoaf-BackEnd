@@ -1,5 +1,6 @@
 using System.Net;
 using System.Net.Http.Json;
+using OneLoaf.CoreApi.Application.Catalog;
 using OneLoaf.CoreApi.Application.Common;
 using OneLoaf.CoreApi.Application.Library;
 using OneLoaf.CoreApi.Application.Recipes;
@@ -41,6 +42,56 @@ public sealed class LibraryTests(ApiFixture fixture)
         Assert.Equal(HttpStatusCode.NoContent, annaUnpublish.StatusCode);
         Assert.Equal(HttpStatusCode.NotFound, hidden.StatusCode);
         Assert.DoesNotContain(after.Items, i => i.Id == published.PublishedRecipeId);
+    }
+
+    [Fact]
+    public async Task US42_CopyWithChoices_UsesAnOwnIngredientInsteadOfADuplicateAndStocksANewOne()
+    {
+        using var anna = fixture.CreateClientAs(Seed.Anna);
+        using var boris = fixture.CreateClientAs(Seed.Boris);
+        using var visitor = fixture.Api.CreateClient();
+        var flour = await (await anna.PostAsJsonAsync("/api/v1/ingredients", new IngredientRequest("Copy test T550", "flour", "g", null),
+            CoreApiFactory.Json, Ct)).ReadAsync<IngredientDto>();
+        var seeds = await (await anna.PostAsJsonAsync("/api/v1/ingredients", new IngredientRequest("Copy test seeds", "add_in", "g", null),
+            CoreApiFactory.Json, Ct)).ReadAsync<IngredientDto>();
+        var recipe = await (await anna.PostAsJsonAsync("/api/v1/recipes", new RecipeRequest("Copy test loaf", null, 1, null, null,
+            [new(null, flour.Id, 500), new(null, seeds.Id, 50)], [new(null, "Bake", "bake", 40, 45)]), CoreApiFactory.Json, Ct)).ReadAsync<RecipeDto>();
+
+        // The photo of the recipe is the photo of its publication, readable without a token.
+        byte[] png = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2, 0, 0, 0];
+        using var form = new MultipartFormDataContent();
+        var file = new ByteArrayContent(png);
+        file.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/png");
+        form.Add(file, "file", "loaf.png");
+        using var uploaded = await anna.PutAsync($"/api/v1/recipes/{recipe.Id}/photo", form, Ct);
+        Assert.Equal(HttpStatusCode.NoContent, uploaded.StatusCode);
+        var published = await (await anna.PostAsync($"/api/v1/recipes/{recipe.Id}/publish", null, Ct)).ReadAsync<PublishResponse>();
+        var publication = await (await visitor.GetAsync($"/api/v1/library/{published.PublishedRecipeId}", Ct)).ReadAsync<PublishedRecipeDto>();
+        Assert.True(publication.HasPhoto);
+        using var photo = await visitor.GetAsync($"/api/v1/library/{published.PublishedRecipeId}/photo", Ct);
+        Assert.Equal(HttpStatusCode.OK, photo.StatusCode);
+        Assert.Equal("image/png", photo.Content.Headers.ContentType!.MediaType);
+
+        // Boris calls the same flour by another name: he uses his own, and says how many seeds he has.
+        var own = await (await boris.PostAsJsonAsync("/api/v1/ingredients", new IngredientRequest("Boris strong flour", "flour", "g", null),
+            CoreApiFactory.Json, Ct)).ReadAsync<IngredientDto>();
+        using var copyResponse = await boris.PostAsJsonAsync($"/api/v1/library/{published.PublishedRecipeId}/copy",
+            new CopyPublicationRequest([new("Copy test T550", own.Id), new("Copy test seeds", null, 200m)]), CoreApiFactory.Json, Ct);
+        Assert.True(copyResponse.StatusCode == HttpStatusCode.Created, await copyResponse.Content.ReadAsStringAsync(Ct));
+        var copy = await copyResponse.ReadAsync<RecipeDto>();
+
+        Assert.Contains(copy.Ingredients, i => i.IngredientId == own.Id && i.Quantity == 500m);
+        var mine = await (await boris.GetAsync("/api/v1/ingredients?search=Copy%20test&pageSize=100", Ct)).ReadAsync<PagedResult<IngredientDto>>();
+        var added = Assert.Single(mine.Items);
+        Assert.Equal("Copy test seeds", added.Name);
+        Assert.Equal(200m, added.Stock);
+
+        // Another unit would change the quantity of the recipe line.
+        var litres = await (await boris.PostAsJsonAsync("/api/v1/ingredients", new IngredientRequest("Boris flour in kilograms", "flour", "kg", null),
+            CoreApiFactory.Json, Ct)).ReadAsync<IngredientDto>();
+        using var wrongUnit = await boris.PostAsJsonAsync($"/api/v1/library/{published.PublishedRecipeId}/copy",
+            new CopyPublicationRequest([new("Copy test T550", litres.Id)]), CoreApiFactory.Json, Ct);
+        Assert.Equal(HttpStatusCode.BadRequest, wrongUnit.StatusCode);
     }
 
     [Fact]

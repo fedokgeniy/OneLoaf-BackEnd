@@ -25,7 +25,7 @@ public sealed class ReminderDispatcherTests
         await dispatcher.HandleAsync(Due(reminders.Add()), Context(1), Ct);
 
         Assert.Equal(ReminderStatus.Sent, reminders.Single.Status);
-        Assert.Equal("Kneading starts soon", Assert.Single(channel.Sent).Title);
+        Assert.Equal("Feed your starter for the batch", Assert.Single(channel.Sent).Title);
     }
 
     [Fact]

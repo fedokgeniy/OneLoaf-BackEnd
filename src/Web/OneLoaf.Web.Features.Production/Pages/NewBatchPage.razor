@@ -81,12 +81,8 @@
                             @if (!string.IsNullOrEmpty(item.StarterId))
                             {
                                 <div class="new-batch__remind">
-                                    <OlSwitch @bind-Value="item.Remind">Remind me to feed the starter before kneading</OlSwitch>
-                                    @if (item.Remind)
-                                    {
-                                        <OlSegmented TValue="int" Label="Minutes before kneading" Options="ReminderOptions" Value="item.ReminderMinutes"
-                                                     ValueChanged="m => SetReminder(item, m)" />
-                                    }
+                                    <OlSwitch @bind-Value="item.Remind">Remind me to feed the starter in time</OlSwitch>
+                                    <p class="ol-field__help">@ReminderHelp(data, item)</p>
                                 </div>
                             }
                         </li>

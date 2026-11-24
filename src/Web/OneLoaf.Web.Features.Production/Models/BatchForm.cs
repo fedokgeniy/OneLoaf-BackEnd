@@ -87,11 +87,8 @@ public sealed class BatchItemForm
     /// <summary>Starter used; null for none.</summary>
     public string? StarterId { get; set; }
 
-    /// <summary>Send a starter reminder before kneading (US-29).</summary>
+    /// <summary>Remind to feed the starter early enough for kneading (US-29); the API knows how early that is.</summary>
     public bool Remind { get; set; } = true;
-
-    /// <summary>Minutes before kneading: 60 or 30.</summary>
-    public int ReminderMinutes { get; set; } = 60;
 
     /// <summary>Recipe chosen and loaves valid.</summary>
     public bool IsComplete => Guid.TryParse(RecipeId, out _) && Loaves is >= 1 and <= 1000;
@@ -101,6 +98,6 @@ public sealed class BatchItemForm
     {
         Guid? starter = Guid.TryParse(StarterId, CultureInfo.InvariantCulture, out var id) ? id : null;
         return new BatchItemRequest(Guid.Parse(RecipeId!, CultureInfo.InvariantCulture), Loaves, starter,
-            starter is not null && Remind ? ReminderMinutes : null);
+            starter is not null && Remind);
     }
 }

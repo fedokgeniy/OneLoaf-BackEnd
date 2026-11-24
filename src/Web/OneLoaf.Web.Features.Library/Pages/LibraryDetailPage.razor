@@ -5,6 +5,9 @@
 @using OneLoaf.Web.Shared.Contracts.Core
 @using OneLoaf.Web.Shared.Formatting
 @using OneLoaf.Web.Shared.State
+@using OneLoaf.Web.Features.Library.Components
+@using OneLoaf.Web.Shared.State.Photos
+@inject IState<OneLoaf.Web.Shared.State.Photos.PhotosState> Photos
 
 <PageTitle>@(State.Value.Publication.Value?.Title ?? "Library recipe") · OneLoaf</PageTitle>
 <ShellTitle Text="@(State.Value.Publication.Value?.Title ?? "Library recipe")" BackHref="library" BackLabel="Back to the library" />
@@ -23,6 +26,15 @@
             <div aria-busy="true"><OlSkeleton Variant="SkeletonVariant.Card" Count="2" /></div>
             break;
         case { Value: { } publication }:
+            @if (publication.HasPhoto)
+            {
+                <div class="publication__photo">
+                    <OlCardPhoto Src="@Photos.Value.For(PhotoKeys.Publication(publication.Id))" Loading="true" />
+                </div>
+            }
+            <CopyRecipeDialog Open="_copyOpen" Ingredients="publication.Snapshot.Ingredients" MyIngredients="State.Value.MyIngredients"
+                              Busy="@(State.Value.Running == nameof(CopyPublication))"
+                              OnConfirm="request => Dispatcher.Dispatch(new CopyPublication(request))" OnClose="() => _copyOpen = false" />
             <header class="publication__head">
                 <span class="ol-card__overline">by @publication.AuthorName · published @DisplayFormat.Date(publication.PublishedAt)</span>
                 <h2 class="h2 publication__title">@publication.Title</h2>
@@ -56,8 +68,7 @@
                 </div>
                 <AuthorizeView>
                     <Authorized>
-                        <OlButton Icon="IconName.Plus" Loading="@(State.Value.Running == nameof(CopyPublication))"
-                                  OnClick="() => Dispatcher.Dispatch(new CopyPublication())">Copy to my recipes</OlButton>
+                        <OlButton Icon="IconName.Plus" Loading="@(State.Value.Running == nameof(CopyPublication))" OnClick="OpenCopy">Save to my recipes</OlButton>
                         @if (publication.IsMine)
                         {
                             <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmUnpublish = true">Remove from library</OlButton>

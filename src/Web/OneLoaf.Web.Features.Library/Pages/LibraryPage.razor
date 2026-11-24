@@ -7,6 +7,8 @@
 @using OneLoaf.Web.Shared.State
 @inject IState<LibraryState> State
 @inject IDispatcher Dispatcher
+@using OneLoaf.Web.Shared.State.Photos
+@inject IState<OneLoaf.Web.Shared.State.Photos.PhotosState> Photos
 
 <PageTitle>Public library · OneLoaf</PageTitle>
 <ShellTitle Text="Public library" />
@@ -50,6 +52,7 @@
                     @foreach (var item in list.Items)
                     {
                         <a @key="item.Id" class="ol-card ol-card--interactive" href="@($"library/{item.Id}")">
+                            <OlCardPhoto Src="@Photos.Value.For(PhotoKeys.Publication(item.Id))" Loading="item.HasPhoto" />
                             <div class="ol-card__body">
                                 <span class="ol-card__overline">by @item.AuthorName · @DisplayFormat.Date(item.PublishedAt)</span>
                                 <h3 class="ol-card__title">@item.Title</h3>

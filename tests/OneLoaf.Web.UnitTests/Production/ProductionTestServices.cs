@@ -39,7 +39,12 @@ internal class ProductionApiStub : IProductionApi
 
     public virtual Task<ApiResult<BatchDto>> GetBatchAsync(Guid id, CancellationToken ct = default) => throw new NotSupportedException();
 
-    public virtual Task<ApiResult<BatchDto>> PreviewAsync(BatchRequest request, CancellationToken ct = default) => Ok(Batch(request));
+    /// <summary>Like the API: a preview is not saved, so its items have no ids yet.</summary>
+    public virtual Task<ApiResult<BatchDto>> PreviewAsync(BatchRequest request, CancellationToken ct = default)
+    {
+        var batch = Batch(request);
+        return Ok(batch with { Items = [.. batch.Items.Select(i => i with { Id = Guid.Empty })] });
+    }
 
     public virtual Task<ApiResult<BatchDto>> CreateBatchAsync(BatchRequest request, CancellationToken ct = default) => Ok(Batch(request));
 
@@ -94,7 +99,7 @@ internal class ProductionApiStub : IProductionApi
     public static BatchDto Batch(BatchRequest request) => new(Guid.NewGuid(), request.Name, BatchStatuses.Planned, "manual", request.PlannedStartAt,
         request.PlannedStartAt.AddHours(15), request.PlannedStartAt.AddHours(18), null, null, new DateOnly(2026, 11, 23), 8.94m, "EUR", request.Notes,
         [.. request.Items.Select((item, i) => new BatchItemDto(Guid.NewGuid(), item.RecipeId, "Country sourdough", item.Loaves, item.StarterId,
-            item.StarterId is null ? null : 300m, 1, item.StarterReminderMinutes, i + 1, []))],
+            item.StarterId is null ? null : 300m, 1, item.RemindToFeedStarter ? 360 : null, i + 1, []))],
         null);
 
     protected static Task<ApiResult<T>> Ok<T>(T value) => Task.FromResult(ApiResult<T>.Ok(value));

@@ -27,6 +27,27 @@ public sealed class NewBatchFormTests : BunitContext
     }
 
     [Fact]
+    public void RemoveRecipe_SecondOfTwoWithAPreview_LeavesTheFirst()
+    {
+        var cut = Render<NewBatchPage>();
+        cut.WaitForAssertion(() => cut.Find("form#batch-form"));
+        cut.FindAll("select")[0].Change(ProductionApiStub.Country.Id.ToString());
+
+        cut.FindAll("button").Single(b => b.TextContent.Contains("Add recipe", StringComparison.Ordinal)).Click();
+        Assert.Equal(2, cut.FindAll(".new-batch__item").Count);
+
+        // The preview of two recipes: its items are not saved yet and share the empty id.
+        cut.FindAll(".new-batch__item")[1].QuerySelector("select")!.Change(ProductionApiStub.Country.Id.ToString());
+        _time.Advance(NewBatchEffects.PreviewDelay);
+        cut.WaitForAssertion(() => Assert.Equal(2, cut.FindAll(".preview__item").Count));
+
+        cut.FindAll(".new-batch__item-head button")[1].Click();
+
+        Assert.Single(cut.FindAll(".new-batch__item"));
+        Assert.Equal(ProductionApiStub.Country.Id.ToString(), cut.FindAll("select")[0].GetAttribute("value"));
+    }
+
+    [Fact]
     public void ChangeRecipe_PreviewsAfterTheDelayAndShowsApiFigures()
     {
         var cut = Render<NewBatchPage>();

@@ -57,7 +57,7 @@ public static class BatchInput
             if (TryGetGuid(item, "starterId", out var starterId))
             {
                 entry["starterId"] = starterId;
-                entry["starterReminderMinutes"] = DefaultStarterReminderMinutes;
+                entry["remindToFeedStarter"] = true;
             }
 
             list.Add(entry);
@@ -75,9 +75,6 @@ public static class BatchInput
 
     /// <summary>Name of a batch the model did not name.</summary>
     public const string DefaultName = "Batch planned with the assistant";
-
-    /// <summary>Starter reminder before kneading for items with a starter.</summary>
-    public const int DefaultStarterReminderMinutes = 60;
 
     /// <summary>Source value of a manual preview.</summary>
     public const string ManualSource = "manual";

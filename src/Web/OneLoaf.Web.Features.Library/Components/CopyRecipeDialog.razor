@@ -1,0 +1,128 @@
+@* Dialog shown before a published recipe is saved to the own recipes (US-42). Another baker names the same flour
+   differently, so every ingredient of the recipe is matched here: use an own ingredient instead, or add it to the
+   catalog, optionally with what is on the shelf. The page sends the choices to the API. *@
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Formatting
+@using OneLoaf.Web.Shared.Forms
+
+<OlDialog Open="Open" Title="Save to my recipes" OnClose="OnClose">
+    <ChildContent>
+        @if (Open)
+        {
+            <p class="copy__intro">
+                Match the ingredients of this recipe to yours. An ingredient you already have under another name is used
+                as it is; the others are added to your ingredients.
+            </p>
+            @if (MyIngredients is null)
+            {
+                <OlSkeleton Variant="SkeletonVariant.Row" Count="3" />
+            }
+            else
+            {
+                <ul class="copy__rows">
+                    @foreach (var row in _rows)
+                    {
+                        <li class="copy__row" @key="row.Name">
+                            <div class="copy__line">
+                                <span class="copy__name">@row.Name</span>
+                                <span class="copy__quantity ol-num">@DisplayFormat.Quantity(row.Quantity, row.Unit)</span>
+                            </div>
+                            <OlSelect Label="@($"Use for {row.Name}")" Options="OptionsFor(row)" Placeholder="Add as a new ingredient" @bind-Value="row.UseId" />
+                            @if (string.IsNullOrEmpty(row.UseId))
+                            {
+                                <OlNumberField TValue="decimal?" Label="@($"On the shelf: {row.Name}")" Suffix="@row.Unit"
+                                               Help="Leave empty when you have none or do not keep its stock." @bind-Value="row.Stock" />
+                            }
+                            else if (Own(row) is { Stock: { } stock })
+                            {
+                                <p class="ol-field__help">In stock: @DisplayFormat.Quantity(stock, row.Unit)</p>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        }
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="OnClose">Cancel</OlButton>
+        <OlButton Icon="IconName.Plus" Loading="@Busy" Disabled="@(MyIngredients is null)" OnClick="Confirm">Save recipe</OlButton>
+    </Footer>
+</OlDialog>
+
+@code {
+    private List<Row> _rows = [];
+    private bool _prepared;
+
+    /// <summary>Open state.</summary>
+    [Parameter] public bool Open { get; set; }
+
+    /// <summary>Ingredients of the published recipe.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<SnapshotIngredientDto> Ingredients { get; set; } = [];
+
+    /// <summary>The own catalog; null while it loads.</summary>
+    [Parameter] public IReadOnlyList<IngredientDto>? MyIngredients { get; set; }
+
+    /// <summary>True while the page saves the recipe.</summary>
+    [Parameter] public bool Busy { get; set; }
+
+    /// <summary>Raised with the choices.</summary>
+    [Parameter] public EventCallback<CopyPublicationRequest> OnConfirm { get; set; }
+
+    /// <summary>Raised when the dialog closes.</summary>
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        if (!Open)
+        {
+            _prepared = false;
+            return;
+        }
+
+        if (_prepared || MyIngredients is null)
+        {
+            return;
+        }
+
+        // An own ingredient with the same name and unit is proposed; everything else starts as "add as new".
+        _prepared = true;
+        _rows = Ingredients.GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).Select(line => new Row
+        {
+            Name = line.Name,
+            Unit = line.Unit,
+            Category = line.Category,
+            Quantity = Ingredients.Where(i => string.Equals(i.Name, line.Name, StringComparison.OrdinalIgnoreCase)).Sum(i => i.Quantity),
+            UseId = MyIngredients.FirstOrDefault(m => string.Equals(m.Name, line.Name, StringComparison.OrdinalIgnoreCase) && m.UnitCode == line.Unit)?.Id.ToString(),
+        }).ToList();
+    }
+
+    /// <summary>Own ingredients in the unit of the line (the quantity stays right), those of the same category first.</summary>
+    private IReadOnlyList<SelectOption> OptionsFor(Row row) =>
+        (MyIngredients ?? []).Where(m => m.UnitCode == row.Unit)
+            .OrderByDescending(m => m.CategoryCode == row.Category).ThenBy(m => m.Name, StringComparer.OrdinalIgnoreCase)
+            .Select(m => new SelectOption(m.Id.ToString(), m.Name)).ToList();
+
+    private IngredientDto? Own(Row row) => MyIngredients?.FirstOrDefault(m => m.Id.ToString() == row.UseId);
+
+    private Task Confirm() => Busy
+        ? Task.CompletedTask
+        : OnConfirm.InvokeAsync(new CopyPublicationRequest(_rows.Select(r => Guid.TryParse(r.UseId, out var own)
+            ? new CopyIngredientChoice(r.Name, own, null)
+            : new CopyIngredientChoice(r.Name, null, r.Stock is > 0 ? r.Stock : null)).ToList()));
+
+    private sealed class Row
+    {
+        public required string Name { get; init; }
+
+        public required string Unit { get; init; }
+
+        public required string Category { get; init; }
+
+        public decimal Quantity { get; init; }
+
+        public string? UseId { get; set; }
+
+        public decimal? Stock { get; set; }
+    }
+}

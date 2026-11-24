@@ -24,7 +24,7 @@ public sealed class ProductionTests(ApiFixture fixture)
     private static CancellationToken Ct => TestContext.Current.CancellationToken;
 
     private static BatchRequest AnnaBatch(string name, int loaves = 3) =>
-        new(name, Start, [new(Seed.R1, loaves, null, 60)], new DateOnly(2026, 11, 15));
+        new(name, Start, [new(Seed.R1, loaves, null, false)], new DateOnly(2026, 11, 15));
 
     [Fact]
     public async Task US20_CreateBatch_PlanFromTheDatabase()

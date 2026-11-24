@@ -11,7 +11,8 @@ public sealed record LibraryItemDto(
     int IngredientCount,
     int StageCount,
     long CommentCount,
-    long ReactionCount);
+    long ReactionCount,
+    bool HasPhoto = false);
 
 /// <summary>
 /// A publication with its recipe snapshot (<c>GET /library/{id}</c>, US-40–42). <see cref="Reactions"/> counts per
@@ -28,7 +29,8 @@ public sealed record PublishedRecipeDto(
     long CommentCount,
     IReadOnlyDictionary<string, int> Reactions,
     string? MyReaction,
-    bool IsMine);
+    bool IsMine,
+    bool HasPhoto = false);
 
 /// <summary>Recipe as it was published (schema version 1): no prices, costs or notes.</summary>
 public sealed record PublicationSnapshotDto(
@@ -99,3 +101,12 @@ public static class LibraryCodes
     /// <summary>Keep the content and close the report.</summary>
     public const string Reject = "reject";
 }
+
+/// <summary><c>POST /library/{id}/copy</c> body: what to do with the ingredients of the published recipe.</summary>
+public sealed record CopyPublicationRequest(IReadOnlyList<CopyIngredientChoice> Ingredients);
+
+/// <summary>
+/// One ingredient of a published recipe: use an own ingredient instead (<see cref="UseIngredientId"/>), or add it to
+/// the catalog, optionally with what is on the shelf (<see cref="StockQuantity"/>).
+/// </summary>
+public sealed record CopyIngredientChoice(string Name, Guid? UseIngredientId, decimal? StockQuantity);

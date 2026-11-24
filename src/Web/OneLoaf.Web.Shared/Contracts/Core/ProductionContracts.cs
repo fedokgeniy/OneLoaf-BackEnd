@@ -51,8 +51,11 @@ public sealed record StockShortageDto(Guid IngredientId, string Name, string Uni
 /// </summary>
 public sealed record BatchStockDto(IReadOnlyList<StockShortageDto> Shortages, int? MaxLoaves, decimal? MaxScale);
 
-/// <summary>One recipe of a batch; a starter reminder is sent <see cref="StarterReminderMinutes"/> before kneading (US-29).</summary>
-public sealed record BatchItemRequest(Guid RecipeId, int Loaves, Guid? StarterId, int? StarterReminderMinutes);
+/// <summary>
+/// One recipe of a batch; with <see cref="RemindToFeedStarter"/> the API reminds to feed the starter its time to peak
+/// before kneading (US-29).
+/// </summary>
+public sealed record BatchItemRequest(Guid RecipeId, int Loaves, Guid? StarterId, bool RemindToFeedStarter);
 
 /// <summary>A batch with planned figures and its stages (US-20–25).</summary>
 public sealed record BatchDto(
