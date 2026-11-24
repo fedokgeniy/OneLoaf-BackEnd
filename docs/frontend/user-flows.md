@@ -135,10 +135,10 @@ message "Add a comment about the result first". 503 → record unchanged, retry 
 
 ## 6. Flow — starter feeding (US-27, US-28, US-29, US-30)
 
-`/starters` → card "Log feeding" → sheet (compact) / dialog (medium+) with flour, water, kept, temperature, fed at (now)
+`/starters` → card "Log feeding" → sheet (compact) / dialog (medium+) with the flour and water ingredients (the usual ones proposed), their grams, kept, temperature, fed at (now)
 → `POST /starters/{id}/feedings` → card shows next feeding, expected peak and the amount after the feeding; reminder is
 created by the backend. *Starter kept* is proposed by the API: the reserve plus the ripe starter no batch has used. The
-backend takes flour and water from the stock of the starter's ingredients. Until the peak the card says *ripening until …*;
+backend takes flour and water from the stock of the ingredients of the feeding and prices the starter from them. Until the peak the card says *ripening until …*;
 after it the usable share (two thirds unless changed) is the stock of the starter's own ingredient, which recipes and
 batches use. Push permission is requested in Settings → Reminders, never automatically.
 

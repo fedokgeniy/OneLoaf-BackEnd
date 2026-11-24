@@ -1242,6 +1242,22 @@
           "string"
         ],
         "description": "Note."
+      },
+      "flourIngredientId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Flour ingredient the feeding used.",
+        "format": "uuid"
+      },
+      "waterIngredientId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Water ingredient the feeding used.",
+        "format": "uuid"
       }
     },
     "description": "A feeding with the schedule computed by the database."
@@ -1299,6 +1315,22 @@
           "string"
         ],
         "description": "Note."
+      },
+      "flourIngredientId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Flour ingredient of this feeding; the usual flour of the starter when null.",
+        "format": "uuid"
+      },
+      "waterIngredientId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "Water ingredient of this feeding; the usual water of the starter when null.",
+        "format": "uuid"
       }
     },
     "description": "Body of POST /starters/{id}/feedings (US-28)."

@@ -26,7 +26,11 @@ cycles (bowl capacity) and oven loading (capacity).
   its date and adds to the stock; with `priceOnly` it sets only the price. A **correction** (`POST …/stock-adjustments`) sets the stock to the counted
   quantity. Creating a batch takes its ingredients, re-planning changes the stock by the difference, and cancelling or
   deleting a batch with `ingredientsUsed=false` returns them. A starter feeding takes flour and water from the
-  ingredients named on the starter.
+  ingredients named in the feeding (`flourIngredientId`, `waterIngredientId`; by default the usual ones of the starter).
+- The **price of a starter is what it was fed**. After every feeding the API stores the cost of the fed starter as the
+  price of its ingredient for that day: flour and water at their prices of the day, the starter that was kept at the
+  price the starter had before. Water without an ingredient costs nothing. No price is written when no flour is named
+  or a named ingredient has no price in the currency of the kitchen.
 - A **starter is also an ingredient** (`starter.ingredientId`, category `starter`, same name): recipes use it. After a
   feeding the starter ripens until `expectedPeakAt` (`riseHours` is required); then `usableShare` (two thirds by
   default) of flour + water + kept becomes the stock of that ingredient, and the rest stays for the next feeding. The

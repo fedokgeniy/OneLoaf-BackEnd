@@ -11,8 +11,8 @@
       "title": "A valid bearer token is required.",
       "status": 401,
       "instance": "/api/v1/reminders",
-      "traceId": "00-9689124a6d4e7de83391d9fe26946370-e0e257cedaae4da8-02",
-      "correlationId": "e08cb21d7b3d4f9880146139fa499864"
+      "traceId": "00-667956525db713b306de06ac67b823c5-2d240b37da9d4ea2-02",
+      "correlationId": "f489f9882a524c3ea427b51d081adf18"
     }
   },
   {
@@ -24,16 +24,16 @@
     "responseContentType": "application/json",
     "responseBody": [
       {
-        "id": "8e4faac7-31f6-4192-8517-2cfec197c1e5",
+        "id": "9d3a4e32-9a4e-49ee-ae9d-14d2686d3b4a",
         "kind": "starter_feeding",
         "channel": "push",
         "status": "scheduled",
         "message": "Time to feed starter \"Rye mother\"",
-        "dueAt": "2026-11-25T07:55:46.082283+00:00",
+        "dueAt": "2026-11-25T08:18:03.669682+00:00",
         "sentAt": null,
         "attempts": 0,
         "batchId": null,
-        "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127"
+        "starterId": "797cc670-8bdb-4748-9add-b7c0a31fa8cc"
       }
     ]
   }

@@ -48,7 +48,7 @@ US-36. Probable causes from the planned vs actual stage log and the feedback; st
 <details><summary>Example — typical (200)</summary>
 
 ```http
-POST /api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/analysis
+POST /api/v1/bake-records/b96889e3-e70b-4e14-a45b-70e3fe132a34/analysis
 Authorization: Bearer <access token>
 ```
 
@@ -56,7 +56,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "bakeRecordId": "7b049ade-7914-409f-9d42-88d8957ede11",
+  "bakeRecordId": "b96889e3-e70b-4e14-a45b-70e3fe132a34",
   "analysis": "The rating is good. The tight crumb suggests the bulk fermentation was a little short for the room temperature; let the dough rise longer before shaping next time.",
   "unverifiedNumbers": []
 }
@@ -80,8 +80,8 @@ Response `404` `application/problem+json`:
   "status": 404,
   "detail": "The bake record was not found.",
   "instance": "/api/v1/bake-records/00000000-0000-4000-9999-000000000000/analysis",
-  "traceId": "00-db3f5ac208c0f24e07a45a9b462a0cdc-3565c0bd181f3049-02",
-  "correlationId": "66f1a5b4cac14093b1e119bc6c219807"
+  "traceId": "00-ff0f9fcedb1d7e3924c0ffd45079b03a-d5c0808c37d40e39-02",
+  "correlationId": "96a2f229c94a43ea97df702fc30aaeed"
 }
 ```
 
@@ -149,8 +149,8 @@ Response `401` `application/problem+json`:
   "title": "A valid bearer token is required.",
   "status": 401,
   "instance": "/api/v1/conversations",
-  "traceId": "00-c5b7d0bb05d93660cb7e8d927636fcaf-d531b586693c1c12-02",
-  "correlationId": "6111ac39b1494e619320148ca3cbcd86"
+  "traceId": "00-0444281c68617eea127db39866a46a21-deab78d4288269e8-02",
+  "correlationId": "3fb648d1568148aea3845f6068bb9ec1"
 }
 ```
 
@@ -168,10 +168,10 @@ Response `200` `application/json`:
 ```json
 [
   {
-    "id": "8804629f-c28f-4d93-8928-6ede37189e48",
+    "id": "72401a60-cd73-46cb-bcb5-2542536ed600",
     "title": "Plan 2 loaves of my Country sourdough for next Saturday morn",
-    "createdAt": "2026-11-24T20:55:48.507206+00:00",
-    "updatedAt": "2026-11-24T20:55:48.782774+00:00"
+    "createdAt": "2026-11-24T21:18:05.903126+00:00",
+    "updatedAt": "2026-11-24T21:18:06.176688+00:00"
   }
 ]
 ```
@@ -209,10 +209,10 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "8804629f-c28f-4d93-8928-6ede37189e48",
+  "id": "72401a60-cd73-46cb-bcb5-2542536ed600",
   "title": null,
-  "createdAt": "2026-11-24T20:55:48.507206+00:00",
-  "updatedAt": "2026-11-24T20:55:48.507206+00:00"
+  "createdAt": "2026-11-24T21:18:05.903126+00:00",
+  "updatedAt": "2026-11-24T21:18:05.903126+00:00"
 }
 ```
 
@@ -234,10 +234,10 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "3a5a810d-935e-44f6-bddc-4f89a9f60994",
+  "id": "cd9a5e91-9663-44c5-9680-d604b64eca94",
   "title": "Rye questions",
-  "createdAt": "2026-11-24T20:55:48.849719+00:00",
-  "updatedAt": "2026-11-24T20:55:48.849719+00:00"
+  "createdAt": "2026-11-24T21:18:06.220198+00:00",
+  "updatedAt": "2026-11-24T21:18:06.220198+00:00"
 }
 ```
 
@@ -259,10 +259,10 @@ Response `201` `application/json`:
 
 ```json
 {
-  "id": "8be93fb6-8930-480b-a0ff-8ff9860d33cf",
+  "id": "dd5b36f2-ce3a-4bef-a434-c5965c9e1b66",
   "title": null,
-  "createdAt": "2026-11-24T20:55:48.924352+00:00",
-  "updatedAt": "2026-11-24T20:55:48.924352+00:00"
+  "createdAt": "2026-11-24T21:18:06.296124+00:00",
+  "updatedAt": "2026-11-24T21:18:06.296124+00:00"
 }
 ```
 
@@ -288,7 +288,7 @@ Erasure of chat data.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-DELETE /api/v1/conversations/3a5a810d-935e-44f6-bddc-4f89a9f60994
+DELETE /api/v1/conversations/cd9a5e91-9663-44c5-9680-d604b64eca94
 Authorization: Bearer <access token>
 ```
 
@@ -319,7 +319,7 @@ User and assistant messages; includeTools=true adds tool calls with their input 
 <details><summary>Example — typical (200)</summary>
 
 ```http
-GET /api/v1/conversations/8804629f-c28f-4d93-8928-6ede37189e48/messages
+GET /api/v1/conversations/72401a60-cd73-46cb-bcb5-2542536ed600/messages
 Authorization: Bearer <access token>
 ```
 
@@ -328,20 +328,20 @@ Response `200` `application/json`:
 ```json
 [
   {
-    "id": "4ea22d08-b494-4e85-bdb8-301273c80942",
+    "id": "5f03d923-3535-4e08-8010-ea14d79afc63",
     "role": "user",
     "content": "Plan 2 loaves of my Country sourdough for next Saturday morning.",
     "toolName": null,
     "toolPayload": null,
-    "createdAt": "2026-11-24T20:55:48.550046+00:00"
+    "createdAt": "2026-11-24T21:18:05.943923+00:00"
   },
   {
-    "id": "78bfac58-c990-47eb-bb9a-982bcc6f698b",
+    "id": "8116531c-50d5-494c-bf56-342c2572e1d2",
     "role": "assistant",
     "content": "I am an AI assistant. I prepared the Saturday bake of Country sourdough; it costs 7.98 EUR. Please confirm it.",
     "toolName": null,
     "toolPayload": null,
-    "createdAt": "2026-11-24T20:55:48.678676+00:00"
+    "createdAt": "2026-11-24T21:18:06.074441+00:00"
   }
 ]
 ```
@@ -351,7 +351,7 @@ Response `200` `application/json`:
 <details><summary>Example — audit with tool calls (200)</summary>
 
 ```http
-GET /api/v1/conversations/8804629f-c28f-4d93-8928-6ede37189e48/messages?includeTools=true
+GET /api/v1/conversations/72401a60-cd73-46cb-bcb5-2542536ed600/messages?includeTools=true
 Authorization: Bearer <access token>
 ```
 
@@ -360,15 +360,15 @@ Response `200` `application/json`:
 ```json
 [
   {
-    "id": "4ea22d08-b494-4e85-bdb8-301273c80942",
+    "id": "5f03d923-3535-4e08-8010-ea14d79afc63",
     "role": "user",
     "content": "Plan 2 loaves of my Country sourdough for next Saturday morning.",
     "toolName": null,
     "toolPayload": null,
-    "createdAt": "2026-11-24T20:55:48.550046+00:00"
+    "createdAt": "2026-11-24T21:18:05.943923+00:00"
   },
   {
-    "id": "64ec171d-7f50-4465-a210-ed0e911d2897",
+    "id": "11409701-ddd9-4af7-b739-264d6bcb2770",
     "role": "tool",
     "content": "ok",
     "toolName": "find_recipes",
@@ -380,29 +380,29 @@ Response `200` `application/json`:
         "page": 1,
         "items": [
           {
-            "id": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
+            "id": "699803e1-119d-4ea6-80fb-0938962fc855",
             "title": "Country sourdough",
             "hasPhoto": false,
-            "updatedAt": "2026-11-24T20:55:47.831659+00:00",
+            "updatedAt": "2026-11-24T21:18:05.33885+00:00",
             "isArchived": false,
             "yieldLoaves": 1,
             "parentRecipeId": null
           },
           {
-            "id": "4207b58e-3604-4f13-8665-d111254a99ba",
+            "id": "e84c5149-0940-4d2a-91e7-6220f3dfb26a",
             "title": "Country sourdough, as baked",
             "hasPhoto": false,
-            "updatedAt": "2026-11-24T20:55:46.835951+00:00",
+            "updatedAt": "2026-11-24T21:18:04.463952+00:00",
             "isArchived": false,
             "yieldLoaves": 1,
-            "parentRecipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98"
+            "parentRecipeId": "699803e1-119d-4ea6-80fb-0938962fc855"
           }
         ],
         "pageSize": 10,
         "totalCount": 3
       }
     },
-    "createdAt": "2026-11-24T20:55:48.636148+00:00"
+    "createdAt": "2026-11-24T21:18:06.031123+00:00"
   }
 ]
 ```
@@ -412,7 +412,7 @@ Response `200` `application/json`:
 <details><summary>Example — deleted conversation (404)</summary>
 
 ```http
-GET /api/v1/conversations/3a5a810d-935e-44f6-bddc-4f89a9f60994/messages
+GET /api/v1/conversations/cd9a5e91-9663-44c5-9680-d604b64eca94/messages
 Authorization: Bearer <access token>
 ```
 
@@ -424,9 +424,9 @@ Response `404` `application/problem+json`:
   "title": "The requested resource was not found.",
   "status": 404,
   "detail": "The conversation was not found.",
-  "instance": "/api/v1/conversations/3a5a810d-935e-44f6-bddc-4f89a9f60994/messages",
-  "traceId": "00-3d018f7e3c9f389b03fc00687cd53846-606bafa0ceefa44e-02",
-  "correlationId": "258b3d700da84d48b8bd9d692b9e8e99"
+  "instance": "/api/v1/conversations/cd9a5e91-9663-44c5-9680-d604b64eca94/messages",
+  "traceId": "00-fc25c2e3fea0467a75ed52fd3ea319c4-aa4d9f3715ffa341-02",
+  "correlationId": "a40705e817f64497847f6c00ebce8f04"
 }
 ```
 
@@ -457,7 +457,7 @@ US-34 - US-38. Tools call the Core API with your token; numbers come only from t
 <details><summary>Example — plans a batch with tools (proposal to confirm) (200)</summary>
 
 ```http
-POST /api/v1/conversations/8804629f-c28f-4d93-8928-6ede37189e48/messages
+POST /api/v1/conversations/72401a60-cd73-46cb-bcb5-2542536ed600/messages
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -471,17 +471,17 @@ Response `200` `application/json`:
 ```json
 {
   "message": {
-    "id": "78bfac58-c990-47eb-bb9a-982bcc6f698b",
+    "id": "8116531c-50d5-494c-bf56-342c2572e1d2",
     "role": "assistant",
     "content": "I am an AI assistant. I prepared the Saturday bake of Country sourdough; it costs 7.98 EUR. Please confirm it.",
     "toolName": null,
     "toolPayload": null,
-    "createdAt": "2026-11-24T20:55:48.6786761+00:00"
+    "createdAt": "2026-11-24T21:18:06.0744415+00:00"
   },
   "pendingAction": {
-    "actionId": "1c578a0e-e6d4-49c7-b0d7-fb2b620c390c",
+    "actionId": "ea65f05d-b348-4b7f-b0f3-2305a0a95a14",
     "kind": "create_batch",
-    "expiresAt": "2026-11-24T21:25:48.6634612+00:00",
+    "expiresAt": "2026-11-24T21:48:06.0593399+00:00",
     "plan": {
       "id": "00000000-0000-0000-0000-000000000000",
       "name": "Saturday bake",
@@ -499,7 +499,7 @@ Response `200` `application/json`:
       "items": [
         {
           "id": "00000000-0000-0000-0000-000000000000",
-          "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
+          "recipeId": "699803e1-119d-4ea6-80fb-0938962fc855",
           "recipeTitle": "Country sourdough",
           "loaves": 2,
           "starterId": null,
@@ -577,7 +577,7 @@ Response `200` `application/json`:
 <details><summary>Example — empty message (400)</summary>
 
 ```http
-POST /api/v1/conversations/8804629f-c28f-4d93-8928-6ede37189e48/messages
+POST /api/v1/conversations/72401a60-cd73-46cb-bcb5-2542536ed600/messages
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -593,15 +593,15 @@ Response `400` `application/problem+json`:
   "type": "https://oneloaf.app/problems/validation",
   "title": "One or more validation errors occurred.",
   "status": 400,
-  "instance": "/api/v1/conversations/8804629f-c28f-4d93-8928-6ede37189e48/messages",
+  "instance": "/api/v1/conversations/72401a60-cd73-46cb-bcb5-2542536ed600/messages",
   "errors": {
     "content": [
       "'Content' должно быть заполнено.",
       "Не выполнено указанное условие для 'Content'."
     ]
   },
-  "traceId": "00-d5fc5d2c1dd1458e77dbc3668821eb12-b0b875cd02770ba5-02",
-  "correlationId": "c2c15760f0f84ee79326081bffb105fa"
+  "traceId": "00-3a751e4abfae716e5bf1f6e9234a6a0f-0c5158896f1eedac-02",
+  "correlationId": "f7c70d9cebb14aa0805c2ab45326635c"
 }
 ```
 
@@ -610,7 +610,7 @@ Response `400` `application/problem+json`:
 <details><summary>Example — second proposal (200)</summary>
 
 ```http
-POST /api/v1/conversations/8804629f-c28f-4d93-8928-6ede37189e48/messages
+POST /api/v1/conversations/72401a60-cd73-46cb-bcb5-2542536ed600/messages
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -624,17 +624,17 @@ Response `200` `application/json`:
 ```json
 {
   "message": {
-    "id": "4bff1668-0b37-48a8-b777-70ba09d9e2ba",
+    "id": "b5587bff-3e0a-4e38-9260-e24db9c8c5d6",
     "role": "assistant",
     "content": "I prepared the Sunday bake as well. Confirm or decline it.",
     "toolName": null,
     "toolPayload": null,
-    "createdAt": "2026-11-24T20:55:48.7814891+00:00"
+    "createdAt": "2026-11-24T21:18:06.1751786+00:00"
   },
   "pendingAction": {
-    "actionId": "08b03041-ab87-49b7-bea3-8ff2a4da9a66",
+    "actionId": "a696bf25-54fc-4a50-94aa-acd3b1784eee",
     "kind": "create_batch",
-    "expiresAt": "2026-11-24T21:25:48.7781999+00:00",
+    "expiresAt": "2026-11-24T21:48:06.1714617+00:00",
     "plan": {
       "id": "00000000-0000-0000-0000-000000000000",
       "name": "Sunday bake",
@@ -652,7 +652,7 @@ Response `200` `application/json`:
       "items": [
         {
           "id": "00000000-0000-0000-0000-000000000000",
-          "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
+          "recipeId": "699803e1-119d-4ea6-80fb-0938962fc855",
           "recipeTitle": "Country sourdough",
           "loaves": 1,
           "starterId": null,
@@ -726,7 +726,7 @@ Response `200` `application/json`:
 <details><summary>Example — Claude unavailable (503)</summary>
 
 ```http
-POST /api/v1/conversations/8be93fb6-8930-480b-a0ff-8ff9860d33cf/messages
+POST /api/v1/conversations/dd5b36f2-ce3a-4bef-a434-c5965c9e1b66/messages
 Authorization: Bearer <access token>
 Content-Type: application/json
 
@@ -743,9 +743,9 @@ Response `503` `application/problem+json`:
   "title": "A required service is temporarily unavailable.",
   "status": 503,
   "detail": "The assistant is temporarily unavailable. Use the planning form or try again later.",
-  "instance": "/api/v1/conversations/8be93fb6-8930-480b-a0ff-8ff9860d33cf/messages",
-  "traceId": "00-f1700600239a8c4835814002f3d7e5c9-a6ba4db4392b3ddf-02",
-  "correlationId": "cf9cab26558e473a836370c92871d468"
+  "instance": "/api/v1/conversations/dd5b36f2-ce3a-4bef-a434-c5965c9e1b66/messages",
+  "traceId": "00-8a4ff31a1728f062ee1bcf2bccb18831-6b25b1f863ac398b-02",
+  "correlationId": "59c4bc9c0eb0475183d90695338953ac"
 }
 ```
 
@@ -773,7 +773,7 @@ US-34. Saves the proposed batch in the Core API with source = assistant; 409 whe
 <details><summary>Example — typical (200)</summary>
 
 ```http
-POST /api/v1/conversations/8804629f-c28f-4d93-8928-6ede37189e48/actions/1c578a0e-e6d4-49c7-b0d7-fb2b620c390c/confirm
+POST /api/v1/conversations/72401a60-cd73-46cb-bcb5-2542536ed600/actions/ea65f05d-b348-4b7f-b0f3-2305a0a95a14/confirm
 Authorization: Bearer <access token>
 ```
 
@@ -781,7 +781,7 @@ Response `200` `application/json`:
 
 ```json
 {
-  "batchId": "2dd3e8e2-ed60-41fe-bb1d-3063bcd5760f",
+  "batchId": "2109c2d9-4b31-4534-b392-dabdbf10975e",
   "recipeId": null
 }
 ```
@@ -791,7 +791,7 @@ Response `200` `application/json`:
 <details><summary>Example — already used (409)</summary>
 
 ```http
-POST /api/v1/conversations/8804629f-c28f-4d93-8928-6ede37189e48/actions/1c578a0e-e6d4-49c7-b0d7-fb2b620c390c/confirm
+POST /api/v1/conversations/72401a60-cd73-46cb-bcb5-2542536ed600/actions/ea65f05d-b348-4b7f-b0f3-2305a0a95a14/confirm
 Authorization: Bearer <access token>
 ```
 
@@ -803,9 +803,9 @@ Response `409` `application/problem+json`:
   "title": "The request conflicts with existing data.",
   "status": 409,
   "detail": "The proposal has expired or was already used.",
-  "instance": "/api/v1/conversations/8804629f-c28f-4d93-8928-6ede37189e48/actions/1c578a0e-e6d4-49c7-b0d7-fb2b620c390c/confirm",
-  "traceId": "00-129a36ea07d2fde90e6f547dc9bbdc0e-f27f59f86ea1bd61-02",
-  "correlationId": "46bc2085afe8465eb7b1ff8665a17ccd"
+  "instance": "/api/v1/conversations/72401a60-cd73-46cb-bcb5-2542536ed600/actions/ea65f05d-b348-4b7f-b0f3-2305a0a95a14/confirm",
+  "traceId": "00-4b35e871f3d783b1bd78a4a7ed018275-dd195f5870663fd5-02",
+  "correlationId": "00f4d8003c794a9baf068d0a72fefb8e"
 }
 ```
 
@@ -833,7 +833,7 @@ Nothing is saved.
 <details><summary>Example — typical (204)</summary>
 
 ```http
-POST /api/v1/conversations/8804629f-c28f-4d93-8928-6ede37189e48/actions/08b03041-ab87-49b7-bea3-8ff2a4da9a66/decline
+POST /api/v1/conversations/72401a60-cd73-46cb-bcb5-2542536ed600/actions/a696bf25-54fc-4a50-94aa-acd3b1784eee/decline
 Authorization: Bearer <access token>
 ```
 

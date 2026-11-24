@@ -2,16 +2,16 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos",
+    "path": "/api/v1/bake-records/b96889e3-e70b-4e14-a45b-70e3fe132a34/photos",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": [
       {
-        "id": "ec8cdc5b-60e2-4075-9236-2f82462c13c1",
+        "id": "373915d3-8df5-4eac-a432-088a4ae20f77",
         "contentType": "image/png",
-        "url": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/ec8cdc5b-60e2-4075-9236-2f82462c13c1",
-        "createdAt": "2026-11-24T20:55:47.231051+00:00"
+        "url": "/api/v1/bake-records/b96889e3-e70b-4e14-a45b-70e3fe132a34/photos/373915d3-8df5-4eac-a432-088a4ae20f77",
+        "createdAt": "2026-11-24T21:18:04.818533+00:00"
       }
     ]
   }

@@ -17,6 +17,10 @@ versions follow [semantic versioning](guides/versioning.md). Dates are UTC.
 - **Prices can be corrected**: `PUT` and `DELETE /ingredients/{id}/prices/{priceId}`; one price per day.
 - **Starter as an ingredient**: every starter has an ingredient (`ingredientId`), is fed from flour and water
   ingredients, and its usable share (`usableShare`, default two thirds) reaches the stock when it is ripe.
+- **A feeding names its flour and water**: `POST /starters/{id}/feedings` takes `flourIngredientId` and
+  `waterIngredientId` (default: the usual ones of the starter) and takes them from the stock. **The price of a starter
+  is what it was fed**: after every feeding the cost of the fed starter (flour and water at their prices of that day,
+  the kept starter at its previous price) becomes the price of its ingredient, so recipes with a starter have a cost.
 - **Photos of ingredients and recipes**: `PUT`, `GET` and `DELETE …/photo` (one photo each, same checks as crumb photos).
 - **Recipe drafts**: `POST /recipes/drafts` creates a recipe together with its missing ingredients in one transaction;
   the assistant proposes such a recipe (`create_recipe` action) and saves it only after the confirmation.

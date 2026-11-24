@@ -175,7 +175,7 @@ descriptions is in the [data dictionary](data-dictionary.md#functions-and-proced
 | Process triggers | life cycle of batches and stages, automatic history record, feeding schedule, publication rules, `updated_at` | US-20, US-23, US-28 - US-31, US-39 |
 | Procedures | `sp_build_batch_plan`, `sp_extend_batch_stage`, `sp_publish_recipe`, `sp_anonymize_user` | US-16 - US-20, US-24, US-29, US-39, GDPR |
 | Views | 8 views and `mv_bake_statistics` | US-07, US-12, US-23, US-33, US-36, US-40, KPI-1, data quality, low stock, masking |
-| Stock of ingredients | `fn_stock_balance`, `fn_stock_balance_at`, `fn_batch_ingredient_needs`, `fn_batch_stock_check`, `sp_apply_batch_stock`, `sp_return_batch_stock`, trigger `trg_starter_feedings_stock` | Purchases, consumption by batches and feedings, returns, ripening of a starter |
+| Stock of ingredients | `fn_stock_balance`, `fn_stock_balance_at`, `fn_starter_feeding_cost`, `fn_batch_ingredient_needs`, `fn_batch_stock_check`, `sp_apply_batch_stock`, `sp_return_batch_stock`, trigger `trg_starter_feedings_stock` | Purchases, consumption by batches and feedings, returns, ripening of a starter |
 | Starter as an ingredient | triggers `trg_starters_ingredient_before`, `trg_starters_name_sync`, `trg_ingredients_starter_name_sync`, `trg_starters_ingredient_after_delete` | One record for the baker: the starter and its ingredient share the name and the life cycle |
 
 Every value is checked by `db/tests/business_tests.sql` against the acceptance criteria of the business analysis
@@ -200,6 +200,7 @@ The database structure is created and changed **only by EF Core migrations** sto
 | 8 | `IngredientStock` | Stock ledger `stock_movements`, stock switch and reorder level of an ingredient, ingredients a starter is fed with, ingredient scale of a batch; stock functions, procedures, trigger and the view `v_low_stock`; the batch plan takes the scale into account |
 | 9 | `StarterIngredients` | A starter is a kind of ingredient (`starters.ingredient_id`, one name kept in step by triggers, usable share); ripened starter becomes stock at its peak (`stock_movements.available_at`, `fn_stock_balance_at`); the batch stock check uses the stock at the planned start; photo columns of ingredients and recipes |
 | 10 | `RefreshTokens` | Table `refresh_tokens`: SHA-256 hashes of the rotating refresh tokens with the family of one sign-in, the expiry and the rotation and revocation times; `sp_anonymize_user` also deletes the tokens of the user |
+| 11 | `StarterFeedingIngredients` | A feeding names the flour and the water it used (`starter_feedings.flour_ingredient_id`, `water_ingredient_id`, default: the usual ones of the starter); `fn_starter_feeding_cost` and the feeding trigger store the cost of the fed starter as the price of its ingredient |
 
 **Rules**
 
