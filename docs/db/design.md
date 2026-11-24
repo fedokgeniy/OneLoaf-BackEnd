@@ -47,7 +47,7 @@ immediately, so it is already clean. Instead of data marts there is a layer of v
 
 | Layer | Objects | Used by |
 |---|---|---|
-| Storage (3NF) | 30 tables | Core API, AI Assistant, Notification service (role `app_write`) |
+| Storage (3NF) | 31 tables | Core API, AI Assistant, Notification service (role `app_write`) |
 | Logic | functions, procedures, triggers | all services; calculations for the assistant tools |
 | Views | `v_recipe_effective_ingredients`, `v_ingredient_current_prices`, `v_batch_stage_log`, `v_batch_log_completeness`, `v_public_catalog`, `v_data_quality_issues`, `v_users_masked` | application screens, assistant, reports (`app_read`) |
 | Aggregates | `mv_bake_statistics` (materialized) | history screen, analysis by the assistant, reports |
@@ -199,6 +199,7 @@ The database structure is created and changed **only by EF Core migrations** sto
 | 7 | `AccessPrivileges` | Privileges of the roles and default privileges for future objects |
 | 8 | `IngredientStock` | Stock ledger `stock_movements`, stock switch and reorder level of an ingredient, ingredients a starter is fed with, ingredient scale of a batch; stock functions, procedures, trigger and the view `v_low_stock`; the batch plan takes the scale into account |
 | 9 | `StarterIngredients` | A starter is a kind of ingredient (`starters.ingredient_id`, one name kept in step by triggers, usable share); ripened starter becomes stock at its peak (`stock_movements.available_at`, `fn_stock_balance_at`); the batch stock check uses the stock at the planned start; photo columns of ingredients and recipes |
+| 10 | `RefreshTokens` | Table `refresh_tokens`: SHA-256 hashes of the rotating refresh tokens with the family of one sign-in, the expiry and the rotation and revocation times; `sp_anonymize_user` also deletes the tokens of the user |
 
 **Rules**
 

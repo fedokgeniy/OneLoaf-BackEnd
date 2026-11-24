@@ -2,13 +2,13 @@
   {
     "case": "history with change percent",
     "method": "GET",
-    "path": "/api/v1/ingredients/16b33a70-1168-4063-a238-2610109d609d/prices",
+    "path": "/api/v1/ingredients/5fd33415-9317-4c0c-8403-7e8ff56aa4c4/prices",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": [
       {
-        "id": "e66aa57f-69c5-41a2-9aef-833185e7c3d0",
+        "id": "50952c6a-6398-49b8-999a-bc818b0c049b",
         "price": 1.3500,
         "perQuantity": 1000.000,
         "unitPrice": 0.00135,
@@ -17,7 +17,7 @@
         "changePercent": 12.5
       },
       {
-        "id": "debe23b3-41a2-4155-93ec-a0cb816a9d53",
+        "id": "5379129a-ebe6-4fa6-864f-3189afbe7f81",
         "price": 1.2000,
         "perQuantity": 1000.000,
         "unitPrice": 0.0012,

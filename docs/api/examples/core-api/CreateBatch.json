@@ -10,9 +10,9 @@
       "source": "manual",
       "items": [
         {
-          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+          "recipeId": "6c9969ad-cecd-4df5-9c64-616f46e999c3",
           "loaves": 3,
-          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+          "starterId": "609bbc5d-57a5-477b-a0a0-fa40d4ab50dd",
           "starterReminderMinutes": 60
         }
       ]
@@ -20,7 +20,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "3357976d-a4d6-422d-affd-80581c93dbce",
+      "id": "a49536f9-1aaf-426c-b6be-bed4391c52de",
       "name": "Weekend bake",
       "status": "planned",
       "source": "manual",
@@ -35,18 +35,18 @@
       "notes": null,
       "items": [
         {
-          "id": "45c9a726-8b78-4430-b7e8-312822027d94",
-          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+          "id": "3f8e8bfd-a9f8-4a0d-83f7-070d97ee009b",
+          "recipeId": "6c9969ad-cecd-4df5-9c64-616f46e999c3",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+          "starterId": "609bbc5d-57a5-477b-a0a0-fa40d4ab50dd",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
           "starterReminderMinutes": 60,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "3340298d-3606-4424-af52-ddce9dbec2ac",
+              "id": "316d2f57-b032-486b-8f03-f25d4e9d04e4",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
@@ -64,7 +64,7 @@
               "note": null
             },
             {
-              "id": "75592e29-c89d-4d12-811c-3975ffba1c74",
+              "id": "2d9a3b29-d7fe-4c8d-a1f9-5b26bdbbd5c1",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
@@ -82,7 +82,7 @@
               "note": null
             },
             {
-              "id": "3398bdc0-81e5-4713-b0c3-ee07a7ea8dd9",
+              "id": "2f94a9aa-3cf4-4f68-826a-216431347e43",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
@@ -100,7 +100,7 @@
               "note": null
             },
             {
-              "id": "e030d61e-8f5d-4b5a-ae8c-a8660cfb2649",
+              "id": "71d4b17b-ac4f-4b67-83f6-1e727986593c",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
@@ -118,7 +118,7 @@
               "note": null
             },
             {
-              "id": "92ede417-668e-47b6-9e3a-fc93bb5474ca",
+              "id": "c70001fc-5d27-4732-b12d-c47b5787228c",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",
@@ -166,8 +166,8 @@
           "'Items' должно быть заполнено."
         ]
       },
-      "traceId": "00-58fe453d1b4ec68041a9cc94fc2b1e26-7b0a0cea6bcaf2b2-02",
-      "correlationId": "4e8cfd3f0b8c4c278f62c1ffac6c02d1"
+      "traceId": "00-f9cc7ec4072cb4e068f93cfc969d81aa-be751c53f29c8121-02",
+      "correlationId": "51a2d9d1c8ad4984aa0ce8ec2a3599e9"
     }
   },
   {
@@ -181,9 +181,9 @@
       "source": "manual",
       "items": [
         {
-          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+          "recipeId": "6c9969ad-cecd-4df5-9c64-616f46e999c3",
           "loaves": 3,
-          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+          "starterId": "609bbc5d-57a5-477b-a0a0-fa40d4ab50dd",
           "starterReminderMinutes": 60
         }
       ]
@@ -191,7 +191,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "f7634d36-c828-4989-ae7e-8d3c6bd419ae",
+      "id": "e67c2241-7679-4a76-861f-3d837cf52d71",
       "name": "Untouched bake",
       "status": "planned",
       "source": "manual",
@@ -206,18 +206,18 @@
       "notes": null,
       "items": [
         {
-          "id": "5133da24-423f-4504-b5f1-1399f2658962",
-          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+          "id": "fc70adc6-6b9c-42ba-8826-f2051a49dae6",
+          "recipeId": "6c9969ad-cecd-4df5-9c64-616f46e999c3",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+          "starterId": "609bbc5d-57a5-477b-a0a0-fa40d4ab50dd",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
           "starterReminderMinutes": 60,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "4a8be4a6-bc63-42be-ae63-bbc9ad6c6896",
+              "id": "04d9e715-0c2b-486a-9037-1b42b5eaadc9",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
@@ -235,7 +235,7 @@
               "note": null
             },
             {
-              "id": "88facfd8-878c-420f-88d0-4e84cee72bde",
+              "id": "9ae4379a-e8c6-4dc5-a83b-18e75c43e1f9",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
@@ -253,7 +253,7 @@
               "note": null
             },
             {
-              "id": "8e748466-ca55-44e2-9e86-7ca02fa2a585",
+              "id": "6e4e284e-6256-4ff3-8195-f2aea3ad7b60",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
@@ -271,7 +271,7 @@
               "note": null
             },
             {
-              "id": "60838552-24f7-4222-8669-b9579a376178",
+              "id": "a47d98d2-761c-418c-b6d6-decc3780c917",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
@@ -289,7 +289,7 @@
               "note": null
             },
             {
-              "id": "fe3aab5d-f18e-484f-b311-cbcca39cb1de",
+              "id": "8aae4218-0347-444e-9551-2536e688776d",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",
@@ -325,9 +325,9 @@
       "source": "manual",
       "items": [
         {
-          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+          "recipeId": "6c9969ad-cecd-4df5-9c64-616f46e999c3",
           "loaves": 3,
-          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+          "starterId": "609bbc5d-57a5-477b-a0a0-fa40d4ab50dd",
           "starterReminderMinutes": 60
         }
       ]
@@ -335,7 +335,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "e97f8f6f-6d4f-4013-ac17-fdf0593c94bd",
+      "id": "5eda9c8c-e0db-4b71-afe7-9d149d0a421a",
       "name": "Weekday bake",
       "status": "planned",
       "source": "manual",
@@ -350,18 +350,18 @@
       "notes": null,
       "items": [
         {
-          "id": "16591114-3cdd-4b5f-aef8-395e09355c9b",
-          "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+          "id": "4f79336b-91cd-4582-b871-5351004ae7b2",
+          "recipeId": "6c9969ad-cecd-4df5-9c64-616f46e999c3",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "bb8deeb7-12be-4d49-a321-671525f0b027",
+          "starterId": "609bbc5d-57a5-477b-a0a0-fa40d4ab50dd",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
           "starterReminderMinutes": 60,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "711e6906-d70f-4fad-8fe1-b2ac8d54495c",
+              "id": "4a9ebcc7-6dd9-43a5-b3c6-9e667817cae5",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
@@ -379,7 +379,7 @@
               "note": null
             },
             {
-              "id": "2171377b-ad39-48da-b6a4-6c1e07b034dc",
+              "id": "ea3dfa87-523a-4948-b791-c2d71187ad1f",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
@@ -397,7 +397,7 @@
               "note": null
             },
             {
-              "id": "dc7024da-5718-4b41-8d41-795ae3b8663f",
+              "id": "5f8ee3a3-ade3-470f-9a7c-7302e9430db7",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
@@ -415,7 +415,7 @@
               "note": null
             },
             {
-              "id": "bdd5da77-94d6-4104-a1b1-dff01c2e4b1f",
+              "id": "ac35862f-6075-47ef-b831-97d36c31b37a",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
@@ -433,7 +433,7 @@
               "note": null
             },
             {
-              "id": "616efe87-9f1f-408d-ac7a-0dad9259e56b",
+              "id": "4d9022c5-182c-4f00-be26-c1eb07669ad5",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",

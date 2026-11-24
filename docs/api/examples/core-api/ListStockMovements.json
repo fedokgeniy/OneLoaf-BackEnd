@@ -2,14 +2,14 @@
   {
     "case": "purchase and correction",
     "method": "GET",
-    "path": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/stock-movements?page=1&pageSize=20",
+    "path": "/api/v1/ingredients/53ba3533-252f-45ce-a3b2-2296da1b740f/stock-movements?page=1&pageSize=20",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
       "items": [
         {
-          "id": "b1ca09cd-304e-499d-a0d5-08ea68555af4",
+          "id": "9f042dd0-85e3-4568-9424-f42f8994f847",
           "type": "adjustment",
           "quantity": -70.000,
           "occurredOn": "2026-11-24",
@@ -20,10 +20,10 @@
           "totalCost": null,
           "currency": null,
           "note": "Counted the shelf",
-          "createdAt": "2026-11-24T19:27:05.023505+00:00"
+          "createdAt": "2026-11-24T19:45:13.915237+00:00"
         },
         {
-          "id": "d1145f42-1c6d-4493-bdf4-c54865c14bee",
+          "id": "b4ba6bd1-a5b8-4eef-a27e-0e032ec36212",
           "type": "purchase",
           "quantity": 500.000,
           "occurredOn": "2026-11-22",
@@ -34,7 +34,7 @@
           "totalCost": 3.2000,
           "currency": "EUR",
           "note": "Market",
-          "createdAt": "2026-11-24T19:27:04.905227+00:00"
+          "createdAt": "2026-11-24T19:45:13.803551+00:00"
         }
       ],
       "page": 1,

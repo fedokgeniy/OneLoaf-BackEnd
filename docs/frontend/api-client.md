@@ -82,7 +82,7 @@ public sealed class ApiClient(HttpClient http, ILogger<ApiClient> log)
 |---|---|---|
 | `validation` 400 | `Validation` | `ServerValidator` puts `FieldErrors` into the form's `ValidationMessageStore` (field names are camelCase paths like `items[0].loaves` — map them to the form model with a small path mapper); summary alert on top |
 | `bad-request` 400 | `BadRequest` | toast "The request was not accepted" + `detail` (a client bug — log at Warning) |
-| `unauthorized` 401 | `Unauthorized` | on login: inline "E-mail or password is wrong"; elsewhere: session cleared, toast "Your session has ended — please sign in again", redirect `/login?returnUrl=…` |
+| `unauthorized` 401 | `Unauthorized` | on login: inline "E-mail or password is wrong"; elsewhere: one silent `POST auth/refresh` with the refresh cookie; only when that fails: session cleared, toast "Your session has ended — please sign in again", redirect `/login?returnUrl=…` |
 | `forbidden` 403 | `Forbidden` | toast `detail`; for delete account with a wrong password: field error on the password |
 | `not-found` 404 | `NotFound` | detail pages render `NotFoundPage` content ("This item does not exist or is not yours"); list actions: toast and reload |
 | `conflict` 409 | `Conflict` | show `detail` (duplicate name / stage already running / proposal used) and reload the affected state |

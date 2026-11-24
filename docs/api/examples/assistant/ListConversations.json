@@ -11,8 +11,8 @@
       "title": "A valid bearer token is required.",
       "status": 401,
       "instance": "/api/v1/conversations",
-      "traceId": "00-d0fd74d27803b92a481166e09120e4f1-e84dedb2a5797a63-02",
-      "correlationId": "00ff1852f3034e288b4bdb2735eead6d"
+      "traceId": "00-853dbb70b07e8c29c4ffaad32157f663-3b5f425d7a9f43e9-02",
+      "correlationId": "c2444f89f74f4d37b8158021266d69e0"
     }
   },
   {
@@ -24,10 +24,10 @@
     "responseContentType": "application/json",
     "responseBody": [
       {
-        "id": "9c1a9074-f34b-47cc-b556-629b300c9042",
+        "id": "f2edf869-95ab-42d9-9de6-ec57fd04739f",
         "title": "Plan 2 loaves of my Country sourdough for next Saturday morn",
-        "createdAt": "2026-11-24T19:27:08.1235+00:00",
-        "updatedAt": "2026-11-24T19:27:08.403822+00:00"
+        "createdAt": "2026-11-24T19:45:17.350598+00:00",
+        "updatedAt": "2026-11-24T19:45:17.638476+00:00"
       }
     ]
   }

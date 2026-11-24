@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/bake-records/6161f51b-d2fb-43d9-b036-064e475ecb8b/photos/49730e30-51e8-4f75-a8bc-265e09976b81",
+    "path": "/api/v1/bake-records/08daff53-8408-4c10-91da-fefc5bc37abb/photos/6238717d-ed8e-45ca-9d5b-b5cdcb947ac9",
     "authenticated": true,
     "status": 200,
     "responseContentType": "image/png",

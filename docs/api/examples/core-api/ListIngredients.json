@@ -9,16 +9,16 @@
     "responseBody": {
       "items": [
         {
-          "id": "16b33a70-1168-4063-a238-2610109d609d",
+          "id": "5fd33415-9317-4c0c-8403-7e8ff56aa4c4",
           "name": "Bread flour",
           "categoryCode": "flour",
           "unitCode": "g",
-          "flourId": "9d44625f-756c-49f7-be92-00dc9eee4b66",
+          "flourId": "fec271fe-1480-4f5f-97f7-32d36f7fe0ac",
           "flourName": "Bread flour T550",
           "proteinPercent": 12.8,
           "currentPrice": null,
-          "createdAt": "2026-11-24T19:27:04.485631+00:00",
-          "updatedAt": "2026-11-24T19:27:04.485631+00:00",
+          "createdAt": "2026-11-24T19:45:13.379061+00:00",
+          "updatedAt": "2026-11-24T19:45:13.379061+00:00",
           "trackStock": false,
           "stock": null,
           "reorderLevel": null,

@@ -36,11 +36,16 @@ Context: OpenAPI 3.1 documents; generators handle 3.1 nullability unevenly. Deci
 disallowed. Consequences: types are readable and trimming-safe; drift is caught by CI when the backend regenerates the
 examples.
 
-## ADR-F07 Token storage: memory + sessionStorage, no refresh
+## ADR-F07 Token storage: access token in memory + sessionStorage, refresh token in an HttpOnly cookie
 
-Context: the API issues 60-minute JWTs without refresh tokens. Decision: keep the token in memory and `sessionStorage`
-(survives reload, not other tabs or browser restart); never `localStorage`. Warn 1 minute before expiry; on 401 go to
-login with `returnUrl`. Consequences: users sign in again after an hour of inactivity per tab — acceptable for the pilot.
+Context: the API issues 60-minute access tokens and a rotating refresh token that it sets as an `HttpOnly`,
+`SameSite=Strict` cookie. Decision: keep the access token in memory and `sessionStorage` (survives reload); never
+`localStorage`. The client never sees the refresh token: `SessionRefresher` calls `POST auth/refresh` with the browser's
+cookies at start-up when the tab has no access token, one minute before the access token ends (`SessionMonitor`) and
+once after a 401; only the three auth calls are sent with credentials. When the exchange fails the session ends as
+before: toast, sign-in page with `returnUrl`. Consequences: a baker stays signed in across tabs and browser restarts for
+as long as the refresh token lives; a script injected into the page can use the access token of the open tab but cannot
+take the sign-in with it.
 
 ## ADR-F08 Same-origin production hosting
 

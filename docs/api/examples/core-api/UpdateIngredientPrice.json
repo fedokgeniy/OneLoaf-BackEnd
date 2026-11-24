@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "PUT",
-    "path": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/42df6159-205c-414f-a749-53275f1f4a1d",
+    "path": "/api/v1/ingredients/53ba3533-252f-45ce-a3b2-2296da1b740f/prices/b721ad92-e05f-4fb5-bf59-155b7b5f1e16",
     "authenticated": true,
     "requestBody": {
       "price": 4.5,
@@ -13,7 +13,7 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "42df6159-205c-414f-a749-53275f1f4a1d",
+      "id": "b721ad92-e05f-4fb5-bf59-155b7b5f1e16",
       "price": 4.5000,
       "perQuantity": 1000.000,
       "unitPrice": 0.0045,
@@ -25,7 +25,7 @@
   {
     "case": "price not found",
     "method": "PUT",
-    "path": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/00000000-0000-4000-9999-000000000000",
+    "path": "/api/v1/ingredients/53ba3533-252f-45ce-a3b2-2296da1b740f/prices/00000000-0000-4000-9999-000000000000",
     "authenticated": true,
     "requestBody": {
       "price": 4.5,
@@ -40,9 +40,9 @@
       "title": "The requested resource was not found.",
       "status": 404,
       "detail": "The price was not found.",
-      "instance": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/prices/00000000-0000-4000-9999-000000000000",
-      "traceId": "00-27c3d05cd034f3d3bfe119c2784d4492-e09cfed79fb5d427-02",
-      "correlationId": "917cd5babfa4457792e9f199010fa089"
+      "instance": "/api/v1/ingredients/53ba3533-252f-45ce-a3b2-2296da1b740f/prices/00000000-0000-4000-9999-000000000000",
+      "traceId": "00-c6e57af3d8137eb83358850029a623ea-43857aee97feb2c5-02",
+      "correlationId": "a67fcfd24b174e44a71857b0164f8911"
     }
   }
 ]

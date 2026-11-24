@@ -2,16 +2,16 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/recipes/911ae220-045a-4dd2-b086-ba231d6eb5e9/timeline?start=2026-11-26T08%3A00%3A00%2B02%3A00",
+    "path": "/api/v1/recipes/6c9969ad-cecd-4df5-9c64-616f46e999c3/timeline?start=2026-11-26T08%3A00%3A00%2B02%3A00",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "recipeId": "911ae220-045a-4dd2-b086-ba231d6eb5e9",
+      "recipeId": "6c9969ad-cecd-4df5-9c64-616f46e999c3",
       "start": "2026-11-26T08:00:00+02:00",
       "stages": [
         {
-          "lineId": "a0a15184-103e-423d-ae4b-4d55e8b0d441",
+          "lineId": "836e24fe-8c52-4133-81a4-0bc83a9a636a",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -22,7 +22,7 @@
           "plannedEndMaxAt": "2026-11-26T08:20:00+02:00"
         },
         {
-          "lineId": "a3e09913-99fe-4697-92b0-5a08665cde83",
+          "lineId": "11ec35cb-0d5a-4a15-9dff-f0825cf75a5a",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -33,7 +33,7 @@
           "plannedEndMaxAt": "2026-11-26T13:20:00+02:00"
         },
         {
-          "lineId": "8ce4b663-2845-4b66-b423-d7fa42fed4d7",
+          "lineId": "ff6b1fa2-efa2-46de-871c-be55ad14b738",
           "sortOrder": 3,
           "name": "Shape",
           "stageTypeCode": "shape",
@@ -44,7 +44,7 @@
           "plannedEndMaxAt": "2026-11-26T13:35:00+02:00"
         },
         {
-          "lineId": "83f43f20-b3c9-47cf-8b57-c24ced0d8d49",
+          "lineId": "399343e7-b076-4a54-b69a-d3eb116820f1",
           "sortOrder": 4,
           "name": "Cold proof",
           "stageTypeCode": "proof",
@@ -55,7 +55,7 @@
           "plannedEndMaxAt": "2026-11-27T01:35:00+02:00"
         },
         {
-          "lineId": "7cfd2818-83d3-4ab3-a694-b257fe28f692",
+          "lineId": "27dbb61f-5ca9-4762-97d4-187c40b6ad75",
           "sortOrder": 5,
           "name": "Bake",
           "stageTypeCode": "bake",

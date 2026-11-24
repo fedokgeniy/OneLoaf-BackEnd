@@ -259,7 +259,7 @@
           "Auth"
         ],
         "summary": "Log in and get an access token",
-        "description": "US-02. Returns an RS256 JWT. Unknown e-mail and wrong password give the same 401.",
+        "description": "US-02. Returns an RS256 JWT and sets the refresh token as an HttpOnly cookie. Unknown e-mail and wrong password give the same 401.",
         "operationId": "Login",
         "requestBody": {
           "content": {
@@ -305,13 +305,55 @@
         }
       }
     },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Exchange the refresh token cookie for a new access token",
+        "description": "US-02. The cookie is replaced by the next token of the same sign-in (rotation). 401 for a missing, expired or revoked token; a token that was already exchanged revokes the whole sign-in.",
+        "operationId": "RefreshSession",
+        "responses": {
+          "429": {
+            "description": "Too Many Requests",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/auth/logout": {
       "post": {
         "tags": [
           "Auth"
         ],
         "summary": "Log out",
-        "description": "US-02. Access tokens are short-lived and stateless; the client discards its token.",
+        "description": "US-02. Revokes the refresh tokens of this sign-in and removes the cookie; the access token expires by itself and the client discards it.",
         "operationId": "Logout",
         "responses": {
           "429": {
@@ -326,23 +368,8 @@
           },
           "204": {
             "description": "No Content"
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/problem+json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
           }
-        },
-        "security": [
-          {
-            "Bearer": []
-          }
-        ]
+        }
       }
     },
     "/api/v1/me": {

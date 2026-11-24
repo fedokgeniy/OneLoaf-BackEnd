@@ -30,7 +30,7 @@ W - `SELECT/INSERT/UPDATE/DELETE`, R - `SELECT` only, C - `SELECT` on some colum
 | Objects | app_write | app_read |
 |---|---|---|
 | Reference tables: `units`, `currencies`, `stage_types`, `ingredient_categories`, `flour_types` | R | R |
-| `users`, `push_subscriptions` | W | - |
+| `users`, `push_subscriptions`, `refresh_tokens` | W | - |
 | `kitchen_settings`, `flours`, `ingredients`, `ingredient_prices` | W | R |
 | `stock_movements` | W | C (without `note`) |
 | `recipes`, `recipe_ingredients`, `recipe_stages` | W | R |
@@ -89,6 +89,7 @@ bootstrap), not MD5.
 | Password | `users.password_hash` | Strong hash only (section 4) |
 | Free text | chat, comments, reports, feedback | No access for `app_read`; column privileges on `bake_records` |
 | Device subscriptions | `push_subscriptions` | No access for `app_read`; deleted together with the account |
+| Sign-ins | `refresh_tokens` | Only the SHA-256 hash of a refresh token is stored; no access for `app_read`; deleted together with the account and by anonymization |
 
 **Right to erasure (GDPR, US-04).** Deleting a user deletes all their data by cascade, including the chat and subscriptions.
 

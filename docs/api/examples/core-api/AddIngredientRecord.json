@@ -2,7 +2,7 @@
   {
     "case": "two packs of 250 g",
     "method": "POST",
-    "path": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/records",
+    "path": "/api/v1/ingredients/53ba3533-252f-45ce-a3b2-2296da1b740f/records",
     "authenticated": true,
     "requestBody": {
       "packCount": 2,
@@ -16,7 +16,7 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "bdbc70fe-0af1-408e-acf2-9804f9841163",
+      "id": "53ba3533-252f-45ce-a3b2-2296da1b740f",
       "name": "Sunflower seeds",
       "categoryCode": "add_in",
       "unitCode": "g",
@@ -30,8 +30,8 @@
         "currency": "EUR",
         "effectiveFrom": "2026-11-22"
       },
-      "createdAt": "2026-11-24T19:27:04.803428+00:00",
-      "updatedAt": "2026-11-24T19:27:04.905227+00:00",
+      "createdAt": "2026-11-24T19:45:13.732791+00:00",
+      "updatedAt": "2026-11-24T19:45:13.803551+00:00",
       "trackStock": true,
       "stock": 500.000,
       "reorderLevel": null,
@@ -43,7 +43,7 @@
   {
     "case": "price only",
     "method": "POST",
-    "path": "/api/v1/ingredients/cad0f44b-a059-45d6-ac52-beb5446d76d1/records",
+    "path": "/api/v1/ingredients/ef64b19f-9efd-47c7-9c3d-80678da3317b/records",
     "authenticated": true,
     "requestBody": {
       "packCount": 1,
@@ -57,7 +57,7 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "cad0f44b-a059-45d6-ac52-beb5446d76d1",
+      "id": "ef64b19f-9efd-47c7-9c3d-80678da3317b",
       "name": "Sea salt",
       "categoryCode": "salt",
       "unitCode": "g",
@@ -71,8 +71,8 @@
         "currency": "EUR",
         "effectiveFrom": "2026-11-21"
       },
-      "createdAt": "2026-11-24T19:27:04.648837+00:00",
-      "updatedAt": "2026-11-24T19:27:04.707834+00:00",
+      "createdAt": "2026-11-24T19:45:13.534722+00:00",
+      "updatedAt": "2026-11-24T19:45:13.599581+00:00",
       "trackStock": false,
       "stock": null,
       "reorderLevel": null,
@@ -84,7 +84,7 @@
   {
     "case": "no packs",
     "method": "POST",
-    "path": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/records",
+    "path": "/api/v1/ingredients/53ba3533-252f-45ce-a3b2-2296da1b740f/records",
     "authenticated": true,
     "requestBody": {
       "packCount": 0,
@@ -101,14 +101,14 @@
       "type": "https://oneloaf.app/problems/validation",
       "title": "One or more validation errors occurred.",
       "status": 400,
-      "instance": "/api/v1/ingredients/bdbc70fe-0af1-408e-acf2-9804f9841163/records",
+      "instance": "/api/v1/ingredients/53ba3533-252f-45ce-a3b2-2296da1b740f/records",
       "errors": {
         "packCount": [
           "'Pack Count' должно быть в диапазоне от 1 до 10000. Введенное значение: 0."
         ]
       },
-      "traceId": "00-27cf0b0f2c60bcf8a04edb0cbd5dd5c6-673115be9a8375a4-02",
-      "correlationId": "d6f9be9c9a4a4a0180c2c1a1246ccbcd"
+      "traceId": "00-40109d0d57ba3790f2eeb04e484a1af6-9287ee47f63c4857-02",
+      "correlationId": "d5681a33c76c47719170b95c4198434b"
     }
   }
 ]

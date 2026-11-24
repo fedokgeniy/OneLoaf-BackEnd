@@ -8,8 +8,8 @@ Type: relational transactional database (OLTP), **PostgreSQL 16**. The structure
 Code First) and created **only by scripts**: a chain of migrations or the DDL script [`db/schema.sql`](../../db/schema.sql)
 generated from it.
 
-**Contents:** 30 tables (5 of them reference tables), 60 foreign keys, 104 CHECK constraints, 104 indexes, 36 triggers,
-24 functions, 27 trigger functions, 6 procedures, 8 views, 1 materialized view, 3 access roles; 247 automated checks.
+**Contents:** 31 tables (5 of them reference tables), 61 foreign keys, 106 CHECK constraints, 108 indexes, 36 triggers,
+24 functions, 27 trigger functions, 6 procedures, 8 views, 1 materialized view, 3 access roles; 248 automated checks.
 
 ## Documentation
 
@@ -51,7 +51,7 @@ generated from it.
 | Requirement | Where |
 |---|---|
 | Structure created by scripts or migrations, not manually | EF Core migrations and `db/schema.sql`; see [Getting started](#getting-started) |
-| Scripts and migrations in Git | [`src/OneLoaf.Infrastructure/Persistence/Migrations/`](../../src/OneLoaf.Infrastructure/Persistence/Migrations) (9 migrations and their SQL scripts), [`db/`](../../db) |
+| Scripts and migrations in Git | [`src/OneLoaf.Infrastructure/Persistence/Migrations/`](../../src/OneLoaf.Infrastructure/Persistence/Migrations) (10 migrations and their SQL scripts), [`db/`](../../db) |
 | Scripts for reference tables | `InitialSchema` migration (EF Core `HasData`, [`ReferenceData.cs`](../../src/OneLoaf.Infrastructure/Persistence/ReferenceData.cs)); values in the [dictionary](data-dictionary.md#reference-values) |
 | Test data covering edge cases | [`db/seed/test_data.sql`](../../db/seed/test_data.sql) (5 users, every status; the edge cases are listed in the file header); volume data in [`db/seed/volume_data.sql`](../../db/seed/volume_data.sql) |
 
@@ -162,7 +162,7 @@ src/
       ModelConventions.cs             snake_case, enum as text + CHECK, defaults
       ReferenceData.cs                reference data
       Configurations/                 keys, indexes, CHECK, ON DELETE (Fluent API)
-      Migrations/                     9 migrations
+      Migrations/                     10 migrations
         Sql/<Migration>/*.sql         functions, triggers, procedures, views, privileges
   OneLoaf.DbMigrator/                 console application that applies the migrations
 db/
