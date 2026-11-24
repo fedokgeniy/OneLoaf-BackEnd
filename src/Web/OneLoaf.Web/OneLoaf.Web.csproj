@@ -9,6 +9,9 @@
     <OverrideHtmlAssetPlaceholders>true</OverrideHtmlAssetPlaceholders>
     <!-- PWA (US-44): the publish writes the asset list the service worker caches for offline use. -->
     <ServiceWorkerAssetsManifest>service-worker-assets.js</ServiceWorkerAssetsManifest>
+    <!-- The SDK adds the framework web assets package only when it finds .razor files. Stated here so the restore
+         gives the same result when only the project files are present (the cached restore layer of the Dockerfile). -->
+    <RequiresAspNetWebAssets>true</RequiresAspNetWebAssets>
   </PropertyGroup>
 
   <!-- ADR-F04: rarely used features are downloaded on first navigation (FeatureAssemblies.Lazy, App.razor). -->
