@@ -29,6 +29,10 @@ public static class Prompts
     /// <summary>Title of the confirmation message.</summary>
     public const string BatchSavedMessage = "The batch is saved. You can follow it in the production calendar.";
 
+    /// <summary>Confirmation message of a saved recipe.</summary>
+    public const string RecipeSavedMessage =
+        "The recipe is saved. New ingredients have no price yet: add prices to see what a loaf costs.";
+
     private static string Read(string name)
     {
         using var stream = typeof(Prompts).Assembly.GetManifestResourceStream(name)
