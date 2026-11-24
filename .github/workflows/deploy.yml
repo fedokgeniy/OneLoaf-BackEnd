@@ -7,7 +7,6 @@ name: deploy
 # GitHub Environment "production":
 #   variables  DEPLOY_HOST, DEPLOY_USER, DEPLOY_PATH (e.g. /opt/oneloaf), DOMAIN
 #   secrets    DEPLOY_SSH_KEY, DEPLOY_KNOWN_HOSTS, PRODUCTION_ENV (the server's .env, see .env.example)
-# Until DEPLOY_HOST is set the job is skipped.
 
 on:
   workflow_run:
@@ -27,9 +26,8 @@ concurrency:
 jobs:
   deploy:
     name: Deploy to production
-    if: >
-      vars.DEPLOY_HOST != '' &&
-      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
+    # No check of the environment variables here: a job condition is evaluated before the environment is attached.
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     environment:
       name: production
