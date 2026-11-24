@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/ingredients/dabd17ca-2d7d-4f2f-b3b1-dbb59250912b/prices",
+    "path": "/api/v1/ingredients/a371fd97-976c-4bcc-aebf-bb7cf5625d33/prices",
     "authenticated": true,
     "requestBody": {
       "price": 1.20,
@@ -13,7 +13,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "2c3c757b-bf4e-4c5e-bd49-0d91594ba007",
+      "id": "efb68312-6681-4476-a9c2-ba94b5c10c2f",
       "price": 1.2000,
       "perQuantity": 1000.000,
       "unitPrice": 0.0012,
@@ -25,7 +25,7 @@
   {
     "case": "price change",
     "method": "POST",
-    "path": "/api/v1/ingredients/dabd17ca-2d7d-4f2f-b3b1-dbb59250912b/prices",
+    "path": "/api/v1/ingredients/a371fd97-976c-4bcc-aebf-bb7cf5625d33/prices",
     "authenticated": true,
     "requestBody": {
       "price": 1.35,
@@ -36,7 +36,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "bf85216d-dfa4-4db6-af08-6379a8e11758",
+      "id": "57ba806f-4b10-45ec-8954-15f110a6fef7",
       "price": 1.3500,
       "perQuantity": 1000.000,
       "unitPrice": 0.00135,
@@ -48,7 +48,7 @@
   {
     "case": "other ingredient",
     "method": "POST",
-    "path": "/api/v1/ingredients/1e1b56b2-ebb3-4e7d-917f-c3c41778225c/prices",
+    "path": "/api/v1/ingredients/35997ae2-07af-49e6-818d-eff5db2679f3/prices",
     "authenticated": true,
     "requestBody": {
       "price": 0.01,
@@ -59,7 +59,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "a53f797e-f3b6-4c41-8cd3-fa016019e003",
+      "id": "955ddd3b-b250-4fd9-a8c2-7782acaebad9",
       "price": 0.0100,
       "perQuantity": 1000.000,
       "unitPrice": 0.00001,
@@ -71,7 +71,7 @@
   {
     "case": "other ingredient",
     "method": "POST",
-    "path": "/api/v1/ingredients/ba1627ce-53a9-4c85-ba2d-968ef091cdf3/prices",
+    "path": "/api/v1/ingredients/c892e73a-0c70-48bf-a54b-df5c57d7f1ad/prices",
     "authenticated": true,
     "requestBody": {
       "price": 0.80,
@@ -82,7 +82,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "ed57d0a7-dd1c-4168-893d-0e981b0eb030",
+      "id": "25f0f261-e2e5-4d31-8f21-018e34935dfa",
       "price": 0.8000,
       "perQuantity": 1000.000,
       "unitPrice": 0.0008,
@@ -94,7 +94,7 @@
   {
     "case": "other ingredient",
     "method": "POST",
-    "path": "/api/v1/ingredients/76b5f6a4-b7cc-4b22-9847-1023decfd765/prices",
+    "path": "/api/v1/ingredients/04be5a2e-945e-497b-939c-7fca43afd766/prices",
     "authenticated": true,
     "requestBody": {
       "price": 0.50,
@@ -105,7 +105,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "aa263f87-7c0a-4f1a-a388-4f914f896e7c",
+      "id": "ed542b08-efbf-4216-848a-bd7a74865447",
       "price": 0.5000,
       "perQuantity": 1000.000,
       "unitPrice": 0.0005,
@@ -117,7 +117,7 @@
   {
     "case": "price entered by mistake",
     "method": "POST",
-    "path": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/prices",
+    "path": "/api/v1/ingredients/25e63c78-8dbc-4a2c-a1a7-b533f41a7c46/prices",
     "authenticated": true,
     "requestBody": {
       "price": 45,
@@ -128,7 +128,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "27603253-6e13-412d-b951-955066d627f1",
+      "id": "1235357c-aa15-4234-b1d6-d88ca26b64da",
       "price": 45.0000,
       "perQuantity": 1000.000,
       "unitPrice": 0.045,

@@ -56,6 +56,10 @@ public class StarterFeedingConfiguration : IEntityTypeConfiguration<StarterFeedi
         b.Property(x => x.Note).HasMaxLength(1000);
         b.HasIndex(x => new { x.StarterId, x.FedAt });
         b.HasOne(x => x.Starter).WithMany(x => x.Feedings).HasForeignKey(x => x.StarterId).OnDelete(DeleteBehavior.Cascade);
+        b.HasIndex(x => x.FlourIngredientId);
+        b.HasIndex(x => x.WaterIngredientId);
+        b.HasOne(x => x.FlourIngredient).WithMany().HasForeignKey(x => x.FlourIngredientId).OnDelete(DeleteBehavior.SetNull);
+        b.HasOne(x => x.WaterIngredient).WithMany().HasForeignKey(x => x.WaterIngredientId).OnDelete(DeleteBehavior.SetNull);
     }
 }
 

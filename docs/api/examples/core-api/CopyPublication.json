@@ -2,12 +2,12 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/copy",
+    "path": "/api/v1/library/2e8a953f-51ab-418a-b265-bd2152a57a6d/copy",
     "authenticated": true,
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "5a66fc1f-9ccc-47a2-bbc8-84cb74fa8101",
+      "id": "f5e82190-09bf-4ea7-9752-6590e5e25e40",
       "parentRecipeId": null,
       "title": "Country sourdough",
       "description": "Open crumb, crisp crust.",
@@ -17,8 +17,8 @@
       "isArchived": false,
       "ingredients": [
         {
-          "lineId": "bb75b039-eb36-421e-bcfa-8098da8d89c7",
-          "ingredientId": "5ab31dcf-3abc-4bb2-81b0-adccf9c138ac",
+          "lineId": "2b2e299f-7e13-44f4-9ff3-ac99ba7a2458",
+          "ingredientId": "a6bd6639-4ca5-446c-98e6-1dac9bea5050",
           "ingredientName": "Bread flour",
           "categoryCode": "flour",
           "unitCode": "g",
@@ -30,7 +30,7 @@
           "isInherited": false
         },
         {
-          "lineId": "e4070da6-e5d3-4037-829f-9bfa6e55d6e7",
+          "lineId": "9f599c72-f9cc-4206-a042-deb2c9525656",
           "ingredientId": "00000000-0000-4000-1001-000000000012",
           "ingredientName": "Water",
           "categoryCode": "water",
@@ -43,8 +43,8 @@
           "isInherited": false
         },
         {
-          "lineId": "26b91e72-9bc3-4c16-aab8-7bb71775c2f4",
-          "ingredientId": "37c2f9ed-556a-4ad5-b9e3-5531b90637a6",
+          "lineId": "dadf085b-b7c9-40de-a93a-d3467783b3e8",
+          "ingredientId": "86843f4b-cb87-4060-b8fd-d99deefdb36d",
           "ingredientName": "Sea salt",
           "categoryCode": "salt",
           "unitCode": "g",
@@ -56,8 +56,8 @@
           "isInherited": false
         },
         {
-          "lineId": "2fbbabad-2ad8-41de-a880-feaf01386dd0",
-          "ingredientId": "1efdcb8f-e7e7-4aa1-9737-02215b1a7462",
+          "lineId": "908363bd-1bb3-44e3-80df-beb0e26a4809",
+          "ingredientId": "52c4526f-5514-415a-92a8-94d7d085fc89",
           "ingredientName": "Rye starter",
           "categoryCode": "starter",
           "unitCode": "g",
@@ -71,7 +71,7 @@
       ],
       "stages": [
         {
-          "lineId": "d9917969-676b-42cb-bda8-843b1de366d0",
+          "lineId": "b4c2d107-4aa4-488f-8dc0-c88cfd630d9a",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -87,7 +87,7 @@
           "isInherited": false
         },
         {
-          "lineId": "cfa3f5f3-699c-48eb-b332-032033b0f0b8",
+          "lineId": "fe51e1e1-b73a-4ed8-acd7-684b2874ddbd",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -103,7 +103,7 @@
           "isInherited": false
         },
         {
-          "lineId": "56e4898c-5211-4623-b4f0-2ab005646f80",
+          "lineId": "3c110af6-3743-4db8-ad71-4e27632180cf",
           "sortOrder": 3,
           "name": "Shape",
           "stageTypeCode": "shape",
@@ -119,7 +119,7 @@
           "isInherited": false
         },
         {
-          "lineId": "74e1f281-80e1-468c-a0db-35e61f583afd",
+          "lineId": "47781e66-78e6-44f1-bc77-e83390a22c6f",
           "sortOrder": 4,
           "name": "Cold proof",
           "stageTypeCode": "proof",
@@ -135,7 +135,7 @@
           "isInherited": false
         },
         {
-          "lineId": "d2762b70-76b9-41fe-b6cc-ce5093e8bcea",
+          "lineId": "5c6ee6f0-5c5a-460e-a50b-c7919753be03",
           "sortOrder": 5,
           "name": "Bake",
           "stageTypeCode": "bake",
@@ -151,8 +151,8 @@
           "isInherited": false
         }
       ],
-      "createdAt": "2026-11-24T20:55:47.544744+00:00",
-      "updatedAt": "2026-11-24T20:55:47.544744+00:00",
+      "createdAt": "2026-11-24T21:18:05.132547+00:00",
+      "updatedAt": "2026-11-24T21:18:05.132547+00:00",
       "hasPhoto": false
     }
   }

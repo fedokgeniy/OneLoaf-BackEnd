@@ -95,6 +95,12 @@ public sealed class FeedingForm
     [Range(typeof(decimal), "0", "100000", ParseLimitsInInvariantCulture = true, ErrorMessage = "Enter 0 g or more.")]
     public decimal? WaterG { get; set; }
 
+    /// <summary>Flour ingredient of this feeding (id as text); the usual flour of the starter by default.</summary>
+    public string? FlourIngredientId { get; set; }
+
+    /// <summary>Water ingredient of this feeding (id as text); the usual water of the starter by default.</summary>
+    public string? WaterIngredientId { get; set; }
+
     /// <summary>Starter kept before feeding, in grams.</summary>
     [Range(typeof(decimal), "0", "100000", ParseLimitsInInvariantCulture = true, ErrorMessage = "Enter 0 g or more.")]
     public decimal? StarterKeptG { get; set; }
@@ -116,6 +122,8 @@ public sealed class FeedingForm
         }
 
         return new FeedingRequest(new DateTimeOffset(local, TimeZoneInfo.Local.GetUtcOffset(local)), FlourG!.Value, WaterG!.Value,
-            StarterKeptG, TemperatureC, string.IsNullOrWhiteSpace(Note) ? null : Note.Trim());
+            StarterKeptG, TemperatureC, string.IsNullOrWhiteSpace(Note) ? null : Note.Trim(),
+            Guid.TryParse(FlourIngredientId, out var flour) ? flour : null,
+            Guid.TryParse(WaterIngredientId, out var water) ? water : null);
     }
 }

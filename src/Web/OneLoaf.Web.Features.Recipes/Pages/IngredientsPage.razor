@@ -71,7 +71,8 @@
                                             }
                                             else
                                             {
-                                                <span class="ol-badge ol-badge--running ingredients__price">Price missing</span>
+                                                @* A starter gets its price from the flour and water of its feedings. *@
+                                                <span class="ol-badge ol-badge--running ingredients__price">@(item.StarterId is null ? "Price missing" : "Priced at feeding")</span>
                                             }
                                             <span class="ingredients__category">@CategoryName(item.CategoryCode)@(item.ProteinPercent is { } protein ? $" · {DisplayFormat.Percent(protein)} protein" : null)</span>
                                             @if (item.Stock is { } stock)

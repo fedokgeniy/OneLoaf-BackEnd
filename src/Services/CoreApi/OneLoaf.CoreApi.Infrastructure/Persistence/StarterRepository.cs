@@ -93,6 +93,9 @@ public sealed class StarterRepository(OneLoafDbContext db) : IStarterRepository
             FlourG = feeding.FlourG,
             WaterG = feeding.WaterG,
             StarterKeptG = feeding.StarterKeptG,
+            // Not chosen: a trigger fills in the usual flour and water of the starter.
+            FlourIngredientId = feeding.FlourIngredientId,
+            WaterIngredientId = feeding.WaterIngredientId,
             TemperatureC = feeding.TemperatureC,
             Note = string.IsNullOrWhiteSpace(feeding.Note) ? null : feeding.Note.Trim(),
         };
@@ -151,7 +154,8 @@ public sealed class StarterRepository(OneLoafDbContext db) : IStarterRepository
             : null;
 
     private static FeedingDto ToDto(StarterFeeding f) => new(
-        f.Id, Utc(f.FedAt), f.FlourG, f.WaterG, f.StarterKeptG, f.TemperatureC, Utc(f.NextFeedingAt), Utc(f.ExpectedPeakAt), f.Note);
+        f.Id, Utc(f.FedAt), f.FlourG, f.WaterG, f.StarterKeptG, f.TemperatureC, Utc(f.NextFeedingAt), Utc(f.ExpectedPeakAt), f.Note,
+        f.FlourIngredientId, f.WaterIngredientId);
 
     private sealed record StarterRow(Starter Starter, StarterFeeding? Last, decimal UsableNow, decimal LedgerTotal);
 }

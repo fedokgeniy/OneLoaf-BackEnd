@@ -2,16 +2,16 @@
   {
     "case": "a comment",
     "method": "POST",
-    "path": "/api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/reports",
+    "path": "/api/v1/library/2e8a953f-51ab-418a-b265-bd2152a57a6d/reports",
     "authenticated": true,
     "requestBody": {
       "reason": "Off-topic advertising link",
-      "commentId": "0f84403b-0db2-4b8d-a0ab-4b9a11258d1a"
+      "commentId": "1a41c553-21ee-4644-a4c6-8af352117bcf"
     },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "reportId": "bc54b381-fb6b-4026-84a6-2b3f66ba1a93"
+      "reportId": "da567b00-c1c9-4d70-b2c7-48040aa8fcc0"
     }
   }
 ]

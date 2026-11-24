@@ -160,6 +160,8 @@ erDiagram
     starter_feedings {
         uuid id PK
         uuid starter_id FK
+        uuid flour_ingredient_id FK
+        uuid water_ingredient_id FK
     }
     starters {
         uuid id PK
@@ -178,6 +180,8 @@ erDiagram
     flours |o--o{ ingredients : "flour_id"
     users ||--o{ ingredients : "owner_id"
     ingredients ||--o{ recipe_ingredients : "ingredient_id"
+    ingredients |o--o{ starter_feedings : "flour_ingredient_id"
+    ingredients |o--o{ starter_feedings : "water_ingredient_id"
     flours |o--o{ starters : "flour_id"
     ingredients |o--o{ starters : "flour_ingredient_id"
     ingredients ||--o| starters : "ingredient_id"
@@ -430,6 +434,8 @@ erDiagram
         timestamptz next_feeding_at
         timestamptz expected_peak_at
         varchar note
+        uuid flour_ingredient_id FK
+        uuid water_ingredient_id FK
     }
     starters {
         uuid id PK
@@ -489,7 +495,9 @@ erDiagram
     batch_stages |o--o{ reminders : "batch_stage_id"
     users ||--o{ reminders : "owner_id"
     starters |o--o{ reminders : "starter_id"
+    ingredients |o--o{ starter_feedings : "flour_ingredient_id"
     starters ||--o{ starter_feedings : "starter_id"
+    ingredients |o--o{ starter_feedings : "water_ingredient_id"
     flours |o--o{ starters : "flour_id"
     ingredients |o--o{ starters : "flour_ingredient_id"
     ingredients ||--o| starters : "ingredient_id"

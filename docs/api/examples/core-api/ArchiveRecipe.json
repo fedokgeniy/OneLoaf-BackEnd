@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/recipes/9152d05e-0b3d-4881-9365-862cbb121938/archive",
+    "path": "/api/v1/recipes/4f2807e6-35db-45b3-aa2f-71d18f2d1fdf/archive",
     "authenticated": true,
     "status": 204
   }

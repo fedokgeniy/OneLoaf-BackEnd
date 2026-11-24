@@ -1027,18 +1027,24 @@ Other sections: [reference values](#reference-values), [views](#views), [functio
 | `next_feeding_at` | `timestamp with time zone` | yes |  |  | Next feeding; computed by a trigger if not given (US-28). |
 | `expected_peak_at` | `timestamp with time zone` | yes |  |  | Expected peak activity; computed by a trigger (US-30). |
 | `note` | `character varying(1000)` | yes |  |  | Note. |
+| `flour_ingredient_id` | `uuid` | yes |  | FK (ingredients) | Flour ingredient this feeding used; the usual flour of the starter when not chosen (trigger). |
+| `water_ingredient_id` | `uuid` | yes |  | FK (ingredients) | Water ingredient this feeding used; the usual water of the starter when not chosen (trigger). |
 
 **Foreign keys**
 
 | Constraint | Column | References | ON DELETE |
 |---|---|---|---|
+| `fk_starter_feedings_ingredients_flour_ingredient_id` | `flour_ingredient_id` | `ingredients.id` | SET NULL |
+| `fk_starter_feedings_ingredients_water_ingredient_id` | `water_ingredient_id` | `ingredients.id` | SET NULL |
 | `fk_starter_feedings_starters_starter_id` | `starter_id` | `starters.id` | CASCADE |
 
 **Indexes** (besides the primary key)
 
 | Index | Columns | Unique | Condition |
 |---|---|---|---|
+| `ix_starter_feedings_flour_ingredient_id` | `flour_ingredient_id` | no |  |
 | `ix_starter_feedings_starter_id_fed_at` | `starter_id, fed_at` | no |  |
+| `ix_starter_feedings_water_ingredient_id` | `water_ingredient_id` | no |  |
 
 **CHECK constraints**
 
@@ -1054,9 +1060,10 @@ Other sections: [reference values](#reference-values), [views](#views), [functio
 
 | Trigger | When | What it does |
 |---|---|---|
+| `trg_starter_feedings_ingredients_before` | BEFORE INSERT | A feeding uses the usual flour and water of its starter unless others are named; they belong to the owner of the starter. |
 | `trg_starter_feedings_schedule_after` | AFTER INSERT | Replaces the scheduled feeding reminder of the starter (US-29). |
 | `trg_starter_feedings_schedule_before` | BEFORE INSERT | Computes the next feeding and the expected peak (US-28, US-30). |
-| `trg_starter_feedings_stock` | AFTER INSERT | A feeding takes its flour and water from the linked ingredients, returns the ripe starter that is left and adds the usable share at the expected peak. |
+| `trg_starter_feedings_stock` | AFTER INSERT | A feeding takes its flour and water from the stock, sets the price of the starter to what it was fed, returns the ripe starter that is left and adds the usable share at the expected peak. |
 
 ## reminders
 
@@ -1760,6 +1767,7 @@ Trigger functions are listed above in the sections of their tables.
 | `fn_recipe_timeline` | function | `p_recipe_id uuid, p_start timestamp with time zone` | `TABLE(...)` | Planned start and end window of every stage for a given start (US-16). |
 | `fn_refresh_bake_statistics` | function, SECURITY DEFINER | - | `void` | Refreshes mv_bake_statistics without blocking readers; SECURITY DEFINER so that app_write can call it. |
 | `fn_starter_amount_g` | function | `p_recipe_id uuid, p_loaves integer` | `numeric` | Starter for N loaves, g (US-18). |
+| `fn_starter_feeding_cost` | function | `p_feeding_id uuid` | `numeric` | Cost of one gram of a starter after a feeding: flour and water at their prices of that day plus the kept starter at its previous price; NULL when a price is missing. |
 | `fn_stock_balance` | function | `p_ingredient_id uuid` | `numeric` | Stock of an ingredient now, in its unit. |
 | `fn_stock_balance_at` | function | `p_ingredient_id uuid, p_at timestamp with time zone` | `numeric` | Stock of an ingredient at a moment: movements that are not available yet (ripening starter) do not count. |
 | `sp_anonymize_user` | procedure | `IN p_user_id uuid` | - | Removes personal data and the workspace of a user; public contributions stay as "Anonymous baker" (GDPR). |

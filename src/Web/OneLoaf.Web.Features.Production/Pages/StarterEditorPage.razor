@@ -46,7 +46,7 @@ else
                 <OlNumberField TValue="decimal?" Label="Hydration" Suffix="%" Help="Water per 100 g of flour." @bind-Value="_form.HydrationPercent" />
                 <div>
                     <OlSelect Label="Flour" Options="FlourIngredientOptions" Placeholder="Not specified" @bind-Value="_form.FlourIngredientId" />
-                    <p class="ol-field__help">A flour from <a class="ol-link" href="ingredients">Ingredients</a>; feedings take from its stock.</p>
+                    <p class="ol-field__help">The usual flour, from <a class="ol-link" href="ingredients">Ingredients</a>; every feeding can name another one. Feedings take from its stock and set the price of the starter.</p>
                 </div>
                 <OlSelect Label="Feeding" Options="ModeOptions" @bind-Value="_form.FeedingMode" />
                 <OlNumberField TValue="int?" Label="Every" Suffix="h" @bind-Value="_form.FeedingIntervalHours" />

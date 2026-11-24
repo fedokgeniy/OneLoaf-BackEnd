@@ -2,7 +2,7 @@
   {
     "case": "move the start",
     "method": "PUT",
-    "path": "/api/v1/batches/065f5d37-a784-4935-bcaf-eeb3163d4aa0",
+    "path": "/api/v1/batches/0b290b06-3df8-4a8a-9f4d-abedf6125b86",
     "authenticated": true,
     "requestBody": {
       "name": "Weekend bake",
@@ -10,9 +10,9 @@
       "source": "manual",
       "items": [
         {
-          "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
+          "recipeId": "699803e1-119d-4ea6-80fb-0938962fc855",
           "loaves": 3,
-          "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
+          "starterId": "797cc670-8bdb-4748-9add-b7c0a31fa8cc",
           "starterReminderMinutes": 60
         }
       ]
@@ -20,7 +20,7 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
+      "id": "0b290b06-3df8-4a8a-9f4d-abedf6125b86",
       "name": "Weekend bake",
       "status": "planned",
       "source": "manual",
@@ -35,18 +35,18 @@
       "notes": null,
       "items": [
         {
-          "id": "21da1e48-6d12-4106-9c12-43d620557541",
-          "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
+          "id": "2fe637d7-b617-46d2-85d9-2500334582c6",
+          "recipeId": "699803e1-119d-4ea6-80fb-0938962fc855",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "4e967a64-78a4-4f3f-bec9-cdea9ef5f127",
+          "starterId": "797cc670-8bdb-4748-9add-b7c0a31fa8cc",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
           "starterReminderMinutes": 60,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "a92341b6-fc2d-41d4-a411-c70ad580bb82",
+              "id": "3cd14e37-b6af-4e79-a1cf-d7942cd261a6",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
@@ -64,7 +64,7 @@
               "note": null
             },
             {
-              "id": "98dc47f6-2c73-4a2f-8231-0b3a5c258ed2",
+              "id": "2a1dbb63-4560-4093-a117-683e21e92c14",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
@@ -82,7 +82,7 @@
               "note": null
             },
             {
-              "id": "9d1b726c-9e5b-4197-90b1-ece9678a0b6a",
+              "id": "45f4bd95-6485-40ba-9946-abf0aef3be1f",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
@@ -100,7 +100,7 @@
               "note": null
             },
             {
-              "id": "907eaf88-894b-41d7-8c58-3f557e539080",
+              "id": "dd4d1b87-7dad-4b2f-bfc1-b7e48f402fae",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
@@ -118,7 +118,7 @@
               "note": null
             },
             {
-              "id": "9a6fce26-2c1d-4efd-bde9-b60388785f1c",
+              "id": "818a8e59-927e-45f4-aab9-bcabe9695642",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",

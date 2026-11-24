@@ -2,14 +2,14 @@
   {
     "case": "typical",
     "method": "DELETE",
-    "path": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/01553e96-af42-4377-8a33-c58dbd6c427f",
+    "path": "/api/v1/bake-records/b96889e3-e70b-4e14-a45b-70e3fe132a34/photos/cc94af52-3caa-4a5e-b568-4b88dcb7e2be",
     "authenticated": true,
     "status": 204
   },
   {
     "case": "not found or another user's",
     "method": "DELETE",
-    "path": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/01553e96-af42-4377-8a33-c58dbd6c427f",
+    "path": "/api/v1/bake-records/b96889e3-e70b-4e14-a45b-70e3fe132a34/photos/cc94af52-3caa-4a5e-b568-4b88dcb7e2be",
     "authenticated": true,
     "status": 404,
     "responseContentType": "application/problem+json",
@@ -18,9 +18,9 @@
       "title": "The requested resource was not found.",
       "status": 404,
       "detail": "The photo was not found.",
-      "instance": "/api/v1/bake-records/7b049ade-7914-409f-9d42-88d8957ede11/photos/01553e96-af42-4377-8a33-c58dbd6c427f",
-      "traceId": "00-c5d4d5a52cb0b34e5c211babc9b4f753-fa9644e3e3f4baf2-02",
-      "correlationId": "edcdd0134ae34076b939920cdb3146d0"
+      "instance": "/api/v1/bake-records/b96889e3-e70b-4e14-a45b-70e3fe132a34/photos/cc94af52-3caa-4a5e-b568-4b88dcb7e2be",
+      "traceId": "00-4f82536c9db78addc841fa13ed9bde50-aef3f9a4815a8811-02",
+      "correlationId": "afb2e4e0c39c477a957bfe37a93e3717"
     }
   }
 ]

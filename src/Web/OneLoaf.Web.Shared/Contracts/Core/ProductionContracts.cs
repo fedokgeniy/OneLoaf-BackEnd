@@ -170,8 +170,10 @@ public sealed record StarterRequest(
 /// <summary>A feeding of a starter (US-28).</summary>
 public sealed record FeedingDto(
     Guid Id, DateTimeOffset FedAt, decimal FlourG, decimal WaterG, decimal? StarterKeptG, decimal? TemperatureC,
-    DateTimeOffset? NextFeedingAt, DateTimeOffset? ExpectedPeakAt, string? Note);
+    DateTimeOffset? NextFeedingAt, DateTimeOffset? ExpectedPeakAt, string? Note,
+    Guid? FlourIngredientId = null, Guid? WaterIngredientId = null);
 
 /// <summary><c>POST /starters/{id}/feedings</c> body.</summary>
 public sealed record FeedingRequest(
-    DateTimeOffset FedAt, decimal FlourG, decimal WaterG, decimal? StarterKeptG, decimal? TemperatureC, string? Note);
+    DateTimeOffset FedAt, decimal FlourG, decimal WaterG, decimal? StarterKeptG, decimal? TemperatureC, string? Note,
+    Guid? FlourIngredientId = null, Guid? WaterIngredientId = null);
