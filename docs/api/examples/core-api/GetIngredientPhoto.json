@@ -2,24 +2,16 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/ingredients/119f5b95-f180-4aa8-a18b-dd442fa267b9/photo",
+    "path": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo",
     "authenticated": true,
-    "status": 404,
-    "responseContentType": "application/problem+json",
-    "responseBody": {
-      "type": "https://oneloaf.app/problems/not-found",
-      "title": "The requested resource was not found.",
-      "status": 404,
-      "detail": "The ingredient was not found.",
-      "instance": "/api/v1/ingredients/119f5b95-f180-4aa8-a18b-dd442fa267b9/photo",
-      "traceId": "00-e78a283acacc70f7fd66f600d25b950b-cb237781e0f5ea1e-02",
-      "correlationId": "0ce3d7888a5544d6a513f35cd651c12e"
-    }
+    "status": 200,
+    "responseContentType": "image/png",
+    "responseBody": "<binary image/png, 29 bytes>"
   },
   {
     "case": "no photo",
     "method": "GET",
-    "path": "/api/v1/ingredients/119f5b95-f180-4aa8-a18b-dd442fa267b9/photo",
+    "path": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo",
     "authenticated": true,
     "status": 404,
     "responseContentType": "application/problem+json",
@@ -27,10 +19,10 @@
       "type": "https://oneloaf.app/problems/not-found",
       "title": "The requested resource was not found.",
       "status": 404,
-      "detail": "The ingredient was not found.",
-      "instance": "/api/v1/ingredients/119f5b95-f180-4aa8-a18b-dd442fa267b9/photo",
-      "traceId": "00-cad3c6077c24b7a1a8c7b9b13ead86db-55e26c8236988081-02",
-      "correlationId": "b79aceab61bc40779f59895e24f50630"
+      "detail": "The photo was not found.",
+      "instance": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo",
+      "traceId": "00-9efc23c8291e164e5a06645ceed79895-731083ca67372f6b-02",
+      "correlationId": "40641d5a0ebe4c37aef057740c7388c5"
     }
   }
 ]

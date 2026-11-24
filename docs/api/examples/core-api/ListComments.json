@@ -2,17 +2,17 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/library/efe5e503-1479-4142-8d86-8b3383b01708/comments?page=1&pageSize=20",
+    "path": "/api/v1/library/68005dad-4a98-48ce-9c10-bf2c977a7b72/comments?page=1&pageSize=20",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
       "items": [
         {
-          "id": "8f75e1f4-062f-428d-b102-1fd477a34d49",
+          "id": "0f84403b-0db2-4b8d-a0ab-4b9a11258d1a",
           "authorName": "Boris Novak",
           "body": "Baked it on Sunday, lovely crumb!",
-          "createdAt": "2026-11-24T20:51:26.948348+00:00",
+          "createdAt": "2026-11-24T20:55:47.450396+00:00",
           "editedAt": null,
           "isMine": true
         }

@@ -2,18 +2,8 @@
   {
     "case": "typical",
     "method": "DELETE",
-    "path": "/api/v1/ingredients/119f5b95-f180-4aa8-a18b-dd442fa267b9/photo",
+    "path": "/api/v1/ingredients/1e30b37f-c209-4d97-874b-d465cc30c864/photo",
     "authenticated": true,
-    "status": 404,
-    "responseContentType": "application/problem+json",
-    "responseBody": {
-      "type": "https://oneloaf.app/problems/not-found",
-      "title": "The requested resource was not found.",
-      "status": 404,
-      "detail": "The ingredient was not found.",
-      "instance": "/api/v1/ingredients/119f5b95-f180-4aa8-a18b-dd442fa267b9/photo",
-      "traceId": "00-2c3eb7f9261b74d2bfef9b6a40634228-30a8e5f970bb322e-02",
-      "correlationId": "1ce26c836b8043ba8438742676433898"
-    }
+    "status": 204
   }
 ]

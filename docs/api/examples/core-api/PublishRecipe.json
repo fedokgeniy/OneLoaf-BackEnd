@@ -2,23 +2,23 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/recipes/b8713bc1-2834-4a1a-b594-ff73be15e7b8/publish",
+    "path": "/api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/publish",
     "authenticated": true,
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "publishedRecipeId": "efe5e503-1479-4142-8d86-8b3383b01708"
+      "publishedRecipeId": "68005dad-4a98-48ce-9c10-bf2c977a7b72"
     }
   },
   {
     "case": "publish again (new snapshot)",
     "method": "POST",
-    "path": "/api/v1/recipes/b8713bc1-2834-4a1a-b594-ff73be15e7b8/publish",
+    "path": "/api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/publish",
     "authenticated": true,
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "publishedRecipeId": "92bc3492-bafa-4b55-be1d-20c3a4912d19"
+      "publishedRecipeId": "8c714f19-63fd-40ed-a3b6-3fc411eda17f"
     }
   }
 ]

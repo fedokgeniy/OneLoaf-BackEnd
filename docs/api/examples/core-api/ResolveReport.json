@@ -2,7 +2,7 @@
   {
     "case": "reject",
     "method": "POST",
-    "path": "/api/v1/admin/reports/6cf1b9df-1858-4203-9264-dbf4980c331b/resolve",
+    "path": "/api/v1/admin/reports/bc54b381-fb6b-4026-84a6-2b3f66ba1a93/resolve",
     "authenticated": true,
     "requestBody": {
       "action": "reject",
@@ -13,7 +13,7 @@
   {
     "case": "already decided",
     "method": "POST",
-    "path": "/api/v1/admin/reports/6cf1b9df-1858-4203-9264-dbf4980c331b/resolve",
+    "path": "/api/v1/admin/reports/bc54b381-fb6b-4026-84a6-2b3f66ba1a93/resolve",
     "authenticated": true,
     "requestBody": {
       "action": "remove",
@@ -26,9 +26,9 @@
       "title": "The request conflicts with existing data.",
       "status": 409,
       "detail": "The report was already decided.",
-      "instance": "/api/v1/admin/reports/6cf1b9df-1858-4203-9264-dbf4980c331b/resolve",
-      "traceId": "00-c2eb4efb814f11b045315d69cbf042f1-400b9911ec81e42b-02",
-      "correlationId": "9eb9d8175c2d433c8e1d71b1888bd7f3"
+      "instance": "/api/v1/admin/reports/bc54b381-fb6b-4026-84a6-2b3f66ba1a93/resolve",
+      "traceId": "00-3baa38e1510f1d1cd7d8364a778adbd7-cb990775280477b8-02",
+      "correlationId": "49f1d4d58ddf41af8f04e9af2ecefd2b"
     }
   }
 ]

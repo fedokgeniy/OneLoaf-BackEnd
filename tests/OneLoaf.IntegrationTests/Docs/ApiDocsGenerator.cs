@@ -454,6 +454,7 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
             new { reason = "Duplicate of an earlier publication." });
 
         // One photo per ingredient and per recipe; both are removed again, so the workspace stays as recorded above.
+        api.As(token);
         byte[] picture = [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0, 0, 0, 13, 0x49, 0x48, 0x44, 0x52, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2, 0, 0, 0];
         await api.UploadAsync("SetIngredientPhoto", "typical", HttpMethod.Put, $"/api/v1/ingredients/{seeds}/photo", "file", "pack.png", "image/png", picture);
         await api.UploadAsync("SetIngredientPhoto", "not an image", HttpMethod.Put, $"/api/v1/ingredients/{seeds}/photo", "file", "notes.png", "image/png", "plain text"u8.ToArray());

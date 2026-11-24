@@ -6,6 +6,6 @@
     "authenticated": true,
     "status": 200,
     "responseContentType": "text/csv",
-    "responseBody": "title,is_variant,yield_loaves,loaf_weight_g,ingredient_lines,stage_lines,is_archived,created_at,updated_at\r\nBeginner sourdough,false,1,900.0,2,2,false,2026-11-24T20:51:24.8673470+00:00,2026-11-24T20:51:24.8673470+00:00\r\nCountry sourdough,false,1,900.0,4,5,false,2026-11-24T20:51:24.7303050+00:00,2026-11-24T20:51:25.0935500+00:00\r\n\"Country sourdough, as baked\",true,1,,0,5,false,2026-11-24T20:51:26.2736870+00:00,2026-11-24T20:51:26.2736870+00:00\r\n\"Country sourdough, longer bulk\",true,1,,8,10,false,2026-11-24T20:51:25.1186930+00:00,2026-11-24T20:51:25.3613510+00:00\r\n"
+    "responseBody": "title,is_variant,yield_loaves,loaf_weight_g,ingredient_lines,stage_lines,is_archived,created_at,updated_at\r\nBeginner sourdough,false,1,900.0,2,2,false,2026-11-24T20:55:45.4358590+00:00,2026-11-24T20:55:45.4358590+00:00\r\nCountry sourdough,false,1,900.0,4,5,false,2026-11-24T20:55:45.3203530+00:00,2026-11-24T20:55:45.6514630+00:00\r\n\"Country sourdough, as baked\",true,1,,0,5,false,2026-11-24T20:55:46.8359510+00:00,2026-11-24T20:55:46.8359510+00:00\r\n\"Country sourdough, longer bulk\",true,1,,8,10,false,2026-11-24T20:55:45.6771480+00:00,2026-11-24T20:55:45.9183660+00:00\r\n"
   }
 ]

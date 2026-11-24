@@ -9,7 +9,7 @@
     "responseBody": {
       "items": [
         {
-          "id": "0fb16bf6-49f5-41f1-ae9a-b9d2c88f3ccb",
+          "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
           "name": "Weekend bake",
           "status": "planned",
           "plannedStartAt": "2026-11-26T06:00:00+00:00",
@@ -40,8 +40,8 @@
           "status must be one of: planned, in_progress, done, cancelled."
         ]
       },
-      "traceId": "00-a83ab216ad6f44d09aa96937dc3b744e-e90f5ba14ca30558-02",
-      "correlationId": "c70411630d6f4ccdb798ffb290f5c762"
+      "traceId": "00-5230617acc47779d217a68de0c728852-b7d776a8b32fed03-02",
+      "correlationId": "1b13cd82fe604f7bb1a6a37624a0a7ec"
     }
   },
   {
@@ -54,7 +54,7 @@
     "responseBody": {
       "items": [
         {
-          "id": "0fb16bf6-49f5-41f1-ae9a-b9d2c88f3ccb",
+          "id": "065f5d37-a784-4935-bcaf-eeb3163d4aa0",
           "name": "Weekend bake",
           "status": "planned",
           "plannedStartAt": "2026-11-26T06:00:00+00:00",

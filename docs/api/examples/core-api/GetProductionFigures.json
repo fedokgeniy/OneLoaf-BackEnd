@@ -2,12 +2,12 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/recipes/b8713bc1-2834-4a1a-b594-ff73be15e7b8/production-figures?loaves=3",
+    "path": "/api/v1/recipes/ccba0d41-1f7d-4d80-b7ab-d1abaa799d98/production-figures?loaves=3",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "recipeId": "b8713bc1-2834-4a1a-b594-ff73be15e7b8",
+      "recipeId": "ccba0d41-1f7d-4d80-b7ab-d1abaa799d98",
       "loaves": 3,
       "doughWeightG": 2880.0000000000000000,
       "kneadingCycles": 1,

@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/conversations/6ebfa073-a173-43be-832e-240ff2d969c4/actions/53e247a9-b47a-4635-8fde-d422b5d77db7/decline",
+    "path": "/api/v1/conversations/8804629f-c28f-4d93-8928-6ede37189e48/actions/08b03041-ab87-49b7-bea3-8ff2a4da9a66/decline",
     "authenticated": true,
     "status": 204
   }
