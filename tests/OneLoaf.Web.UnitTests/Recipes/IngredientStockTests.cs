@@ -34,7 +34,7 @@ public sealed class IngredientStockTests : BunitContext
     }
 
     [Fact]
-    public void AddPurchase_PacksAndSize_SendsThemAndShowsTheLedger()
+    public void AddRecord_PacksAndSize_SendsThemAndShowsTheLedger()
     {
         var cut = Render<IngredientsPage>();
         cut.WaitForAssertion(() => cut.FindAll(".ingredients__row")[0].Click());
@@ -42,17 +42,36 @@ public sealed class IngredientStockTests : BunitContext
         Assert.Contains("Purchase", cut.Find("#ingredient-panel-stock").TextContent, StringComparison.Ordinal);
         Assert.Contains("5 × ", cut.Find("#ingredient-panel-stock").TextContent, StringComparison.Ordinal);
 
-        cut.FindAll("#ingredient-panel-stock button").Single(b => b.TextContent.Contains("Add purchase", StringComparison.Ordinal)).Click();
-        cut.FindAll("#purchase-form input[inputmode]")[0].Change("3");
-        cut.FindAll("#purchase-form input[inputmode]")[1].Change("2500");
-        cut.FindAll("#purchase-form input[inputmode]")[2].Change("9.60");
-        cut.Find("#purchase-form").Submit();
+        cut.FindAll(".ingredients__card button").First(b => b.TextContent.Contains("Add record", StringComparison.Ordinal)).Click();
+        cut.FindAll("#record-form input[inputmode]")[0].Change("3");
+        cut.FindAll("#record-form input[inputmode]")[1].Change("2500");
+        cut.FindAll("#record-form input[inputmode]")[2].Change("9.60");
+        cut.Find("#record-form").Submit();
 
-        cut.WaitForAssertion(() => Assert.NotNull(_catalog.LastPurchase));
-        Assert.Equal(3, _catalog.LastPurchase!.PackCount);
-        Assert.Equal(2500m, _catalog.LastPurchase.PackSize);
-        Assert.Equal(9.60m, _catalog.LastPurchase.TotalCost);
-        cut.WaitForAssertion(() => Assert.Empty(cut.FindAll("#purchase-form")));
+        cut.WaitForAssertion(() => Assert.NotNull(_catalog.LastRecord));
+        Assert.Equal(3, _catalog.LastRecord!.PackCount);
+        Assert.Equal(2500m, _catalog.LastRecord.PackSize);
+        Assert.Equal(9.60m, _catalog.LastRecord.TotalCost);
+        Assert.False(_catalog.LastRecord.PriceOnly);
+        cut.WaitForAssertion(() => Assert.Empty(cut.FindAll("#record-form")));
+    }
+
+    [Fact]
+    public void AddRecord_OnlyPrice_SendsThePriceWithoutTouchingTheStock()
+    {
+        var cut = Render<IngredientsPage>();
+        cut.WaitForAssertion(() => cut.FindAll(".ingredients__row")[1].Click());
+        cut.WaitForAssertion(() => cut.Find(".ingredients__card"));
+
+        cut.FindAll(".ingredients__card button").First(b => b.TextContent.Contains("Add record", StringComparison.Ordinal)).Click();
+        cut.FindAll("#record-form input[inputmode]")[1].Change("1000");
+        cut.FindAll("#record-form input[inputmode]")[2].Change("0.80");
+        cut.Find("#record-form input[role=switch]").Change(true);
+        Assert.Contains("stays as it is", cut.Find("#record-form").TextContent, StringComparison.Ordinal);
+        cut.Find("#record-form").Submit();
+
+        cut.WaitForAssertion(() => Assert.True(_catalog.LastRecord?.PriceOnly));
+        Assert.Equal(0.80m, _catalog.LastRecord!.TotalCost);
     }
 
     [Fact]
@@ -91,7 +110,7 @@ public sealed class IngredientStockTests : BunitContext
     {
         public static readonly Guid PriceId = Guid.NewGuid();
 
-        public PurchaseRequest? LastPurchase { get; private set; }
+        public IngredientRecordRequest? LastRecord { get; private set; }
 
         public Guid? DeletedPrice { get; private set; }
 
@@ -110,12 +129,10 @@ public sealed class IngredientStockTests : BunitContext
                 new StockMovementDto(Guid.NewGuid(), "batch_consumption", -4600m, new DateOnly(2026, 11, 22), Guid.NewGuid(), "Saturday bake", null, null, null, null, null, DateTimeOffset.UnixEpoch),
             ], 1, 100, 2)));
 
-        public override Task<ApiResult<StockMovementDto>> AddPurchaseAsync(Guid id, PurchaseRequest request, CancellationToken ct = default)
+        public override Task<ApiResult<IngredientDto>> AddRecordAsync(Guid id, IngredientRecordRequest request, CancellationToken ct = default)
         {
-            LastPurchase = request;
-            return Task.FromResult(ApiResult<StockMovementDto>.Ok(new StockMovementDto(Guid.NewGuid(), "purchase",
-                request.PackCount * request.PackSize, request.PurchasedOn, null, null, request.PackCount, request.PackSize, request.TotalCost,
-                request.Currency, request.Note, DateTimeOffset.UnixEpoch)));
+            LastRecord = request;
+            return Task.FromResult(ApiResult<IngredientDto>.Ok(Flour));
         }
 
         public override Task<ApiResult> DeletePriceAsync(Guid id, Guid priceId, CancellationToken ct = default)

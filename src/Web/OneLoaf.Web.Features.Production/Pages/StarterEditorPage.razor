@@ -45,12 +45,13 @@ else
                 <div class="editor__wide"><OlTextField Label="Name" Placeholder="Mother rye" @bind-Value="_form.Name" /></div>
                 <OlNumberField TValue="decimal?" Label="Hydration" Suffix="%" Help="Water per 100 g of flour." @bind-Value="_form.HydrationPercent" />
                 <div>
-                    <OlSelect Label="Flour" Options="FlourOptions" Placeholder="Not specified" @bind-Value="_form.FlourId" />
-                    <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Plus" OnClick="OpenFlourForm">Add flour</OlButton>
+                    <OlSelect Label="Flour" Options="FlourIngredientOptions" Placeholder="Not specified" @bind-Value="_form.FlourIngredientId" />
+                    <p class="ol-field__help">A flour from <a class="ol-link" href="ingredients">Ingredients</a>; feedings take from its stock.</p>
                 </div>
                 <OlSelect Label="Feeding" Options="ModeOptions" @bind-Value="_form.FeedingMode" />
                 <OlNumberField TValue="int?" Label="Every" Suffix="h" @bind-Value="_form.FeedingIntervalHours" />
-                <OlNumberField TValue="decimal?" Label="Time to peak" Suffix="h" Help="After a feeding; used for the expected peak." @bind-Value="_form.RiseHours" />
+                <OlNumberField TValue="decimal?" Label="Time to peak" Suffix="h" Help="After a feeding the starter ripens for this long and cannot be used before." @bind-Value="_form.RiseHours" />
+                <OlNumberField TValue="decimal?" Label="Usable when ripe" Suffix="%" Help="This share of the fed starter goes to the stock for dough; the rest stays for the next feeding." @bind-Value="_form.UsablePercent" />
                 <div class="editor__wide">
                     <OlSwitch @bind-Value="_form.IsActive">Active — send feeding reminders</OlSwitch>
                     <p class="ol-field__help">Reminders reach this device when push reminders are on in Settings.</p>
@@ -59,13 +60,12 @@ else
             </div>
         </section>
         <section class="ol-card editor__card" aria-labelledby="starter-stock">
-            <h2 class="h3" id="starter-stock">Fed from the stock</h2>
+            <h2 class="h3" id="starter-stock">Starter and the stock</h2>
             <p class="ol-field__help">
-                Each feeding takes its flour and water from the stock of these ingredients. Only ingredients whose
-                stock is kept are counted; leave a field empty to keep feedings out of the stock.
+                The starter is also an ingredient with the same name: use it in recipes, and find its ripe stock in Ingredients.
+                Each feeding takes its flour and water from the stock of the ingredients chosen here, when their stock is kept.
             </p>
             <div class="editor__general">
-                <OlSelect Label="Flour ingredient" Options="FlourIngredientOptions" Placeholder="Not taken from the stock" @bind-Value="_form.FlourIngredientId" />
                 <OlSelect Label="Water ingredient" Options="WaterIngredientOptions" Placeholder="Not taken from the stock" @bind-Value="_form.WaterIngredientId" />
             </div>
         </section>
@@ -87,9 +87,6 @@ else
     </Footer>
 </OlDialog>
 
-<FlourFormDialog Open="_flourOpen" FlourTypes="FlourTypeOptions" Busy="State.Value.Busy" Error="_flourError"
-                 OnSave="AddFlour" OnClose="() => _flourOpen = false" />
-
 @code {
     private static readonly IReadOnlyList<SelectOption> ModeOptions =
         [new("regular", "Regularly"), new("weekly", "Weekly"), new("fridge", "Kept in the fridge")];
@@ -103,69 +100,30 @@ else
     /// <summary>Starter id; null for a new starter.</summary>
     [Parameter] public Guid? Id { get; set; }
 
-    private bool _flourOpen;
-    private ApiError? _flourError;
-
-    private IReadOnlyList<SelectOption> FlourOptions =>
-        State.Value.Flours.Value?.Select(f => new SelectOption(f.Id.ToString(), f.Name)).ToList() ?? [];
-
-    private IReadOnlyList<SelectOption> FlourTypeOptions =>
-        State.Value.FlourTypes.Select(t => new SelectOption(t.Code, t.Name)).ToList();
-
     private IReadOnlyList<SelectOption> FlourIngredientOptions => IngredientOptions("flour");
 
     private IReadOnlyList<SelectOption> WaterIngredientOptions => IngredientOptions("water");
 
-    /// <summary>Ingredients of the category first, then the others: a feeding may use any of them.</summary>
     private IReadOnlyList<SelectOption> IngredientOptions(string category) =>
-        State.Value.Ingredients.OrderBy(i => i.CategoryCode == category ? 0 : 1).ThenBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
+        State.Value.Ingredients.Where(i => i.CategoryCode == category).OrderBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
             .Select(i => new SelectOption(i.Id.ToString(), i.TrackStock ? i.Name : $"{i.Name} (stock not kept)")).ToList();
-
-    private void OpenFlourForm()
-    {
-        _flourError = null;
-        _flourOpen = true;
-    }
-
-    private void AddFlour(FlourRequest request)
-    {
-        _flourError = null;
-        Dispatcher.Dispatch(new AddStarterFlour(request));
-    }
 
     /// <inheritdoc />
     protected override void OnInitialized()
     {
         base.OnInitialized();
         SubscribeToAction<StartersLoaded>(_ => BuildForm());
-        SubscribeToAction<StarterFlourAdded>(added =>
-        {
-            _flourOpen = false;
-            if (_form is not null)
-            {
-                _form.FlourId = added.Flour.Id.ToString();
-            }
-        });
+
         SubscribeToAction<StarterCommandFailed>(a =>
         {
-            if (a.Command == nameof(AddStarterFlour))
-            {
-                _flourError = a.Error;
-            }
-            else if (a.Command == nameof(SaveStarter))
+            if (a.Command == nameof(SaveStarter))
             {
                 _error = a.Error.Kind == ApiErrorKind.Validation && _server is not null && _server.Display(a.Error.FieldErrors).Count == 0 ? null
                     : a.Error.Kind == ApiErrorKind.Conflict && _server is not null ? ShowUnderName(a.Error) : a.Error;
             }
         });
-        if (State.Value.Starters is Loadable<IReadOnlyList<StarterDto>>.Loaded)
-        {
-            BuildForm();
-        }
-        else
-        {
-            Dispatcher.Dispatch(new LoadStarters());
-        }
+        // Always from the server: flours and ingredients are added in other sections.
+        Dispatcher.Dispatch(new LoadStarters());
     }
 
     private void BuildForm()

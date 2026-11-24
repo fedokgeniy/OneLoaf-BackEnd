@@ -20,7 +20,6 @@ internal static class ProductionTestServices
         context.Services.AddSingleton(time ?? TimeProvider.System);
         context.Services.AddScoped<DeviceContext>();
         context.Services.AddSingleton(api);
-        context.Services.AddSingleton<OneLoaf.Web.Shared.Reference.IReferenceApi>(new Recipes.ReferenceApiStub());
         context.Services.AddFluxor(o => o.ScanAssemblies(typeof(SessionState).Assembly, typeof(ProductionFeature).Assembly));
         context.Render<Fluxor.Blazor.Web.StoreInitializer>();
     }
@@ -85,8 +84,6 @@ internal class ProductionApiStub : IProductionApi
 
     public virtual Task<ApiResult<PagedResult<FlourDto>>> ListFloursAsync(CancellationToken ct = default) =>
         Ok(new PagedResult<FlourDto>([], 1, 100, 0));
-
-    public virtual Task<ApiResult<FlourDto>> CreateFlourAsync(FlourRequest request, CancellationToken ct = default) => throw new NotSupportedException();
 
     public virtual Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(CancellationToken ct = default) =>
         Ok(new PagedResult<IngredientDto>([], 1, 100, 0));

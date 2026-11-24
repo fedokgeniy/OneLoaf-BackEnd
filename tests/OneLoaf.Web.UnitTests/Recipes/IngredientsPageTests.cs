@@ -33,16 +33,17 @@ public sealed class IngredientsPageTests : BunitContext
     }
 
     [Fact]
-    public void AddPrice_DateAlreadyHasPrice_ShowsConflictUnderTheDate()
+    public void EditPrice_DateAlreadyHasPrice_ShowsConflictUnderTheDate()
     {
         var cut = Render<IngredientsPage>();
         cut.WaitForAssertion(() => cut.FindAll(".ingredients__row")[0].Click());
-        cut.WaitForAssertion(() => cut.Find(".form-grid"));
+        cut.WaitForAssertion(() => cut.Find("#ingredient-panel-prices table"));
 
-        cut.Find(".form-grid input[inputmode=decimal]").Change("1.40");
-        cut.Find(".form-grid").Submit();
+        cut.FindAll("#ingredient-panel-prices button[aria-label^='Edit the price']")[0].Click();
+        cut.Find("#price-edit-form input[inputmode=decimal]").Change("1.40");
+        cut.Find("#price-edit-form").Submit();
 
-        cut.WaitForAssertion(() => Assert.Contains("A price for this date already exists.", cut.Find("input[type=date]").ParentElement!.ParentElement!.TextContent));
+        cut.WaitForAssertion(() => Assert.Contains("A price for this date already exists.", cut.Find("#price-edit-form").TextContent));
         Assert.Equal(1.40m, _catalog.LastPrice!.Price);
     }
 
@@ -60,7 +61,7 @@ public sealed class IngredientsPageTests : BunitContext
                 new PriceDto(Guid.NewGuid(), 1.20m, 1000m, 0.0012m, "EUR", new DateOnly(2026, 10, 1), null),
             ]));
 
-        public override Task<ApiResult<PriceDto>> AddPriceAsync(Guid id, PriceRequest request, CancellationToken ct = default)
+        public override Task<ApiResult<PriceDto>> UpdatePriceAsync(Guid id, Guid priceId, PriceRequest request, CancellationToken ct = default)
         {
             LastPrice = request;
             return Task.FromResult(ApiResult<PriceDto>.Fail(ApiError.FromProblem(new ProblemDetailsDto(

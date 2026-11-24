@@ -93,9 +93,15 @@ public sealed class PriceForm
         DateOnly.ParseExact(EffectiveFrom!, "yyyy-MM-dd", CultureInfo.InvariantCulture));
 }
 
-/// <summary>Purchase: a number of packs of one size bought for an amount.</summary>
-public sealed class PurchaseForm
+/// <summary>
+/// Record of what was bought: a number of packs of one size for an amount. It always sets the price of its date; with
+/// <see cref="PriceOnly"/> the stock is left alone.
+/// </summary>
+public sealed class IngredientRecordForm
 {
+    /// <summary>Only the price: the stock does not change and is not switched on.</summary>
+    public bool PriceOnly { get; set; }
+
     /// <summary>Number of packs.</summary>
     [Required(ErrorMessage = "Enter the number of packs.")]
     [Range(1, 10000, ErrorMessage = "Enter 1 to 10000 packs.")]
@@ -115,20 +121,20 @@ public sealed class PurchaseForm
     [Required(ErrorMessage = "Choose a currency.")]
     public string? Currency { get; set; } = "EUR";
 
-    /// <summary>Purchase date (yyyy-MM-dd).</summary>
+    /// <summary>Date of the purchase and of the price (yyyy-MM-dd).</summary>
     [Required(ErrorMessage = "Enter the date.")]
     [RegularExpression(@"^\d{4}-\d{2}-\d{2}$", ErrorMessage = "Enter a date.")]
-    public string? PurchasedOn { get; set; }
+    public string? Date { get; set; }
 
     /// <summary>Note, for example the shop.</summary>
     [StringLength(500, ErrorMessage = "Use at most 500 characters.")]
     public string? Note { get; set; }
 
     /// <summary>The request.</summary>
-    public PurchaseRequest ToRequest() => new(
+    public IngredientRecordRequest ToRequest() => new(
         PackCount!.Value, PackSize!.Value, TotalCost!.Value, Currency!,
-        DateOnly.ParseExact(PurchasedOn!, "yyyy-MM-dd", CultureInfo.InvariantCulture),
-        string.IsNullOrWhiteSpace(Note) ? null : Note.Trim());
+        DateOnly.ParseExact(Date!, "yyyy-MM-dd", CultureInfo.InvariantCulture),
+        string.IsNullOrWhiteSpace(Note) ? null : Note.Trim(), PriceOnly);
 }
 
 /// <summary>Stock correction: the quantity counted on the shelf and the reason.</summary>

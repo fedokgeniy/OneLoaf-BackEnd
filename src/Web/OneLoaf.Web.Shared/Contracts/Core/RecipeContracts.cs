@@ -7,7 +7,8 @@ public sealed record RecipeSummaryDto(
     Guid? ParentRecipeId,
     int YieldLoaves,
     bool IsArchived,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    bool HasPhoto = false);
 
 /// <summary>A recipe with its ingredient lines and stages (<c>GET /api/v1/recipes/{id}</c>).</summary>
 public sealed record RecipeDto(
@@ -22,7 +23,8 @@ public sealed record RecipeDto(
     IReadOnlyList<RecipeIngredientDto> Ingredients,
     IReadOnlyList<RecipeStageDto> Stages,
     DateTimeOffset CreatedAt,
-    DateTimeOffset UpdatedAt);
+    DateTimeOffset UpdatedAt,
+    bool HasPhoto = false);
 
 /// <summary>Ingredient line of a recipe; <see cref="IsInherited"/> marks a line copied from the parent of a variant.</summary>
 public sealed record RecipeIngredientDto(

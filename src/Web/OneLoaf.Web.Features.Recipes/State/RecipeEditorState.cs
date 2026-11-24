@@ -6,7 +6,12 @@ using OneLoaf.Web.Shared.State;
 namespace OneLoaf.Web.Features.Recipes.State;
 
 /// <summary>What the editor needs besides the form: the recipe (when editing), the ingredient catalog, the stage types.</summary>
-public sealed record EditorData(RecipeDto? Recipe, IReadOnlyList<IngredientDto> Ingredients, IReadOnlyList<StageTypeDto> StageTypes);
+public sealed record EditorData(
+    RecipeDto? Recipe,
+    IReadOnlyList<IngredientDto> Ingredients,
+    IReadOnlyList<StageTypeDto> StageTypes,
+    IReadOnlyList<IngredientCategoryDto>? Categories = null,
+    IReadOnlyList<UnitDto>? Units = null);
 
 /// <summary>Recipe editor slice (US-05, US-07, US-10). The form itself is local state of the page.</summary>
 [FeatureState(Name = "RecipeEditor")]
@@ -29,6 +34,15 @@ public sealed record EditorLoadFailed(Guid? Id, ApiError Error);
 
 /// <summary>Intent: create (<paramref name="Id"/> null) or update a recipe.</summary>
 public sealed record SaveRecipe(Guid? Id, RecipeRequest Request);
+
+/// <summary>Intent: add an ingredient to the catalog without leaving the editor.</summary>
+public sealed record CreateEditorIngredient(IngredientRequest Request);
+
+/// <summary>Result: the ingredient exists and can be used in a line.</summary>
+public sealed record EditorIngredientCreated(IngredientDto Ingredient);
+
+/// <summary>Result: the ingredient could not be created.</summary>
+public sealed record EditorIngredientFailed(ApiError Error);
 
 /// <summary>Intent: create a variant of <paramref name="ParentId"/> (US-07).</summary>
 public sealed record CreateVariant(Guid ParentId, string Title);
@@ -71,6 +85,18 @@ public static class RecipeEditorReducers
     [ReducerMethod]
     public static RecipeEditorState OnLoadFailed(RecipeEditorState state, EditorLoadFailed action) =>
         action.Id == state.RecipeId ? state with { Data = new Loadable<EditorData>.Failed(action.Error) } : state;
+
+    /// <summary>The new ingredient joins the catalog the editor offers.</summary>
+    [ReducerMethod]
+    public static RecipeEditorState OnIngredientCreated(RecipeEditorState state, EditorIngredientCreated action) =>
+        state.Data.Value is { } data
+            ? state with { Data = new Loadable<EditorData>.Loaded(data with { Ingredients = [.. data.Ingredients, action.Ingredient] }) }
+            : state;
+
+    /// <summary>The ingredient list of the catalog page is stale.</summary>
+    [ReducerMethod(typeof(EditorIngredientCreated))]
+    public static CatalogState CatalogAfterIngredient(CatalogState state) =>
+        state with { List = Loadable<OneLoaf.Web.Shared.Contracts.PagedResult<IngredientDto>>.Idle };
 
     /// <summary>A save, variant, archive or delete request runs.</summary>
     [ReducerMethod(typeof(SaveRecipe))]

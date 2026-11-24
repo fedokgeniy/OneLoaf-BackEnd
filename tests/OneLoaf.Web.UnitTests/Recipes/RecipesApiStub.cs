@@ -33,4 +33,12 @@ internal class RecipesApiStub : IRecipesApi
     public virtual Task<ApiResult<RecipeComparisonDto>> CompareAsync(Guid id, CancellationToken ct = default) => Fail<RecipeComparisonDto>();
 
     private static Task<ApiResult<T>> Fail<T>() => throw new NotSupportedException($"Unexpected call returning {typeof(T).Name}.");
+
+    public virtual Task<ApiResult<FileDownload>> GetPhotoAsync(Guid id, CancellationToken ct = default) =>
+        Task.FromResult(ApiResult<FileDownload>.Fail(ApiError.FromStatus(404)));
+
+    public virtual Task<ApiResult> SetPhotoAsync(Guid id, OneLoaf.Web.Shared.Ui.PhotoFile photo, CancellationToken ct = default) =>
+        Task.FromResult(ApiResult.Ok);
+
+    public virtual Task<ApiResult> DeletePhotoAsync(Guid id, CancellationToken ct = default) => Task.FromResult(ApiResult.Ok);
 }

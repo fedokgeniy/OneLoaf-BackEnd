@@ -153,12 +153,19 @@ public sealed record StarterDto(
     DateTimeOffset UpdatedAt,
     Guid? FlourIngredientId = null,
     Guid? WaterIngredientId = null,
-    decimal? AmountG = null);
+    decimal? AmountG = null,
+    Guid? IngredientId = null,
+    decimal UsableShare = 0.667m,
+    decimal? UsableG = null,
+    decimal? SuggestedKeptG = null);
 
-/// <summary><c>POST/PUT /starters</c> body; feedings take flour and water from the stock of the two ingredients.</summary>
+/// <summary>
+/// <c>POST/PUT /starters</c> body. The flour of the starter is an ingredient; feedings take flour and water from the
+/// stock of the two ingredients, and <see cref="UsableShare"/> of the fed starter becomes stock when it is ripe.
+/// </summary>
 public sealed record StarterRequest(
     string Name, decimal HydrationPercent, string FeedingMode, int FeedingIntervalHours, Guid? FlourId, decimal? RiseHours,
-    bool IsActive, string? Notes, Guid? FlourIngredientId = null, Guid? WaterIngredientId = null);
+    bool IsActive, string? Notes, Guid? FlourIngredientId = null, Guid? WaterIngredientId = null, decimal? UsableShare = null);
 
 /// <summary>A feeding of a starter (US-28).</summary>
 public sealed record FeedingDto(

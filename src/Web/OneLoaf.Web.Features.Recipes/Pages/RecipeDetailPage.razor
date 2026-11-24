@@ -43,6 +43,10 @@
             </Actions>
         </ShellTitle>
         <div class="ol-container recipe">
+            @if (Photo.Value.RecipeId == recipe.Id && Photo.Value.Src is { } photoSrc)
+            {
+                <img class="recipe__photo" src="@photoSrc" alt="@($"Photo of {recipe.Title}")" />
+            }
             <div class="recipe__badges">
                 @if (recipe.ParentRecipeId is { } parent)
                 {

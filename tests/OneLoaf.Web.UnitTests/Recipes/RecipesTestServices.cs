@@ -55,7 +55,14 @@ internal class CatalogApiStub : ICatalogApi
     public virtual Task<ApiResult<PagedResult<StockMovementDto>>> ListMovementsAsync(Guid id, CancellationToken ct = default) =>
         Task.FromResult(ApiResult<PagedResult<StockMovementDto>>.Ok(new PagedResult<StockMovementDto>([], 1, 100, 0)));
 
-    public virtual Task<ApiResult<StockMovementDto>> AddPurchaseAsync(Guid id, PurchaseRequest request, CancellationToken ct = default) => throw new NotSupportedException();
+    public virtual Task<ApiResult<IngredientDto>> AddRecordAsync(Guid id, IngredientRecordRequest request, CancellationToken ct = default) => throw new NotSupportedException();
+
+    public virtual Task<ApiResult<FileDownload>> GetIngredientPhotoAsync(Guid id, CancellationToken ct = default) =>
+        Task.FromResult(ApiResult<FileDownload>.Fail(ApiError.FromStatus(404)));
+
+    public virtual Task<ApiResult> SetIngredientPhotoAsync(Guid id, OneLoaf.Web.Shared.Ui.PhotoFile photo, CancellationToken ct = default) => throw new NotSupportedException();
+
+    public virtual Task<ApiResult> DeleteIngredientPhotoAsync(Guid id, CancellationToken ct = default) => throw new NotSupportedException();
 
     public virtual Task<ApiResult<StockMovementDto>> AdjustStockAsync(Guid id, StockAdjustmentRequest request, CancellationToken ct = default) => throw new NotSupportedException();
 
