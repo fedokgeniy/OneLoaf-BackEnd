@@ -26,8 +26,10 @@ public sealed class CatalogScreensTests(WebAppFixture app) : IClassFixture<WebAp
         await Route(page, "**/api/v1/reference/units", "GetUnits");
         await Route(page, "**/api/v1/reference/currencies", "GetCurrencies");
         await Route(page, "**/api/v1/reference/ingredient-categories", "GetIngredientCategories");
+        await Route(page, "**/api/v1/reference/flour-types", "GetFlourTypes");
         await Route(page, "**/api/v1/flours?*", "ListFlours");
         await Route(page, "**/api/v1/ingredients/*/prices", "GetIngredientPrices", "history with change percent");
+        await Route(page, "**/api/v1/ingredients/*/stock-movements?*", "ListStockMovements", "purchase and correction");
         await Route(page, "**/api/v1/ingredients?*", "ListIngredients", "filter by category");
         await Route(page, "**/api/v1/kitchen-settings", "GetKitchenSettings", "defaults after registration");
         var (recipeStatus, recipe) = RecordedApi.Case("core-api", "GetRecipe", "typical");
@@ -42,6 +44,12 @@ public sealed class CatalogScreensTests(WebAppFixture app) : IClassFixture<WebAp
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Price history" })).ToBeVisibleAsync();
         await Shot(page, "ingredients", width);
         await Accessibility.AssertNoSeriousViolationsAsync(page, "ingredients");
+
+        await page.GetByRole(AriaRole.Tab, new() { Name = "Stock" }).ClickAsync();
+        await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Stock movements" })).ToBeVisibleAsync();
+        await Assertions.Expect(page.GetByText("Counted the shelf")).ToBeVisibleAsync();
+        await Shot(page, "ingredients-stock", width);
+        await Accessibility.AssertNoSeriousViolationsAsync(page, "ingredients-stock");
 
         await page.GotoAsync($"/recipes/{(string)recipe["id"]!}/edit");
         await Assertions.Expect(page.GetByRole(AriaRole.Heading, new() { Name = "Stages" })).ToBeVisibleAsync();

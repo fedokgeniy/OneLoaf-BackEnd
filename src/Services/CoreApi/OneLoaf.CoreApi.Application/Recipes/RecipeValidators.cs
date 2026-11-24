@@ -60,20 +60,23 @@ public sealed class RecipeRequestValidator : AbstractValidator<RecipeRequest>
             line.RuleFor(i => i.Note).MaximumLength(RecipeLimits.NoteMaxLength);
             line.RuleFor(i => i.SortOrder).GreaterThanOrEqualTo(0);
         });
-        RuleForEach(x => x.Stages).ChildRules(stage =>
-        {
-            stage.RuleFor(s => s.Name).NotEmpty().Must(n => !string.IsNullOrWhiteSpace(n))
-                .MaximumLength(RecipeLimits.StageNameMaxLength);
-            stage.RuleFor(s => s.StageTypeCode).NotEmpty();
-            stage.RuleFor(s => s.MinDurationMinutes).InclusiveBetween(0, RecipeLimits.MaxStageMinutes);
-            stage.RuleFor(s => s.MaxDurationMinutes).InclusiveBetween(0, RecipeLimits.MaxStageMinutes)
-                .GreaterThanOrEqualTo(s => s.MinDurationMinutes);
-            stage.RuleFor(s => s.ActiveMinutes).GreaterThanOrEqualTo(0).LessThanOrEqualTo(s => s.MaxDurationMinutes);
-            stage.RuleFor(s => s.TemperatureC).InclusiveBetween(RecipeLimits.MinTemperatureC, RecipeLimits.MaxTemperatureC);
-            stage.RuleFor(s => s.ProofMode).IsInEnum();
-            stage.RuleFor(s => s.Instructions).MaximumLength(RecipeLimits.TextMaxLength);
-            stage.RuleFor(s => s.SortOrder).GreaterThanOrEqualTo(0);
-        });
+        RuleForEach(x => x.Stages).ChildRules(StageRules);
+    }
+
+    /// <summary>Rules of one stage, shared with the recipe draft.</summary>
+    internal static void StageRules(InlineValidator<RecipeStageInput> stage)
+    {
+        stage.RuleFor(s => s.Name).NotEmpty().Must(n => !string.IsNullOrWhiteSpace(n))
+            .MaximumLength(RecipeLimits.StageNameMaxLength);
+        stage.RuleFor(s => s.StageTypeCode).NotEmpty();
+        stage.RuleFor(s => s.MinDurationMinutes).InclusiveBetween(0, RecipeLimits.MaxStageMinutes);
+        stage.RuleFor(s => s.MaxDurationMinutes).InclusiveBetween(0, RecipeLimits.MaxStageMinutes)
+            .GreaterThanOrEqualTo(s => s.MinDurationMinutes);
+        stage.RuleFor(s => s.ActiveMinutes).GreaterThanOrEqualTo(0).LessThanOrEqualTo(s => s.MaxDurationMinutes);
+        stage.RuleFor(s => s.TemperatureC).InclusiveBetween(RecipeLimits.MinTemperatureC, RecipeLimits.MaxTemperatureC);
+        stage.RuleFor(s => s.ProofMode).IsInEnum();
+        stage.RuleFor(s => s.Instructions).MaximumLength(RecipeLimits.TextMaxLength);
+        stage.RuleFor(s => s.SortOrder).GreaterThanOrEqualTo(0);
     }
 
     private static bool HaveDistinctLineIds(IReadOnlyList<RecipeIngredientInput>? lines) =>
@@ -86,6 +89,33 @@ public sealed class RecipeRequestValidator : AbstractValidator<RecipeRequest>
     {
         var present = ids.Where(id => id.HasValue).ToList();
         return present.Count == present.Distinct().Count();
+    }
+}
+
+/// <summary>Validates <see cref="RecipeDraftRequest"/>.</summary>
+public sealed class RecipeDraftRequestValidator : AbstractValidator<RecipeDraftRequest>
+{
+    /// <summary>Creates the rules.</summary>
+    public RecipeDraftRequestValidator()
+    {
+        RuleFor(x => x.Title).NotEmpty().Must(t => !string.IsNullOrWhiteSpace(t)).MaximumLength(RecipeLimits.TitleMaxLength);
+        RuleFor(x => x.Description).MaximumLength(RecipeLimits.TextMaxLength);
+        RuleFor(x => x.Notes).MaximumLength(RecipeLimits.TextMaxLength);
+        RuleFor(x => x.YieldLoaves).InclusiveBetween(1, RecipeLimits.MaxLoaves);
+        RuleFor(x => x.LoafWeightG).GreaterThan(0).LessThan(RecipeLimits.MaxLoafWeightG);
+        RuleFor(x => x.Ingredients).NotNull().NotEmpty().Must(l => l.Count <= RecipeLimits.MaxLines)
+            .Must(l => l is null || l.Select(i => i.Name?.Trim()).Distinct(StringComparer.OrdinalIgnoreCase).Count() == l.Count)
+            .WithMessage("Ingredient names must be unique.");
+        RuleFor(x => x.Stages).NotNull().NotEmpty().Must(l => l.Count <= RecipeLimits.MaxLines);
+        RuleForEach(x => x.Ingredients).ChildRules(line =>
+        {
+            line.RuleFor(i => i.Name).NotEmpty().Must(n => !string.IsNullOrWhiteSpace(n)).MaximumLength(CatalogLimits.NameMaxLength);
+            line.RuleFor(i => i.CategoryCode).NotEmpty();
+            line.RuleFor(i => i.UnitCode).NotEmpty();
+            line.RuleFor(i => i.Quantity).GreaterThan(0).LessThan(CatalogLimits.MaxQuantity);
+            line.RuleFor(i => i.Note).MaximumLength(RecipeLimits.NoteMaxLength);
+        });
+        RuleForEach(x => x.Stages).ChildRules(RecipeRequestValidator.StageRules);
     }
 }
 

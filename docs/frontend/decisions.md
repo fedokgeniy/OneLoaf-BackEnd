@@ -58,6 +58,25 @@ full-stack test proves the wiring before the defense.
 Decision: no chart library; SVG components with tokens and a data-table alternative. Consequences: tiny payload,
 accessible, themeable; limited to the three charts we need.
 
+## ADR-F11 Assistant replies: an own Markdown subset rendered as elements
+
+**Context.** The assistant answers in Markdown (lists, bold, headings). Shown as plain text the markers are noise; inserting
+converted HTML would execute whatever the model writes.
+**Decision.** `MarkdownParser` reads the subset the assistant uses (paragraphs, headings, bulleted and numbered lists,
+fenced code, bold, italic, inline code, http/https links) into a tree of text pieces, and `MarkdownText` builds elements
+from it with the render tree. No `MarkupString`, no HTML passes through; unknown syntax stays text.
+**Consequences.** No new dependency and no download size; tables and nested lists are not rendered (they stay readable
+text). A library such as Markdig was rejected because it produces HTML that must then be sanitised.
+
+## ADR-F12 Stock figures and offers come from the API
+
+**Context.** The stock of an ingredient, what a batch takes and what the stock is enough for are business numbers.
+**Decision.** The client shows `stock`, `isLowStock` and the batch `stock` check (`shortages`, `maxLoaves`, `maxScale`) as
+returned and sends only the baker's choice: the loaves or the `ingredientScale` offered by the API, and
+`ingredientsUsed` when a batch is cancelled or deleted. After every purchase, correction or batch the list and the
+ledger are loaded again instead of being updated in the client.
+**Consequences.** Same rule as for cost and timeline (rule 1); one more request after each command.
+
 ## Dependency policy
 
 | Used | Deliberately not used |

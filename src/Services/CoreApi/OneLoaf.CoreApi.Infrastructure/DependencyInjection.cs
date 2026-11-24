@@ -4,6 +4,7 @@ using OneLoaf.CoreApi.Application.Account;
 using OneLoaf.CoreApi.Application.Auth;
 using OneLoaf.CoreApi.Application.Batches;
 using OneLoaf.CoreApi.Application.Catalog;
+using OneLoaf.CoreApi.Application.Common;
 using OneLoaf.CoreApi.Application.History;
 using OneLoaf.CoreApi.Application.Kitchen;
 using OneLoaf.CoreApi.Application.Library;
@@ -50,6 +51,7 @@ public static class DependencyInjection
         services.AddScoped<IKitchenSettingsRepository, KitchenSettingsRepository>();
         services.AddScoped<IFlourRepository, FlourRepository>();
         services.AddScoped<IIngredientRepository, IngredientRepository>();
+        services.AddScoped<IWorkspaceTransaction, WorkspaceTransaction>();
         services.AddScoped<IRecipeRepository, RecipeRepository>();
         services.AddCoreApiCaching(configuration);
         services.AddScoped<IWarningsReader, WarningsReader>();

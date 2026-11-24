@@ -26,6 +26,7 @@ public static class DependencyInjection
         services.AddScoped<IAssistantTool, ListStartersTool>();
         services.AddScoped<IAssistantTool, PreviewBatchPlanTool>();
         services.AddScoped<IAssistantTool, ProposeBatchTool>();
+        services.AddScoped<IAssistantTool, ProposeRecipeTool>();
         services.AddScoped<IAssistantTool, GetBakeAnalysisDataTool>();
         services.AddScoped<IAssistantTool, GetIngredientPricesTool>();
         services.AddScoped<IAssistantTool, GetMissingDataTool>();

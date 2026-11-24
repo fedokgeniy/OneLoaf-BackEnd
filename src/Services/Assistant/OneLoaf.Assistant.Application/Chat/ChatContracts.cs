@@ -31,7 +31,7 @@ public sealed record SendMessageRequest(string Content);
 /// <param name="IncludeTools">Include tool messages (audit).</param>
 public sealed record MessageListQuery(bool IncludeTools = false);
 
-/// <summary>A batch proposal waiting for the baker's confirmation (US-34).</summary>
+/// <summary>A batch or recipe proposal waiting for the baker's confirmation (US-34).</summary>
 /// <param name="ActionId">Id to confirm or decline.</param>
 /// <param name="Kind">Kind of action (create_batch).</param>
 /// <param name="ExpiresAt">After this time the proposal cannot be confirmed.</param>
@@ -60,15 +60,19 @@ public sealed record ChatReplyDto(
     MessageDto Message, PendingActionDto? PendingAction, IReadOnlyList<ToolCallDto> ToolCalls, string? Disclaimer,
     IReadOnlyList<string> UnverifiedNumbers, TurnUsageDto Usage);
 
-/// <summary>Result of confirming a proposal.</summary>
-/// <param name="BatchId">The saved batch.</param>
-public sealed record ConfirmActionResponse(Guid BatchId);
+/// <summary>Result of confirming a proposal: the id of what was created.</summary>
+/// <param name="BatchId">The created batch, for a batch proposal.</param>
+/// <param name="RecipeId">The created recipe, for a recipe proposal.</param>
+public sealed record ConfirmActionResponse(Guid? BatchId, Guid? RecipeId = null);
 
 /// <summary>Kinds of pending actions.</summary>
 public static class PendingActionKinds
 {
     /// <summary>Create the proposed batch.</summary>
     public const string CreateBatch = "create_batch";
+
+    /// <summary>Create the proposed recipe together with its missing ingredients.</summary>
+    public const string CreateRecipe = "create_recipe";
 }
 
 /// <summary>A stored proposal.</summary>

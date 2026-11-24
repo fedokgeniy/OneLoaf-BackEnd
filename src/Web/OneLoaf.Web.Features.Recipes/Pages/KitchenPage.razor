@@ -8,7 +8,7 @@
 @inject IState<KitchenState> State
 @inject IDispatcher Dispatcher
 
-<ShellTitle Text="Kitchen" BackHref="settings" BackLabel="Back to settings">
+<ShellTitle Text="My kitchen" BackHref="settings" BackLabel="Back to settings">
     <Actions>
         @if (_form is not null)
         {
@@ -21,7 +21,7 @@
 {
     case Loadable<KitchenData>.Failed { Error: var error }:
         <div class="ol-container editor">
-            <OlAlert Kind="AlertKind.Danger" Title="The kitchen settings could not be loaded." CorrelationId="@error.CorrelationId">
+            <OlAlert Kind="AlertKind.Danger" Title="My kitchen could not be loaded." CorrelationId="@error.CorrelationId">
                 <p>@error.Message</p>
                 <OlButton Variant="ButtonVariant.Secondary" OnClick="() => Dispatcher.Dispatch(new LoadKitchen())">Try again</OlButton>
             </OlAlert>

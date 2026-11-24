@@ -14,7 +14,7 @@ The overview shows every table with its key columns; all columns are in the per-
 |---|---|---|
 | Reference data | `units`, `currencies`, `stage_types`, `ingredient_categories`, `flour_types` | Fixed data: units, currencies, stage types, ingredient categories, flour types. Inserted by a migration; the services only read them. |
 | E1 Accounts and kitchen | `users`, `kitchen_settings`, `push_subscriptions` | The user is the root of a workspace. All data of a baker references the user through owner_id and is deleted with the account. |
-| E3 Catalog and prices | `flours`, `ingredients`, `ingredient_prices` | Flours, ingredients and price history - the basis of the cost on any date. |
+| E3 Catalog, prices and stock | `flours`, `ingredients`, `ingredient_prices`, `stock_movements` | Flours, ingredients and price history - the basis of the cost on any date - and the stock ledger of purchases and consumption. |
 | E2 Recipes and variants | `recipes`, `recipe_ingredients`, `recipe_stages` | Recipe knowledge base. A variant references its parent and stores only the differences: replacing lines and variant_overrides. |
 | E5 Production | `batches`, `batch_items`, `batch_stages` | Batch - items (recipe x loaves) - stage log with plan and actual times. |
 | E6 Starters and reminders | `starters`, `starter_feedings`, `reminders` | Starters, feeding log and the reminder queue of the Notification service. |
@@ -79,9 +79,9 @@ erDiagram
     users ||--o{ push_subscriptions : "user_id"
 ```
 
-### E3 Catalog and prices
+### E3 Catalog, prices and stock
 
-Flours, ingredients and price history - the basis of the cost on any date.
+Flours, ingredients and price history - the basis of the cost on any date - and the stock ledger of purchases and consumption.
 
 ```mermaid
 erDiagram
@@ -114,6 +114,28 @@ erDiagram
         uuid flour_id FK
         timestamptz created_at
         timestamptz updated_at
+        numeric reorder_level
+        bool track_stock
+    }
+    stock_movements {
+        uuid id PK
+        uuid ingredient_id FK
+        varchar movement_type
+        numeric quantity
+        date occurred_on
+        uuid batch_id FK
+        uuid feeding_id FK
+        int pack_count
+        numeric pack_size
+        numeric total_cost
+        char currency FK
+        varchar note
+        timestamptz created_at
+    }
+    batches {
+        uuid id PK
+        uuid owner_id FK
+        char currency FK
     }
     recipe_ingredients {
         uuid id PK
@@ -121,10 +143,16 @@ erDiagram
         uuid ingredient_id FK
         uuid replaces_item_id FK
     }
+    starter_feedings {
+        uuid id PK
+        uuid starter_id FK
+    }
     starters {
         uuid id PK
         uuid owner_id FK
         uuid flour_id FK
+        uuid flour_ingredient_id FK
+        uuid water_ingredient_id FK
     }
     users {
         uuid id PK
@@ -136,6 +164,11 @@ erDiagram
     users ||--o{ ingredients : "owner_id"
     ingredients ||--o{ recipe_ingredients : "ingredient_id"
     flours |o--o{ starters : "flour_id"
+    ingredients |o--o{ starters : "flour_ingredient_id"
+    ingredients |o--o{ starters : "water_ingredient_id"
+    batches |o--o{ stock_movements : "batch_id"
+    starter_feedings |o--o{ stock_movements : "feeding_id"
+    ingredients ||--o{ stock_movements : "ingredient_id"
 ```
 
 ### E2 Recipes and variants
@@ -289,6 +322,7 @@ erDiagram
         varchar notes
         timestamptz created_at
         timestamptz updated_at
+        numeric ingredient_scale
     }
     bake_records {
         uuid id PK
@@ -319,6 +353,15 @@ erDiagram
         uuid id PK
         uuid owner_id FK
         uuid flour_id FK
+        uuid flour_ingredient_id FK
+        uuid water_ingredient_id FK
+    }
+    stock_movements {
+        uuid id PK
+        uuid ingredient_id FK
+        uuid batch_id FK
+        uuid feeding_id FK
+        char currency FK
     }
     users {
         uuid id PK
@@ -333,6 +376,7 @@ erDiagram
     users ||--o{ batches : "owner_id"
     batch_items |o--o{ reminders : "batch_item_id"
     batch_stages |o--o{ reminders : "batch_stage_id"
+    batches |o--o{ stock_movements : "batch_id"
 ```
 
 ### E6 Starters and reminders
@@ -381,6 +425,8 @@ erDiagram
         varchar notes
         timestamptz created_at
         timestamptz updated_at
+        uuid flour_ingredient_id FK
+        uuid water_ingredient_id FK
     }
     batch_items {
         uuid id PK
@@ -399,6 +445,20 @@ erDiagram
         uuid owner_id FK
         varchar flour_type_code FK
     }
+    ingredients {
+        uuid id PK
+        uuid owner_id FK
+        varchar category_code FK
+        varchar unit_code FK
+        uuid flour_id FK
+    }
+    stock_movements {
+        uuid id PK
+        uuid ingredient_id FK
+        uuid batch_id FK
+        uuid feeding_id FK
+        char currency FK
+    }
     users {
         uuid id PK
         varchar normalized_email UK
@@ -410,7 +470,10 @@ erDiagram
     starters |o--o{ reminders : "starter_id"
     starters ||--o{ starter_feedings : "starter_id"
     flours |o--o{ starters : "flour_id"
+    ingredients |o--o{ starters : "flour_ingredient_id"
     users ||--o{ starters : "owner_id"
+    ingredients |o--o{ starters : "water_ingredient_id"
+    starter_feedings |o--o{ stock_movements : "feeding_id"
 ```
 
 ### E7 Baking history

@@ -46,11 +46,13 @@ public static class ProductionEndpoints
                 TypedResults.Ok(await s.PreviewAsync(request, ct)))
             .WithValidation<BatchRequest>()
             .WithName("PreviewBatch").WithSummary("Plan a batch without saving it")
-            .WithDescription("US-34. Same input as create; the plan is built by the database and rolled back. Ids are empty.");
+            .WithDescription("US-34. Same input as create; the plan is built by the database and rolled back. Ids are empty. " +
+                             "The stock check tells which ingredients are missing and what the stock is enough for.");
         batches.MapPost("/", CreateBatchAsync)
             .WithValidation<BatchRequest>()
             .WithName("CreateBatch").WithSummary("Create a batch and build its plan")
-            .WithDescription("US-20. Stages, kneading cycles, starter amounts, reminders, ready window and cost from sp_build_batch_plan.");
+            .WithDescription("US-20. Stages, kneading cycles, starter amounts, reminders, ready window and cost from " +
+                             "sp_build_batch_plan; the ingredients with kept stock are taken from the stock.");
         batches.MapGet("/{id:guid}", async (Guid id, BatchService s, CancellationToken ct) => TypedResults.Ok(await s.GetAsync(id, ct)))
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithName("GetBatch").WithSummary("Get a batch with items and stages").WithDescription("US-20, US-23.");
@@ -62,7 +64,14 @@ public static class ProductionEndpoints
             .WithDescription("US-20. Only a batch that has not started can be changed (409 otherwise).");
         batches.MapPost("/{id:guid}/cancel", CancelBatchAsync)
             .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status409Conflict)
-            .WithName("CancelBatch").WithSummary("Cancel a batch").WithDescription("Scheduled reminders of the batch are cancelled.");
+            .WithName("CancelBatch").WithSummary("Cancel a batch")
+            .WithDescription("Scheduled reminders of the batch are cancelled. ingredientsUsed=false returns the ingredients " +
+                             "the batch took to the stock; the default keeps them consumed.");
+        batches.MapDelete("/{id:guid}", DeleteBatchAsync)
+            .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status409Conflict)
+            .WithName("DeleteBatch").WithSummary("Delete a batch")
+            .WithDescription("A running batch cannot be deleted (409). The history record of a completed batch stays. " +
+                             "ingredientsUsed=false returns the ingredients the batch took to the stock.");
         batches.MapPost("/{id:guid}/complete", async (Guid id, BatchService s, CancellationToken ct) =>
                 TypedResults.Ok(await s.CompleteAsync(id, ct)))
             .ProducesProblem(StatusCodes.Status404NotFound).ProducesProblem(StatusCodes.Status409Conflict)
@@ -193,9 +202,17 @@ public static class ProductionEndpoints
         return TypedResults.Created($"{BatchesRoute}/{batch.Id}", batch);
     }
 
-    private static async Task<NoContent> CancelBatchAsync(Guid id, BatchService batches, CancellationToken ct)
+    private static async Task<NoContent> CancelBatchAsync(
+        Guid id, BatchService batches, CancellationToken ct, bool ingredientsUsed = true)
     {
-        await batches.CancelAsync(id, ct);
+        await batches.CancelAsync(id, ingredientsUsed, ct);
+        return TypedResults.NoContent();
+    }
+
+    private static async Task<NoContent> DeleteBatchAsync(
+        Guid id, BatchService batches, CancellationToken ct, bool ingredientsUsed = true)
+    {
+        await batches.DeleteAsync(id, ingredientsUsed, ct);
         return TypedResults.NoContent();
     }
 

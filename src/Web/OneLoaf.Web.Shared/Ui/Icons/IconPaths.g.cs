@@ -23,6 +23,7 @@ internal static class IconPaths
         IconName.History => """<path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5M12 7v5l3 2"/>""",
         IconName.Home => """<path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>""",
         IconName.Info => """<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>""",
+        IconName.Kitchen => """<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M7 6h.01M11 6h.01M17 6h.01"/><rect x="7" y="12" width="10" height="6" rx="1"/>""",
         IconName.Library => """<path d="M2 5h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2zM22 5h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/>""",
         IconName.Logout => """<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/>""",
         IconName.Menu => """<path d="M4 6h16M4 12h16M4 18h16"/>""",

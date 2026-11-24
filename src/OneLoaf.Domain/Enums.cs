@@ -30,3 +30,5 @@ public enum PublicationStatus { Published, Unpublished, Removed }
 public enum ReactionType { Like, Love, WantToBake }
 
 public enum ReportStatus { Open, Resolved, Rejected }
+
+public enum StockMovementType { Purchase, BatchConsumption, BatchReturn, StarterFeeding, Adjustment }

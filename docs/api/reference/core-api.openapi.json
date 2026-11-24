@@ -1540,6 +1540,412 @@
         ]
       }
     },
+    "/api/v1/ingredients/{id}/prices/{priceId}": {
+      "put": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Replace a price",
+        "description": "US-12. Corrects a price entered by mistake; another price on the new date is a 409.",
+        "operationId": "UpdateIngredientPrice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "priceId",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PriceRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Delete a price",
+        "description": "US-12. Costs on the dates of the deleted price fall back to the previous price.",
+        "operationId": "DeleteIngredientPrice",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "priceId",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ingredients/{id}/stock-movements": {
+      "get": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Stock ledger of an ingredient",
+        "description": "Purchases, batch consumption and returns, starter feedings and corrections; newest first, paged.",
+        "operationId": "ListStockMovements",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Page",
+            "in": "query",
+            "description": "Page, from 1.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1
+            }
+          },
+          {
+            "name": "PageSize",
+            "in": "query",
+            "description": "Page size, 1-100.",
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfStockMovementDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ingredients/{id}/purchases": {
+      "post": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Record a purchase",
+        "description": "Packs of a size bought for an amount: the stock grows, the price of the purchase date is created or replaced, and the stock of the ingredient is kept from now on.",
+        "operationId": "AddIngredientPurchase",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PurchaseRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMovementDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/ingredients/{id}/stock-adjustments": {
+      "post": {
+        "tags": [
+          "Catalog"
+        ],
+        "summary": "Correct the stock to the counted quantity",
+        "description": "Writes the difference between the counted quantity and the stock to the ledger; a note is required.",
+        "operationId": "AdjustIngredientStock",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StockAdjustmentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StockMovementDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/recipes": {
       "get": {
         "tags": [
@@ -1668,6 +2074,63 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RecipeDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/recipes/drafts": {
+      "post": {
+        "tags": [
+          "Recipes"
+        ],
+        "summary": "Create a recipe with ingredients given by name",
+        "description": "US-34. Used when a recipe proposed by the assistant is confirmed: ingredients of the user are matched by name, missing ones are created without a price; one transaction.",
+        "operationId": "CreateRecipeDraft",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecipeDraftRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RecipeDraftResponse"
                 }
               }
             }
@@ -2651,7 +3114,7 @@
           "Production"
         ],
         "summary": "Create a batch and build its plan",
-        "description": "US-20. Stages, kneading cycles, starter amounts, reminders, ready window and cost from sp_build_batch_plan.",
+        "description": "US-20. Stages, kneading cycles, starter amounts, reminders, ready window and cost from sp_build_batch_plan; the ingredients with kept stock are taken from the stock.",
         "operationId": "CreateBatch",
         "requestBody": {
           "content": {
@@ -2708,7 +3171,7 @@
           "Production"
         ],
         "summary": "Plan a batch without saving it",
-        "description": "US-34. Same input as create; the plan is built by the database and rolled back. Ids are empty.",
+        "description": "US-34. Same input as create; the plan is built by the database and rolled back. Ids are empty. The stock check tells which ingredients are missing and what the stock is enough for.",
         "operationId": "PreviewBatch",
         "requestBody": {
           "content": {
@@ -2903,6 +3366,74 @@
             "Bearer": []
           }
         ]
+      },
+      "delete": {
+        "tags": [
+          "Production"
+        ],
+        "summary": "Delete a batch",
+        "description": "A running batch cannot be deleted (409). The history record of a completed batch stays. ingredientsUsed=false returns the ingredients the batch took to the stock.",
+        "operationId": "DeleteBatch",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Id of the resource (UUID).",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "ingredientsUsed",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": true
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ]
       }
     },
     "/api/v1/batches/{id}/cancel": {
@@ -2911,7 +3442,7 @@
           "Production"
         ],
         "summary": "Cancel a batch",
-        "description": "Scheduled reminders of the batch are cancelled.",
+        "description": "Scheduled reminders of the batch are cancelled. ingredientsUsed=false returns the ingredients the batch took to the stock; the default keeps them consumed.",
         "operationId": "CancelBatch",
         "parameters": [
           {
@@ -2922,6 +3453,14 @@
             "schema": {
               "type": "string",
               "format": "uuid"
+            }
+          },
+          {
+            "name": "ingredientsUsed",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": true
             }
           }
         ],
@@ -6379,6 +6918,22 @@
             ],
             "description": "History record of a completed batch.",
             "format": "uuid"
+          },
+          "ingredientScale": {
+            "type": "number",
+            "description": "Share of the recipe quantities that is used, 0-1.",
+            "format": "double",
+            "default": 1
+          },
+          "stock": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BatchStockDto"
+              }
+            ]
           }
         },
         "description": "A production batch with its plan (US-20) and progress (US-23)."
@@ -6541,6 +7096,14 @@
           },
           "source": {
             "$ref": "#/components/schemas/BatchSource"
+          },
+          "ingredientScale": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "Share of the recipe quantities to use, 0.01-1; below 1 the loaves stay and the dough shrinks (baking from what is in stock). Defaults to 1.",
+            "format": "double"
           }
         },
         "description": "Body of POST /batches, POST /batches/preview and PUT /batches/{id} (US-20)."
@@ -6670,6 +7233,40 @@
           "cancelled"
         ],
         "description": "Status."
+      },
+      "BatchStockDto": {
+        "required": [
+          "shortages",
+          "maxLoaves",
+          "maxScale"
+        ],
+        "type": "object",
+        "properties": {
+          "shortages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StockShortageDto"
+            },
+            "description": "Ingredients with kept stock that do not cover the batch; empty when the stock is enough."
+          },
+          "maxLoaves": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "Largest number of loaves the stock covers at full quantities; only for a batch of one item.",
+            "format": "int32"
+          },
+          "maxScale": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "Largest ingredient scale the stock covers with the planned loaves; null when nothing can be baked.",
+            "format": "double"
+          }
+        },
+        "description": "Stock check, returned by preview, create and re-plan when a stock-kept ingredient is used."
       },
       "BatchSummaryDto": {
         "required": [
@@ -7481,6 +8078,32 @@
             "type": "string",
             "description": "Last change.",
             "format": "date-time"
+          },
+          "trackStock": {
+            "type": "boolean",
+            "description": "True when the stock is kept: batches and starter feedings take from it.",
+            "default": false
+          },
+          "stock": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "Stock in the ingredient unit; null when the stock is not kept.",
+            "format": "double"
+          },
+          "reorderLevel": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "Stock level below which the ingredient is low.",
+            "format": "double"
+          },
+          "isLowStock": {
+            "type": "boolean",
+            "description": "True when the stock is below the reorder level, or below zero without a level.",
+            "default": false
           }
         },
         "description": "Ingredient of the user's catalog (US-10)."
@@ -7513,6 +8136,21 @@
             ],
             "description": "Flour of the user's catalog.",
             "format": "uuid"
+          },
+          "trackStock": {
+            "type": [
+              "null",
+              "boolean"
+            ],
+            "description": "Keep the stock of the ingredient; null leaves the switch as it is (off for a new ingredient)."
+          },
+          "reorderLevel": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "Stock level below which the ingredient is reported as low; null = no level.",
+            "format": "double"
           }
         },
         "description": "Body of POST/PUT /ingredients."
@@ -8392,6 +9030,40 @@
         },
         "description": "One page of a list: { items, page, pageSize, totalCount }."
       },
+      "PagedResultOfStockMovementDto": {
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalCount"
+        ],
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StockMovementDto"
+            },
+            "description": "Items of the page."
+          },
+          "page": {
+            "type": "integer",
+            "description": "1-based page number.",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "description": "Requested page size.",
+            "format": "int32"
+          },
+          "totalCount": {
+            "type": "integer",
+            "description": "Number of items over all pages.",
+            "format": "int32"
+          }
+        },
+        "description": "One page of a list: { items, page, pageSize, totalCount }."
+      },
       "PriceDto": {
         "required": [
           "id",
@@ -8660,6 +9332,50 @@
         },
         "description": "Response of POST /recipes/{id}/publish."
       },
+      "PurchaseRequest": {
+        "required": [
+          "packCount",
+          "packSize",
+          "totalCost",
+          "currency",
+          "purchasedOn"
+        ],
+        "type": "object",
+        "properties": {
+          "packCount": {
+            "type": "integer",
+            "description": "Number of packs, 1-10000.",
+            "format": "int32"
+          },
+          "packSize": {
+            "type": "number",
+            "description": "Content of one pack in the ingredient unit (1000 for a 1 kg bag of an ingredient kept in g).",
+            "format": "double"
+          },
+          "totalCost": {
+            "type": "number",
+            "description": "Amount paid for all packs, at least 0.",
+            "format": "double"
+          },
+          "currency": {
+            "type": "string",
+            "description": "Currency code."
+          },
+          "purchasedOn": {
+            "type": "string",
+            "description": "Date of the purchase; the price applies from this date.",
+            "format": "date"
+          },
+          "note": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Note, for example the shop."
+          }
+        },
+        "description": "Body of POST /ingredients/{id}/purchases: packs of a size bought for an amount."
+      },
       "ReactionRequest": {
         "required": [
           "reaction"
@@ -8724,6 +9440,127 @@
           }
         },
         "description": "Variant compared with its parent (US-08)."
+      },
+      "RecipeDraftIngredient": {
+        "required": [
+          "name",
+          "categoryCode",
+          "unitCode",
+          "quantity"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name; an ingredient of the user with this name is reused, otherwise it is created without a price."
+          },
+          "categoryCode": {
+            "type": "string",
+            "description": "Category for a new ingredient."
+          },
+          "unitCode": {
+            "type": "string",
+            "description": "Unit for a new ingredient; the quantity is in the unit of the ingredient."
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Quantity for the recipe yield.",
+            "format": "double"
+          },
+          "isOptional": {
+            "type": "boolean",
+            "description": "Optional ingredient.",
+            "default": false
+          },
+          "note": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Note."
+          }
+        },
+        "description": "Ingredient of a recipe draft, named instead of referenced."
+      },
+      "RecipeDraftRequest": {
+        "required": [
+          "title",
+          "description",
+          "yieldLoaves",
+          "loafWeightG",
+          "notes",
+          "ingredients",
+          "stages"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Title."
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Description."
+          },
+          "yieldLoaves": {
+            "type": "integer",
+            "description": "Loaves the quantities are written for.",
+            "format": "int32"
+          },
+          "loafWeightG": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "Weight of one loaf, g.",
+            "format": "double"
+          },
+          "notes": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Notes."
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeDraftIngredient"
+            },
+            "description": "Ingredients by name."
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeStageInput"
+            },
+            "description": "Stages in order."
+          }
+        },
+        "description": "Body of POST /recipes/drafts: a recipe whose ingredients are given by name (a recipe proposed by the assistant, US-34). Missing ingredients are created together with the recipe."
+      },
+      "RecipeDraftResponse": {
+        "required": [
+          "recipe",
+          "createdIngredients"
+        ],
+        "type": "object",
+        "properties": {
+          "recipe": {
+            "$ref": "#/components/schemas/RecipeDto"
+          },
+          "createdIngredients": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Names of the ingredients that were created; they have no price yet."
+          }
+        },
+        "description": "Result of POST /recipes/drafts."
       },
       "RecipeDto": {
         "required": [
@@ -9944,6 +10781,30 @@
             "type": "string",
             "description": "Last change.",
             "format": "date-time"
+          },
+          "flourIngredientId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Ingredient whose stock a feeding takes the flour from.",
+            "format": "uuid"
+          },
+          "waterIngredientId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Ingredient whose stock a feeding takes the water from.",
+            "format": "uuid"
+          },
+          "amountG": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "Starter after the last feeding, g: flour + water + starter kept.",
+            "format": "double"
           }
         },
         "description": "A starter with its schedule from the last feeding (US-27, US-28, US-30)."
@@ -10001,6 +10862,22 @@
               "string"
             ],
             "description": "Notes."
+          },
+          "flourIngredientId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Ingredient whose stock a feeding takes the flour from.",
+            "format": "uuid"
+          },
+          "waterIngredientId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Ingredient whose stock a feeding takes the water from.",
+            "format": "uuid"
           }
         },
         "description": "Body of POST/PUT /starters (US-27)."
@@ -10036,6 +10913,173 @@
           }
         },
         "description": "Start window for a desired ready time (US-52)."
+      },
+      "StockAdjustmentRequest": {
+        "required": [
+          "actualQuantity",
+          "note"
+        ],
+        "type": "object",
+        "properties": {
+          "actualQuantity": {
+            "type": "number",
+            "description": "Counted stock in the ingredient unit, at least 0.",
+            "format": "double"
+          },
+          "note": {
+            "type": "string",
+            "description": "Why the stock is corrected."
+          }
+        },
+        "description": "Body of POST /ingredients/{id}/stock-adjustments: the quantity that is really on the shelf."
+      },
+      "StockMovementDto": {
+        "required": [
+          "id",
+          "type",
+          "quantity",
+          "occurredOn",
+          "batchId",
+          "batchName",
+          "packCount",
+          "packSize",
+          "totalCost",
+          "currency",
+          "note",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Id.",
+            "format": "uuid"
+          },
+          "type": {
+            "$ref": "#/components/schemas/StockMovementType"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Signed quantity in the ingredient unit: positive adds to the stock.",
+            "format": "double"
+          },
+          "occurredOn": {
+            "type": "string",
+            "description": "Date of the movement.",
+            "format": "date"
+          },
+          "batchId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Batch that took or returned the quantity; null after the batch is deleted.",
+            "format": "uuid"
+          },
+          "batchName": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Name of that batch."
+          },
+          "packCount": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "Purchase: number of packs.",
+            "format": "int32"
+          },
+          "packSize": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "Purchase: content of one pack in the ingredient unit.",
+            "format": "double"
+          },
+          "totalCost": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "Purchase: amount paid.",
+            "format": "double"
+          },
+          "currency": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Purchase: currency."
+          },
+          "note": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "Note; always present for a correction."
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "When the row was written.",
+            "format": "date-time"
+          }
+        },
+        "description": "A row of the stock ledger of an ingredient."
+      },
+      "StockMovementType": {
+        "enum": [
+          "purchase",
+          "batch_consumption",
+          "batch_return",
+          "starter_feeding",
+          "adjustment"
+        ],
+        "description": "purchase, batch_consumption, batch_return, starter_feeding or adjustment."
+      },
+      "StockShortageDto": {
+        "required": [
+          "ingredientId",
+          "name",
+          "unitCode",
+          "needed",
+          "available",
+          "missing"
+        ],
+        "type": "object",
+        "properties": {
+          "ingredientId": {
+            "type": "string",
+            "description": "Ingredient.",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name."
+          },
+          "unitCode": {
+            "type": "string",
+            "description": "Unit of the quantities."
+          },
+          "needed": {
+            "type": "number",
+            "description": "Quantity the batch takes with its ingredient scale.",
+            "format": "double"
+          },
+          "available": {
+            "type": "number",
+            "description": "Stock before the batch.",
+            "format": "double"
+          },
+          "missing": {
+            "type": "number",
+            "description": "Needed minus available.",
+            "format": "double"
+          }
+        },
+        "description": "An ingredient the stock does not cover for a batch."
       },
       "Stream": {
         "type": "string",
@@ -10256,7 +11300,7 @@
         "properties": {
           "issueCode": {
             "type": "string",
-            "description": "Kind of issue, for example missing_price."
+            "description": "Kind of issue, for example missing_price or low_stock."
           },
           "entityType": {
             "type": "string",

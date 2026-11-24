@@ -1,0 +1,100 @@
+@* Renders an assistant reply written in Markdown (headings, lists, bold, italic, code, links). The text is parsed
+   into pieces and rendered as elements: the reply is model output and is never inserted as HTML. *@
+@using OneLoaf.Web.Features.Assistant.Services
+
+<div class="markdown">
+    @foreach (var block in _blocks)
+    {
+        switch (block.Kind)
+        {
+            case MarkdownBlockKind.Heading:
+                <p class="markdown__heading" role="heading" aria-level="@(block.Level + 2)">@Inline(block.Inlines)</p>
+                break;
+            case MarkdownBlockKind.BulletList:
+                <ul class="markdown__list">
+                    @foreach (var item in block.Items ?? [])
+                    {
+                        <li>@Inline(item)</li>
+                    }
+                </ul>
+                break;
+            case MarkdownBlockKind.NumberedList:
+                <ol class="markdown__list">
+                    @foreach (var item in block.Items ?? [])
+                    {
+                        <li>@Inline(item)</li>
+                    }
+                </ol>
+                break;
+            case MarkdownBlockKind.Code:
+                <pre class="markdown__pre"><code>@(block.Inlines.Count > 0 ? block.Inlines[0].Text : null)</code></pre>
+                break;
+            default:
+                <p class="markdown__p">@Inline(block.Inlines)</p>
+                break;
+        }
+    }
+</div>
+
+@code {
+    private IReadOnlyList<MarkdownBlock> _blocks = [];
+    private string? _parsed;
+
+    /// <summary>The Markdown text.</summary>
+    [Parameter, EditorRequired] public string Text { get; set; } = string.Empty;
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        if (!ReferenceEquals(Text, _parsed))
+        {
+            _parsed = Text;
+            _blocks = MarkdownParser.Parse(Text);
+        }
+    }
+
+    private static RenderFragment Inline(IReadOnlyList<MarkdownInline> inlines) => builder =>
+    {
+        var sequence = 0;
+        foreach (var inline in inlines)
+        {
+            if (inline.Href is not null)
+            {
+                builder.OpenElement(sequence++, "a");
+                builder.AddAttribute(sequence++, "class", "ol-link");
+                builder.AddAttribute(sequence++, "href", inline.Href);
+                builder.AddAttribute(sequence++, "target", "_blank");
+                builder.AddAttribute(sequence++, "rel", "noopener noreferrer");
+                builder.AddContent(sequence++, inline.Text);
+                builder.CloseElement();
+                continue;
+            }
+
+            var depth = 0;
+            if (inline.Bold)
+            {
+                builder.OpenElement(sequence++, "strong");
+                depth++;
+            }
+
+            if (inline.Italic)
+            {
+                builder.OpenElement(sequence++, "em");
+                depth++;
+            }
+
+            if (inline.Code)
+            {
+                builder.OpenElement(sequence++, "code");
+                builder.AddAttribute(sequence++, "class", "markdown__code");
+                depth++;
+            }
+
+            builder.AddContent(sequence++, inline.Text);
+            for (; depth > 0; depth--)
+            {
+                builder.CloseElement();
+            }
+        }
+    };
+}

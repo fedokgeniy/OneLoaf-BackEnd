@@ -20,6 +20,7 @@ internal static class ProductionTestServices
         context.Services.AddSingleton(time ?? TimeProvider.System);
         context.Services.AddScoped<DeviceContext>();
         context.Services.AddSingleton(api);
+        context.Services.AddSingleton<OneLoaf.Web.Shared.Reference.IReferenceApi>(new Recipes.ReferenceApiStub());
         context.Services.AddFluxor(o => o.ScanAssemblies(typeof(SessionState).Assembly, typeof(ProductionFeature).Assembly));
         context.Render<Fluxor.Blazor.Web.StoreInitializer>();
     }
@@ -43,7 +44,9 @@ internal class ProductionApiStub : IProductionApi
 
     public virtual Task<ApiResult<BatchDto>> CreateBatchAsync(BatchRequest request, CancellationToken ct = default) => Ok(Batch(request));
 
-    public virtual Task<ApiResult> CancelBatchAsync(Guid id, CancellationToken ct = default) => Task.FromResult(ApiResult.Ok);
+    public virtual Task<ApiResult> CancelBatchAsync(Guid id, bool ingredientsUsed, CancellationToken ct = default) => Task.FromResult(ApiResult.Ok);
+
+    public virtual Task<ApiResult> DeleteBatchAsync(Guid id, bool ingredientsUsed, CancellationToken ct = default) => Task.FromResult(ApiResult.Ok);
 
     public virtual Task<ApiResult<CompleteBatchResponse>> CompleteBatchAsync(Guid id, CancellationToken ct = default) => Ok(new CompleteBatchResponse(Guid.NewGuid()));
 
@@ -82,6 +85,11 @@ internal class ProductionApiStub : IProductionApi
 
     public virtual Task<ApiResult<PagedResult<FlourDto>>> ListFloursAsync(CancellationToken ct = default) =>
         Ok(new PagedResult<FlourDto>([], 1, 100, 0));
+
+    public virtual Task<ApiResult<FlourDto>> CreateFlourAsync(FlourRequest request, CancellationToken ct = default) => throw new NotSupportedException();
+
+    public virtual Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(CancellationToken ct = default) =>
+        Ok(new PagedResult<IngredientDto>([], 1, 100, 0));
 
     public virtual Task<ApiResult<IReadOnlyList<ReminderDto>>> ListRemindersAsync(DateTimeOffset from, DateTimeOffset to, CancellationToken ct = default) =>
         Ok<IReadOnlyList<ReminderDto>>([]);

@@ -136,8 +136,39 @@ message "Add a comment about the result first". 503 → record unchanged, retry 
 ## 6. Flow — starter feeding (US-27, US-28, US-29, US-30)
 
 `/starters` → card "Log feeding" → sheet (compact) / dialog (medium+) with flour, water, kept, temperature, fed at (now)
-→ `POST /starters/{id}/feedings` → card shows next feeding and expected peak; reminder is created by the backend.
-Push permission is requested in Settings → Reminders, never automatically.
+→ `POST /starters/{id}/feedings` → card shows next feeding, expected peak and the amount after the feeding; reminder is
+created by the backend. When the starter names its flour and water ingredients (starter form, "Fed from the stock"), the
+backend takes the feeding from their stock. Push permission is requested in Settings → Reminders, never automatically.
+
+## 6a. Flow — stock: purchase, bake, correct (ST-01 – ST-07)
+
+```mermaid
+flowchart LR
+    a[/ingredients/] -->|select ingredient → tab Stock| b[Add purchase]
+    b -->|packs × pack size, amount, date| c[POST /ingredients/:id/purchases]
+    c --> d[stock and price of that date from the API; stock is kept from now on]
+    d --> e[/batches/new/]
+    e -->|preview| f{stock check<br/>in the preview}
+    f -- enough --> g[POST /batches → the API takes the ingredients]
+    f -- shortages --> h[Reduce to N loaves · Bake from what is in stock · plan anyway]
+    h -->|loaves or ingredientScale offered by the API| e
+    g --> i[/batches/:id/]
+    i -->|Cancel or Delete| j{The ingredients<br/>were already used?}
+    j -- no --> k[ingredientsUsed=false → the API returns them to the stock]
+    j -- yes --> l[the consumption stays in the ledger]
+    a -->|Correct stock: counted quantity + reason| m[POST /ingredients/:id/stock-adjustments]
+```
+
+The client never adds or subtracts quantities: after every command it loads the ingredient list and the ledger again.
+An ingredient whose stock is not kept is ignored by the stock check and is not consumed; the switch is in the ingredient form.
+
+## 6b. Flow — recipe through the assistant (AS-01)
+
+"Add a recipe for a beginner" → the assistant calls its `propose_recipe` tool and answers with a recipe card: ingredients
+with quantities, *New ingredient* badges, stages → **Save recipe** → `POST /conversations/{id}/actions/{actionId}/confirm`
+→ the Core API creates the recipe and the missing ingredients (without prices) in one transaction → toast and card link
+to the recipe; the recipe list and the ingredient list reload. **Decline** discards the proposal. The quantities are the
+assistant's suggestion and are labelled so; the cost stays incomplete until the baker adds prices.
 
 ## 7. Flow — public library (US-39–US-42, LR-11)
 

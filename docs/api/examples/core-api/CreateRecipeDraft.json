@@ -1,0 +1,175 @@
+[
+  {
+    "case": "recipe proposed by the assistant",
+    "method": "POST",
+    "path": "/api/v1/recipes/drafts",
+    "authenticated": true,
+    "requestBody": {
+      "title": "Beginner sourdough",
+      "description": "A simple first loaf.",
+      "yieldLoaves": 1,
+      "loafWeightG": 900,
+      "notes": null,
+      "ingredients": [
+        {
+          "name": "Whole wheat flour",
+          "categoryCode": "flour",
+          "unitCode": "g",
+          "quantity": 500,
+          "isOptional": false,
+          "note": null
+        },
+        {
+          "name": "Honey",
+          "categoryCode": "sweetener",
+          "unitCode": "g",
+          "quantity": 15,
+          "isOptional": true,
+          "note": null
+        }
+      ],
+      "stages": [
+        {
+          "name": "Mix",
+          "stageTypeCode": "mix",
+          "minDurationMinutes": 10,
+          "maxDurationMinutes": 15
+        },
+        {
+          "name": "Bake",
+          "stageTypeCode": "bake",
+          "minDurationMinutes": 40,
+          "maxDurationMinutes": 45
+        }
+      ]
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "recipe": {
+        "id": "841fd988-13af-4bb6-8298-354f902bc406",
+        "parentRecipeId": null,
+        "title": "Beginner sourdough",
+        "description": "A simple first loaf.",
+        "yieldLoaves": 1,
+        "loafWeightG": 900.0,
+        "notes": null,
+        "isArchived": false,
+        "ingredients": [
+          {
+            "lineId": "ca8ebe6c-464c-4030-bcde-6d1e83d78d94",
+            "ingredientId": "0e4741f8-e218-4334-a48e-236ae90d15e6",
+            "ingredientName": "Whole wheat flour",
+            "categoryCode": "flour",
+            "unitCode": "g",
+            "quantity": 500.000,
+            "isOptional": false,
+            "sortOrder": 1,
+            "note": null,
+            "proteinPercent": null,
+            "isInherited": false
+          },
+          {
+            "lineId": "e60e57d0-7d0b-4735-acf0-57f26a6a343d",
+            "ingredientId": "00baf121-47fc-4220-b5cd-f5d766df8f5e",
+            "ingredientName": "Honey",
+            "categoryCode": "sweetener",
+            "unitCode": "g",
+            "quantity": 15.000,
+            "isOptional": true,
+            "sortOrder": 2,
+            "note": null,
+            "proteinPercent": null,
+            "isInherited": false
+          }
+        ],
+        "stages": [
+          {
+            "lineId": "a6130cf3-d3e2-42d1-b388-ebdf2d74898d",
+            "sortOrder": 1,
+            "name": "Mix",
+            "stageTypeCode": "mix",
+            "minDurationMinutes": 10,
+            "maxDurationMinutes": 15,
+            "activeMinutes": 0,
+            "proofMode": null,
+            "temperatureC": null,
+            "usesOven": false,
+            "usesMixer": true,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          },
+          {
+            "lineId": "1ad3faa9-93ab-4011-b81f-2943855a73a0",
+            "sortOrder": 2,
+            "name": "Bake",
+            "stageTypeCode": "bake",
+            "minDurationMinutes": 40,
+            "maxDurationMinutes": 45,
+            "activeMinutes": 0,
+            "proofMode": null,
+            "temperatureC": null,
+            "usesOven": true,
+            "usesMixer": false,
+            "isOptional": false,
+            "instructions": null,
+            "isInherited": false
+          }
+        ],
+        "createdAt": "2026-11-24T16:43:51.690764+00:00",
+        "updatedAt": "2026-11-24T16:43:51.690764+00:00"
+      },
+      "createdIngredients": [
+        "Whole wheat flour",
+        "Honey"
+      ]
+    }
+  },
+  {
+    "case": "unknown stage type",
+    "method": "POST",
+    "path": "/api/v1/recipes/drafts",
+    "authenticated": true,
+    "requestBody": {
+      "title": "Rejected draft",
+      "description": null,
+      "yieldLoaves": 1,
+      "loafWeightG": null,
+      "notes": null,
+      "ingredients": [
+        {
+          "name": "Spelt flour",
+          "categoryCode": "flour",
+          "unitCode": "g",
+          "quantity": 500,
+          "isOptional": false,
+          "note": null
+        }
+      ],
+      "stages": [
+        {
+          "name": "Rest",
+          "stageTypeCode": "nap",
+          "minDurationMinutes": 10,
+          "maxDurationMinutes": 15
+        }
+      ]
+    },
+    "status": 400,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/validation",
+      "title": "One or more validation errors occurred.",
+      "status": 400,
+      "instance": "/api/v1/recipes/drafts",
+      "errors": {
+        "stages[0].stageTypeCode": [
+          "Unknown stage type 'nap'."
+        ]
+      },
+      "traceId": "00-b4bd9e3b4d71f84f4ce2ea764a76f6c8-dd6027bba08103ab-02",
+      "correlationId": "5bfab343daff45c4b7c314347adf2a61"
+    }
+  }
+]

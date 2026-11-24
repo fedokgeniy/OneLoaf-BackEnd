@@ -16,7 +16,7 @@ CREATE TEMP TABLE policy (relname text PRIMARY KEY, app_write char(1), app_read 
 INSERT INTO policy VALUES
  ('units','R','R'), ('currencies','R','R'), ('stage_types','R','R'), ('ingredient_categories','R','R'), ('flour_types','R','R'),
  ('users','W','-'), ('push_subscriptions','W','-'), ('kitchen_settings','W','R'),
- ('flours','W','R'), ('ingredients','W','R'), ('ingredient_prices','W','R'),
+ ('flours','W','R'), ('ingredients','W','R'), ('ingredient_prices','W','R'), ('stock_movements','W','C'),
  ('recipes','W','R'), ('recipe_ingredients','W','R'), ('recipe_stages','W','R'),
  ('batches','W','R'), ('batch_items','W','R'), ('batch_stages','W','R'),
  ('starters','W','R'), ('starter_feedings','W','R'), ('reminders','W','-'),
@@ -26,7 +26,7 @@ INSERT INTO policy VALUES
  ('__ef_migrations_history','-','-'),
  ('v_users_masked','R','R'), ('v_ingredient_current_prices','R','R'), ('v_recipe_effective_ingredients','R','R'),
  ('v_batch_stage_log','R','R'), ('v_batch_log_completeness','R','R'), ('v_public_catalog','R','R'),
- ('v_data_quality_issues','R','R'), ('mv_bake_statistics','R','R');
+ ('v_data_quality_issues','R','R'), ('mv_bake_statistics','R','R'), ('v_low_stock','R','R');
 
 -- every table and view has a policy decision
 SELECT pg_temp.check('every relation is covered by the policy',
@@ -60,6 +60,10 @@ WHERE to_regclass(p.relname) IS NOT NULL;
 SELECT pg_temp.check('app_read cannot see free-text columns of bake_records',
     NOT has_column_privilege('app_read', 'bake_records', 'comment', 'SELECT')
     AND NOT has_column_privilege('app_read', 'bake_records', 'assistant_analysis', 'SELECT'));
+
+SELECT pg_temp.check('app_read cannot see the free-text note of stock_movements',
+    NOT has_column_privilege('app_read', 'stock_movements', 'note', 'SELECT')
+    AND has_column_privilege('app_read', 'stock_movements', 'quantity', 'SELECT'));
 
 -- roles: nobody used by the services is privileged
 SELECT pg_temp.check(format('role %s has no superuser/createrole/createdb/bypassrls', r.rolname),

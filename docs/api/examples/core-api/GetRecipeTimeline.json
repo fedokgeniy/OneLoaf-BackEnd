@@ -2,72 +2,72 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/recipes/b7727976-4ac5-4d7d-bad9-57aca1d6109d/timeline?start=2026-11-25T08%3A00%3A00%2B02%3A00",
+    "path": "/api/v1/recipes/f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33/timeline?start=2026-11-26T08%3A00%3A00%2B02%3A00",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
-      "start": "2026-11-25T08:00:00+02:00",
+      "recipeId": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
+      "start": "2026-11-26T08:00:00+02:00",
       "stages": [
         {
-          "lineId": "bcc2b449-f02c-4ca5-b11e-c09eb552adb5",
+          "lineId": "8d508577-a2f7-45d9-90e2-dec2baaf32fc",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
           "minMinutes": 15,
           "maxMinutes": 20,
-          "plannedStartAt": "2026-11-25T08:00:00+02:00",
-          "plannedEndMinAt": "2026-11-25T08:15:00+02:00",
-          "plannedEndMaxAt": "2026-11-25T08:20:00+02:00"
+          "plannedStartAt": "2026-11-26T08:00:00+02:00",
+          "plannedEndMinAt": "2026-11-26T08:15:00+02:00",
+          "plannedEndMaxAt": "2026-11-26T08:20:00+02:00"
         },
         {
-          "lineId": "1228b81e-4350-414e-8d24-48aa79e82e23",
+          "lineId": "1ec767a7-6eca-4a94-9820-ef5e0d63b7cb",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
           "minMinutes": 240,
           "maxMinutes": 300,
-          "plannedStartAt": "2026-11-25T08:15:00+02:00",
-          "plannedEndMinAt": "2026-11-25T12:15:00+02:00",
-          "plannedEndMaxAt": "2026-11-25T13:20:00+02:00"
+          "plannedStartAt": "2026-11-26T08:15:00+02:00",
+          "plannedEndMinAt": "2026-11-26T12:15:00+02:00",
+          "plannedEndMaxAt": "2026-11-26T13:20:00+02:00"
         },
         {
-          "lineId": "9f854c28-7b1f-471b-8815-b5459c3bc1ae",
+          "lineId": "7e3fd958-e2dc-4a9e-9eb5-563f6dbfd509",
           "sortOrder": 3,
           "name": "Shape",
           "stageTypeCode": "shape",
           "minMinutes": 10,
           "maxMinutes": 15,
-          "plannedStartAt": "2026-11-25T12:15:00+02:00",
-          "plannedEndMinAt": "2026-11-25T12:25:00+02:00",
-          "plannedEndMaxAt": "2026-11-25T13:35:00+02:00"
+          "plannedStartAt": "2026-11-26T12:15:00+02:00",
+          "plannedEndMinAt": "2026-11-26T12:25:00+02:00",
+          "plannedEndMaxAt": "2026-11-26T13:35:00+02:00"
         },
         {
-          "lineId": "2a595b89-d596-4849-9c53-1b4577fd91c9",
+          "lineId": "2dc5898e-c5cf-40a8-a242-fad81c7cb228",
           "sortOrder": 4,
           "name": "Cold proof",
           "stageTypeCode": "proof",
           "minMinutes": 600,
           "maxMinutes": 720,
-          "plannedStartAt": "2026-11-25T12:25:00+02:00",
-          "plannedEndMinAt": "2026-11-25T22:25:00+02:00",
-          "plannedEndMaxAt": "2026-11-26T01:35:00+02:00"
+          "plannedStartAt": "2026-11-26T12:25:00+02:00",
+          "plannedEndMinAt": "2026-11-26T22:25:00+02:00",
+          "plannedEndMaxAt": "2026-11-27T01:35:00+02:00"
         },
         {
-          "lineId": "dd420a4b-ed76-4028-a829-446e6c087837",
+          "lineId": "3c362e71-c0d8-4e34-b9ab-b69b58f2f30b",
           "sortOrder": 5,
           "name": "Bake",
           "stageTypeCode": "bake",
           "minMinutes": 40,
           "maxMinutes": 45,
-          "plannedStartAt": "2026-11-25T22:25:00+02:00",
-          "plannedEndMinAt": "2026-11-25T23:05:00+02:00",
-          "plannedEndMaxAt": "2026-11-26T02:20:00+02:00"
+          "plannedStartAt": "2026-11-26T22:25:00+02:00",
+          "plannedEndMinAt": "2026-11-26T23:05:00+02:00",
+          "plannedEndMaxAt": "2026-11-27T02:20:00+02:00"
         }
       ],
-      "readyFrom": "2026-11-25T23:05:00+02:00",
-      "readyTo": "2026-11-26T02:20:00+02:00"
+      "readyFrom": "2026-11-26T23:05:00+02:00",
+      "readyTo": "2026-11-27T02:20:00+02:00"
     }
   }
 ]

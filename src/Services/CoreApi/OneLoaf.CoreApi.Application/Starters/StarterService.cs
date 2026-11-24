@@ -12,6 +12,7 @@ namespace OneLoaf.CoreApi.Application.Starters;
 public sealed partial class StarterService(
     IStarterRepository starters,
     IFlourRepository flours,
+    IIngredientRepository ingredients,
     IEventPublisher events,
     TimeProvider timeProvider,
     ICurrentUser currentUser,
@@ -89,12 +90,22 @@ public sealed partial class StarterService(
             throw ValidationFailures.For("flourId", FlourService.NotFoundMessage);
         }
 
+        await EnsureIngredientAsync(normalized.FlourIngredientId, "flourIngredientId", cancellationToken);
+        await EnsureIngredientAsync(normalized.WaterIngredientId, "waterIngredientId", cancellationToken);
         if (await starters.NameExistsAsync(currentUser.Id, normalized.Name, id, cancellationToken))
         {
             throw new ConflictException(NameTakenMessage);
         }
 
         return normalized;
+    }
+
+    private async Task EnsureIngredientAsync(Guid? ingredientId, string field, CancellationToken cancellationToken)
+    {
+        if (ingredientId is { } id && (await ingredients.GetOwnedIdsAsync(currentUser.Id, [id], cancellationToken)).Count == 0)
+        {
+            throw ValidationFailures.For(field, IngredientService.NotFoundMessage);
+        }
     }
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Starter {StarterId} fed by {UserId}")]

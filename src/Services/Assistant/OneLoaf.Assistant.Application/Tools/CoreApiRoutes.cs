@@ -9,6 +9,9 @@ public static class CoreApiRoutes
     /// <summary>Recipes.</summary>
     public const string Recipes = Base + "/recipes";
 
+    /// <summary>Recipe with ingredients given by name.</summary>
+    public const string RecipeDrafts = Recipes + "/drafts";
+
     /// <summary>Starters.</summary>
     public const string Starters = Base + "/starters";
 

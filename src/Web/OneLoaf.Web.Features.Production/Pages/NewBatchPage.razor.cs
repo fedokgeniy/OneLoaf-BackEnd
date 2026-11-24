@@ -77,6 +77,29 @@ public sealed partial class NewBatchPage
     private void SetLoaves(BatchItemForm item, int loaves)
     {
         item.Loaves = loaves;
+        _form.IngredientScale = null;
+        SchedulePreview();
+    }
+
+    /// <summary>Offer of the stock check: the loaves the stock covers (one-item batches).</summary>
+    private void UseLoaves(int loaves)
+    {
+        if (_form.Items.Count == 1)
+        {
+            SetLoaves(_form.Items[0], loaves);
+        }
+    }
+
+    /// <summary>Offer of the stock check: the same loaves from the share of the dough the stock covers.</summary>
+    private void UseScale(decimal scale)
+    {
+        _form.IngredientScale = scale;
+        SchedulePreview();
+    }
+
+    private void UseFullRecipe()
+    {
+        _form.IngredientScale = null;
         SchedulePreview();
     }
 
@@ -89,12 +112,14 @@ public sealed partial class NewBatchPage
     private void AddItem()
     {
         _form.Items.Add(new BatchItemForm());
+        _form.IngredientScale = null;
         SchedulePreview();
     }
 
     private void RemoveItem(int index)
     {
         _form.Items.RemoveAt(index);
+        _form.IngredientScale = null;
         SchedulePreview();
     }
 

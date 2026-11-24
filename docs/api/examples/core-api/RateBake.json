@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "PATCH",
-    "path": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7",
+    "path": "/api/v1/bake-records/b77babe6-9f9b-4dce-b844-699603e9c3c3",
     "authenticated": true,
     "requestBody": {
       "rating": 4,
@@ -11,9 +11,9 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "cb026621-c131-4daa-b02c-23ce49686fa7",
-      "batchId": "dcab64b0-9720-4f19-997d-b3bcd2492ddc",
-      "bakedOn": "2026-11-23",
+      "id": "b77babe6-9f9b-4dce-b844-699603e9c3c3",
+      "batchId": "1de1aea8-feae-4b1f-8c15-ca89b41289d2",
+      "bakedOn": "2026-11-24",
       "totalLoaves": 3,
       "totalCost": 8.94,
       "currency": "EUR",
@@ -23,22 +23,22 @@
       "analysisAt": null,
       "items": [
         {
-          "id": "4483e631-67d7-44f6-8f7e-8f4f7800c12f",
-          "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
+          "id": "f7b2f41e-ee9b-48ff-9005-ca38f794063b",
+          "recipeId": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
           "cost": 8.94
         }
       ],
-      "createdAt": "2026-11-23T10:08:55.834209+00:00",
-      "updatedAt": "2026-11-23T10:08:56.191987+00:00",
+      "createdAt": "2026-11-24T16:43:52.914081+00:00",
+      "updatedAt": "2026-11-24T16:43:53.224955+00:00",
       "photos": []
     }
   },
   {
     "case": "rating out of range",
     "method": "PATCH",
-    "path": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7",
+    "path": "/api/v1/bake-records/b77babe6-9f9b-4dce-b844-699603e9c3c3",
     "authenticated": true,
     "requestBody": {
       "rating": 9,
@@ -50,14 +50,14 @@
       "type": "https://oneloaf.app/problems/validation",
       "title": "One or more validation errors occurred.",
       "status": 400,
-      "instance": "/api/v1/bake-records/cb026621-c131-4daa-b02c-23ce49686fa7",
+      "instance": "/api/v1/bake-records/b77babe6-9f9b-4dce-b844-699603e9c3c3",
       "errors": {
         "rating": [
           "'Rating' должно быть в диапазоне от 1 до 5. Введенное значение: 9."
         ]
       },
-      "traceId": "00-7269fe9a6ab3fda314bfa57c9768d963-ffc10c44a5601e9c-02",
-      "correlationId": "1a2282f776544453bc31c9fb7d904cc4"
+      "traceId": "00-6d2e6aa8bab2be5f785ba39a46661957-5b2073a48aadcdb9-02",
+      "correlationId": "9e10f9f0df4840de99c76896e81726e2"
     }
   }
 ]

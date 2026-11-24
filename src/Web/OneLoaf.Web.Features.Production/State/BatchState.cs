@@ -58,7 +58,13 @@ public sealed record BatchCommandFailed(ApiError Error);
 public sealed record CompleteBatch(Guid Id);
 
 /// <summary>Intent: cancel the batch.</summary>
-public sealed record CancelBatch(Guid Id);
+public sealed record CancelBatch(Guid Id, bool IngredientsUsed);
+
+/// <summary>Intent: delete a batch that is not running; unused ingredients go back to the stock.</summary>
+public sealed record DeleteBatch(Guid Id, bool IngredientsUsed);
+
+/// <summary>Result: deleted; the page leaves for the calendar.</summary>
+public sealed record BatchDeleted(Guid Id);
 
 /// <summary>Result: cancelled.</summary>
 public sealed record BatchCancelled(Guid Id);
@@ -104,6 +110,14 @@ public static class BatchReducers
     /// <summary>Batch command runs.</summary>
     [ReducerMethod(typeof(CancelBatch))]
     public static BatchState OnCancel(BatchState state) => state with { BusyBatch = true };
+
+    /// <summary>A command runs.</summary>
+    [ReducerMethod(typeof(DeleteBatch))]
+    public static BatchState OnDelete(BatchState state) => state with { BusyBatch = true };
+
+    /// <summary>Deleted.</summary>
+    [ReducerMethod(typeof(BatchDeleted))]
+    public static BatchState OnDeleted(BatchState state) => state with { BusyBatch = false };
 
     /// <summary>Batch command runs.</summary>
     [ReducerMethod(typeof(SaveBatchAsVariant))]
@@ -191,15 +205,33 @@ public sealed class BatchEffects(IProductionApi api)
     {
         ArgumentNullException.ThrowIfNull(action);
         ArgumentNullException.ThrowIfNull(dispatcher);
-        switch (await api.CancelBatchAsync(action.Id))
+        switch (await api.CancelBatchAsync(action.Id, action.IngredientsUsed))
         {
             case ApiResult.Failure { Error: var error }:
                 Fail(error, dispatcher, reloadBatchId: null);
                 break;
             default:
                 dispatcher.Dispatch(new BatchCancelled(action.Id));
-                dispatcher.Dispatch(new ShowToast(Toast.Info("Batch cancelled")));
+                dispatcher.Dispatch(new ShowToast(Toast.Info(action.IngredientsUsed ? "Batch cancelled" : "Batch cancelled, ingredients returned to the stock")));
                 dispatcher.Dispatch(new OpenBatch(action.Id));
+                break;
+        }
+    }
+
+    /// <summary>Deletes the batch; a running batch is refused by the API (409).</summary>
+    [EffectMethod]
+    public async Task HandleDelete(DeleteBatch action, IDispatcher dispatcher)
+    {
+        ArgumentNullException.ThrowIfNull(action);
+        ArgumentNullException.ThrowIfNull(dispatcher);
+        switch (await api.DeleteBatchAsync(action.Id, action.IngredientsUsed))
+        {
+            case ApiResult.Failure { Error: var error }:
+                Fail(error, dispatcher, reloadBatchId: action.Id);
+                break;
+            default:
+                dispatcher.Dispatch(new BatchDeleted(action.Id));
+                dispatcher.Dispatch(new ShowToast(Toast.Info(action.IngredientsUsed ? "Batch deleted" : "Batch deleted, ingredients returned to the stock")));
                 break;
         }
     }

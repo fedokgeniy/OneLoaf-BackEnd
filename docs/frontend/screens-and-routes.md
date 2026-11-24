@@ -20,16 +20,16 @@ Auth: **A** = signed-in baker, **P** = public (anonymous allowed), **Adm** = adm
 | `/recipes/{id}/variant` | `CreateVariantDialog` on the detail page | A | — (DS Dialog) | US-07 | `POST /recipes/{id}/variants` |
 | `/recipes/{id}/compare` | `VariantComparePage` (Recipes) | A | `VariantCompare-*` | US-08 | `GET /recipes/{id}/comparison` |
 | `/recipes/{id}/publish` | `PublishPage` (Library, lazy) — publish dialog opened from the recipe page | A | `Publish-Tablet` | US-39 | `POST /recipes/{id}/publish` |
-| `/ingredients` | `IngredientsPage` (Recipes) — list + detail pane with price history | A | `Ingredients-*` | US-10, US-11, US-12 | `GET/POST/PUT/DELETE /ingredients`, `GET/POST /ingredients/{id}/prices`, `GET /flours`, `GET /warnings` |
-| `/settings/kitchen` | `KitchenPage` (Recipes) | A | `Kitchen-*` | US-13, US-47, US-48, US-49 | `GET/PUT /kitchen-settings`, `GET /reference/currencies` |
+| `/ingredients` | `IngredientsPage` (Recipes) — list with price and stock + detail pane with the tabs Prices · Stock | A | `Ingredients-*` (the Stock tab, purchases and flour dialogs extend the mockup) | US-10, US-11, US-12, ST-01 – ST-07 | `GET/POST/PUT/DELETE /ingredients`, `GET/POST /ingredients/{id}/prices`, `PUT/DELETE /ingredients/{id}/prices/{priceId}`, `GET /ingredients/{id}/stock-movements`, `POST /ingredients/{id}/purchases`, `POST /ingredients/{id}/stock-adjustments`, `GET/POST/PUT/DELETE /flours`, `GET /reference/flour-types`, `GET /warnings` |
+| `/settings/kitchen` | `KitchenPage` (Recipes) — titled *My kitchen* | A | `Kitchen-*` | US-13, US-47, US-48, US-49 | `GET/PUT /kitchen-settings`, `GET /reference/currencies` |
 | `/batches` | `CalendarPage` (Production) — week view | A | `Calendar-*` | US-26 | `GET /batches?from=&to=`, `GET /notify/api/v1/reminders` |
-| `/batches/new` | `NewBatchPage` (Production) | A | `NewBatch-*`, `NewBatch-Phone-21x9` | US-20, US-52, US-18, US-29 | `POST /batches/preview` (debounced), `POST /batches`, `GET /recipes/{id}/start-window?readyAt=` (Ready by mode), `GET /recipes`, `GET /starters` |
-| `/batches/{id}` | `BatchPage` (Production) — stage list, current stage, stage log, figures | A | `Batch-*`, `Batch-Phone-landscape`, `Batch-Watch` | US-23, US-24, US-21, US-22, US-31, US-25 | `GET /batches/{id}`, `POST …/stages/{stageId}/start\|complete\|skip\|extend\|reset`, `PATCH …/stages/{stageId}`, `GET /batches/{id}/kneading-plan`, `POST /batches/{id}/complete\|cancel\|save-as-variant` |
+| `/batches/new` | `NewBatchPage` (Production) | A | `NewBatch-*`, `NewBatch-Phone-21x9` | US-20, US-52, US-18, US-29, ST-05 | `POST /batches/preview` (debounced, with the stock check), `POST /batches`, `GET /recipes/{id}/start-window?readyAt=` (Ready by mode), `GET /recipes`, `GET /starters` |
+| `/batches/{id}` | `BatchPage` (Production) — stage list, current stage, stage log, figures | A | `Batch-*`, `Batch-Phone-landscape`, `Batch-Watch` | US-23, US-24, US-21, US-22, US-31, US-25, ST-04 | `GET /batches/{id}`, `POST …/stages/{stageId}/start\|complete\|skip\|extend\|reset`, `PATCH …/stages/{stageId}`, `GET /batches/{id}/kneading-plan`, `POST /batches/{id}/complete\|cancel?ingredientsUsed=\|save-as-variant`, `DELETE /batches/{id}?ingredientsUsed=` |
 | `/starters` | `StartersPage` (Production) — cards + feeding log | A | `Starters-*` | US-27, US-28, US-30 | `GET /starters`, `GET/POST /starters/{id}/feedings` |
-| `/starters/new`, `/starters/{id}/edit` | `StarterEditorPage` (Production) | A | `NewStarter-*` | US-27, US-29 | `POST/PUT /starters` |
+| `/starters/new`, `/starters/{id}/edit` | `StarterEditorPage` (Production) | A | `NewStarter-*` | US-27, US-29, US-11, ST-06 | `POST/PUT /starters`, `GET /ingredients`, `GET/POST /flours`, `GET /reference/flour-types` |
 | `/history` | `HistoryPage` (History, lazy) — list + filters + stats | A | `History-*` | US-31, US-33 | `GET /bake-records?recipeId=&from=&to=&minRating=`, `GET /bake-records/statistics` |
 | `/history/{id}` | `BakeRecordPage` (History) — rating, comment, stage log, photos, analysis | A | `History-Desktop` (detail pane) | US-32, US-36, US-51 | `GET/PATCH /bake-records/{id}`, `GET /bake-records/{id}/stage-log`, photos, `POST /assistant/api/v1/bake-records/{id}/analysis` |
-| `/assistant`, `/assistant/{conversationId}` | `AssistantPage` (Assistant, lazy) | A | `Assistant-*`, `Assistant-Phone-keyboard` | US-34, US-35, US-37, US-38, LR-10, LR-12 | `GET/POST /conversations`, `GET/POST /conversations/{id}/messages`, `POST …/actions/{actionId}/confirm\|decline`, `GET /usage/me` |
+| `/assistant`, `/assistant/{conversationId}` | `AssistantPage` (Assistant, lazy) | A | `Assistant-*`, `Assistant-Phone-keyboard` | US-34, US-35, US-37, US-38, AS-01, AS-02, LR-10, LR-12 | `GET/POST /conversations`, `GET/POST /conversations/{id}/messages`, `POST …/actions/{actionId}/confirm\|decline`, `GET /usage/me` |
 | `/library` | `LibraryPage` (Library, lazy) | P | `Library-*` | US-40 | `GET /library?search=&page=` |
 | `/library/{id}` | `LibraryDetailPage` (Library) | P (actions A) | `LibraryDetail-*` | US-40, US-41, US-42, LR-11 | `GET /library/{id}`, `GET/POST /library/{id}/comments`, `PUT/DELETE /library/{id}/reactions/me`, `POST /library/{id}/copy`, `POST /library/{id}/reports`, `POST /library/{id}/unpublish` (owner) |
 | `/admin/reports` | `ModerationPage` (Library, lazy) | Adm | — (DS table + Dialog; no mockup) | LR-11 | `GET /admin/reports?status=`, `POST /admin/reports/{id}/resolve` (`remove` takes the content down, `reject` keeps it) |
@@ -43,9 +43,9 @@ Components and states: `Components-States` board = the component library with al
 
 | Size class | Pattern | Items |
 |---|---|---|
-| compact (phones) | bottom bar, 5 items + top bar avatar menu | Home · Recipes · Batches · Starters · Assistant; the avatar menu (top bar "Profile and settings") holds Library, History, Ingredients, Kitchen, Settings, **Sign out** |
-| medium (tablets, phone landscape) | navigation rail | the 8 items + Settings + **Sign out** at the bottom of the rail |
-| expanded+ (desktop, ultrawide) | espresso sidebar | Home, Recipes, Batches, Starters, Assistant, Library, History, Settings, Sign out |
+| compact (phones) | bottom bar, 5 items + top bar avatar menu | Home · Recipes · Batches · Starters · Assistant; the avatar menu (top bar "Profile and settings") holds Library, History, Ingredients, My kitchen, Settings, **Sign out** |
+| medium (tablets, phone landscape) | navigation rail | Home, Recipes, Batches, Starters, Assistant, Library, History at the top; Ingredients, My kitchen, Settings and **Sign out** pinned to the bottom; the avatar menu keeps Settings and Sign out |
+| expanded+ (desktop, ultrawide) | espresso sidebar | Home, Recipes, Batches, Starters, Assistant, Library, History at the top; Ingredients, My kitchen, Settings and **Sign out** pinned to the bottom; the avatar menu keeps Settings and Sign out |
 | watch | single column + menu button | current batch stage only |
 
 ## Story coverage (Must = M, Should = S, Could = C)
@@ -62,9 +62,9 @@ Components and states: `Components-States` board = the component library with al
 | US-08 Compare | S | `/recipes/{id}/compare` | "Changes only / All lines" segmented control |
 | US-09 Optional, proof mode + °C | S | editor stage row | chips Warm/Cold + temperature field |
 | US-10 Ingredients + units | M | `/ingredients`, editor | unit select from `/reference/units` |
-| US-11 Flour catalog | S | `/ingredients` detail, recipe header | protein % shown in the recipe header ("Bread flour · 12.8 % protein"); the list API has no protein, so cards do not show it |
-| US-12 Price history | M | `/ingredients` detail | 409 duplicate date → field error |
-| US-13 Kitchen | M | `/settings/kitchen` | oven, mixer (bowl capacity), cost settings |
+| US-11 Flour catalog | S | `/ingredients` form and detail, `/starters/new`, recipe header | *Add flour* next to the flour select opens a dialog (name, type, protein, grind, notes) and selects the new flour; the detail pane edits and deletes the flour details; a duplicate name (409) is shown under the name; protein % shown in the recipe header ("Bread flour · 12.8 % protein") |
+| US-12 Price history | M | `/ingredients` detail, tab Prices | 409 duplicate date → field error; every row can be edited (dialog) and deleted (confirmation that costs fall back to the previous price) |
+| US-13 My kitchen | M | `/settings/kitchen` | oven, mixer (bowl capacity), cost settings |
 | US-14 Cost | M | detail → Cost tab | lines exactly as returned, including the API's `total` line; total tile = API `total`; incomplete cost lists `missingPrices` with a link to Ingredients |
 | US-15 Prices as of | M | detail → "Prices as of" date | `asOf` param |
 | US-16 Timeline + ready window | M | detail → Timeline tab, stats | "Start at" (default: next full hour) → `GET /timeline?start=`; Ready tile shows `readyFrom–readyTo` with "next day" |
@@ -91,6 +91,8 @@ Components and states: `Components-States` board = the component library with al
 | US-33 Filter history | C | `/history` chips + filters | recipe chips from `/bake-records/statistics`, *Rating 4+* chip (`minRating=4`), *From* / *To* dates; per-recipe statistics table; paging ("Show more bakes") |
 | US-51 Crumb photo | C | `/history/{id}` | JPEG / PNG / WebP up to 5 MB (checked before upload, 422 from the API shown inline); photos are fetched with the bearer token and shown as data URLs; delete per photo |
 | US-34 Batch from chat | M | `/assistant` | plan card + Confirm / Decline; 409 marks the proposal expired; after Confirm a toast links to `/batches/{id}` and the batch lists reload |
+| AS-01 Recipe from chat | S | `/assistant` | the assistant proposes a complete recipe as a card: ingredients with quantities, *New ingredient* badges for the ones that will be added without a price, stages; nothing is saved until *Save recipe*; after it a toast and the card link to `/recipes/{id}` and to Ingredients for the prices |
+| AS-02 Formatted answers | S | `/assistant` | assistant messages are rendered from Markdown (paragraphs, headings, lists, bold, italic, code, links) as elements built from parsed text; HTML in a reply is shown as text, links are limited to http and https |
 | US-35 Numbers from tools | M | `/assistant` | show `unverifiedNumbers` warning if the API returns any |
 | US-36 Analyse bake | M | `/history/{id}` → Ask the assistant | 422 shows the API `detail` and focuses the comment field; 429 / 503 inline; the analysis is stored by the assistant and shown with "Informational only" |
 | US-37 Search recipes / flour filter | S | `/assistant`, `/recipes` | `/recipes`: "Minimum flour protein" segmented control (any, ≥ 11, ≥ 12, ≥ 13 %) → `minProteinPercent` |
@@ -103,3 +105,10 @@ Components and states: `Components-States` board = the component library with al
 | US-43 360 px phone | M | all | Playwright at 360×640 |
 | US-44 PWA offline | S | all | installable (manifest, icons); the published service worker caches the app shell and recipe reads (network first); offline banner; cached recipe data is dropped on sign out |
 | US-50 CSV export | C | `/settings` → Export my data | recipes and bake history: `GET /export/*.csv` with the token through the pipeline, saved as a file by the browser |
+| ST-01 Record a purchase | S | `/ingredients` → tab Stock → *Add purchase* | packs × size of one pack + amount paid + date; the stock grows and the price of that date is created or replaced by the API; the first purchase starts keeping the stock |
+| ST-02 See the stock | S | `/ingredients` list and tab Stock | stock in the ingredient unit from the API; *Low stock* as badge with icon and text; ingredients whose stock is not kept show no stock |
+| ST-03 Correct the stock | S | tab Stock → *Correct stock* | counted quantity + required reason; the API writes the difference |
+| ST-04 Batch takes and returns ingredients | S | `/batches/new`, `/batches/{id}` | creating a batch takes the ingredients (API); *Cancel batch* and *Delete batch* ask "The ingredients were already used" and send `ingredientsUsed` |
+| ST-05 Not enough in stock | S | `/batches/new` preview, assistant plan card | the preview lists the missing ingredients and offers *Reduce to N loaves* and *Bake from what is in stock* (same loaves, less dough); both figures come from `stock.maxLoaves` and `stock.maxScale` of the API; planning anyway is allowed |
+| ST-06 Feedings take flour and water | S | `/starters/new`, `/starters/{id}/edit` | the starter names the flour and water ingredients; the API takes each feeding from their stock; the starter card shows the amount after the last feeding |
+| ST-07 Keep or ignore the stock | S | ingredient form | switch *Keep the stock of this ingredient* and the reorder level; an ingredient without it is not consumed and not checked |

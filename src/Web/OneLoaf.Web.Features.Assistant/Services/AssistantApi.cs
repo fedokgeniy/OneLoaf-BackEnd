@@ -5,8 +5,11 @@ using OneLoaf.Web.Shared.Contracts.Core;
 
 namespace OneLoaf.Web.Features.Assistant.Services;
 
-/// <summary>A proposal of the assistant waiting for Confirm (rule 2); <see cref="Batch"/> is the plan mapped from JSON.</summary>
-public sealed record BatchProposal(Guid ActionId, string Kind, DateTimeOffset ExpiresAt, BatchDto? Batch);
+/// <summary>
+/// A proposal of the assistant waiting for Confirm (rule 2): <see cref="Batch"/> is the plan of a batch and
+/// <see cref="Recipe"/> a new recipe, each mapped from JSON; at most one of them is set.
+/// </summary>
+public sealed record BatchProposal(Guid ActionId, string Kind, DateTimeOffset ExpiresAt, BatchDto? Batch, RecipeProposalDto? Recipe = null);
 
 /// <summary>Reply of the assistant with the proposal already mapped.</summary>
 public sealed record ChatReply(MessageDto Message, BatchProposal? Proposal, string? Disclaimer, IReadOnlyList<string> UnverifiedNumbers);
@@ -42,8 +45,11 @@ public interface IAssistantApi
 /// <inheritdoc />
 public sealed class AssistantApi(ApiClientFactory api, ApiJsonOptions json) : IAssistantApi
 {
-    /// <summary>Kind of the only proposal the assistant makes.</summary>
+    /// <summary>Kind of a batch proposal.</summary>
     public const string CreateBatch = "create_batch";
+
+    /// <summary>Kind of a recipe proposal.</summary>
+    public const string CreateRecipe = "create_recipe";
 
     /// <inheritdoc />
     public Task<ApiResult<IReadOnlyList<ConversationDto>>> ListConversationsAsync(CancellationToken ct = default) =>
@@ -84,21 +90,26 @@ public sealed class AssistantApi(ApiClientFactory api, ApiJsonOptions json) : IA
 
     private ChatReply Map(ChatReplyDto reply) => new(
         reply.Message,
-        reply.PendingAction is { } action ? new BatchProposal(action.ActionId, action.Kind, action.ExpiresAt, MapPlan(action)) : null,
+        reply.PendingAction is { } action
+            ? new BatchProposal(action.ActionId, action.Kind, action.ExpiresAt,
+                action.Kind == CreateBatch ? MapPlan(action, json.TypeInfo<BatchDto>()) : null,
+                action.Kind == CreateRecipe ? MapPlan(action, json.TypeInfo<RecipeProposalDto>()) : null)
+            : null,
         reply.Disclaimer,
         reply.UnverifiedNumbers);
 
-    // The plan is the only JsonElement in the client: mapped here, once, to the batch contract (rule 9).
-    private BatchDto? MapPlan(PendingActionDto action)
+    // The plan is the only JsonElement in the client: mapped here, once, to its contract (rule 9).
+    private static T? MapPlan<T>(PendingActionDto action, System.Text.Json.Serialization.Metadata.JsonTypeInfo<T> type)
+        where T : class
     {
-        if (action.Kind != CreateBatch || action.Plan.ValueKind != JsonValueKind.Object)
+        if (action.Plan.ValueKind != JsonValueKind.Object)
         {
             return null;
         }
 
         try
         {
-            return action.Plan.Deserialize(json.TypeInfo<BatchDto>());
+            return action.Plan.Deserialize(type);
         }
         catch (JsonException)
         {

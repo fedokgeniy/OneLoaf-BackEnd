@@ -126,6 +126,12 @@ internal sealed class FakeIngredientRepository : IIngredientRepository
 
     public Task<bool> IsUsedAsync(Guid ownerId, Guid id, CancellationToken cancellationToken) => Task.FromResult(Used.Contains(id));
 
+    public Task<IReadOnlyDictionary<string, Guid>> FindByNamesAsync(
+        Guid ownerId, IReadOnlyCollection<string> names, CancellationToken cancellationToken) =>
+        Task.FromResult<IReadOnlyDictionary<string, Guid>>(Ingredients.Values
+            .Where(i => i.Owner == ownerId && names.Contains(i.Ingredient.Name, StringComparer.OrdinalIgnoreCase))
+            .ToDictionary(i => i.Ingredient.Name, i => i.Ingredient.Id, StringComparer.OrdinalIgnoreCase));
+
     public Task<Guid> CreateAsync(Guid ownerId, IngredientRequest ingredient, CancellationToken cancellationToken) =>
         Task.FromResult(Add(ownerId, ingredient.Name));
 
@@ -152,6 +158,58 @@ internal sealed class FakeIngredientRepository : IIngredientRepository
         var id = Guid.NewGuid();
         Prices[ingredientId].Add(new PriceRow(id, price.Price, price.PerQuantity, price.Currency, price.EffectiveFrom));
         return Task.FromResult(id);
+    }
+
+    public Dictionary<Guid, decimal> Stock { get; } = [];
+
+    public List<StockMovementDto> Movements { get; } = [];
+
+    public PurchaseRequest? LastPurchase { get; private set; }
+
+    public Task<bool> UpdatePriceAsync(Guid ingredientId, Guid priceId, PriceRequest price, CancellationToken cancellationToken)
+    {
+        var index = Prices[ingredientId].FindIndex(p => p.Id == priceId);
+        if (index < 0)
+        {
+            return Task.FromResult(false);
+        }
+
+        Prices[ingredientId][index] = new PriceRow(priceId, price.Price, price.PerQuantity, price.Currency, price.EffectiveFrom);
+        return Task.FromResult(true);
+    }
+
+    public Task<bool> DeletePriceAsync(Guid ingredientId, Guid priceId, CancellationToken cancellationToken) =>
+        Task.FromResult(Prices[ingredientId].RemoveAll(p => p.Id == priceId) > 0);
+
+    public Task<decimal> GetStockAsync(Guid ingredientId, CancellationToken cancellationToken) =>
+        Task.FromResult(Stock.GetValueOrDefault(ingredientId));
+
+    public Task<PagedResult<StockMovementDto>?> ListMovementsAsync(
+        Guid ownerId, Guid ingredientId, StockMovementListQuery query, CancellationToken cancellationToken) =>
+        Task.FromResult(Ingredients.TryGetValue(ingredientId, out var i) && i.Owner == ownerId
+            ? new PagedResult<StockMovementDto>(Movements, query.Page, query.PageSize, Movements.Count)
+            : null);
+
+    public Task<Guid> AddPurchaseAsync(Guid ingredientId, PurchaseRequest purchase, CancellationToken cancellationToken)
+    {
+        LastPurchase = purchase;
+        return Task.FromResult(Record(ingredientId, OneLoaf.Domain.StockMovementType.Purchase,
+            purchase.PackCount * purchase.PackSize, purchase.PurchasedOn, purchase.Note));
+    }
+
+    public Task<Guid> AddAdjustmentAsync(
+        Guid ingredientId, decimal quantity, DateOnly occurredOn, string note, CancellationToken cancellationToken) =>
+        Task.FromResult(Record(ingredientId, OneLoaf.Domain.StockMovementType.Adjustment, quantity, occurredOn, note));
+
+    public Task<StockMovementDto> GetMovementAsync(Guid movementId, CancellationToken cancellationToken) =>
+        Task.FromResult(Movements.Single(m => m.Id == movementId));
+
+    private Guid Record(Guid ingredientId, OneLoaf.Domain.StockMovementType type, decimal quantity, DateOnly on, string? note)
+    {
+        var id = Guid.NewGuid();
+        Stock[ingredientId] = Stock.GetValueOrDefault(ingredientId) + quantity;
+        Movements.Add(new StockMovementDto(id, type, quantity, on, null, null, null, null, null, null, note, DateTimeOffset.UnixEpoch));
+        return id;
     }
 }
 
@@ -249,4 +307,10 @@ internal sealed class FakeCalculations : IRecipeCalculations
 
     public Task<ProductionFigures> GetProductionFiguresAsync(Guid recipeId, int loaves, CancellationToken cancellationToken) =>
         Task.FromResult(new ProductionFigures(960m * loaves, 1, 100m * loaves));
+}
+
+/// <summary>Runs the work at once: the fakes have no transaction to roll back.</summary>
+internal sealed class ImmediateTransaction : OneLoaf.CoreApi.Application.Common.IWorkspaceTransaction
+{
+    public Task<T> ExecuteAsync<T>(Func<CancellationToken, Task<T>> work, CancellationToken cancellationToken) => work(cancellationToken);
 }

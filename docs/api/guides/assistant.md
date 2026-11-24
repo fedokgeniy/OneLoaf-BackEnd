@@ -32,7 +32,8 @@ sequenceDiagram
     A-->>C: 200 {batchId}
 ```
 
-At most 6 tool rounds per message. The tools are read-only except `propose_batch`, which only *proposes*.
+At most 6 tool rounds per message. The tools are read-only except `propose_batch` and `propose_recipe`, which only
+*propose*.
 
 | Tool | Core API call |
 |---|---|
@@ -40,6 +41,7 @@ At most 6 tool rounds per message. The tools are read-only except `propose_batch
 | `calculate_cost`, `calculate_timeline`, `calculate_start_window`, `calculate_production_figures` | calculator endpoints |
 | `list_starters`, `get_ingredient_prices`, `get_missing_data` | starters, price history, warnings |
 | `preview_batch_plan`, `propose_batch` | batch preview (+ pending action) |
+| `propose_recipe` | ingredient list, to mark the ingredients the baker does not have yet (+ pending action) |
 | `get_bake_analysis_data` | bake record and stage log |
 
 ## Numbers come only from tools
@@ -51,11 +53,15 @@ comes with a `disclaimer`. The first answer of a conversation says that it is an
 
 ## Pending actions
 
-`pendingAction` contains the plan exactly as the Core API computed it. Show it and offer **Confirm** / **Decline**.
+`pendingAction.kind` is `create_batch` or `create_recipe`. For a batch, `plan` is the plan exactly as the Core API
+computed it. For a recipe, `plan` is the recipe the assistant wrote (title, yield, ingredients with `isNew`, stages): its
+quantities are the assistant's suggestion, the only numbers it may choose itself. Show the proposal and offer
+**Confirm** / **Decline**.
 
 | Call | Result |
 |---|---|
 | `POST …/actions/{actionId}/confirm` | `200 {batchId}`; the batch is created with `source: assistant` |
+| `POST …/actions/{actionId}/confirm` (recipe) | `200 {recipeId}`; `POST /recipes/drafts` creates the recipe and the missing ingredients, without prices, in one transaction |
 | `POST …/actions/{actionId}/decline` | `204`; nothing is saved |
 | either, after 30 minutes or a second time | `409` |
 

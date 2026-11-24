@@ -18,6 +18,11 @@ public class Batch
     /// <summary>Total cost computed by the Core API when the plan was saved (snapshot).</summary>
     public decimal? TotalCost { get; set; }
     public string Currency { get; set; } = "EUR";
+    /// <summary>
+    /// Share of the recipe quantities that is actually used (0-1]: below 1 when the batch is baked from what is in
+    /// stock. The loaves stay; the dough, the starter amount, the ingredient cost and the stock consumption shrink.
+    /// </summary>
+    public decimal IngredientScale { get; set; } = 1m;
     public string? Notes { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

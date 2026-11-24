@@ -36,6 +36,8 @@ public enum IconName
     Home,
     /// <summary>icons/info.svg</summary>
     Info,
+    /// <summary>icons/kitchen.svg</summary>
+    Kitchen,
     /// <summary>icons/library.svg</summary>
     Library,
     /// <summary>icons/logout.svg</summary>

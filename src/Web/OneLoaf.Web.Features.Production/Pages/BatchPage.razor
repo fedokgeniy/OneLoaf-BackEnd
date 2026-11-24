@@ -99,6 +99,10 @@
                                 }
                             </OlAlert>
                         }
+                        @if (batch.IngredientScale < 1m)
+                        {
+                            <span class="batch__figure-meta">Baked from what was in stock: @DisplayFormat.Percent(batch.IngredientScale * 100m) of the recipe quantities.</span>
+                        }
                         <span class="batch__cost">
                             Total cost @(batch.TotalCost is { } cost ? DisplayFormat.Money(cost, batch.Currency) : "incomplete") · prices as of @DisplayFormat.Date(batch.PriceDate)
                         </span>
@@ -111,13 +115,19 @@
                             {
                                 <OlButton Large="true" Loading="State.Value.BusyBatch" OnClick="() => Dispatcher.Dispatch(new CompleteBatch(batch.Id))">Complete batch</OlButton>
                             }
-                            <OlButton Variant="ButtonVariant.Ghost" Disabled="State.Value.BusyBatch" OnClick="() => _confirmCancel = true">Cancel batch</OlButton>
+                            <OlButton Variant="ButtonVariant.Ghost" Disabled="State.Value.BusyBatch" OnClick="() => AskCancel(batch)">Cancel batch</OlButton>
                         </div>
                     }
                     @if (batch.Status == BatchStatuses.Done || stages.Any(s => s.ActualEndAt is not null))
                     {
                         <div class="batch__actions">
                             <OlButton Variant="ButtonVariant.Secondary" Disabled="State.Value.BusyBatch" OnClick="() => _variantTitle = string.Empty">Save as recipe variant</OlButton>
+                        </div>
+                    }
+                    @if (batch.Status != BatchStatuses.InProgress)
+                    {
+                        <div class="batch__actions">
+                            <OlButton Variant="ButtonVariant.Ghost" Icon="IconName.Trash" Disabled="State.Value.BusyBatch" OnClick="() => AskDelete(batch)">Delete batch</OlButton>
                         </div>
                     }
                 </section>
@@ -171,10 +181,26 @@
         </OlDialog>
 
         <OlDialog Open="_confirmCancel" Title="Cancel this batch?" OnClose="() => _confirmCancel = false">
-            <ChildContent><p>Reminders for this batch stop. The batch stays in the calendar as cancelled.</p></ChildContent>
+            <ChildContent>
+                <p>Reminders for this batch stop. The batch stays in the calendar as cancelled.</p>
+                <OlSwitch @bind-Value="_ingredientsUsed">The ingredients were already used</OlSwitch>
+                <p class="batch__hint">@StockHint</p>
+            </ChildContent>
             <Footer>
                 <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmCancel = false">Keep the batch</OlButton>
                 <OlButton Variant="ButtonVariant.Danger" OnClick="() => CancelBatch(batch)">Cancel batch</OlButton>
+            </Footer>
+        </OlDialog>
+
+        <OlDialog Open="_confirmDelete" Title="Delete this batch?" OnClose="() => _confirmDelete = false">
+            <ChildContent>
+                <p>The batch, its stages and its reminders are removed. A bake record in your history stays.</p>
+                <OlSwitch @bind-Value="_ingredientsUsed">The ingredients were already used</OlSwitch>
+                <p class="batch__hint">@StockHint</p>
+            </ChildContent>
+            <Footer>
+                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _confirmDelete = false">Keep the batch</OlButton>
+                <OlButton Variant="ButtonVariant.Danger" OnClick="() => DeleteBatch(batch)">Delete batch</OlButton>
             </Footer>
         </OlDialog>
 

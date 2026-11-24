@@ -162,6 +162,57 @@ public sealed class WorkspaceServiceTests
     }
 
     [Fact]
+    public async Task US12_UpdateAndDeletePrice_CorrectAMistakeAndKeepOneDatePerPrice()
+    {
+        var id = _ingredients.Add(Me, "Flour");
+        var service = Ingredients(_user);
+        var june = await service.AddPriceAsync(id, new PriceRequest(1.20m, 1000, "EUR", new DateOnly(2026, 6, 1)), Ct);
+        var october = await service.AddPriceAsync(id, new PriceRequest(13.5m, 1000, "EUR", new DateOnly(2026, 10, 1)), Ct);
+
+        var corrected = await service.UpdatePriceAsync(id, october.Id, new PriceRequest(1.35m, 1000, "EUR", new DateOnly(2026, 10, 1)), Ct);
+        Assert.Equal(12.5m, corrected.ChangePercent);
+        await Assert.ThrowsAsync<ConflictException>(() =>
+            service.UpdatePriceAsync(id, october.Id, new PriceRequest(1.35m, 1000, "EUR", new DateOnly(2026, 6, 1)), Ct));
+
+        await service.DeletePriceAsync(id, june.Id, Ct);
+        Assert.Null(Assert.Single(await service.GetPricesAsync(id, Ct)).ChangePercent);
+        await Assert.ThrowsAsync<NotFoundException>(() => service.DeletePriceAsync(id, june.Id, Ct));
+    }
+
+    // ---- Stock ----
+
+    [Fact]
+    public async Task Stock_Purchase_AddsPacksTimesPackSize()
+    {
+        var id = _ingredients.Add(Me, "Flour");
+
+        var movement = await Stock().AddPurchaseAsync(id, new PurchaseRequest(5, 1000, 6m, "EUR", new DateOnly(2026, 11, 20), "  "), Ct);
+
+        Assert.Equal(5000m, movement.Quantity);
+        Assert.Equal(StockMovementType.Purchase, movement.Type);
+        Assert.Null(_ingredients.LastPurchase!.Note);
+        await Assert.ThrowsAsync<ValidationException>(() =>
+            Stock().AddPurchaseAsync(id, new PurchaseRequest(1, 1, 1, "XXX", new DateOnly(2026, 11, 20)), Ct));
+        await Assert.ThrowsAsync<NotFoundException>(() =>
+            Stock().AddPurchaseAsync(_ingredients.Add(Other, "Flour"), new PurchaseRequest(1, 1, 1, "EUR", new DateOnly(2026, 11, 20)), Ct));
+    }
+
+    [Fact]
+    public async Task Stock_Adjust_WritesTheDifferenceToTheCountedQuantity()
+    {
+        var id = _ingredients.Add(Me, "Flour");
+        _ingredients.Stock[id] = 5000m;
+
+        var movement = await Stock().AdjustAsync(id, new StockAdjustmentRequest(4200m, " spilled "), Ct);
+
+        Assert.Equal(-800m, movement.Quantity);
+        Assert.Equal("spilled", movement.Note);
+        Assert.Equal(new DateOnly(2026, 11, 24), movement.OccurredOn);
+        var same = await Assert.ThrowsAsync<ValidationException>(() => Stock().AdjustAsync(id, new StockAdjustmentRequest(4200m, "again"), Ct));
+        Assert.Equal(StockService.NothingToAdjustMessage, Assert.Single(same.Errors).ErrorMessage);
+    }
+
+    [Fact]
     public void PriceHistory_ChangeOnlyAgainstSameCurrencyAndNonZero()
     {
         var rows = new[]
@@ -203,6 +254,24 @@ public sealed class WorkspaceServiceTests
         var proof = await Assert.ThrowsAsync<ValidationException>(() => service.CreateAsync(
             new RecipeRequest("Loaf", null, 1, null, null, [], [new(null, "Bake", "bake", 1, 2, ProofMode: ProofMode.Warm)]), Ct));
         Assert.Equal(RecipeService.ProofModeMessage, Assert.Single(proof.Errors).ErrorMessage);
+    }
+
+    [Fact]
+    public async Task Recipe_CreateDraft_ReusesIngredientsByNameAndCreatesTheMissingOnes()
+    {
+        var flour = _ingredients.Add(Me, "Bread flour");
+        var service = Recipes();
+
+        var result = await service.CreateDraftAsync(new RecipeDraftRequest("Beginner loaf", null, 1, 900, null,
+            [new("bread FLOUR", "flour", "g", 500), new("Water", "liquid", "g", 350)], [new(null, "Bake", "bake", 40, 45)]), Ct);
+
+        Assert.Equal(["Water"], result.CreatedIngredients);
+        var lines = Assert.Single(_recipes.Created).Changes.Ingredients;
+        Assert.Equal(flour, lines[0].IngredientId);
+        Assert.Null(_ingredients.Ingredients[lines[1].IngredientId].Ingredient.CurrentPrice);
+        var unknownUnit = await Assert.ThrowsAsync<ValidationException>(() => service.CreateDraftAsync(
+            new RecipeDraftRequest("Loaf", null, 1, null, null, [new("Salt", "flour", "cup", 10)], [new(null, "Bake", "bake", 40, 45)]), Ct));
+        Assert.Equal("ingredients[0].unitCode", Assert.Single(unknownUnit.Errors).PropertyName);
     }
 
     [Fact]
@@ -348,7 +417,10 @@ public sealed class WorkspaceServiceTests
 
     private IngredientService Ingredients(FakeCurrentUser user) => new(_ingredients, _flours, _reference, user);
 
-    private RecipeService Recipes() => new(_recipes, _ingredients, _reference, _user);
+    private RecipeService Recipes() => new(_recipes, _ingredients, _reference, new ImmediateTransaction(), _user);
+
+    private StockService Stock() =>
+        new(_ingredients, _reference, new FixedTimeProvider(new DateTimeOffset(2026, 11, 24, 8, 0, 0, TimeSpan.Zero)), _user);
 
     private CalculationService Calculations(FakeCalculations calculations, DateTimeOffset? now = null) =>
         new(calculations, _recipes, new KitchenSettingsService(_kitchen, _reference, _user),

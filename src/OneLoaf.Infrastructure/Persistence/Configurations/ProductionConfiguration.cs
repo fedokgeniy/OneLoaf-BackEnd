@@ -17,10 +17,12 @@ public class BatchConfiguration : IEntityTypeConfiguration<Batch>
             t.HasCheckConstraint("ck_batches_completed_after_start", "completed_at >= actual_start_at");
             t.HasCheckConstraint("ck_batches_done_has_completed_at", "status <> 'done' OR completed_at IS NOT NULL");
             t.HasCheckConstraint("ck_batches_name_not_blank", "length(btrim(name)) > 0");
+            t.HasCheckConstraint("ck_batches_ingredient_scale", "ingredient_scale > 0 AND ingredient_scale <= 1");
         });
         b.HasKey(x => x.Id);
         b.Property(x => x.Name).HasMaxLength(200).IsRequired();
         b.Property(x => x.TotalCost).HasPrecision(12, 2);
+        b.Property(x => x.IngredientScale).HasPrecision(5, 4).HasDefaultValue(1m);
         b.Property(x => x.Currency).HasMaxLength(3).IsFixedLength();
         b.Property(x => x.Notes).HasMaxLength(4000);
         b.HasIndex(x => new { x.OwnerId, x.PlannedStartAt }); // weekly calendar

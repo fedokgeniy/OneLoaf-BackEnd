@@ -32,6 +32,7 @@ W - `SELECT/INSERT/UPDATE/DELETE`, R - `SELECT` only, C - `SELECT` on some colum
 | Reference tables: `units`, `currencies`, `stage_types`, `ingredient_categories`, `flour_types` | R | R |
 | `users`, `push_subscriptions` | W | - |
 | `kitchen_settings`, `flours`, `ingredients`, `ingredient_prices` | W | R |
+| `stock_movements` | W | C (without `note`) |
 | `recipes`, `recipe_ingredients`, `recipe_stages` | W | R |
 | `batches`, `batch_items`, `batch_stages`, `starters`, `starter_feedings` | W | R |
 | `reminders`, `bake_record_photos` | W | - |

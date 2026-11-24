@@ -25,6 +25,10 @@ public static class RecipeEndpoints
         recipes.MapPost("/", CreateAsync).WithValidation<RecipeRequest>()
             .WithName("CreateRecipe").WithSummary("Create a recipe with ingredients and stages")
             .WithDescription("US-05, US-09. Saved in one transaction.");
+        recipes.MapPost("/drafts", CreateDraftAsync).WithValidation<RecipeDraftRequest>()
+            .WithName("CreateRecipeDraft").WithSummary("Create a recipe with ingredients given by name")
+            .WithDescription("US-34. Used when a recipe proposed by the assistant is confirmed: ingredients of the user are " +
+                             "matched by name, missing ones are created without a price; one transaction.");
         recipes.MapGet("/{id:guid}", GetAsync).ProducesProblem(StatusCodes.Status404NotFound)
             .WithName("GetRecipe").WithSummary("Get the effective recipe")
             .WithDescription("US-05, US-07. A variant is shown with the inherited content resolved (isInherited).");
@@ -79,6 +83,13 @@ public static class RecipeEndpoints
     {
         var recipe = await recipes.CreateAsync(request, ct);
         return TypedResults.Created($"{GroupRoute}/{recipe.Id}", recipe);
+    }
+
+    private static async Task<Created<RecipeDraftResponse>> CreateDraftAsync(
+        RecipeDraftRequest request, RecipeService recipes, CancellationToken ct)
+    {
+        var created = await recipes.CreateDraftAsync(request, ct);
+        return TypedResults.Created($"{GroupRoute}/{created.Recipe.Id}", created);
     }
 
     private static async Task<Ok<RecipeDto>> GetAsync(Guid id, RecipeService recipes, CancellationToken ct) =>

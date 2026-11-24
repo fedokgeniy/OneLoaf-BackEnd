@@ -54,6 +54,11 @@ public sealed class BatchForm
         return new DateTimeOffset(local, TimeZoneInfo.Local.GetUtcOffset(local));
     }
 
+    /// <summary>
+    /// Share of the recipe quantities to bake with, offered by the stock check of the preview; null = the full recipe.
+    /// </summary>
+    public decimal? IngredientScale { get; set; }
+
     /// <summary>True when the form can be previewed: a moment and at least one complete item.</summary>
     public bool CanPreview => Moment() is not null && Items.Count > 0 && Items.All(i => i.IsComplete);
 
@@ -64,7 +69,8 @@ public sealed class BatchForm
         [.. Items.Select(i => i.ToRequest())],
         null,
         string.IsNullOrWhiteSpace(Notes) ? null : Notes.Trim(),
-        "manual");
+        "manual",
+        IngredientScale);
 }
 
 /// <summary>One recipe of the new batch.</summary>

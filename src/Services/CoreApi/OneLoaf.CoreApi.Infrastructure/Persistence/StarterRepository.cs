@@ -109,6 +109,8 @@ public sealed class StarterRepository(OneLoafDbContext db) : IStarterRepository
     {
         entity.Name = starter.Name;
         entity.FlourId = starter.FlourId;
+        entity.FlourIngredientId = starter.FlourIngredientId;
+        entity.WaterIngredientId = starter.WaterIngredientId;
         entity.HydrationPercent = starter.HydrationPercent;
         entity.FeedingMode = starter.FeedingMode;
         entity.FeedingIntervalHours = starter.FeedingIntervalHours;
@@ -124,7 +126,8 @@ public sealed class StarterRepository(OneLoafDbContext db) : IStarterRepository
         row.Starter.Id, row.Starter.Name, row.Starter.FlourId, row.Starter.HydrationPercent, row.Starter.FeedingMode,
         row.Starter.FeedingIntervalHours, row.Starter.RiseHours, row.Starter.IsActive, row.Starter.Notes,
         Utc(row.Last?.FedAt), Utc(row.Last?.NextFeedingAt), Utc(row.Last?.ExpectedPeakAt), Utc(row.Starter.CreatedAt),
-        Utc(row.Starter.UpdatedAt));
+        Utc(row.Starter.UpdatedAt), row.Starter.FlourIngredientId, row.Starter.WaterIngredientId,
+        row.Last is { } last ? last.FlourG + last.WaterG + (last.StarterKeptG ?? 0m) : null);
 
     private static FeedingDto ToDto(StarterFeeding f) => new(
         f.Id, Utc(f.FedAt), f.FlourG, f.WaterG, f.StarterKeptG, f.TemperatureC, Utc(f.NextFeedingAt), Utc(f.ExpectedPeakAt), f.Note);

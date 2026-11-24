@@ -87,10 +87,12 @@ public sealed class BatchRepository(OneLoafDbContext db) : IBatchRepository
         db.Batches.Add(entity);
         await db.SaveChangesAsync(cancellationToken);
         await db.Database.ExecuteSqlInterpolatedAsync($"CALL sp_build_batch_plan({entity.Id})", cancellationToken);
-        var planned = (await GetAsync(ownerId, entity.Id, cancellationToken))!;
+        var stock = await CheckStockAsync(entity.Id, batch, cancellationToken);
+        var planned = (await GetAsync(ownerId, entity.Id, cancellationToken))! with { Stock = stock };
 
         if (save)
         {
+            await db.Database.ExecuteSqlInterpolatedAsync($"CALL sp_apply_batch_stock({entity.Id})", cancellationToken);
             await transaction.CommitAsync(cancellationToken);
             db.ChangeTracker.Clear();
             return planned;
@@ -116,6 +118,9 @@ public sealed class BatchRepository(OneLoafDbContext db) : IBatchRepository
         ApplyHeader(entity, batch);
         db.BatchItems.RemoveRange(entity.Items);
         await db.SaveChangesAsync(cancellationToken);
+        // What the batch took goes back first, so the stock check sees the stock without this batch.
+        await db.StockMovements.Where(m => m.BatchId == id && m.MovementType == StockMovementType.BatchConsumption)
+            .ExecuteDeleteAsync(cancellationToken);
         foreach (var item in batch.Items.Select(ToItem))
         {
             item.BatchId = id;
@@ -124,9 +129,44 @@ public sealed class BatchRepository(OneLoafDbContext db) : IBatchRepository
 
         await db.SaveChangesAsync(cancellationToken);
         await db.Database.ExecuteSqlInterpolatedAsync($"CALL sp_build_batch_plan({id})", cancellationToken);
+        var stock = await CheckStockAsync(id, batch, cancellationToken);
+        await db.Database.ExecuteSqlInterpolatedAsync($"CALL sp_apply_batch_stock({id})", cancellationToken);
         await transaction.CommitAsync(cancellationToken);
         db.ChangeTracker.Clear();
-        return await GetAsync(ownerId, id, cancellationToken);
+        return (await GetAsync(ownerId, id, cancellationToken))! with { Stock = stock };
+    }
+
+    /// <inheritdoc />
+    public async Task CancelAsync(Guid ownerId, Guid id, bool returnStock, CancellationToken cancellationToken)
+    {
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+        if (returnStock)
+        {
+            await db.Database.ExecuteSqlInterpolatedAsync($"CALL sp_return_batch_stock({id})", cancellationToken);
+        }
+
+        await SetStatusAsync(ownerId, id, BatchStatus.Cancelled, cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+    }
+
+    /// <inheritdoc />
+    public async Task<bool> DeleteAsync(Guid ownerId, Guid id, bool returnStock, CancellationToken cancellationToken)
+    {
+        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+        if (!await db.Batches.AsNoTracking().AnyAsync(b => b.OwnerId == ownerId && b.Id == id, cancellationToken))
+        {
+            return false;
+        }
+
+        if (returnStock)
+        {
+            await db.Database.ExecuteSqlInterpolatedAsync($"CALL sp_return_batch_stock({id})", cancellationToken);
+        }
+
+        // The ledger rows of the batch stay (batch_id becomes NULL), so the stock keeps its history.
+        await db.Batches.Where(b => b.OwnerId == ownerId && b.Id == id).ExecuteDeleteAsync(cancellationToken);
+        await transaction.CommitAsync(cancellationToken);
+        return true;
     }
 
     /// <inheritdoc />
@@ -257,8 +297,19 @@ public sealed class BatchRepository(OneLoafDbContext db) : IBatchRepository
             .ToListAsync(cancellationToken);
     }
 
+    private async Task<BatchStockDto?> CheckStockAsync(Guid batchId, NewBatch batch, CancellationToken cancellationToken)
+    {
+        var rows = await db.Database.SqlQuery<BatchStockRow>($"""
+            SELECT ingredient_id AS "IngredientId", name AS "Name", unit_code AS "UnitCode", needed_full AS "NeededFull",
+                   needed AS "Needed", available AS "Available"
+            FROM fn_batch_stock_check({batchId})
+            """).ToListAsync(cancellationToken);
+        return BatchStockPlanner.Evaluate(rows, batch.Items.Count == 1 ? batch.Items[0].Loaves : null);
+    }
+
     private static void ApplyHeader(Batch entity, NewBatch batch)
     {
+        entity.IngredientScale = batch.IngredientScale;
         entity.Name = batch.Name;
         entity.Source = batch.Source;
         entity.PlannedStartAt = batch.PlannedStartAt.UtcDateTime;
@@ -285,7 +336,7 @@ public sealed class BatchRepository(OneLoafDbContext db) : IBatchRepository
                 s.PlannedMinMinutes, s.PlannedMaxMinutes, Utc(s.PlannedStartAt), Utc(s.PlannedEndMinAt), Utc(s.PlannedEndMaxAt),
                 Utc(s.ActualStartAt), Utc(s.ActualEndAt), s.Status, s.ExtendedMinutes, s.IsOverridden, s.ActualTemperatureC,
                 s.Note)).ToList())).ToList(),
-        bakeRecordId);
+        bakeRecordId, b.IngredientScale);
 
     /// <summary>A preview is not stored: its ids are cleared so that they cannot be used.</summary>
     private static BatchDto AsPreview(BatchDto planned) => planned with

@@ -108,6 +108,36 @@ public sealed record RecipeRequest(
     string Title, string? Description, int YieldLoaves, decimal? LoafWeightG, string? Notes,
     IReadOnlyList<RecipeIngredientInput> Ingredients, IReadOnlyList<RecipeStageInput> Stages);
 
+/// <summary>Ingredient of a recipe draft, named instead of referenced.</summary>
+/// <param name="Name">Name; an ingredient of the user with this name is reused, otherwise it is created without a price.</param>
+/// <param name="CategoryCode">Category for a new ingredient.</param>
+/// <param name="UnitCode">Unit for a new ingredient; the quantity is in the unit of the ingredient.</param>
+/// <param name="Quantity">Quantity for the recipe yield.</param>
+/// <param name="IsOptional">Optional ingredient.</param>
+/// <param name="Note">Note.</param>
+public sealed record RecipeDraftIngredient(
+    string Name, string CategoryCode, string UnitCode, decimal Quantity, bool IsOptional = false, string? Note = null);
+
+/// <summary>
+/// Body of <c>POST /recipes/drafts</c>: a recipe whose ingredients are given by name (a recipe proposed by the
+/// assistant, US-34). Missing ingredients are created together with the recipe.
+/// </summary>
+/// <param name="Title">Title.</param>
+/// <param name="Description">Description.</param>
+/// <param name="YieldLoaves">Loaves the quantities are written for.</param>
+/// <param name="LoafWeightG">Weight of one loaf, g.</param>
+/// <param name="Notes">Notes.</param>
+/// <param name="Ingredients">Ingredients by name.</param>
+/// <param name="Stages">Stages in order.</param>
+public sealed record RecipeDraftRequest(
+    string Title, string? Description, int YieldLoaves, decimal? LoafWeightG, string? Notes,
+    IReadOnlyList<RecipeDraftIngredient> Ingredients, IReadOnlyList<RecipeStageInput> Stages);
+
+/// <summary>Result of <c>POST /recipes/drafts</c>.</summary>
+/// <param name="Recipe">The created recipe.</param>
+/// <param name="CreatedIngredients">Names of the ingredients that were created; they have no price yet.</param>
+public sealed record RecipeDraftResponse(RecipeDto Recipe, IReadOnlyList<string> CreatedIngredients);
+
 /// <summary>Body of <c>POST /recipes/{id}/variants</c>: a new variant inherits everything; change it with PUT.</summary>
 /// <param name="Title">Title of the variant.</param>
 public sealed record CreateVariantRequest(string Title);

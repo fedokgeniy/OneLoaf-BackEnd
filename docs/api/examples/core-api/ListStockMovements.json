@@ -1,0 +1,45 @@
+[
+  {
+    "case": "purchase and correction",
+    "method": "GET",
+    "path": "/api/v1/ingredients/625260a8-63f3-45d5-b6e9-b5d79695ae6f/stock-movements?page=1&pageSize=20",
+    "authenticated": true,
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "items": [
+        {
+          "id": "1dccf57b-b720-4691-ba49-5b8570088cc8",
+          "type": "adjustment",
+          "quantity": -70.000,
+          "occurredOn": "2026-11-24",
+          "batchId": null,
+          "batchName": null,
+          "packCount": null,
+          "packSize": null,
+          "totalCost": null,
+          "currency": null,
+          "note": "Counted the shelf",
+          "createdAt": "2026-11-24T16:43:51.422869+00:00"
+        },
+        {
+          "id": "948942fd-ecbf-47c0-89f8-70b747060ea4",
+          "type": "purchase",
+          "quantity": 500.000,
+          "occurredOn": "2026-11-22",
+          "batchId": null,
+          "batchName": null,
+          "packCount": 2,
+          "packSize": 250.000,
+          "totalCost": 3.2000,
+          "currency": "EUR",
+          "note": "Market",
+          "createdAt": "2026-11-24T16:43:51.305728+00:00"
+        }
+      ],
+      "page": 1,
+      "pageSize": 20,
+      "totalCount": 2
+    }
+  }
+]

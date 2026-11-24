@@ -1,0 +1,26 @@
+[
+  {
+    "case": "cancelled batch",
+    "method": "DELETE",
+    "path": "/api/v1/batches/e467b750-b76d-494d-91dc-8a2d40573a9a?ingredientsUsed=false",
+    "authenticated": true,
+    "status": 204
+  },
+  {
+    "case": "running batch",
+    "method": "DELETE",
+    "path": "/api/v1/batches/91fc4cd7-79a8-4d4b-9bd7-8ff4c66c21fa",
+    "authenticated": true,
+    "status": 409,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/conflict",
+      "title": "The request conflicts with existing data.",
+      "status": 409,
+      "detail": "Complete or cancel the running batch before deleting it.",
+      "instance": "/api/v1/batches/91fc4cd7-79a8-4d4b-9bd7-8ff4c66c21fa",
+      "traceId": "00-64263791449f3d69360a451cc7cebe7e-7b8d66a482ceba8a-02",
+      "correlationId": "a099acdaa34343ffa5c642db5fc11945"
+    }
+  }
+]

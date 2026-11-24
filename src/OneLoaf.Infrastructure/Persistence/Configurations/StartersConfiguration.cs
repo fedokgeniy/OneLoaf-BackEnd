@@ -24,6 +24,10 @@ public class StarterConfiguration : IEntityTypeConfiguration<Starter>
         b.HasOne(x => x.Owner).WithMany().HasForeignKey(x => x.OwnerId).OnDelete(DeleteBehavior.Cascade);
         b.HasIndex(x => x.FlourId);
         b.HasOne(x => x.Flour).WithMany().HasForeignKey(x => x.FlourId).OnDelete(DeleteBehavior.SetNull);
+        b.HasIndex(x => x.FlourIngredientId);
+        b.HasIndex(x => x.WaterIngredientId);
+        b.HasOne(x => x.FlourIngredient).WithMany().HasForeignKey(x => x.FlourIngredientId).OnDelete(DeleteBehavior.SetNull);
+        b.HasOne(x => x.WaterIngredient).WithMany().HasForeignKey(x => x.WaterIngredientId).OnDelete(DeleteBehavior.SetNull);
     }
 }
 

@@ -9,12 +9,12 @@
     "responseBody": {
       "items": [
         {
-          "id": "dcab64b0-9720-4f19-997d-b3bcd2492ddc",
+          "id": "1de1aea8-feae-4b1f-8c15-ca89b41289d2",
           "name": "Weekend bake",
           "status": "planned",
-          "plannedStartAt": "2026-11-25T06:00:00+00:00",
-          "plannedReadyFrom": "2026-11-25T21:05:00+00:00",
-          "plannedReadyTo": "2026-11-26T00:20:00+00:00",
+          "plannedStartAt": "2026-11-26T06:00:00+00:00",
+          "plannedReadyFrom": "2026-11-26T21:05:00+00:00",
+          "plannedReadyTo": "2026-11-27T00:20:00+00:00",
           "totalLoaves": 3
         }
       ],
@@ -40,26 +40,26 @@
           "status must be one of: planned, in_progress, done, cancelled."
         ]
       },
-      "traceId": "00-c223cb76cce5740d727319c08e875dab-e5694eeb02d23589-02",
-      "correlationId": "1bc71bb7db974b4fa4883eb79f06ee79"
+      "traceId": "00-6cb8c49ca9d1a0bf862c13fe52bdd8c6-2c436f1d67342592-02",
+      "correlationId": "01ead8fcda3e42699e212188bbcaa223"
     }
   },
   {
     "case": "calendar range",
     "method": "GET",
-    "path": "/api/v1/batches?from=2026-11-24T08%3A00%3A00.0000000%2B02%3A00&page=1&pageSize=20",
+    "path": "/api/v1/batches?from=2026-11-25T08%3A00%3A00.0000000%2B02%3A00&page=1&pageSize=20",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
       "items": [
         {
-          "id": "dcab64b0-9720-4f19-997d-b3bcd2492ddc",
+          "id": "1de1aea8-feae-4b1f-8c15-ca89b41289d2",
           "name": "Weekend bake",
           "status": "planned",
-          "plannedStartAt": "2026-11-25T06:00:00+00:00",
-          "plannedReadyFrom": "2026-11-25T21:05:00+00:00",
-          "plannedReadyTo": "2026-11-26T00:20:00+00:00",
+          "plannedStartAt": "2026-11-26T06:00:00+00:00",
+          "plannedReadyFrom": "2026-11-26T21:05:00+00:00",
+          "plannedReadyTo": "2026-11-27T00:20:00+00:00",
           "totalLoaves": 3
         }
       ],

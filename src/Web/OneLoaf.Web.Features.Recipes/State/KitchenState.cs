@@ -98,7 +98,7 @@ public sealed class KitchenEffects(ICatalogApi api, IReferenceApi reference)
         {
             case ApiResult<KitchenSettingsDto>.Success { Value: var settings }:
                 dispatcher.Dispatch(new KitchenSaved(settings));
-                dispatcher.Dispatch(new ShowToast(Toast.Success("Kitchen settings saved")));
+                dispatcher.Dispatch(new ShowToast(Toast.Success("My kitchen saved")));
                 break;
             case ApiResult<KitchenSettingsDto>.Failure { Error: var error }:
                 dispatcher.Dispatch(new KitchenSaveFailed(error));

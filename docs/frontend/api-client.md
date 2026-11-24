@@ -144,7 +144,7 @@ public sealed class CalculatorApi(ApiClientFactory f)
 | `ReferenceApi` (Shared, cached for the session) | `reference/units`, `currencies`, `stage-types`, `ingredient-categories`, `flour-types` |
 | `RecipesApi` (Recipes) | `recipes` CRUD, `archive`, `unarchive`, `variants`, `comparison`, `scaled` |
 | `CalculatorApi` (Recipes) | `cost`, `timeline`, `start-window`, `production-figures`, `calculations/oven-loading` |
-| `IngredientsApi`, `FloursApi`, `KitchenApi` (Recipes) | `ingredients` + `prices`, `flours`, `kitchen-settings`, `warnings` |
+| `IngredientsApi`, `FloursApi`, `KitchenApi` (Recipes) | `ingredients` + `prices`, `stock-movements`, `purchases`, `stock-adjustments`, `flours`, `kitchen-settings`, `warnings` |
 | `BatchesApi` (Production) | `batches` list/get/create/update/preview/cancel/complete/save-as-variant/kneading-plan, stage start/complete/skip/extend/patch/reset |
 | `StartersApi` (Production) | `starters` CRUD, `feedings` |
 | `RemindersApi` (Shared — used by Home and Calendar) | notification `reminders` |

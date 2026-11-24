@@ -1,0 +1,107 @@
+@* Dialog that adds or edits a flour of the catalog (US-11). It only collects the data: the page saves the request
+   through its own state and passes the result back with Busy and Error. *@
+@using Microsoft.AspNetCore.Components.Forms
+@using OneLoaf.Web.Shared.Api
+@using OneLoaf.Web.Shared.Contracts.Core
+@using OneLoaf.Web.Shared.Ui
+
+<OlDialog Open="Open" Title="@(Flour is null ? "New flour" : $"Edit {Flour.Name}")" OnClose="OnClose">
+    <ChildContent>
+        @if (Open)
+        {
+            <EditForm id="@FormId" Model="_form" OnValidSubmit="Submit" class="form-stack" novalidate>
+                <ObjectGraphValidation />
+                <ServerValidation @ref="_server" />
+                <OlTextField Label="Name" Placeholder="Bread flour T550" @bind-Value="_form.Name" />
+                <OlSelect Label="Flour type" Options="FlourTypes" Placeholder="Choose a type" @bind-Value="_form.FlourTypeCode" />
+                <OlNumberField TValue="decimal?" Label="Protein" Suffix="%" Help="From the bag; used to find recipes by flour strength." @bind-Value="_form.ProteinPercent" />
+                <OlTextField Label="Grind" Placeholder="fine" @bind-Value="_form.Grind" />
+                <OlTextArea Label="Notes" Rows="2" @bind-Value="_form.Notes" />
+                @if (_alert is not null)
+                {
+                    <OlAlert Kind="AlertKind.Danger" CorrelationId="@_alert.CorrelationId">@_alert.Message</OlAlert>
+                }
+            </EditForm>
+        }
+    </ChildContent>
+    <Footer>
+        <OlButton Variant="ButtonVariant.Secondary" OnClick="OnClose">Cancel</OlButton>
+        <OlButton Type="submit" form="@FormId" Loading="@Busy">Save flour</OlButton>
+    </Footer>
+</OlDialog>
+
+@code {
+    private const string FormId = "flour-form";
+
+    private FlourForm _form = new();
+    private ServerValidation? _server;
+    private ApiError? _alert;
+    private ApiError? _shownError;
+    private bool _wasOpen;
+
+    /// <summary>True while the dialog is shown.</summary>
+    [Parameter] public bool Open { get; set; }
+
+    /// <summary>The flour to edit; null adds a flour.</summary>
+    [Parameter] public FlourDto? Flour { get; set; }
+
+    /// <summary>Flour types of the reference data.</summary>
+    [Parameter, EditorRequired] public IReadOnlyList<SelectOption> FlourTypes { get; set; } = [];
+
+    /// <summary>True while the page saves the flour.</summary>
+    [Parameter] public bool Busy { get; set; }
+
+    /// <summary>Error of the last save: field errors go under the fields, a duplicate name under the name.</summary>
+    [Parameter] public ApiError? Error { get; set; }
+
+    /// <summary>Raised with the valid request.</summary>
+    [Parameter] public EventCallback<FlourRequest> OnSave { get; set; }
+
+    /// <summary>Raised when the dialog closes.</summary>
+    [Parameter] public EventCallback OnClose { get; set; }
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        if (Open && !_wasOpen)
+        {
+            _form = Flour is null ? new FlourForm() : FlourForm.From(Flour);
+            _alert = null;
+            _shownError = Error;
+        }
+
+        _wasOpen = Open;
+        if (Open && Error is not null && !ReferenceEquals(Error, _shownError))
+        {
+            _shownError = Error;
+            Show(Error);
+        }
+    }
+
+    private Task Submit()
+    {
+        if (Busy)
+        {
+            return Task.CompletedTask;
+        }
+
+        _alert = null;
+        return OnSave.InvokeAsync(_form.ToRequest());
+    }
+
+    private void Show(ApiError error)
+    {
+        if (error.Kind == ApiErrorKind.Validation && _server is not null && _server.Display(error.FieldErrors).Count == 0)
+        {
+            return;
+        }
+
+        if (error.Kind == ApiErrorKind.Conflict && _server is not null)
+        {
+            _server.DisplayFor(nameof(FlourForm.Name), error.Message);
+            return;
+        }
+
+        _alert = error;
+    }
+}

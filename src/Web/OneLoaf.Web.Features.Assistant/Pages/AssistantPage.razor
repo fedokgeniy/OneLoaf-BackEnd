@@ -40,7 +40,7 @@
                 <div class="ol-chat" role="log" aria-live="polite" aria-relevant="additions">
                     <div class="ol-msg ol-msg--assistant">
                         <span class="ol-msg__meta"><OlIcon Name="IconName.Assistant" /> OneLoaf assistant · AI</span>
-                        <span>Hi! I’m an AI assistant. I can plan a batch, calculate cost and help analyse a bake.</span>
+                        <span>Hi! I’m an AI assistant. I can plan a batch, suggest a new recipe, calculate cost and help analyse a bake.</span>
                     </div>
                     @foreach (var entry in entries)
                     {
@@ -53,7 +53,14 @@
                             {
                                 <span class="ol-visually-hidden">You:</span>
                             }
-                            <span class="assistant__text">@entry.Message.Content</span>
+                            @if (entry.Message.Role == "user")
+                            {
+                                <span class="assistant__text">@entry.Message.Content</span>
+                            }
+                            else
+                            {
+                                <MarkdownText Text="@entry.Message.Content" />
+                            }
                             @if (entry.UnverifiedNumbers is { Count: > 0 } unverified)
                             {
                                 <OlAlert Kind="AlertKind.Warning" Title="Some numbers could not be checked">
@@ -62,7 +69,7 @@
                             }
                             @if (entry.Proposal is { } proposal)
                             {
-                                <PlanCard Proposal="proposal" Status="entry.Status" BatchId="entry.BatchId" Busy="State.Value.ActingOn == proposal.ActionId"
+                                <PlanCard Proposal="proposal" Status="entry.Status" BatchId="entry.BatchId" RecipeId="entry.RecipeId" Busy="State.Value.ActingOn == proposal.ActionId"
                                           OnConfirm="() => Dispatcher.Dispatch(new ConfirmProposal(proposal.ActionId))"
                                           OnDecline="() => Dispatcher.Dispatch(new DeclineProposal(proposal.ActionId))" />
                             }
@@ -102,7 +109,7 @@
                           Disabled="@(State.Value.Sending is not null || string.IsNullOrWhiteSpace(_draft))" />
         </form>
         <p class="assistant__help" id="composer-help">
-            Ctrl + Enter sends. The assistant only saves a batch after you confirm it.
+            Ctrl + Enter sends. The assistant only saves a batch or a recipe after you confirm it.
             @if (State.Value.Usage.Value is { } usage)
             {
                 <span>Today: @usage.Requests of @usage.RequestLimit requests.</span>

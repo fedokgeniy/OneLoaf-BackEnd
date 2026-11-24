@@ -92,12 +92,23 @@
     "type": "object",
     "properties": {
       "batchId": {
-        "type": "string",
-        "description": "The saved batch.",
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "The created batch, for a batch proposal.",
+        "format": "uuid"
+      },
+      "recipeId": {
+        "type": [
+          "null",
+          "string"
+        ],
+        "description": "The created recipe, for a recipe proposal.",
         "format": "uuid"
       }
     },
-    "description": "Result of confirming a proposal."
+    "description": "Result of confirming a proposal: the id of what was created."
   },
   "ConversationDto": {
     "required": [

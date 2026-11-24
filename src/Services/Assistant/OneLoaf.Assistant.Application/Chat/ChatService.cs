@@ -113,7 +113,10 @@ public sealed partial class ChatService(
             new TurnUsageDto(turn.InputTokens, turn.OutputTokens, cost));
     }
 
-    /// <summary>Saves the proposed batch through the Core API with source = assistant (US-34).</summary>
+    /// <summary>
+    /// Saves the proposal through the Core API (US-34): a batch with source = assistant, or a recipe together with
+    /// the ingredients the baker does not have yet.
+    /// </summary>
     public async Task<ConfirmActionResponse> ConfirmAsync(Guid conversationId, Guid actionId, CancellationToken cancellationToken)
     {
         var action = await GetOwnActionAsync(conversationId, actionId, cancellationToken);
@@ -122,18 +125,21 @@ public sealed partial class ChatService(
             throw new ConflictException(ActionGoneMessage);
         }
 
+        var isRecipe = action.Kind == PendingActionKinds.CreateRecipe;
         using var payload = JsonDocument.Parse(action.Payload);
-        var response = await coreApi.SendAsync(HttpMethod.Post, CoreApiRoutes.Batches, payload.RootElement, cancellationToken);
+        var response = await coreApi.SendAsync(HttpMethod.Post, isRecipe ? CoreApiRoutes.RecipeDrafts : CoreApiRoutes.Batches,
+            payload.RootElement, cancellationToken);
         if (!response.IsSuccess)
         {
             throw new ConflictException(CoreApiTool.ToResult(response).Content);
         }
 
-        using var batch = JsonDocument.Parse(response.Body);
-        var batchId = batch.RootElement.GetProperty("id").GetGuid();
-        await conversations.AddMessageAsync(conversationId, new NewMessage(ChatRole.Assistant, Prompts.BatchSavedMessage), cancellationToken);
-        LogConfirmed(logger, batchId, currentUser.Id);
-        return new ConfirmActionResponse(batchId);
+        using var created = JsonDocument.Parse(response.Body);
+        var id = (isRecipe ? created.RootElement.GetProperty("recipe") : created.RootElement).GetProperty("id").GetGuid();
+        await conversations.AddMessageAsync(conversationId,
+            new NewMessage(ChatRole.Assistant, isRecipe ? Prompts.RecipeSavedMessage : Prompts.BatchSavedMessage), cancellationToken);
+        LogConfirmed(logger, action.Kind, id, currentUser.Id);
+        return isRecipe ? new ConfirmActionResponse(null, id) : new ConfirmActionResponse(id);
     }
 
     /// <summary>Discards a proposal; nothing is saved (UC-01 alternative flow A2).</summary>
@@ -240,8 +246,8 @@ public sealed partial class ChatService(
     [LoggerMessage(Level = LogLevel.Warning, Message = "Conversation {ConversationId}: {Count} unverified numbers removed")]
     private static partial void LogUnverified(ILogger logger, Guid conversationId, int count);
 
-    [LoggerMessage(Level = LogLevel.Information, Message = "Batch {BatchId} saved from the assistant for {UserId}")]
-    private static partial void LogConfirmed(ILogger logger, Guid batchId, Guid userId);
+    [LoggerMessage(Level = LogLevel.Information, Message = "Proposal {Kind} saved from the assistant as {EntityId} for {UserId}")]
+    private static partial void LogConfirmed(ILogger logger, string kind, Guid entityId, Guid userId);
 }
 
 /// <summary>Accumulated state of one turn: tokens, tool calls and tool outputs.</summary>

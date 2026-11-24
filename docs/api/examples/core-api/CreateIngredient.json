@@ -8,21 +8,25 @@
       "name": "Bread flour",
       "categoryCode": "flour",
       "unitCode": "g",
-      "flourId": "091556f9-e047-41ba-a3c4-34037d3833f6"
+      "flourId": "ab7520cd-d427-4acf-882e-bf82bf81f612"
     },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "f2a4c8d9-547a-4da7-bf63-07f14c020a27",
+      "id": "10c358b9-7268-404a-b141-aaf0cebfc880",
       "name": "Bread flour",
       "categoryCode": "flour",
       "unitCode": "g",
-      "flourId": "091556f9-e047-41ba-a3c4-34037d3833f6",
+      "flourId": "ab7520cd-d427-4acf-882e-bf82bf81f612",
       "flourName": "Bread flour T550",
       "proteinPercent": 12.8,
       "currentPrice": null,
-      "createdAt": "2026-11-23T10:08:53.921546+00:00",
-      "updatedAt": "2026-11-23T10:08:53.921546+00:00"
+      "createdAt": "2026-11-24T16:43:50.990477+00:00",
+      "updatedAt": "2026-11-24T16:43:50.990477+00:00",
+      "trackStock": false,
+      "stock": null,
+      "reorderLevel": null,
+      "isLowStock": false
     }
   },
   {
@@ -39,7 +43,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "c988c3b7-4463-4474-895b-255438fb664d",
+      "id": "d0d37e1b-b474-431e-bcb7-d1c4364eb162",
       "name": "Water",
       "categoryCode": "water",
       "unitCode": "g",
@@ -47,8 +51,12 @@
       "flourName": null,
       "proteinPercent": null,
       "currentPrice": null,
-      "createdAt": "2026-11-23T10:08:54.051536+00:00",
-      "updatedAt": "2026-11-23T10:08:54.051536+00:00"
+      "createdAt": "2026-11-24T16:43:51.114805+00:00",
+      "updatedAt": "2026-11-24T16:43:51.114805+00:00",
+      "trackStock": false,
+      "stock": null,
+      "reorderLevel": null,
+      "isLowStock": false
     }
   },
   {
@@ -65,7 +73,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "180012fa-8da7-4292-baae-b071aea57ec4",
+      "id": "6d143075-ce04-4d4e-941d-3d42146db57e",
       "name": "Salt",
       "categoryCode": "salt",
       "unitCode": "g",
@@ -73,8 +81,12 @@
       "flourName": null,
       "proteinPercent": null,
       "currentPrice": null,
-      "createdAt": "2026-11-23T10:08:54.062006+00:00",
-      "updatedAt": "2026-11-23T10:08:54.062006+00:00"
+      "createdAt": "2026-11-24T16:43:51.121953+00:00",
+      "updatedAt": "2026-11-24T16:43:51.121953+00:00",
+      "trackStock": false,
+      "stock": null,
+      "reorderLevel": null,
+      "isLowStock": false
     }
   },
   {
@@ -91,7 +103,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "9de3b3a4-f7ea-4bb2-9563-88df35b267d3",
+      "id": "37b13fb3-fcb2-4a9c-9ef7-bf45408a3336",
       "name": "Rye starter",
       "categoryCode": "starter",
       "unitCode": "g",
@@ -99,8 +111,12 @@
       "flourName": null,
       "proteinPercent": null,
       "currentPrice": null,
-      "createdAt": "2026-11-23T10:08:54.07945+00:00",
-      "updatedAt": "2026-11-23T10:08:54.07945+00:00"
+      "createdAt": "2026-11-24T16:43:51.135096+00:00",
+      "updatedAt": "2026-11-24T16:43:51.135096+00:00",
+      "trackStock": false,
+      "stock": null,
+      "reorderLevel": null,
+      "isLowStock": false
     }
   },
   {
@@ -126,8 +142,8 @@
           "Unknown unit 'spoon'."
         ]
       },
-      "traceId": "00-2faf562a3b2dd13d7ca03b380aaad0e8-c952884d3d16484f-02",
-      "correlationId": "e34e1ef61c2243178933b828b8cb9604"
+      "traceId": "00-f08a4b3e426fe83de1fd6a1f71a0fe45-5487c71949bf679a-02",
+      "correlationId": "bce9e3b597a14d1d8d4d182acf0be561"
     }
   },
   {
@@ -144,7 +160,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "77a86713-a6ae-4c6e-8303-64f2abea4439",
+      "id": "ce9d3fe9-33af-4b1b-a12f-bc6ec8894138",
       "name": "Sesame",
       "categoryCode": "add_in",
       "unitCode": "g",
@@ -152,8 +168,42 @@
       "flourName": null,
       "proteinPercent": null,
       "currentPrice": null,
-      "createdAt": "2026-11-23T10:08:54.231425+00:00",
-      "updatedAt": "2026-11-23T10:08:54.231425+00:00"
+      "createdAt": "2026-11-24T16:43:51.244076+00:00",
+      "updatedAt": "2026-11-24T16:43:51.244076+00:00",
+      "trackStock": false,
+      "stock": null,
+      "reorderLevel": null,
+      "isLowStock": false
+    }
+  },
+  {
+    "case": "ingredient bought in packs",
+    "method": "POST",
+    "path": "/api/v1/ingredients",
+    "authenticated": true,
+    "requestBody": {
+      "name": "Sunflower seeds",
+      "categoryCode": "add_in",
+      "unitCode": "g",
+      "flourId": null
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "625260a8-63f3-45d5-b6e9-b5d79695ae6f",
+      "name": "Sunflower seeds",
+      "categoryCode": "add_in",
+      "unitCode": "g",
+      "flourId": null,
+      "flourName": null,
+      "proteinPercent": null,
+      "currentPrice": null,
+      "createdAt": "2026-11-24T16:43:51.248728+00:00",
+      "updatedAt": "2026-11-24T16:43:51.248728+00:00",
+      "trackStock": false,
+      "stock": null,
+      "reorderLevel": null,
+      "isLowStock": false
     }
   }
 ]

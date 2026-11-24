@@ -3,7 +3,7 @@ using OneLoaf.SharedKernel.Security;
 namespace OneLoaf.CoreApi.Application.Warnings;
 
 /// <summary>A data quality issue of the user's workspace (missing price, empty recipe, overdue batch, ...).</summary>
-/// <param name="IssueCode">Kind of issue, for example <c>missing_price</c>.</param>
+/// <param name="IssueCode">Kind of issue, for example <c>missing_price</c> or <c>low_stock</c>.</param>
 /// <param name="EntityType">Kind of entity: ingredient, recipe, batch, starter.</param>
 /// <param name="EntityId">Id of the entity.</param>
 /// <param name="Details">Human-readable explanation.</param>

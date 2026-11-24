@@ -30,6 +30,9 @@ public static class ToolNames
     /// <summary>Plan of a batch saved as a pending action for the baker to confirm.</summary>
     public const string ProposeBatch = "propose_batch";
 
+    /// <summary>A new recipe saved as a pending action for the baker to confirm.</summary>
+    public const string ProposeRecipe = "propose_recipe";
+
     /// <summary>Stage log and feedback of a bake.</summary>
     public const string GetBakeAnalysisData = "get_bake_analysis_data";
 

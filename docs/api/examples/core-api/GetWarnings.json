@@ -6,6 +6,13 @@
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
-    "responseBody": []
+    "responseBody": [
+      {
+        "issueCode": "missing_price",
+        "entityType": "ingredient",
+        "entityId": "0e4741f8-e218-4334-a48e-236ae90d15e6",
+        "details": "No price for \"Whole wheat flour\" used in \"Beginner sourdough\""
+      }
+    ]
   }
 ]

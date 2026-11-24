@@ -13,7 +13,7 @@ public sealed class ToolContext(Guid userId, Guid conversationId)
     /// <summary>Conversation of the turn.</summary>
     public Guid ConversationId { get; } = conversationId;
 
-    /// <summary>A batch proposal created in this turn, if any.</summary>
+    /// <summary>A batch or recipe proposal created in this turn, if any.</summary>
     public PendingActionDto? PendingAction { get; set; }
 }
 

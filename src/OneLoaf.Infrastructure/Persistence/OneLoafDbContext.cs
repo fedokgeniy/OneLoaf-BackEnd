@@ -23,6 +23,7 @@ public class OneLoafDbContext : DbContext
     public DbSet<Flour> Flours => Set<Flour>();
     public DbSet<Ingredient> Ingredients => Set<Ingredient>();
     public DbSet<IngredientPrice> IngredientPrices => Set<IngredientPrice>();
+    public DbSet<StockMovement> StockMovements => Set<StockMovement>();
 
     // E2 Recipes
     public DbSet<Recipe> Recipes => Set<Recipe>();

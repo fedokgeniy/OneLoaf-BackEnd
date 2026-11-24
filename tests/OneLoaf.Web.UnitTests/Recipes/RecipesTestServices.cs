@@ -48,8 +48,25 @@ internal class CatalogApiStub : ICatalogApi
 
     public virtual Task<ApiResult<PriceDto>> AddPriceAsync(Guid id, PriceRequest request, CancellationToken ct = default) => throw new NotSupportedException();
 
+    public virtual Task<ApiResult<PriceDto>> UpdatePriceAsync(Guid id, Guid priceId, PriceRequest request, CancellationToken ct = default) => throw new NotSupportedException();
+
+    public virtual Task<ApiResult> DeletePriceAsync(Guid id, Guid priceId, CancellationToken ct = default) => throw new NotSupportedException();
+
+    public virtual Task<ApiResult<PagedResult<StockMovementDto>>> ListMovementsAsync(Guid id, CancellationToken ct = default) =>
+        Task.FromResult(ApiResult<PagedResult<StockMovementDto>>.Ok(new PagedResult<StockMovementDto>([], 1, 100, 0)));
+
+    public virtual Task<ApiResult<StockMovementDto>> AddPurchaseAsync(Guid id, PurchaseRequest request, CancellationToken ct = default) => throw new NotSupportedException();
+
+    public virtual Task<ApiResult<StockMovementDto>> AdjustStockAsync(Guid id, StockAdjustmentRequest request, CancellationToken ct = default) => throw new NotSupportedException();
+
     public virtual Task<ApiResult<PagedResult<FlourDto>>> ListFloursAsync(CancellationToken ct = default) =>
         Task.FromResult(ApiResult<PagedResult<FlourDto>>.Ok(new PagedResult<FlourDto>([], 1, 100, 0)));
+
+    public virtual Task<ApiResult<FlourDto>> CreateFlourAsync(FlourRequest request, CancellationToken ct = default) => throw new NotSupportedException();
+
+    public virtual Task<ApiResult<FlourDto>> UpdateFlourAsync(Guid id, FlourRequest request, CancellationToken ct = default) => throw new NotSupportedException();
+
+    public virtual Task<ApiResult> DeleteFlourAsync(Guid id, CancellationToken ct = default) => throw new NotSupportedException();
 
     public virtual Task<ApiResult<IReadOnlyList<WarningDto>>> GetWarningsAsync(CancellationToken ct = default) =>
         Task.FromResult(ApiResult<IReadOnlyList<WarningDto>>.Ok([]));

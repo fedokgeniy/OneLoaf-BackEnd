@@ -1,0 +1,26 @@
+[
+  {
+    "case": "typical",
+    "method": "DELETE",
+    "path": "/api/v1/ingredients/625260a8-63f3-45d5-b6e9-b5d79695ae6f/prices/b7461c5c-fd3d-42e3-824f-46799eac8f95",
+    "authenticated": true,
+    "status": 204
+  },
+  {
+    "case": "already deleted",
+    "method": "DELETE",
+    "path": "/api/v1/ingredients/625260a8-63f3-45d5-b6e9-b5d79695ae6f/prices/b7461c5c-fd3d-42e3-824f-46799eac8f95",
+    "authenticated": true,
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "The price was not found.",
+      "instance": "/api/v1/ingredients/625260a8-63f3-45d5-b6e9-b5d79695ae6f/prices/b7461c5c-fd3d-42e3-824f-46799eac8f95",
+      "traceId": "00-2c3ab665286a27dbc072a451ce40042d-ddaca44d4af14883-02",
+      "correlationId": "af4c801547bc4c1c9405277c2dd22ef7"
+    }
+  }
+]

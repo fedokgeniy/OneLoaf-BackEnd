@@ -12,9 +12,12 @@ namespace OneLoaf.CoreApi.Application.Starters;
 /// <param name="RiseHours">Hours from feeding to peak (US-30).</param>
 /// <param name="IsActive">Reminders are created for active starters only.</param>
 /// <param name="Notes">Notes.</param>
+/// <param name="FlourIngredientId">Ingredient whose stock a feeding takes the flour from.</param>
+/// <param name="WaterIngredientId">Ingredient whose stock a feeding takes the water from.</param>
 public sealed record StarterRequest(
     string Name, decimal HydrationPercent, FeedingMode FeedingMode, int FeedingIntervalHours, Guid? FlourId = null,
-    decimal? RiseHours = null, bool IsActive = true, string? Notes = null);
+    decimal? RiseHours = null, bool IsActive = true, string? Notes = null, Guid? FlourIngredientId = null,
+    Guid? WaterIngredientId = null);
 
 /// <summary>A starter with its schedule from the last feeding (US-27, US-28, US-30).</summary>
 /// <param name="Id">Id.</param>
@@ -31,10 +34,14 @@ public sealed record StarterRequest(
 /// <param name="ExpectedPeakAt">Expected peak from the last feeding.</param>
 /// <param name="CreatedAt">Creation time.</param>
 /// <param name="UpdatedAt">Last change.</param>
+/// <param name="FlourIngredientId">Ingredient whose stock a feeding takes the flour from.</param>
+/// <param name="WaterIngredientId">Ingredient whose stock a feeding takes the water from.</param>
+/// <param name="AmountG">Starter after the last feeding, g: flour + water + starter kept.</param>
 public sealed record StarterDto(
     Guid Id, string Name, Guid? FlourId, decimal HydrationPercent, FeedingMode FeedingMode, int FeedingIntervalHours,
     decimal? RiseHours, bool IsActive, string? Notes, DateTimeOffset? LastFedAt, DateTimeOffset? NextFeedingAt,
-    DateTimeOffset? ExpectedPeakAt, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt);
+    DateTimeOffset? ExpectedPeakAt, DateTimeOffset CreatedAt, DateTimeOffset UpdatedAt, Guid? FlourIngredientId = null,
+    Guid? WaterIngredientId = null, decimal? AmountG = null);
 
 /// <summary>Body of <c>POST /starters/{id}/feedings</c> (US-28).</summary>
 /// <param name="FedAt">Feeding time.</param>

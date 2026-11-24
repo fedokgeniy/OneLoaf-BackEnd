@@ -153,6 +153,44 @@ public sealed class AssistantTests
     }
 
     [Fact]
+    public async Task US34_ProposeRecipe_MarksNewIngredientsAndIsSavedOnlyOnConfirm()
+    {
+        var conversation = await _conversations.CreateAsync(UserId, null, Ct);
+        var recipeId = Guid.NewGuid();
+        _coreApi.Responses["/api/v1/ingredients?pageSize=100"] = """{"items":[{"name":"Bread flour"}]}""";
+        _coreApi.Responses["/api/v1/recipes/drafts"] = $$"""{"recipe":{"id":"{{recipeId}}"},"createdIngredients":["Water"]}""";
+        var context = new ToolContext(UserId, conversation.Id);
+        var tool = new ProposeRecipeTool(_coreApi, _pending, new FixedTime(Now));
+
+        var proposed = await tool.ExecuteAsync(Json(new
+        {
+            title = "Beginner loaf",
+            yieldLoaves = 1,
+            ingredients = new object[]
+            {
+                new { name = "bread flour", category = "flour", unit = "g", quantity = 500 },
+                new { name = "Water", category = "water", unit = "g", quantity = 350 },
+            },
+            stages = new object[] { new { name = "Bake", stageType = "bake", minMinutes = 40, maxMinutes = 45 } },
+        }), context, Ct);
+        var invalid = await tool.ExecuteAsync(Json(new { title = "No stages", yieldLoaves = 1, ingredients = Array.Empty<object>() }), context, Ct);
+
+        Assert.False(proposed.IsError);
+        Assert.True(invalid.IsError);
+        Assert.Equal(PendingActionKinds.CreateRecipe, context.PendingAction!.Kind);
+        var lines = context.PendingAction.Plan.GetProperty("ingredients");
+        Assert.False(lines[0].GetProperty("isNew").GetBoolean());
+        Assert.True(lines[1].GetProperty("isNew").GetBoolean());
+        Assert.DoesNotContain("POST /api/v1/recipes/drafts", _coreApi.Calls);
+
+        var confirmed = await Chat(new ScriptedClaude()).ConfirmAsync(conversation.Id, context.PendingAction.ActionId, Ct);
+
+        Assert.Equal(recipeId, confirmed.RecipeId);
+        Assert.Null(confirmed.BatchId);
+        Assert.Contains("POST /api/v1/recipes/drafts", _coreApi.Calls);
+    }
+
+    [Fact]
     public async Task Conversations_ListCreateDeleteAndForeign()
     {
         var chat = Chat(new ScriptedClaude());
