@@ -8,8 +8,8 @@ Type: relational transactional database (OLTP), **PostgreSQL 16**. The structure
 Code First) and created **only by scripts**: a chain of migrations or the DDL script [`db/schema.sql`](../../db/schema.sql)
 generated from it.
 
-**Contents:** 29 tables (5 of them reference tables), 53 foreign keys, 96 CHECK constraints, 97 indexes, 29 triggers,
-20 functions, 20 trigger functions, 4 procedures, 7 views, 1 materialized view, 3 access roles; 225 automated checks.
+**Contents:** 30 tables (5 of them reference tables), 59 foreign keys, 103 CHECK constraints, 103 indexes, 32 triggers,
+23 functions, 23 trigger functions, 6 procedures, 8 views, 1 materialized view, 3 access roles; 242 automated checks.
 
 ## Documentation
 
@@ -40,7 +40,7 @@ generated from it.
 |---|---|
 | Modern relational DBMS | PostgreSQL 16; justification in [design.md - Choice of the DBMS](design.md#choice-of-the-dbms) |
 | Normalization to 3NF | [design.md - Normalization](design.md#normalization) |
-| Enough tables and different relationship types | 29 tables; 1:1, 1:N, M:N, recursive, reference - [logical-schema.md - Relationship types](logical-schema.md#relationship-types) |
+| Enough tables and different relationship types | 30 tables; 1:1, 1:N, M:N, recursive, reference - [logical-schema.md - Relationship types](logical-schema.md#relationship-types) |
 | PK, FK, NOT NULL, UNIQUE, CHECK, meaningful data types | Every table; `numeric` for money and quantities, `timestamptz`/`date` for time - [data dictionary](data-dictionary.md) |
 | JSON only with a designed model | Three columns with a documented structure checked by CHECK functions - [design.md - JSON columns](design.md#json-columns) |
 | Indexes with justification | [design.md - Indexes](design.md#indexes), plans in [`db/queries/explain_plans.sql`](../../db/queries/explain_plans.sql) |
@@ -51,7 +51,7 @@ generated from it.
 | Requirement | Where |
 |---|---|
 | Structure created by scripts or migrations, not manually | EF Core migrations and `db/schema.sql`; see [Getting started](#getting-started) |
-| Scripts and migrations in Git | [`src/OneLoaf.Infrastructure/Persistence/Migrations/`](../../src/OneLoaf.Infrastructure/Persistence/Migrations) (7 migrations and their SQL scripts), [`db/`](../../db) |
+| Scripts and migrations in Git | [`src/OneLoaf.Infrastructure/Persistence/Migrations/`](../../src/OneLoaf.Infrastructure/Persistence/Migrations) (8 migrations and their SQL scripts), [`db/`](../../db) |
 | Scripts for reference tables | `InitialSchema` migration (EF Core `HasData`, [`ReferenceData.cs`](../../src/OneLoaf.Infrastructure/Persistence/ReferenceData.cs)); values in the [dictionary](data-dictionary.md#reference-values) |
 | Test data covering edge cases | [`db/seed/test_data.sql`](../../db/seed/test_data.sql) (5 users, every status; the edge cases are listed in the file header); volume data in [`db/seed/volume_data.sql`](../../db/seed/volume_data.sql) |
 
@@ -65,7 +65,7 @@ generated from it.
 | Passwords only in encrypted form, no outdated algorithms | PBKDF2-HMAC-SHA512 with at least 100000 iterations; a CHECK rejects plain text, MD5 and SHA-1; role passwords are SCRAM-SHA-256 |
 | Integrity through constraints and transactions | [integrity-and-transactions.md](integrity-and-transactions.md) |
 | Triggers, procedures and functions with business logic | [design.md - Logic in the database](design.md#logic-in-the-database) |
-| Views and materialized views | 7 views and `mv_bake_statistics` - [dictionary - Views](data-dictionary.md#views) |
+| Views and materialized views | 8 views and `mv_bake_statistics` - [dictionary - Views](data-dictionary.md#views) |
 | Masking and anonymization of personal data | `v_users_masked`, `fn_mask_email`, `fn_mask_name`, `sp_anonymize_user` - [security.md - Personal data](security.md#5-personal-data) |
 
 ## Getting started
@@ -143,8 +143,8 @@ the logical schema match the database, loads the volume data and shows the query
 | File | Role | What it checks | Checks |
 |---|---|---|---|
 | [`db/tests/constraint_tests.sql`](../../db/tests/constraint_tests.sql) | `oneloaf_app` | The database rejects invalid data with an integrity error: formats, ranges, reference data, user isolation, variant rules, status transitions, JSON structure, weak password hashes; cascading account deletion | 71 |
-| [`db/tests/business_tests.sql`](../../db/tests/business_tests.sql) | `oneloaf_app` | Functions, procedures, triggers and views return the values of the acceptance criteria US-06 - US-52 | 64 |
-| [`db/tests/security_audit.sql`](../../db/tests/security_audit.sql) | `app_admin` | Privileges of every table and view match the policy; role attributes; default privileges; no function is executable by `PUBLIC` | 57 |
+| [`db/tests/business_tests.sql`](../../db/tests/business_tests.sql) | `oneloaf_app` | Functions, procedures, triggers and views return the values of the acceptance criteria US-06 - US-52 and of the ingredient stock | 78 |
+| [`db/tests/security_audit.sql`](../../db/tests/security_audit.sql) | `app_admin` | Privileges of every table and view match the policy; role attributes; default privileges; no function is executable by `PUBLIC` | 60 |
 | [`db/tests/security_app.sql`](../../db/tests/security_app.sql) | `oneloaf_app` | The application role writes data but cannot change the structure, reference data, migration history or its own privileges | 17 |
 | [`db/tests/security_reader.sql`](../../db/tests/security_reader.sql) | `oneloaf_reader` | The reporting role sees personal data only masked and cannot change anything | 16 |
 
@@ -162,7 +162,7 @@ src/
       ModelConventions.cs             snake_case, enum as text + CHECK, defaults
       ReferenceData.cs                reference data
       Configurations/                 keys, indexes, CHECK, ON DELETE (Fluent API)
-      Migrations/                     7 migrations
+      Migrations/                     8 migrations
         Sql/<Migration>/*.sql         functions, triggers, procedures, views, privileges
   OneLoaf.DbMigrator/                 console application that applies the migrations
 db/

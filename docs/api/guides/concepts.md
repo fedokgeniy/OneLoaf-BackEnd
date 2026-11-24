@@ -13,13 +13,25 @@ One row per user: oven power and capacity, mixer bowl capacity, electricity tari
 labour rate, currency and IANA time zone. They feed the cost (electricity, packaging, labour, loss lines), kneading
 cycles (bowl capacity) and oven loading (capacity).
 
-## Catalog: flours, ingredients, prices
+## Catalog: flours, ingredients, prices, stock
 
 - A **flour** has a type (`wheat`, `rye`, `spelt`, …) and protein percent; recipes can be filtered by protein (US-37).
 - An **ingredient** has a category (`flour`, `water`, `salt`, `starter`, `yeast`, …) and a unit (`g`, `kg`, `ml`, `l`,
   `pcs`); a flour ingredient links to a flour. Categories decide what counts as flour and liquid for hydration.
 - **Prices** form a history per ingredient (`effectiveFrom`). A cost uses the price valid on its date, so the cost of a
-  bake in September stays as it was even after a price change in October.
+  bake in September stays as it was even after a price change in October. A price entered by mistake can be replaced
+  (`PUT …/prices/{priceId}`) or deleted; there is one price per ingredient and date.
+- **Stock** is a ledger per ingredient (`GET /ingredients/{id}/stock-movements`); the stock is the sum of the
+  movements, in the ingredient unit. A **purchase** (`POST …/purchases`: packs × pack size for an amount) adds to the
+  stock and sets the price of its date; a **correction** (`POST …/stock-adjustments`) sets the stock to the counted
+  quantity. Creating a batch takes its ingredients, re-planning changes the stock by the difference, and cancelling or
+  deleting a batch with `ingredientsUsed=false` returns them. A starter feeding takes flour and water from the
+  ingredients named on the starter. Only ingredients with `trackStock = true` are consumed and checked: the first
+  purchase or correction switches it on, and `PUT /ingredients/{id}` can switch it off. `isLowStock` and the
+  `low_stock` warning report a stock below `reorderLevel` (or below zero).
+- A batch **preview** returns the stock check: `stock.shortages`, `stock.maxLoaves` (loaves the stock covers at full
+  quantities, one-item batches) and `stock.maxScale`. Sending `ingredientScale` below 1 keeps the loaves and bakes
+  from what is in stock: starter amount, kneading cycles, ingredient cost and consumption shrink with it.
 
 ## Recipes and variants
 

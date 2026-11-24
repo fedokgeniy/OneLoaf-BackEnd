@@ -168,6 +168,37 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
         await api.CallAsync("GetIngredientPrices", "history with change percent", HttpMethod.Get, $"/api/v1/ingredients/{flourIngredient}/prices");
         var sesame = Id(await api.CallAsync("CreateIngredient", "unused ingredient", HttpMethod.Post, "/api/v1/ingredients",
             new { name = "Sesame", categoryCode = "add_in", unitCode = "g", flourId = (Guid?)null }));
+
+        // Price correction and stock on an ingredient that no recipe uses, so the calculations below keep their figures.
+        var seeds = Id(await api.CallAsync("CreateIngredient", "ingredient bought in packs", HttpMethod.Post, "/api/v1/ingredients",
+            new { name = "Sunflower seeds", categoryCode = "add_in", unitCode = "g", flourId = (Guid?)null }));
+        var wrongPrice = Id(await api.CallAsync("AddIngredientPrice", "price entered by mistake", HttpMethod.Post,
+            $"/api/v1/ingredients/{seeds}/prices", new { price = 45m, perQuantity = 1000m, currency = "EUR", effectiveFrom = priceFrom }));
+        await api.CallAsync("UpdateIngredientPrice", "typical", HttpMethod.Put, $"/api/v1/ingredients/{seeds}/prices/{wrongPrice}",
+            new { price = 4.5m, perQuantity = 1000m, currency = "EUR", effectiveFrom = priceFrom });
+        await api.CallAsync("UpdateIngredientPrice", "price not found", HttpMethod.Put, $"/api/v1/ingredients/{seeds}/prices/{Missing}",
+            new { price = 4.5m, perQuantity = 1000m, currency = "EUR", effectiveFrom = priceFrom });
+        await api.CallAsync("AddIngredientPurchase", "two packs of 250 g", HttpMethod.Post, $"/api/v1/ingredients/{seeds}/purchases",
+            new
+            {
+                packCount = 2,
+                packSize = 250m,
+                totalCost = 3.20m,
+                currency = "EUR",
+                purchasedOn = today.AddDays(-2).ToString("yyyy-MM-dd", CultureInfo.InvariantCulture),
+                note = "Market",
+            });
+        await api.CallAsync("AddIngredientPurchase", "no packs", HttpMethod.Post, $"/api/v1/ingredients/{seeds}/purchases",
+            new { packCount = 0, packSize = 250m, totalCost = 3.20m, currency = "EUR", purchasedOn = priceFrom, note = (string?)null });
+        await api.CallAsync("GetIngredient", "with kept stock", HttpMethod.Get, $"/api/v1/ingredients/{seeds}");
+        await api.CallAsync("AdjustIngredientStock", "typical", HttpMethod.Post, $"/api/v1/ingredients/{seeds}/stock-adjustments",
+            new { actualQuantity = 430m, note = "Counted the shelf" });
+        await api.CallAsync("AdjustIngredientStock", "stock already equals the quantity", HttpMethod.Post,
+            $"/api/v1/ingredients/{seeds}/stock-adjustments", new { actualQuantity = 430m, note = "Counted again" });
+        await api.CallAsync("ListStockMovements", "purchase and correction", HttpMethod.Get,
+            $"/api/v1/ingredients/{seeds}/stock-movements?page=1&pageSize=20");
+        await api.CallAsync("DeleteIngredientPrice", "typical", HttpMethod.Delete, $"/api/v1/ingredients/{seeds}/prices/{wrongPrice}");
+        await api.CallAsync("DeleteIngredientPrice", "already deleted", HttpMethod.Delete, $"/api/v1/ingredients/{seeds}/prices/{wrongPrice}");
         await api.CallAsync("DeleteIngredient", "typical", HttpMethod.Delete, $"/api/v1/ingredients/{sesame}");
 
         // Recipes
@@ -207,6 +238,36 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
                 stages = new object[] { new { name = "Mix", stageTypeCode = "mix", minDurationMinutes = 30, maxDurationMinutes = 10 } },
             });
         await api.CallAsync("DeleteIngredient", "used in a recipe", HttpMethod.Delete, $"/api/v1/ingredients/{flourIngredient}");
+        await api.CallAsync("CreateRecipeDraft", "recipe proposed by the assistant", HttpMethod.Post, "/api/v1/recipes/drafts",
+            new
+            {
+                title = "Beginner sourdough",
+                description = "A simple first loaf.",
+                yieldLoaves = 1,
+                loafWeightG = 900m,
+                notes = (string?)null,
+                ingredients = new object[]
+                {
+                    new { name = "Whole wheat flour", categoryCode = "flour", unitCode = "g", quantity = 500m, isOptional = false, note = (string?)null },
+                    new { name = "Honey", categoryCode = "sweetener", unitCode = "g", quantity = 15m, isOptional = true, note = (string?)null },
+                },
+                stages = new object[]
+                {
+                    new { name = "Mix", stageTypeCode = "mix", minDurationMinutes = 10, maxDurationMinutes = 15 },
+                    new { name = "Bake", stageTypeCode = "bake", minDurationMinutes = 40, maxDurationMinutes = 45 },
+                },
+            });
+        await api.CallAsync("CreateRecipeDraft", "unknown stage type", HttpMethod.Post, "/api/v1/recipes/drafts",
+            new
+            {
+                title = "Rejected draft",
+                description = (string?)null,
+                yieldLoaves = 1,
+                loafWeightG = (decimal?)null,
+                notes = (string?)null,
+                ingredients = new object[] { new { name = "Spelt flour", categoryCode = "flour", unitCode = "g", quantity = 500m, isOptional = false, note = (string?)null } },
+                stages = new object[] { new { name = "Rest", stageTypeCode = "nap", minDurationMinutes = 10, maxDurationMinutes = 15 } },
+            });
         await api.CallAsync("ListRecipes", "typical", HttpMethod.Get, "/api/v1/recipes?search=country&page=1&pageSize=20");
         await api.CallAsync("ListRecipes", "by flour protein", HttpMethod.Get, "/api/v1/recipes?minProteinPercent=12");
         await api.CallAsync("GetRecipe", "typical", HttpMethod.Get, $"/api/v1/recipes/{recipe}");
@@ -292,7 +353,9 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
             batchBody with { name = "Untouched bake", plannedStartAt = start.AddDays(5) }));
         await api.CallAsync("SaveBatchAsVariant", "batch followed the recipe", HttpMethod.Post, $"/api/v1/batches/{untouched}/save-as-variant",
             new { itemId = (string?)null, title = (string?)null });
-        await api.CallAsync("CancelBatch", "untouched batch", HttpMethod.Post, $"/api/v1/batches/{untouched}/cancel");
+        await api.CallAsync("CancelBatch", "untouched batch, ingredients returned to the stock", HttpMethod.Post,
+            $"/api/v1/batches/{untouched}/cancel?ingredientsUsed=false");
+        await api.CallAsync("DeleteBatch", "cancelled batch", HttpMethod.Delete, $"/api/v1/batches/{untouched}?ingredientsUsed=false");
         var second = Id(await api.CallAsync("CreateBatch", "second batch", HttpMethod.Post, "/api/v1/batches",
             batchBody with { name = "Weekday bake", plannedStartAt = start.AddDays(3) }));
         var secondStages = (await api.CallAsync("GetBatch", "second batch", HttpMethod.Get, $"/api/v1/batches/{second}"))!["items"]![0]!["stages"]!
@@ -308,6 +371,7 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
         await api.CallAsync("ResetStage", "stage already running", HttpMethod.Post, $"/api/v1/batches/{second}/stages/{secondStages[0]}/reset");
         await api.CallAsync("SkipStage", "typical", HttpMethod.Post, $"/api/v1/batches/{second}/stages/{secondStages[2]}/skip",
             new { actualTemperatureC = (decimal?)null, note = "Baked without shaping, in a tin" });
+        await api.CallAsync("DeleteBatch", "running batch", HttpMethod.Delete, $"/api/v1/batches/{second}");
         await api.CallAsync("CancelBatch", "typical", HttpMethod.Post, $"/api/v1/batches/{second}/cancel");
         await api.CallAsync("CancelBatch", "not found or another user's", HttpMethod.Post, $"/api/v1/batches/{Missing}/cancel");
 

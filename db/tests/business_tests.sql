@@ -210,6 +210,66 @@ SELECT pg_temp.check_equal('data quality issue codes',
     (SELECT string_agg(DISTINCT issue_code, ',' ORDER BY issue_code) FROM v_data_quality_issues),
     'incomplete_stage_log,missing_price,overdue_planned_batch,price_currency_mismatch,recipe_without_ingredients,recipe_without_stages,starter_feeding_overdue');
 
+-- Stock of ingredients: purchases add, batches and feedings take, a cancelled batch gives back.
+-- The block removes what it wrote, so the checks after it see the unchanged test data.
+\set salt    '''00000000-0000-4000-1001-000000000004'''
+\set stockb  '''00000000-0000-4000-6001-0000000000f1'''
+
+SELECT pg_temp.check_equal('stock of an ingredient without movements = 0', fn_stock_balance(:flour), 0::numeric);
+
+INSERT INTO stock_movements (ingredient_id, movement_type, quantity, occurred_on, pack_count, pack_size, total_cost, currency)
+VALUES (:flour, 'purchase', 2000, current_date, 2, 1000, 2.70, 'EUR');
+UPDATE ingredients SET track_stock = true, reorder_level = 1500 WHERE id = :flour;
+SELECT pg_temp.check_equal('purchase of 2 x 1000 g gives a stock of 2000 g', fn_stock_balance(:flour), 2000::numeric);
+
+INSERT INTO batches (id, owner_id, name, status, source, planned_start_at, price_date, currency)
+VALUES (:stockb, :anna, 'Stock test', 'planned', 'manual', now() + interval '1 day', current_date, 'EUR');
+INSERT INTO batch_items (batch_id, recipe_id, loaves, sort_order) VALUES (:stockb, :r1, 3, 1);
+CALL sp_build_batch_plan(:stockb);
+
+SELECT pg_temp.check_equal('batch needs: 3 loaves of R1 need 1500 g of flour',
+    (SELECT quantity FROM fn_batch_ingredient_needs(:stockb) WHERE ingredient_id = :flour), 1500::numeric);
+SELECT pg_temp.check_equal('stock check lists only ingredients with kept stock',
+    (SELECT string_agg(name, ', ') FROM fn_batch_stock_check(:stockb)), 'Bread flour');
+
+CALL sp_apply_batch_stock(:stockb);
+SELECT pg_temp.check_equal('batch takes its flour from the stock', fn_stock_balance(:flour), 500::numeric);
+SELECT pg_temp.check_equal('salt without kept stock is not consumed',
+    (SELECT count(*) FROM stock_movements WHERE ingredient_id = :salt), 0::bigint);
+SELECT pg_temp.check_equal('below the reorder level the ingredient is in v_low_stock',
+    (SELECT stock FROM v_low_stock WHERE ingredient_id = :flour), 500::numeric);
+
+UPDATE batch_items SET loaves = 2 WHERE batch_id = :stockb;
+CALL sp_build_batch_plan(:stockb);
+CALL sp_apply_batch_stock(:stockb);
+SELECT pg_temp.check_equal('re-planned batch changes the stock by the difference', fn_stock_balance(:flour), 1000::numeric);
+
+UPDATE batches SET ingredient_scale = 0.5 WHERE id = :stockb;
+CALL sp_build_batch_plan(:stockb);
+CALL sp_apply_batch_stock(:stockb);
+SELECT pg_temp.check_equal('half of the dough takes half of the flour', fn_stock_balance(:flour), 1500::numeric);
+SELECT pg_temp.check_equal('half of the dough needs half of the starter',
+    (SELECT starter_amount_g FROM batch_items WHERE batch_id = :stockb), 100::numeric);
+
+CALL sp_return_batch_stock(:stockb);
+SELECT pg_temp.check_equal('cancelled batch returns what it took', fn_stock_balance(:flour), 2000::numeric);
+CALL sp_return_batch_stock(:stockb);
+SELECT pg_temp.check_equal('nothing is returned twice', fn_stock_balance(:flour), 2000::numeric);
+
+DELETE FROM batches WHERE id = :stockb;
+SELECT pg_temp.check_equal('ledger rows stay after the batch is deleted',
+    (SELECT count(*) FROM stock_movements WHERE ingredient_id = :flour AND batch_id IS NULL AND movement_type LIKE 'batch%'), 2::bigint);
+
+UPDATE starters SET flour_ingredient_id = :flour WHERE owner_id = :anna;
+INSERT INTO starter_feedings (starter_id, fed_at, flour_g, water_g, starter_kept_g)
+SELECT id, now(), 50, 50, 20 FROM starters WHERE owner_id = :anna ORDER BY name LIMIT 1;
+SELECT pg_temp.check_equal('feeding takes its flour from the linked ingredient', fn_stock_balance(:flour), 1950::numeric);
+
+DELETE FROM starter_feedings WHERE id IN (SELECT feeding_id FROM stock_movements WHERE ingredient_id = :flour AND feeding_id IS NOT NULL);
+DELETE FROM stock_movements WHERE ingredient_id = :flour;
+UPDATE starters SET flour_ingredient_id = NULL WHERE owner_id = :anna;
+UPDATE ingredients SET track_stock = false, reorder_level = NULL WHERE id = :flour;
+
 -- Anonymization (GDPR): personal data and workspace removed, public contributions kept
 CALL sp_anonymize_user(:anna);
 SELECT pg_temp.check_equal('anonymize: e-mail replaced',

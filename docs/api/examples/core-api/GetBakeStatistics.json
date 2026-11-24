@@ -8,15 +8,15 @@
     "responseContentType": "application/json",
     "responseBody": [
       {
-        "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
+        "recipeId": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
         "recipeTitle": "Country sourdough",
         "bakesCount": 1,
         "loavesTotal": 3,
         "avgRating": null,
         "ratedCount": 0,
         "avgCostPerLoaf": 2.98,
-        "firstBakedOn": "2026-11-23",
-        "lastBakedOn": "2026-11-23"
+        "firstBakedOn": "2026-11-24",
+        "lastBakedOn": "2026-11-24"
       }
     ]
   }

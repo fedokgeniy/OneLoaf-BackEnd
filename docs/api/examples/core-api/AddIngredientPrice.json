@@ -2,115 +2,138 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/ingredients/f2a4c8d9-547a-4da7-bf63-07f14c020a27/prices",
+    "path": "/api/v1/ingredients/10c358b9-7268-404a-b141-aaf0cebfc880/prices",
     "authenticated": true,
     "requestBody": {
       "price": 1.20,
       "perQuantity": 1000,
       "currency": "EUR",
-      "effectiveFrom": "2026-10-24"
+      "effectiveFrom": "2026-10-25"
     },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "830bcdf0-ae09-4ff7-8000-3f0c5cfd76bd",
+      "id": "2af74445-86df-452f-812d-35dbb9dbb1c7",
       "price": 1.2000,
       "perQuantity": 1000.000,
       "unitPrice": 0.0012,
       "currency": "EUR",
-      "effectiveFrom": "2026-10-24",
+      "effectiveFrom": "2026-10-25",
       "changePercent": null
     }
   },
   {
     "case": "price change",
     "method": "POST",
-    "path": "/api/v1/ingredients/f2a4c8d9-547a-4da7-bf63-07f14c020a27/prices",
+    "path": "/api/v1/ingredients/10c358b9-7268-404a-b141-aaf0cebfc880/prices",
     "authenticated": true,
     "requestBody": {
       "price": 1.35,
       "perQuantity": 1000,
       "currency": "EUR",
-      "effectiveFrom": "2026-11-22"
+      "effectiveFrom": "2026-11-23"
     },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "8659bf6b-7f21-454d-84a2-761dc60957ca",
+      "id": "08498c1b-d6aa-4db7-9d6d-5bf69a4b9d8a",
       "price": 1.3500,
       "perQuantity": 1000.000,
       "unitPrice": 0.00135,
       "currency": "EUR",
-      "effectiveFrom": "2026-11-22",
+      "effectiveFrom": "2026-11-23",
       "changePercent": 12.5
     }
   },
   {
     "case": "other ingredient",
     "method": "POST",
-    "path": "/api/v1/ingredients/c988c3b7-4463-4474-895b-255438fb664d/prices",
+    "path": "/api/v1/ingredients/d0d37e1b-b474-431e-bcb7-d1c4364eb162/prices",
     "authenticated": true,
     "requestBody": {
       "price": 0.01,
       "perQuantity": 1000,
       "currency": "EUR",
-      "effectiveFrom": "2026-10-24"
+      "effectiveFrom": "2026-10-25"
     },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "4e151efc-f9d3-40e0-89e2-e62bd484696e",
+      "id": "be9f4f88-7e12-4d4b-8ea3-b291aeef205b",
       "price": 0.0100,
       "perQuantity": 1000.000,
       "unitPrice": 0.00001,
       "currency": "EUR",
-      "effectiveFrom": "2026-10-24",
+      "effectiveFrom": "2026-10-25",
       "changePercent": null
     }
   },
   {
     "case": "other ingredient",
     "method": "POST",
-    "path": "/api/v1/ingredients/180012fa-8da7-4292-baae-b071aea57ec4/prices",
+    "path": "/api/v1/ingredients/6d143075-ce04-4d4e-941d-3d42146db57e/prices",
     "authenticated": true,
     "requestBody": {
       "price": 0.80,
       "perQuantity": 1000,
       "currency": "EUR",
-      "effectiveFrom": "2026-10-24"
+      "effectiveFrom": "2026-10-25"
     },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "9d81a9c4-d53b-45eb-91c7-90836ddbe34e",
+      "id": "3aa58476-33c6-458e-bb78-88bf8d4f4e0b",
       "price": 0.8000,
       "perQuantity": 1000.000,
       "unitPrice": 0.0008,
       "currency": "EUR",
-      "effectiveFrom": "2026-10-24",
+      "effectiveFrom": "2026-10-25",
       "changePercent": null
     }
   },
   {
     "case": "other ingredient",
     "method": "POST",
-    "path": "/api/v1/ingredients/9de3b3a4-f7ea-4bb2-9563-88df35b267d3/prices",
+    "path": "/api/v1/ingredients/37b13fb3-fcb2-4a9c-9ef7-bf45408a3336/prices",
     "authenticated": true,
     "requestBody": {
       "price": 0.50,
       "perQuantity": 1000,
       "currency": "EUR",
-      "effectiveFrom": "2026-10-24"
+      "effectiveFrom": "2026-10-25"
     },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "8b011c43-7cca-44d9-8f0c-f05ee09f992b",
+      "id": "5ffbc9d8-2810-43d5-bc16-abed13a4b5b7",
       "price": 0.5000,
       "perQuantity": 1000.000,
       "unitPrice": 0.0005,
       "currency": "EUR",
-      "effectiveFrom": "2026-10-24",
+      "effectiveFrom": "2026-10-25",
+      "changePercent": null
+    }
+  },
+  {
+    "case": "price entered by mistake",
+    "method": "POST",
+    "path": "/api/v1/ingredients/625260a8-63f3-45d5-b6e9-b5d79695ae6f/prices",
+    "authenticated": true,
+    "requestBody": {
+      "price": 45,
+      "perQuantity": 1000,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-25"
+    },
+    "status": 201,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "b7461c5c-fd3d-42e3-824f-46799eac8f95",
+      "price": 45.0000,
+      "perQuantity": 1000.000,
+      "unitPrice": 0.045,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-25",
       "changePercent": null
     }
   }

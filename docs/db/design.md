@@ -47,7 +47,7 @@ immediately, so it is already clean. Instead of data marts there is a layer of v
 
 | Layer | Objects | Used by |
 |---|---|---|
-| Storage (3NF) | 29 tables | Core API, AI Assistant, Notification service (role `app_write`) |
+| Storage (3NF) | 30 tables | Core API, AI Assistant, Notification service (role `app_write`) |
 | Logic | functions, procedures, triggers | all services; calculations for the assistant tools |
 | Views | `v_recipe_effective_ingredients`, `v_ingredient_current_prices`, `v_batch_stage_log`, `v_batch_log_completeness`, `v_public_catalog`, `v_data_quality_issues`, `v_users_masked` | application screens, assistant, reports (`app_read`) |
 | Aggregates | `mv_bake_statistics` (materialized) | history screen, analysis by the assistant, reports |
@@ -174,7 +174,8 @@ descriptions is in the [data dictionary](data-dictionary.md#functions-and-proced
 | Integrity triggers | 12 triggers for workspace isolation and variant consistency | US-03, NFR-03, US-07 |
 | Process triggers | life cycle of batches and stages, automatic history record, feeding schedule, publication rules, `updated_at` | US-20, US-23, US-28 - US-31, US-39 |
 | Procedures | `sp_build_batch_plan`, `sp_extend_batch_stage`, `sp_publish_recipe`, `sp_anonymize_user` | US-16 - US-20, US-24, US-29, US-39, GDPR |
-| Views | 7 views and `mv_bake_statistics` | US-07, US-12, US-23, US-33, US-36, US-40, KPI-1, data quality, masking |
+| Views | 8 views and `mv_bake_statistics` | US-07, US-12, US-23, US-33, US-36, US-40, KPI-1, data quality, low stock, masking |
+| Stock of ingredients | `fn_stock_balance`, `fn_batch_ingredient_needs`, `fn_batch_stock_check`, `sp_apply_batch_stock`, `sp_return_batch_stock`, trigger `trg_starter_feedings_stock` | Purchases, consumption by batches and feedings, returns |
 
 Every value is checked by `db/tests/business_tests.sql` against the acceptance criteria of the business analysis
 (for example, the cost of 3 loaves is 11.22 and equals the sum of the lines; the ready window for a start at 12:00 is
@@ -195,6 +196,7 @@ The database structure is created and changed **only by EF Core migrations** sto
 | 5 | `BusinessProcedures` | Procedures for the batch plan, stage extension, publishing, anonymization |
 | 6 | `ReportingViewsAndMasking` | Masking, views, materialized statistics |
 | 7 | `AccessPrivileges` | Privileges of the roles and default privileges for future objects |
+| 8 | `IngredientStock` | Stock ledger `stock_movements`, stock switch and reorder level of an ingredient, ingredients a starter is fed with, ingredient scale of a batch; stock functions, procedures, trigger and the view `v_low_stock`; the batch plan takes the scale into account |
 
 **Rules**
 
@@ -204,8 +206,9 @@ The database structure is created and changed **only by EF Core migrations** sto
 2. **Programmable objects** (functions, triggers, views, privileges) are written as SQL scripts in
    `Persistence/Migrations/Sql/<MigrationName>/` and executed by their migration. A script belongs to one migration;
    a change of a function or view is a new `CREATE OR REPLACE` script in a new migration.
-3. **A released migration is never edited.** A fix is a new migration. The current chain of seven migrations was assembled
-   before the first deployment of the database; further changes only add migrations.
+3. **A released migration is never edited.** A fix is a new migration. The first seven migrations were assembled
+   before the first deployment of the database; further changes only add migrations, as `IngredientStock` does: it
+   replaces `sp_build_batch_plan` with `CREATE OR REPLACE` instead of editing the script of `BusinessProcedures`.
 4. **Every migration has a `Down` method**; rollback: `dotnet ef database update <PreviousMigration>`.
 5. **The history of applied migrations** is stored in the table `__ef_migrations_history` (identifier and EF Core version of
    every applied migration); migrations are applied strictly in order and never twice.

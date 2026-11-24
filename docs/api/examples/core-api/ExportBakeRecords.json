@@ -6,6 +6,6 @@
     "authenticated": true,
     "status": 200,
     "responseContentType": "text/csv",
-    "responseBody": "baked_on,recipes,total_loaves,total_cost,currency,rating,comment\r\n2026-11-23,Country sourdough x3,3,8.94,EUR,4,\"Good oven spring, crumb a bit tight.\"\r\n"
+    "responseBody": "baked_on,recipes,total_loaves,total_cost,currency,rating,comment\r\n2026-11-24,Country sourdough x3,3,8.94,EUR,4,\"Good oven spring, crumb a bit tight.\"\r\n"
   }
 ]

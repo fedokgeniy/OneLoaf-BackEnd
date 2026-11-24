@@ -181,7 +181,7 @@ sequenceDiagram
 | `Display` | `Theme`, `Scale`, `ReduceMotion`, `SizeClass`, `Orientation`, `IsOnline` | `SetTheme`, `SetScale`, `DeviceChanged` | `device.js`, `localStorage` |
 | `Notifications` | `ImmutableList<Toast>` | `ShowToast`, `DismissToast` | timer |
 | `Recipes` | list (`Loadable<Page<RecipeSummary>>`), filter, current recipe, calculator, comparison | `LoadRecipes`, `SetRecipeFilter`, `LoadRecipe`, `ChangeLoaves`, `ChangeAsOf`, `SaveRecipe`, `CreateVariant` | `RecipesApi`, `CalculatorApi` |
-| `Catalog` | ingredients, selected ingredient + price history, flours, kitchen settings, reference data (cached) | `LoadIngredients`, `AddPrice`, `SaveKitchen` | `IngredientsApi`, `KitchenApi`, `ReferenceApi` |
+| `Catalog` | ingredients, selected ingredient + price history and stock ledger, flours, kitchen settings, reference data (cached) | `LoadIngredients`, `AddPrice`, `UpdatePrice`, `AddPurchase`, `AdjustStock`, `SaveFlour`, `SaveKitchen` | `IngredientsApi`, `KitchenApi`, `ReferenceApi` |
 | `Production` | batches (week), current batch, preview, kneading plan | `LoadWeek`, `PreviewBatch` (debounced), `CreateBatch`, `StartStage`, `CompleteStage`, `ExtendStage`, `ResetStage` | `BatchesApi` |
 | `Starters` | starters, feedings of selected | `LoadStarters`, `LogFeeding`, `SaveStarter` | `StartersApi` |
 | `History` (lazy) | records, filter, statistics, selected record + stage log | `LoadHistory`, `RateBake`, `RequestAnalysis` | `BakeRecordsApi`, `InsightsApi` |

@@ -277,5 +277,7 @@ COMMENT ON PROCEDURE sp_build_batch_plan(uuid) IS
 GRANT SELECT (id, ingredient_id, movement_type, quantity, occurred_on, batch_id, feeding_id, pack_count, pack_size,
               total_cost, currency, created_at)
     ON stock_movements TO app_read;
+-- A view gets the default table privileges of app_write; like the other views it is read-only.
+REVOKE INSERT, UPDATE, DELETE ON v_low_stock FROM app_write;
 GRANT SELECT ON v_low_stock TO app_write, app_read;
 GRANT EXECUTE ON FUNCTION fn_stock_balance(uuid), fn_batch_ingredient_needs(uuid), fn_batch_stock_check(uuid) TO app_read;

@@ -1,0 +1,48 @@
+[
+  {
+    "case": "typical",
+    "method": "PUT",
+    "path": "/api/v1/ingredients/625260a8-63f3-45d5-b6e9-b5d79695ae6f/prices/b7461c5c-fd3d-42e3-824f-46799eac8f95",
+    "authenticated": true,
+    "requestBody": {
+      "price": 4.5,
+      "perQuantity": 1000,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-25"
+    },
+    "status": 200,
+    "responseContentType": "application/json",
+    "responseBody": {
+      "id": "b7461c5c-fd3d-42e3-824f-46799eac8f95",
+      "price": 4.5000,
+      "perQuantity": 1000.000,
+      "unitPrice": 0.0045,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-25",
+      "changePercent": null
+    }
+  },
+  {
+    "case": "price not found",
+    "method": "PUT",
+    "path": "/api/v1/ingredients/625260a8-63f3-45d5-b6e9-b5d79695ae6f/prices/00000000-0000-4000-9999-000000000000",
+    "authenticated": true,
+    "requestBody": {
+      "price": 4.5,
+      "perQuantity": 1000,
+      "currency": "EUR",
+      "effectiveFrom": "2026-10-25"
+    },
+    "status": 404,
+    "responseContentType": "application/problem+json",
+    "responseBody": {
+      "type": "https://oneloaf.app/problems/not-found",
+      "title": "The requested resource was not found.",
+      "status": 404,
+      "detail": "The price was not found.",
+      "instance": "/api/v1/ingredients/625260a8-63f3-45d5-b6e9-b5d79695ae6f/prices/00000000-0000-4000-9999-000000000000",
+      "traceId": "00-d5d154d78137b396f1a7ffe41ecbae55-37fb6b4dc830b64c-02",
+      "correlationId": "42d4b7ce12964cc2964d4e04bc4dd360"
+    }
+  }
+]

@@ -7,11 +7,11 @@
     "requestBody": {
       "items": [
         {
-          "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
+          "recipeId": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
           "loaves": 3
         },
         {
-          "recipeId": "84d2f7ec-11fd-47ad-80e2-c6e97756155d",
+          "recipeId": "eeb06747-68e0-4992-99c5-4f1b6791afd4",
           "loaves": 2
         }
       ]
@@ -29,12 +29,12 @@
           "startOffsetMinutes": 0,
           "items": [
             {
-              "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
+              "recipeId": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
               "title": "Country sourdough",
               "loaves": 3
             },
             {
-              "recipeId": "84d2f7ec-11fd-47ad-80e2-c6e97756155d",
+              "recipeId": "eeb06747-68e0-4992-99c5-4f1b6791afd4",
               "title": "Country sourdough, longer bulk",
               "loaves": 1
             }
@@ -47,7 +47,7 @@
           "startOffsetMinutes": 45,
           "items": [
             {
-              "recipeId": "84d2f7ec-11fd-47ad-80e2-c6e97756155d",
+              "recipeId": "eeb06747-68e0-4992-99c5-4f1b6791afd4",
               "title": "Country sourdough, longer bulk",
               "loaves": 1
             }

@@ -2,27 +2,27 @@
   {
     "case": "history with change percent",
     "method": "GET",
-    "path": "/api/v1/ingredients/f2a4c8d9-547a-4da7-bf63-07f14c020a27/prices",
+    "path": "/api/v1/ingredients/10c358b9-7268-404a-b141-aaf0cebfc880/prices",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": [
       {
-        "id": "8659bf6b-7f21-454d-84a2-761dc60957ca",
+        "id": "08498c1b-d6aa-4db7-9d6d-5bf69a4b9d8a",
         "price": 1.3500,
         "perQuantity": 1000.000,
         "unitPrice": 0.00135,
         "currency": "EUR",
-        "effectiveFrom": "2026-11-22",
+        "effectiveFrom": "2026-11-23",
         "changePercent": 12.5
       },
       {
-        "id": "830bcdf0-ae09-4ff7-8000-3f0c5cfd76bd",
+        "id": "2af74445-86df-452f-812d-35dbb9dbb1c7",
         "price": 1.2000,
         "perQuantity": 1000.000,
         "unitPrice": 0.0012,
         "currency": "EUR",
-        "effectiveFrom": "2026-10-24",
+        "effectiveFrom": "2026-10-25",
         "changePercent": null
       }
     ]

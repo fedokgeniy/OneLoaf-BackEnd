@@ -2,17 +2,17 @@
   {
     "case": "move the start",
     "method": "PUT",
-    "path": "/api/v1/batches/dcab64b0-9720-4f19-997d-b3bcd2492ddc",
+    "path": "/api/v1/batches/1de1aea8-feae-4b1f-8c15-ca89b41289d2",
     "authenticated": true,
     "requestBody": {
       "name": "Weekend bake",
-      "plannedStartAt": "2026-11-25T09:00:00+02:00",
+      "plannedStartAt": "2026-11-26T09:00:00+02:00",
       "source": "manual",
       "items": [
         {
-          "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
+          "recipeId": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
           "loaves": 3,
-          "starterId": "1953c953-6626-48eb-bae0-29cc6d218d8b",
+          "starterId": "e0f6ccfa-7f1e-499d-a4d8-fdd07579da80",
           "starterReminderMinutes": 60
         }
       ]
@@ -20,41 +20,41 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "dcab64b0-9720-4f19-997d-b3bcd2492ddc",
+      "id": "1de1aea8-feae-4b1f-8c15-ca89b41289d2",
       "name": "Weekend bake",
       "status": "planned",
       "source": "manual",
-      "plannedStartAt": "2026-11-25T07:00:00+00:00",
-      "plannedReadyFrom": "2026-11-25T22:05:00+00:00",
-      "plannedReadyTo": "2026-11-26T01:20:00+00:00",
+      "plannedStartAt": "2026-11-26T07:00:00+00:00",
+      "plannedReadyFrom": "2026-11-26T22:05:00+00:00",
+      "plannedReadyTo": "2026-11-27T01:20:00+00:00",
       "actualStartAt": null,
       "completedAt": null,
-      "priceDate": "2026-11-23",
+      "priceDate": "2026-11-24",
       "totalCost": 8.94,
       "currency": "EUR",
       "notes": null,
       "items": [
         {
-          "id": "c4d2bd1b-c13c-42e1-80c9-9f55976e3171",
-          "recipeId": "b7727976-4ac5-4d7d-bad9-57aca1d6109d",
+          "id": "df674706-85ce-4cfe-84eb-2a0117a206d0",
+          "recipeId": "f536ea6f-0e05-4fc2-b7ec-5b7fc82fec33",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "1953c953-6626-48eb-bae0-29cc6d218d8b",
+          "starterId": "e0f6ccfa-7f1e-499d-a4d8-fdd07579da80",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
           "starterReminderMinutes": 60,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "b6531aa5-ff40-43a4-8dc6-a434586816b0",
+              "id": "15903ba2-adb4-4d9b-92dc-c63e925bb381",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
               "plannedMinMinutes": 15,
               "plannedMaxMinutes": 20,
-              "plannedStartAt": "2026-11-25T07:00:00+00:00",
-              "plannedEndMinAt": "2026-11-25T07:15:00+00:00",
-              "plannedEndMaxAt": "2026-11-25T07:20:00+00:00",
+              "plannedStartAt": "2026-11-26T07:00:00+00:00",
+              "plannedEndMinAt": "2026-11-26T07:15:00+00:00",
+              "plannedEndMaxAt": "2026-11-26T07:20:00+00:00",
               "actualStartAt": null,
               "actualEndAt": null,
               "status": "pending",
@@ -64,15 +64,15 @@
               "note": null
             },
             {
-              "id": "b8f44825-17dc-47e5-af8e-fa1b7e2db263",
+              "id": "080b7159-3f82-4560-9a5e-fce52032bdf1",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
               "plannedMinMinutes": 240,
               "plannedMaxMinutes": 300,
-              "plannedStartAt": "2026-11-25T07:15:00+00:00",
-              "plannedEndMinAt": "2026-11-25T11:15:00+00:00",
-              "plannedEndMaxAt": "2026-11-25T12:20:00+00:00",
+              "plannedStartAt": "2026-11-26T07:15:00+00:00",
+              "plannedEndMinAt": "2026-11-26T11:15:00+00:00",
+              "plannedEndMaxAt": "2026-11-26T12:20:00+00:00",
               "actualStartAt": null,
               "actualEndAt": null,
               "status": "pending",
@@ -82,15 +82,15 @@
               "note": null
             },
             {
-              "id": "d1e61722-9c53-4ba2-aa37-9b6e65ed6a6f",
+              "id": "83e3a3c3-f83b-47eb-8e77-93c7789fb168",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
               "plannedMinMinutes": 10,
               "plannedMaxMinutes": 15,
-              "plannedStartAt": "2026-11-25T11:15:00+00:00",
-              "plannedEndMinAt": "2026-11-25T11:25:00+00:00",
-              "plannedEndMaxAt": "2026-11-25T12:35:00+00:00",
+              "plannedStartAt": "2026-11-26T11:15:00+00:00",
+              "plannedEndMinAt": "2026-11-26T11:25:00+00:00",
+              "plannedEndMaxAt": "2026-11-26T12:35:00+00:00",
               "actualStartAt": null,
               "actualEndAt": null,
               "status": "pending",
@@ -100,15 +100,15 @@
               "note": null
             },
             {
-              "id": "0361c523-21dc-4c61-8d15-490fc88e69ee",
+              "id": "911cc76b-4cd4-4d69-b3b9-f66cc5a49193",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
               "plannedMinMinutes": 600,
               "plannedMaxMinutes": 720,
-              "plannedStartAt": "2026-11-25T11:25:00+00:00",
-              "plannedEndMinAt": "2026-11-25T21:25:00+00:00",
-              "plannedEndMaxAt": "2026-11-26T00:35:00+00:00",
+              "plannedStartAt": "2026-11-26T11:25:00+00:00",
+              "plannedEndMinAt": "2026-11-26T21:25:00+00:00",
+              "plannedEndMaxAt": "2026-11-27T00:35:00+00:00",
               "actualStartAt": null,
               "actualEndAt": null,
               "status": "pending",
@@ -118,15 +118,15 @@
               "note": null
             },
             {
-              "id": "a03b7615-5a9c-4888-b4bb-65301c0cabdd",
+              "id": "636be6d7-80ea-4e3b-a17d-7f960dfaece7",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",
               "plannedMinMinutes": 40,
               "plannedMaxMinutes": 45,
-              "plannedStartAt": "2026-11-25T21:25:00+00:00",
-              "plannedEndMinAt": "2026-11-25T22:05:00+00:00",
-              "plannedEndMaxAt": "2026-11-26T01:20:00+00:00",
+              "plannedStartAt": "2026-11-26T21:25:00+00:00",
+              "plannedEndMinAt": "2026-11-26T22:05:00+00:00",
+              "plannedEndMaxAt": "2026-11-27T01:20:00+00:00",
               "actualStartAt": null,
               "actualEndAt": null,
               "status": "pending",
@@ -138,7 +138,9 @@
           ]
         }
       ],
-      "bakeRecordId": null
+      "bakeRecordId": null,
+      "ingredientScale": 1.0000,
+      "stock": null
     }
   }
 ]
