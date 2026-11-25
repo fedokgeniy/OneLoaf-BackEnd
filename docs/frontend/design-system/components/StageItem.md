@@ -8,6 +8,6 @@ number (upcoming), a pulsing ring (running) or a check (done). Times in a `<dl>`
 
 The two buttons always form one full-width row at the bottom of the card on every screen size and share the width
 (48px, `.ol-btn--lg`, in the thumb zone on phones): the main action on the left, **Adjust** on the right. Never more
-than one primary button per stage. Under the row a slider (native range control, 5-minute steps, marks every hour)
+than one primary button per stage. Under the row a slider drawn as a line and a circle (over a range control, which keeps keyboard and touch; 5-minute steps, marks every hour)
 chooses by how much **Adjust** changes the time of the stage: more time for a running stage, shorter or longer for one
 that has not started. The chosen value is shown as text next to the label ("+30 min"), not by the thumb alone.

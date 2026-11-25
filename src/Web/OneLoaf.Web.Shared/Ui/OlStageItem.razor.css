@@ -26,31 +26,123 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* The native range control keeps keyboard and touch behaviour; the row is as tall as a touch target. */
+/* The slider is drawn here as a line and a circle; the range control underneath only supplies the behaviour.
+   --position (0 to 1) comes from the component; the filled part of the line ends under the centre of the circle. */
 .stage-adjust__slider {
+    --thumb: 1.5rem;
+    --line: 0.25rem;
+    --filled: calc(var(--position, 0) * (100% - var(--thumb)) + var(--thumb) / 2);
+    -webkit-appearance: none;
+    appearance: none;
+    display: block;
     width: 100%;
-    min-height: var(--target-min);
+    height: var(--target-min);
     margin: 0;
-    accent-color: var(--primary);
+    padding: 0;
+    background: transparent;
     cursor: pointer;
+}
+
+.stage-adjust__slider:focus {
+    outline: none;
+}
+
+/* The line. */
+.stage-adjust__slider::-webkit-slider-runnable-track {
+    height: var(--line);
+    border-radius: var(--line);
+    background: linear-gradient(to right, var(--primary) var(--filled), var(--border-control) var(--filled));
+}
+
+.stage-adjust__slider::-moz-range-track {
+    height: var(--line);
+    border-radius: var(--line);
+    background: var(--border-control);
+}
+
+.stage-adjust__slider::-moz-range-progress {
+    height: var(--line);
+    border-radius: var(--line);
+    background: var(--primary);
+}
+
+/* The circle. */
+.stage-adjust__slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+    width: var(--thumb);
+    height: var(--thumb);
+    margin-top: calc((var(--line) - var(--thumb)) / 2);
+    border: 0.1875rem solid var(--primary);
+    border-radius: 50%;
+    background: var(--surface);
+}
+
+.stage-adjust__slider::-moz-range-thumb {
+    box-sizing: border-box;
+    width: var(--thumb);
+    height: var(--thumb);
+    border: 0.1875rem solid var(--primary);
+    border-radius: 50%;
+    background: var(--surface);
+}
+
+.stage-adjust__slider:hover::-webkit-slider-thumb,
+.stage-adjust__slider:active::-webkit-slider-thumb {
+    background: var(--primary-tint);
+}
+
+.stage-adjust__slider:hover::-moz-range-thumb,
+.stage-adjust__slider:active::-moz-range-thumb {
+    background: var(--primary-tint);
+}
+
+/* Keyboard focus is shown on the circle. */
+.stage-adjust__slider:focus-visible::-webkit-slider-thumb {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.stage-adjust__slider:focus-visible::-moz-range-thumb {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
 }
 
 .stage-adjust__slider:disabled {
     cursor: default;
+    opacity: 0.5;
 }
 
+/* The hour marks stand exactly under the positions of the circle: --at is the share of the line, like --position. */
 .stage-adjust__scale {
-    display: flex;
-    justify-content: space-between;
+    --thumb: 1.5rem;
+    position: relative;
+    height: 1.25rem;
     font-size: 0.75rem;
     color: var(--ink-muted);
     font-variant-numeric: tabular-nums;
 }
 
-/* Marks every hour, equally spaced like the ends of the track (from −1 h for a planned stage, from 0 for a running one). */
 .stage-adjust__scale span {
-    flex: 0 0 auto;
+    position: absolute;
+    left: calc(var(--at) * (100% - var(--thumb)) + var(--thumb) / 2);
+    transform: translateX(-50%);
+    white-space: nowrap;
 }
+
+/* 0, +1 h, +2 h, +3 h of a running stage. */
+.stage-adjust__scale--four span:nth-child(1) { --at: 0; }
+.stage-adjust__scale--four span:nth-child(2) { --at: 0.3333; }
+.stage-adjust__scale--four span:nth-child(3) { --at: 0.6667; }
+.stage-adjust__scale--four span:nth-child(4) { --at: 1; }
+
+/* −1 h, 0, +1 h, +2 h, +3 h of a stage that has not started. */
+.stage-adjust__scale--five span:nth-child(1) { --at: 0; }
+.stage-adjust__scale--five span:nth-child(2) { --at: 0.25; }
+.stage-adjust__scale--five span:nth-child(3) { --at: 0.5; }
+.stage-adjust__scale--five span:nth-child(4) { --at: 0.75; }
+.stage-adjust__scale--five span:nth-child(5) { --at: 1; }
 
 .stage-adjust__more {
     display: flex;

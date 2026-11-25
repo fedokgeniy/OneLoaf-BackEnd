@@ -35,7 +35,9 @@
                 @* Next to the profile button, so it is in the same place at every stage of the batch. *@
                 @if (open)
                 {
-                    <OlButton Variant="ButtonVariant.Secondary" Icon="IconName.Close" Disabled="State.Value.BusyBatch" OnClick="() => AskCancel(batch)">Cancel batch</OlButton>
+                    <OlButton Variant="ButtonVariant.Secondary" Icon="IconName.Close" Disabled="State.Value.BusyBatch" class="app-hide-compact" OnClick="() => AskCancel(batch)">Cancel batch</OlButton>
+                    @* On a phone the name of the batch needs the width: the same action as an icon button. *@
+                    <span class="ol-show-compact"><OlIconButton Icon="IconName.Close" Label="Cancel batch" Disabled="State.Value.BusyBatch" OnClick="() => AskCancel(batch)" /></span>
                 }
             </Actions>
         </ShellTitle>
