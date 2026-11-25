@@ -1,0 +1,20 @@
+@* Photo area of a card (.ol-card__media, 3:2 as on the Recipes boards): the photo when it is loaded, a quiet bread
+   mark otherwise, so the cards of a grid keep one height. Decorative: the title of the card names it. *@
+<div class="ol-card__media card-photo">
+    @if (Src is not null)
+    {
+        <img src="@Src" alt="" loading="lazy" decoding="async" />
+    }
+    else
+    {
+        <span class="card-photo__empty @(Loading ? "card-photo__empty--loading" : null)" aria-hidden="true"><OlIcon Name="IconName.Recipes" /></span>
+    }
+</div>
+
+@code {
+    /// <summary>Photo as a data URL; null shows the placeholder.</summary>
+    [Parameter] public string? Src { get; set; }
+
+    /// <summary>The card has a photo that is still loading.</summary>
+    [Parameter] public bool Loading { get; set; }
+}

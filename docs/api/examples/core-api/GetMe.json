@@ -11,8 +11,8 @@
       "title": "A valid bearer token is required.",
       "status": 401,
       "instance": "/api/v1/me",
-      "traceId": "00-c06494ee19c05792476610ab5076f556-aee424cb5a7748fb-02",
-      "correlationId": "7661923dd1234364b05e239d2d53c324"
+      "traceId": "00-90af0e34972c09844b5c2e37822d0db5-7d2d27df252d8789-02",
+      "correlationId": "536414ad90fa490d93bf8daf0113918a"
     }
   },
   {
@@ -23,12 +23,12 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "69f2c719-f05c-4adb-8307-d60cb04b77d6",
-      "email": "docs.baker.342219be3@example.com",
+      "id": "2274e188-d337-453a-b5fb-d8394a0d2447",
+      "email": "docs.baker.588c65fcd@example.com",
       "displayName": "Docs Baker",
       "role": "user",
-      "createdAt": "2026-11-24T21:18:01.248395+00:00",
-      "lastLoginAt": "2026-11-24T21:18:01.457278+00:00"
+      "createdAt": "2026-11-24T23:58:02.371242+00:00",
+      "lastLoginAt": "2026-11-24T23:58:02.623587+00:00"
     }
   }
 ]

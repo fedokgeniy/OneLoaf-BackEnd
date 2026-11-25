@@ -1,6 +1,7 @@
 @* Batch stage (.ol-stage, StageItem page): number, name, status word with dot (never colour alone), planned and actual
-   times, and one full-width row of actions — pending: Start, Skip, Adjust; running: Complete, +30 min, Adjust; done or
-   skipped: none. Callbacks carry the stage; the page talks to the API. *@
+   times, and the actions: the main one on the left (Start for a pending stage, Complete for a running one), Adjust on
+   the right, and under them a slider that chooses by how many minutes Adjust changes the time of the stage. Done or
+   skipped: no actions. Callbacks carry the stage; the page talks to the API. *@
 @using OneLoaf.Web.Shared.Contracts.Core
 @using OneLoaf.Web.Shared.Formatting
 
@@ -36,18 +37,46 @@
     </dl>
     @if (Stage.Status is StageStatuses.Pending or StageStatuses.Running && Actionable)
     {
-        <div class="ol-stage__actions">
+        <div class="ol-stage__actions stage-actions">
             @if (Stage.Status == StageStatuses.Pending)
             {
-                <OlButton Large="true" Loading="Busy" OnClick="() => OnStart.InvokeAsync(Stage)">Start @Stage.Name.ToLowerInvariant()</OlButton>
-                <OlButton Variant="ButtonVariant.Ghost" Disabled="Busy" OnClick="() => OnSkip.InvokeAsync(Stage)">Skip</OlButton>
+                <OlButton Large="true" Loading="Busy" OnClick="() => OnStart.InvokeAsync(Stage)">Start</OlButton>
             }
             else
             {
-                <OlButton Large="true" Loading="Busy" OnClick="() => OnComplete.InvokeAsync(Stage)">Complete @Stage.Name.ToLowerInvariant()</OlButton>
-                <OlButton Variant="ButtonVariant.Secondary" Icon="IconName.TimerPlus" Disabled="Busy" OnClick="() => OnExtend.InvokeAsync(Stage)">+30 min</OlButton>
+                <OlButton Large="true" Loading="Busy" OnClick="() => OnComplete.InvokeAsync(Stage)">Complete</OlButton>
             }
-            <OlButton Variant="ButtonVariant.Ghost" Disabled="Busy" OnClick="() => OnAdjust.InvokeAsync(Stage)">Adjust</OlButton>
+            <OlButton Variant="ButtonVariant.Secondary" Large="true" Icon="IconName.TimerPlus" Disabled="@(Busy || _minutes == 0)"
+                      aria-label="@($"Adjust {Stage.Name.ToLowerInvariant()}: {DeltaText}")" OnClick="Adjust">Adjust</OlButton>
+        </div>
+        <div class="stage-adjust">
+            <label class="stage-adjust__label" for="@SliderId">Change the time by <output class="stage-adjust__value" for="@SliderId">@DeltaText</output></label>
+            @* A line and a circle drawn by the stylesheet; the range control on top keeps the keyboard, touch and
+               screen-reader behaviour and shows only its circle. *@
+            <div class="stage-adjust__control">
+                @* Width is where the circle stands on the line: a computed value that cannot be a class. *@
+                <span class="stage-adjust__fill" aria-hidden="true" style="width: @FillWidth"></span>
+                <input id="@SliderId" class="stage-adjust__slider" type="range" min="@MinMinutes" max="@MaxMinutes" step="@StepMinutes"
+                       value="@_minutes" disabled="@Busy" aria-valuetext="@DeltaText" @oninput="OnSlide" />
+            </div>
+            <div class="stage-adjust__scale @(MinMinutes < 0 ? "stage-adjust__scale--five" : "stage-adjust__scale--four")" aria-hidden="true">
+                @if (MinMinutes < 0)
+                {
+                    <span>−1 h</span>
+                }
+                <span>0</span><span>+1 h</span><span>+2 h</span><span>+3 h</span>
+            </div>
+            <p class="ol-field__help">The following stages, the reminders and the ready time move with it.</p>
+            <div class="stage-adjust__more">
+                @if (Stage.Status == StageStatuses.Pending)
+                {
+                    <OlButton Variant="ButtonVariant.Ghost" Disabled="Busy" OnClick="() => OnSkip.InvokeAsync(Stage)">Skip</OlButton>
+                }
+                @if (Stage.IsOverridden)
+                {
+                    <OlButton Variant="ButtonVariant.Ghost" Disabled="Busy" OnClick="() => OnReset.InvokeAsync(Stage)">Reset to recipe</OlButton>
+                }
+            </div>
         </div>
     }
 </article>
@@ -71,14 +100,72 @@
     /// <summary>Complete pressed.</summary>
     [Parameter] public EventCallback<BatchStageDto> OnComplete { get; set; }
 
-    /// <summary>"+30 min" pressed.</summary>
-    [Parameter] public EventCallback<BatchStageDto> OnExtend { get; set; }
-
     /// <summary>Skip pressed.</summary>
     [Parameter] public EventCallback<BatchStageDto> OnSkip { get; set; }
 
-    /// <summary>Adjust pressed (durations dialog).</summary>
-    [Parameter] public EventCallback<BatchStageDto> OnAdjust { get; set; }
+    /// <summary>Adjust pressed: the stage and the minutes chosen with the slider.</summary>
+    [Parameter] public EventCallback<StageAdjustment> OnAdjust { get; set; }
+
+    /// <summary>"Reset to recipe" pressed (offered when the durations were changed for this batch).</summary>
+    [Parameter] public EventCallback<BatchStageDto> OnReset { get; set; }
+
+    /// <summary>
+    /// A stage that has not started can be planned shorter or longer. A running stage only gets more time: to end it
+    /// earlier the baker completes it.
+    /// </summary>
+    private int MinMinutes => Stage.Status == StageStatuses.Running ? 0 : -60;
+
+    private const int MaxMinutes = 180;
+    private const int StepMinutes = 5;
+
+    /// <summary>A running stage usually needs more time: the slider starts at the half hour bakers add most often.</summary>
+    private const int RunningDefault = 30;
+
+    private readonly string _id = ElementIds.Next("stage-adjust");
+    private Guid _stageId;
+    private string? _status;
+    private int _minutes;
+
+    private string SliderId => _id;
+
+    /// <summary>
+    /// Width of the filled part of the line: it ends under the centre of the circle, which travels the line less its
+    /// own width (1.5rem, as in the stylesheet).
+    /// </summary>
+    private string FillWidth
+    {
+        get
+        {
+            var share = ((_minutes - MinMinutes) / (double)(MaxMinutes - MinMinutes)).ToString("0.####", System.Globalization.CultureInfo.InvariantCulture);
+            return $"calc({share} * (100% - 1.5rem) + 0.75rem)";
+        }
+    }
+
+    private string DeltaText => _minutes switch
+    {
+        0 => "no change",
+        > 0 => $"+{DisplayFormat.Duration(_minutes)}",
+        _ => $"−{DisplayFormat.Duration(-_minutes)}",
+    };
+
+    /// <inheritdoc />
+    protected override void OnParametersSet()
+    {
+        // Another stage, or the same stage in another state: the slider starts from its default again.
+        if (Stage.Id != _stageId || Stage.Status != _status)
+        {
+            _stageId = Stage.Id;
+            _status = Stage.Status;
+            _minutes = Stage.Status == StageStatuses.Running ? RunningDefault : 0;
+        }
+    }
+
+    private void OnSlide(ChangeEventArgs e) =>
+        _minutes = int.TryParse(e.Value?.ToString(), System.Globalization.NumberStyles.Integer, System.Globalization.CultureInfo.InvariantCulture, out var minutes)
+            ? Math.Clamp(minutes, MinMinutes, MaxMinutes)
+            : _minutes;
+
+    private Task Adjust() => _minutes == 0 ? Task.CompletedTask : OnAdjust.InvokeAsync(new StageAdjustment(Stage, _minutes));
 
     private string? StateClass => Stage.Status switch
     {

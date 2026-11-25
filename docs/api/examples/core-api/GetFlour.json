@@ -2,19 +2,19 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/flours/e86bb6b6-071e-4713-9965-129f260d38f5",
+    "path": "/api/v1/flours/1477ce50-150b-409c-95f4-7d2236d4070c",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "e86bb6b6-071e-4713-9965-129f260d38f5",
+      "id": "1477ce50-150b-409c-95f4-7d2236d4070c",
       "name": "Bread flour T550",
       "flourTypeCode": "wheat",
       "proteinPercent": 12.5,
       "grind": "fine",
       "notes": null,
-      "createdAt": "2026-11-24T21:18:01.909946+00:00",
-      "updatedAt": "2026-11-24T21:18:01.909946+00:00"
+      "createdAt": "2026-11-24T23:58:03.093237+00:00",
+      "updatedAt": "2026-11-24T23:58:03.093237+00:00"
     }
   },
   {
@@ -30,8 +30,8 @@
       "status": 404,
       "detail": "The flour was not found.",
       "instance": "/api/v1/flours/00000000-0000-4000-9999-000000000000",
-      "traceId": "00-50a87f6f7a8d7f63b749d3d8b522859a-f839cc5529bcc4f0-02",
-      "correlationId": "9496ee73dc1d4e27919a6b4daf0c53ce"
+      "traceId": "00-b0a9e6b5ec11f349041c77c26f6f1af5-f345ea1c41e478b6-02",
+      "correlationId": "775e0b20980b4cd8879bab812d6a21bc"
     }
   }
 ]

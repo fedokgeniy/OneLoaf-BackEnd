@@ -11,8 +11,8 @@
       "title": "You are not allowed to perform this action.",
       "status": 403,
       "instance": "/api/v1/admin/reports",
-      "traceId": "00-459893aac02673600274385c5ecf6b77-b1557435fefa374b-02",
-      "correlationId": "2242cdc2dd8c41049f5c619c489164d2"
+      "traceId": "00-6bc85cfd98fe13f6565ecd2ce7d3a388-6150625a35581069-02",
+      "correlationId": "b85555f20dd94ea19267bff2f8e1d050"
     }
   },
   {
@@ -25,25 +25,25 @@
     "responseBody": {
       "items": [
         {
-          "id": "87caf90f-0eef-416e-85e8-039ea64b2aee",
-          "publishedRecipeId": "6df98872-6ed1-4c99-ba60-98ea817e91a0",
+          "id": "4820425d-a548-42ee-b471-800551601f1a",
+          "publishedRecipeId": "18ba85dc-7f1b-43a9-ab69-5ddadc4aed74",
           "publicationTitle": "White loaf with rye",
           "commentId": null,
           "commentBody": null,
           "reason": "Quantities look wrong",
           "status": "open",
-          "createdAt": "2026-11-24T21:17:59.256311+00:00",
+          "createdAt": "2026-11-24T23:57:59.728563+00:00",
           "resolvedAt": null
         },
         {
-          "id": "da567b00-c1c9-4d70-b2c7-48040aa8fcc0",
-          "publishedRecipeId": "2e8a953f-51ab-418a-b265-bd2152a57a6d",
+          "id": "dacf1530-c024-4487-ae32-8b346b425348",
+          "publishedRecipeId": "4183c7fb-b3fc-4f46-b2dc-2ee80e31490a",
           "publicationTitle": "Country sourdough",
-          "commentId": "1a41c553-21ee-4644-a4c6-8af352117bcf",
+          "commentId": "a1b359da-11b3-4301-b794-dd039f880c5a",
           "commentBody": "Baked it on Sunday, lovely crumb!",
           "reason": "Off-topic advertising link",
           "status": "open",
-          "createdAt": "2026-11-24T21:18:05.190078+00:00",
+          "createdAt": "2026-11-24T23:58:06.547458+00:00",
           "resolvedAt": null
         }
       ],

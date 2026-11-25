@@ -12,7 +12,7 @@ public static class ReminderTemplates
         var title = reminder.Kind switch
         {
             ReminderKind.StarterFeeding => "Time to feed your starter",
-            ReminderKind.BeforeKneading => "Kneading starts soon",
+            ReminderKind.BeforeKneading => "Feed your starter for the batch",
             _ => "Next stage",
         };
         var url = reminder.BatchId is { } batchId ? $"/batches/{batchId}"

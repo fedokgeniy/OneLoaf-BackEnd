@@ -29,7 +29,13 @@ public interface ILibraryApi
     Task<ApiResult> SetReactionAsync(Guid id, string? reaction, CancellationToken ct = default);
 
     /// <summary><c>POST library/{id}/copy</c>: the new recipe of the user (US-42).</summary>
-    Task<ApiResult<RecipeDto>> CopyAsync(Guid id, CancellationToken ct = default);
+    Task<ApiResult<RecipeDto>> CopyAsync(Guid id, CopyPublicationRequest request, CancellationToken ct = default);
+
+    /// <summary><c>GET library/{id}/photo</c>: the photo of a published recipe.</summary>
+    Task<ApiResult<FileDownload>> GetPhotoAsync(Guid id, CancellationToken ct = default);
+
+    /// <summary><c>GET ingredients</c>: the own catalog, to choose what replaces an ingredient of a published recipe.</summary>
+    Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(CancellationToken ct = default);
 
     /// <summary><c>POST library/{id}/reports</c> (LR-11).</summary>
     Task<ApiResult<ReportCreatedResponse>> ReportAsync(Guid id, ReportRequest request, CancellationToken ct = default);
@@ -81,8 +87,16 @@ public sealed class LibraryApi(ApiClientFactory api) : ILibraryApi
             : api.Core.PutAsync($"api/v1/library/{id}/reactions/me", new ReactionRequest(reaction), ct);
 
     /// <inheritdoc />
-    public Task<ApiResult<RecipeDto>> CopyAsync(Guid id, CancellationToken ct = default) =>
-        api.Core.PostEmptyAsync<RecipeDto>($"api/v1/library/{id}/copy", ct);
+    public Task<ApiResult<RecipeDto>> CopyAsync(Guid id, CopyPublicationRequest request, CancellationToken ct = default) =>
+        api.Core.PostAsync<CopyPublicationRequest, RecipeDto>($"api/v1/library/{id}/copy", request, ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<FileDownload>> GetPhotoAsync(Guid id, CancellationToken ct = default) =>
+        api.Core.DownloadAsync($"api/v1/library/{id}/photo", ct);
+
+    /// <inheritdoc />
+    public Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(CancellationToken ct = default) =>
+        api.Core.GetAsync<PagedResult<IngredientDto>>("api/v1/ingredients?page=1&pageSize=100", ct);
 
     /// <inheritdoc />
     public Task<ApiResult<ReportCreatedResponse>> ReportAsync(Guid id, ReportRequest request, CancellationToken ct = default) =>

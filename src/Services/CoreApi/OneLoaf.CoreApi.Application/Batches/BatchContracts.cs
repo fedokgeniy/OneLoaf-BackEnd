@@ -7,8 +7,18 @@ namespace OneLoaf.CoreApi.Application.Batches;
 /// <param name="RecipeId">Recipe or variant of the user.</param>
 /// <param name="Loaves">Number of loaves, 1-1000.</param>
 /// <param name="StarterId">Starter of the user.</param>
-/// <param name="StarterReminderMinutes">Minutes before kneading to remind about the starter; null = no reminder.</param>
-public sealed record BatchItemRequest(Guid RecipeId, int Loaves, Guid? StarterId = null, int? StarterReminderMinutes = null);
+/// <param name="RemindToFeedStarter">
+/// Remind to feed the starter early enough to be ripe for kneading: its time to peak before the first kneading stage.
+/// </param>
+public sealed record BatchItemRequest(Guid RecipeId, int Loaves, Guid? StarterId = null, bool RemindToFeedStarter = false)
+{
+    /// <summary>
+    /// How long before kneading the reminder is due: the time to peak of the starter, filled in by the service.
+    /// Not part of the request body.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public int? StarterReminderMinutes { get; init; }
+}
 
 /// <summary>Body of <c>POST /batches</c>, <c>POST /batches/preview</c> and <c>PUT /batches/{id}</c> (US-20).</summary>
 /// <param name="Name">Batch name.</param>
@@ -80,7 +90,7 @@ public sealed record BatchStageDto(
 /// <param name="StarterId">Starter.</param>
 /// <param name="StarterAmountG">Starter to prepare, g.</param>
 /// <param name="KneadingCycles">Kneading cycles for the bowl; null when no bowl is set.</param>
-/// <param name="StarterReminderMinutes">Starter reminder before kneading, minutes.</param>
+/// <param name="StarterReminderMinutes">Feeding reminder before kneading, minutes (the time to peak of the starter); null = no reminder.</param>
 /// <param name="SortOrder">Order.</param>
 /// <param name="Stages">Stages in order.</param>
 public sealed record BatchItemDto(

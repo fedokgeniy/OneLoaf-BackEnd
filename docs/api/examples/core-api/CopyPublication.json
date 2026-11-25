@@ -2,12 +2,26 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/library/2e8a953f-51ab-418a-b265-bd2152a57a6d/copy",
+    "path": "/api/v1/library/4183c7fb-b3fc-4f46-b2dc-2ee80e31490a/copy",
     "authenticated": true,
+    "requestBody": {
+      "ingredients": [
+        {
+          "name": "Bread flour",
+          "useIngredientId": "765af749-e2a8-4f3f-99fe-02ff34bf2676",
+          "stockQuantity": null
+        },
+        {
+          "name": "Salt",
+          "useIngredientId": null,
+          "stockQuantity": 500
+        }
+      ]
+    },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "f5e82190-09bf-4ea7-9752-6590e5e25e40",
+      "id": "51b1b43d-7d41-48fd-a027-5b2af9f77823",
       "parentRecipeId": null,
       "title": "Country sourdough",
       "description": "Open crumb, crisp crust.",
@@ -17,9 +31,9 @@
       "isArchived": false,
       "ingredients": [
         {
-          "lineId": "2b2e299f-7e13-44f4-9ff3-ac99ba7a2458",
-          "ingredientId": "a6bd6639-4ca5-446c-98e6-1dac9bea5050",
-          "ingredientName": "Bread flour",
+          "lineId": "be972b29-ef09-4b3c-ad79-81193497d862",
+          "ingredientId": "765af749-e2a8-4f3f-99fe-02ff34bf2676",
+          "ingredientName": "Strong white flour",
           "categoryCode": "flour",
           "unitCode": "g",
           "quantity": 500.000,
@@ -30,7 +44,7 @@
           "isInherited": false
         },
         {
-          "lineId": "9f599c72-f9cc-4206-a042-deb2c9525656",
+          "lineId": "84f3e7a0-6e87-4b00-ad0a-a9db265559de",
           "ingredientId": "00000000-0000-4000-1001-000000000012",
           "ingredientName": "Water",
           "categoryCode": "water",
@@ -43,8 +57,8 @@
           "isInherited": false
         },
         {
-          "lineId": "dadf085b-b7c9-40de-a93a-d3467783b3e8",
-          "ingredientId": "86843f4b-cb87-4060-b8fd-d99deefdb36d",
+          "lineId": "15d8120e-54cc-4bf5-9a47-a9b5cf3c9b2e",
+          "ingredientId": "0efa0a46-d006-4243-aca3-381c773db43b",
           "ingredientName": "Sea salt",
           "categoryCode": "salt",
           "unitCode": "g",
@@ -56,8 +70,8 @@
           "isInherited": false
         },
         {
-          "lineId": "908363bd-1bb3-44e3-80df-beb0e26a4809",
-          "ingredientId": "52c4526f-5514-415a-92a8-94d7d085fc89",
+          "lineId": "8e67be61-a97d-410f-92b7-1d84331e0fee",
+          "ingredientId": "a5997a48-b906-40dc-adf5-3bed5c4709d4",
           "ingredientName": "Rye starter",
           "categoryCode": "starter",
           "unitCode": "g",
@@ -71,7 +85,7 @@
       ],
       "stages": [
         {
-          "lineId": "b4c2d107-4aa4-488f-8dc0-c88cfd630d9a",
+          "lineId": "59fe61d8-90be-44d9-a45e-977d2249c32a",
           "sortOrder": 1,
           "name": "Mix",
           "stageTypeCode": "mix",
@@ -87,7 +101,7 @@
           "isInherited": false
         },
         {
-          "lineId": "fe51e1e1-b73a-4ed8-acd7-684b2874ddbd",
+          "lineId": "b788d54e-f854-44d7-b31c-7ccf9184324e",
           "sortOrder": 2,
           "name": "Bulk fermentation",
           "stageTypeCode": "bulk_fermentation",
@@ -103,7 +117,7 @@
           "isInherited": false
         },
         {
-          "lineId": "3c110af6-3743-4db8-ad71-4e27632180cf",
+          "lineId": "b11ee2ed-fdd1-45a7-8ac0-77ce7319e773",
           "sortOrder": 3,
           "name": "Shape",
           "stageTypeCode": "shape",
@@ -119,7 +133,7 @@
           "isInherited": false
         },
         {
-          "lineId": "47781e66-78e6-44f1-bc77-e83390a22c6f",
+          "lineId": "46740fed-00aa-4ad2-9492-5a3150525c24",
           "sortOrder": 4,
           "name": "Cold proof",
           "stageTypeCode": "proof",
@@ -135,7 +149,7 @@
           "isInherited": false
         },
         {
-          "lineId": "5c6ee6f0-5c5a-460e-a50b-c7919753be03",
+          "lineId": "09e36975-86d4-4bae-8ce5-c00d091a4ff4",
           "sortOrder": 5,
           "name": "Bake",
           "stageTypeCode": "bake",
@@ -151,8 +165,8 @@
           "isInherited": false
         }
       ],
-      "createdAt": "2026-11-24T21:18:05.132547+00:00",
-      "updatedAt": "2026-11-24T21:18:05.132547+00:00",
+      "createdAt": "2026-11-24T23:58:06.472929+00:00",
+      "updatedAt": "2026-11-24T23:58:06.472929+00:00",
       "hasPhoto": false
     }
   }

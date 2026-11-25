@@ -172,7 +172,7 @@ internal sealed class FakeStarterRepository : IStarterRepository
     public Guid Add(Guid owner, string name = "Rye starter")
     {
         var id = Guid.NewGuid();
-        Starters[id] = (owner, ToDto(id, new StarterRequest(name, 100, FeedingMode.Regular, 24)));
+        Starters[id] = (owner, ToDto(id, new StarterRequest(name, 100, FeedingMode.Regular, 24, RiseHours: 6)));
         return id;
     }
 

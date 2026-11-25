@@ -2,14 +2,14 @@
   {
     "case": "cancelled batch",
     "method": "DELETE",
-    "path": "/api/v1/batches/9a8ab03f-24e4-4d49-9f48-31a7497f6816?ingredientsUsed=false",
+    "path": "/api/v1/batches/00b4cd00-2597-42fc-b3b7-c53dc8de859e?ingredientsUsed=false",
     "authenticated": true,
     "status": 204
   },
   {
     "case": "running batch",
     "method": "DELETE",
-    "path": "/api/v1/batches/e7bf51f2-8140-4a25-8388-e6672123c859",
+    "path": "/api/v1/batches/e4be33d1-fb4b-4aba-885c-903dfcef15ea",
     "authenticated": true,
     "status": 409,
     "responseContentType": "application/problem+json",
@@ -18,9 +18,9 @@
       "title": "The request conflicts with existing data.",
       "status": 409,
       "detail": "Complete or cancel the running batch before deleting it.",
-      "instance": "/api/v1/batches/e7bf51f2-8140-4a25-8388-e6672123c859",
-      "traceId": "00-b011b5097406833e2d5f9eca6a7ee5cb-6d8bed0a56dec178-02",
-      "correlationId": "c131595e33af44e8902d30396b7ff1ac"
+      "instance": "/api/v1/batches/e4be33d1-fb4b-4aba-885c-903dfcef15ea",
+      "traceId": "00-00da19ee9d5bf14b8a8c0e7e95dee5b5-622fdc3564d3ef7b-02",
+      "correlationId": "4fbedaf5f4094ca89f4ec85402ef684d"
     }
   }
 ]

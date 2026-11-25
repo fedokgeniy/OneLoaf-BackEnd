@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/ingredients/25e63c78-8dbc-4a2c-a1a7-b533f41a7c46/stock-adjustments",
+    "path": "/api/v1/ingredients/44e5222a-743e-47d6-bcb1-b263d78ed2b3/stock-adjustments",
     "authenticated": true,
     "requestBody": {
       "actualQuantity": 430,
@@ -11,7 +11,7 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "380803ed-54f1-48bf-a807-9bb524dc93e6",
+      "id": "35c5d940-fe53-4325-9bd4-76fb3e085322",
       "type": "adjustment",
       "quantity": -70.000,
       "occurredOn": "2026-11-24",
@@ -22,13 +22,13 @@
       "totalCost": null,
       "currency": null,
       "note": "Counted the shelf",
-      "createdAt": "2026-11-24T21:18:02.554705+00:00"
+      "createdAt": "2026-11-24T23:58:03.748359+00:00"
     }
   },
   {
     "case": "stock already equals the quantity",
     "method": "POST",
-    "path": "/api/v1/ingredients/25e63c78-8dbc-4a2c-a1a7-b533f41a7c46/stock-adjustments",
+    "path": "/api/v1/ingredients/44e5222a-743e-47d6-bcb1-b263d78ed2b3/stock-adjustments",
     "authenticated": true,
     "requestBody": {
       "actualQuantity": 430,
@@ -40,14 +40,14 @@
       "type": "https://oneloaf.app/problems/validation",
       "title": "One or more validation errors occurred.",
       "status": 400,
-      "instance": "/api/v1/ingredients/25e63c78-8dbc-4a2c-a1a7-b533f41a7c46/stock-adjustments",
+      "instance": "/api/v1/ingredients/44e5222a-743e-47d6-bcb1-b263d78ed2b3/stock-adjustments",
       "errors": {
         "actualQuantity": [
           "The stock already equals this quantity."
         ]
       },
-      "traceId": "00-e40f4daaf7bc73a0ff8c1825ed236265-d400a96c858a6038-02",
-      "correlationId": "3da873d64c8c4a629438725e4b426e4c"
+      "traceId": "00-046068a00b761c9ece12232ee9791063-e743b98e2448a85a-02",
+      "correlationId": "48ac9ad86125463fb39fee555785ffa6"
     }
   }
 ]

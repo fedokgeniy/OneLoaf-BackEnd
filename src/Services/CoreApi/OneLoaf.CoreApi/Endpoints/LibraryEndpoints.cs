@@ -34,6 +34,15 @@ public static class LibraryEndpoints
             .AllowAnonymous().ProducesProblem(StatusCodes.Status404NotFound)
             .WithName("GetPublication").WithSummary("A published recipe")
             .WithDescription("US-40. Anonymous. Snapshot, author name, comment and reaction counts. Unpublished ones are visible only to the author.");
+        library.MapGet("/{id:guid}/photo", async (Guid id, LibraryService s, CancellationToken ct) =>
+            {
+                var photo = await s.OpenPhotoAsync(id, ct);
+                return TypedResults.Stream(photo.Content, photo.ContentType);
+            })
+            .AllowAnonymous().ProducesProblem(StatusCodes.Status404NotFound)
+            .Produces<FileStreamHttpResult>(StatusCodes.Status200OK, "image/jpeg", "image/png", "image/webp")
+            .WithName("GetPublicationPhoto").WithSummary("The photo of a published recipe")
+            .WithDescription("Anonymous. The photo of the recipe the publication was made from; 404 without a photo or for a hidden publication.");
         library.MapGet("/{id:guid}/comments", async (Guid id, [AsParameters] CommentListQuery query, LibraryService s, CancellationToken ct) =>
                 TypedResults.Ok(await s.ListCommentsAsync(id, query, ct)))
             .AllowAnonymous().WithValidation<CommentListQuery>().ProducesProblem(StatusCodes.Status404NotFound)
@@ -54,7 +63,9 @@ public static class LibraryEndpoints
             .WithName("RemoveReaction").WithSummary("Remove the own reaction").WithDescription("US-41. Idempotent.");
         members.MapPost("/{id:guid}/copy", CopyAsync).ProducesProblem(StatusCodes.Status422UnprocessableEntity)
             .WithName("CopyPublication").WithSummary("Copy a published recipe into the own workspace")
-            .WithDescription("US-42. Creates an independent recipe; ingredients are matched to the own catalog by name or created.");
+            .WithDescription("US-42. Creates an independent recipe. The optional body says, per ingredient of the published recipe, which own " +
+                             "ingredient to use instead (same unit) or how much of a new one is on the shelf; without a choice an " +
+                             "ingredient is matched to the own catalog by name or created.");
         members.MapPost("/{id:guid}/reports", ReportAsync).WithValidation<ReportRequest>()
             .WithName("ReportContent").WithSummary("Report a publication or a comment")
             .WithDescription("LR-11. With commentId the comment is reported, otherwise the publication.");
@@ -111,9 +122,10 @@ public static class LibraryEndpoints
         return TypedResults.NoContent();
     }
 
-    private static async Task<Created<Application.Recipes.RecipeDto>> CopyAsync(Guid id, LibraryService library, CancellationToken ct)
+    private static async Task<Created<Application.Recipes.RecipeDto>> CopyAsync(
+        Guid id, CopyPublicationRequest? request, LibraryService library, CancellationToken ct)
     {
-        var recipe = await library.CopyAsync(id, ct);
+        var recipe = await library.CopyAsync(id, request, ct);
         return TypedResults.Created($"{RecipeEndpoints.GroupRoute}/{recipe.Id}", recipe);
     }
 

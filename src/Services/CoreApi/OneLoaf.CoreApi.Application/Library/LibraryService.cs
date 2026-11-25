@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using FluentValidation;
 using OneLoaf.CoreApi.Application.Catalog;
 using OneLoaf.CoreApi.Application.Common;
+using OneLoaf.CoreApi.Application.History;
 using OneLoaf.CoreApi.Application.Recipes;
 using OneLoaf.Domain;
 using OneLoaf.SharedKernel.Exceptions;
@@ -19,8 +20,17 @@ public sealed class LibraryService(
     IRecipeRepository recipes,
     IIngredientRepository ingredients,
     RecipeService recipeService,
+    IPhotoStorage photoStorage,
+    IWorkspaceTransaction transaction,
+    TimeProvider timeProvider,
     ICurrentUser currentUser)
 {
+    /// <summary>Message when an ingredient chosen for a copy has another unit than the published recipe uses.</summary>
+    public const string UnitMismatchMessage = "Choose an ingredient measured in the same unit as the recipe uses.";
+
+    private const string PhotoNotFoundMessage = "The photo was not found.";
+    private const string CopyStockNote = "On the shelf when the recipe was saved from the library";
+
     /// <summary>Message of a missing or hidden publication.</summary>
     public const string NotFoundMessage = "Publication not found.";
 
@@ -133,33 +143,89 @@ public sealed class LibraryService(
         return new ReportCreatedResponse(reportId);
     }
 
+    /// <summary>The photo of a published recipe: the photo of the recipe it was published from; 404 without one.</summary>
+    public async Task<PhotoContent> OpenPhotoAsync(Guid id, CancellationToken cancellationToken)
+    {
+        if (await library.GetPhotoAsync(id, cancellationToken) is not { StorageKey: { } key, ContentType: { } contentType })
+        {
+            throw new NotFoundException(PhotoNotFoundMessage);
+        }
+
+        var stream = await photoStorage.OpenReadAsync(key, cancellationToken) ?? throw new NotFoundException(PhotoNotFoundMessage);
+        return new PhotoContent(stream, contentType);
+    }
+
     /// <summary>
-    /// Copies a published recipe into the own workspace as an independent recipe (US-42). Ingredients are matched to
-    /// the own catalog by name; missing ones are created with the category and unit of the snapshot.
+    /// Copies a published recipe into the own workspace as an independent recipe (US-42). For every ingredient the
+    /// baker may name an own ingredient to use instead, so that another name for the same flour makes no duplicate, or
+    /// say how much of a new ingredient is on the shelf. Without a choice an ingredient is matched to the own catalog
+    /// by name, and created with the category and unit of the snapshot when there is none. One transaction.
     /// </summary>
-    public async Task<RecipeDto> CopyAsync(Guid id, CancellationToken cancellationToken)
+    public async Task<RecipeDto> CopyAsync(Guid id, CopyPublicationRequest? request, CancellationToken cancellationToken)
     {
         var publication = await library.GetSnapshotAsync(id, cancellationToken) ?? throw new NotFoundException(NotFoundMessage);
         var snapshot = JsonSerializer.Deserialize<RecipeSnapshot>(publication.Snapshot, SnapshotJson)
                        ?? throw new BusinessRuleException("The publication has no recipe content.");
 
-        var names = snapshot.Ingredients.Select(i => i.Name).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-        var existing = new Dictionary<string, Guid>(await library.GetIngredientIdsByNameAsync(currentUser.Id, names, cancellationToken),
-            StringComparer.OrdinalIgnoreCase);
-        foreach (var ingredient in snapshot.Ingredients.Where(i => !existing.ContainsKey(i.Name)))
+        var choices = new Dictionary<string, CopyIngredientChoice>(StringComparer.OrdinalIgnoreCase);
+        foreach (var (choice, index) in (request?.Ingredients ?? []).Select((c, i) => (c, i)))
         {
-            existing[ingredient.Name] = await ingredients.CreateAsync(currentUser.Id,
-                new IngredientRequest(ingredient.Name, ingredient.Category, ingredient.Unit, null), cancellationToken);
+            if (choice.StockQuantity is < 0 or >= CatalogLimits.MaxQuantity)
+            {
+                throw ValidationFailures.For($"ingredients[{index}].stockQuantity", "Enter a quantity of zero or more.");
+            }
+
+            choices[choice.Name?.Trim() ?? string.Empty] = choice;
         }
 
-        var request = new RecipeRequest(
-            publication.Title, publication.Description, snapshot.YieldLoaves, snapshot.LoafWeightG, null,
-            snapshot.Ingredients.Select(i => new RecipeIngredientInput(null, existing[i.Name], i.Quantity, i.IsOptional)).ToList(),
-            snapshot.Stages.Select(s => new RecipeStageInput(null, s.Name, s.StageType, s.MinMinutes, s.MaxMinutes,
-                ProofMode: s.ProofMode, TemperatureC: s.TemperatureC, IsOptional: s.IsOptional)).ToList());
-        var recipe = await recipeService.CreateAsync(request, cancellationToken);
-        await library.MarkCopiedAsync(recipe.Id, id, cancellationToken);
-        return recipe;
+        var lines = snapshot.Ingredients.GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase).Select(g => g.First()).ToList();
+        var chosen = new Dictionary<string, Guid>(StringComparer.OrdinalIgnoreCase);
+        foreach (var line in lines)
+        {
+            if (choices.TryGetValue(line.Name, out var choice) && choice.UseIngredientId is { } ownId)
+            {
+                var own = await ingredients.GetAsync(currentUser.Id, ownId, cancellationToken)
+                          ?? throw ValidationFailures.For("ingredients", IngredientService.NotFoundMessage);
+                if (!string.Equals(own.UnitCode, line.Unit, StringComparison.Ordinal))
+                {
+                    // The quantity of the recipe line is in the unit of the snapshot; another unit would change it.
+                    throw ValidationFailures.For("ingredients", $"{line.Name}: {UnitMismatchMessage}");
+                }
+
+                chosen[line.Name] = ownId;
+            }
+        }
+
+        return await transaction.ExecuteAsync(async ct =>
+        {
+            var byName = new Dictionary<string, Guid>(
+                await library.GetIngredientIdsByNameAsync(currentUser.Id, lines.Select(l => l.Name).ToList(), ct), StringComparer.OrdinalIgnoreCase);
+            foreach (var line in lines.Where(l => !chosen.ContainsKey(l.Name)))
+            {
+                if (byName.TryGetValue(line.Name, out var sameName))
+                {
+                    chosen[line.Name] = sameName;
+                    continue;
+                }
+
+                var created = await ingredients.CreateAsync(currentUser.Id, new IngredientRequest(line.Name, line.Category, line.Unit, null), ct);
+                chosen[line.Name] = created;
+                if (choices.TryGetValue(line.Name, out var choice) && choice.StockQuantity is > 0)
+                {
+                    await ingredients.AddAdjustmentAsync(created, choice.StockQuantity.Value,
+                        DateOnly.FromDateTime(timeProvider.GetUtcNow().UtcDateTime), CopyStockNote, ct);
+                }
+            }
+
+            var recipeRequest = new RecipeRequest(
+                publication.Title, publication.Description, snapshot.YieldLoaves, snapshot.LoafWeightG, null,
+                snapshot.Ingredients.Select(i => new RecipeIngredientInput(null, chosen[i.Name], i.Quantity, i.IsOptional)).ToList(),
+                snapshot.Stages.Select(s => new RecipeStageInput(null, s.Name, s.StageType, s.MinMinutes, s.MaxMinutes,
+                    ProofMode: s.ProofMode, TemperatureC: s.TemperatureC, IsOptional: s.IsOptional)).ToList());
+            var recipe = await recipeService.CreateAsync(recipeRequest, ct);
+            await library.MarkCopiedAsync(recipe.Id, id, ct);
+            return recipe;
+        }, cancellationToken);
     }
 
     private async Task EnsurePublishedAsync(Guid id, CancellationToken cancellationToken)

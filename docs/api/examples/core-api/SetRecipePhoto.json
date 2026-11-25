@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "PUT",
-    "path": "/api/v1/recipes/699803e1-119d-4ea6-80fb-0938962fc855/photo",
+    "path": "/api/v1/recipes/e6e62d43-bafb-462e-8b2d-88853bb427c2/photo",
     "authenticated": true,
     "requestBody": {
       "multipart/form-data": {

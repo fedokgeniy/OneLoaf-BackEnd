@@ -47,8 +47,8 @@ public static class NavDestinations
     /// <summary>Tablet rail and desktop sidebar: the seven main items at the top.</summary>
     public static IReadOnlyList<NavDestination> Main { get; } = [Home, Recipes, Batches, Starters, Assistant, Library, History];
 
-    /// <summary>Tablet rail and desktop sidebar: the workspace set-up pinned to the bottom, above Sign out.</summary>
-    public static IReadOnlyList<NavDestination> Pinned { get; } = [Ingredients, Kitchen, Settings];
+    /// <summary>Tablet rail and desktop sidebar: the workspace set-up pinned to the bottom.</summary>
+    public static IReadOnlyList<NavDestination> Pinned { get; } = [Ingredients, Kitchen];
 
     /// <summary>Phone avatar menu: what does not fit in the bottom bar.</summary>
     public static IReadOnlyList<NavDestination> AccountMenu { get; } = [Library, History, Ingredients, Kitchen, Settings];

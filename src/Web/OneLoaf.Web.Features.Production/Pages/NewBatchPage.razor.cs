@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.Forms;
 using OneLoaf.Web.Features.Production.Models;
 using OneLoaf.Web.Features.Production.State;
 using OneLoaf.Web.Shared.Api;
+using OneLoaf.Web.Shared.Formatting;
 using OneLoaf.Web.Shared.Forms;
 using OneLoaf.Web.Shared.State;
 using OneLoaf.Web.Shared.Ui;
@@ -21,9 +22,6 @@ public sealed partial class NewBatchPage
 
     private static readonly IReadOnlyList<SegmentOption<PlanMode>> ModeOptions =
         [new(PlanMode.StartAt, "Start time"), new(PlanMode.ReadyBy, "Ready by")];
-
-    private static readonly IReadOnlyList<SegmentOption<int>> ReminderOptions =
-        [new(60, "60 min"), new(30, "30 min")];
 
     private readonly BatchForm _form = new();
     private EditContext? _editContext;
@@ -65,6 +63,15 @@ public sealed partial class NewBatchPage
     private static IReadOnlyList<SelectOption> StarterOptions(NewBatchData data) =>
         [.. data.Starters.Where(s => s.IsActive).Select(s => new SelectOption(s.Id.ToString(), s.Name))];
 
+    /// <summary>
+    /// When the reminder comes: a fed starter needs its time to peak, so the API sends the reminder that long before
+    /// kneading. The time is the starter's own setting; it is only shown here.
+    /// </summary>
+    private static string ReminderHelp(NewBatchData data, BatchItemForm item) =>
+        data.Starters.FirstOrDefault(s => s.Id.ToString() == item.StarterId)?.RiseHours is { } hours
+            ? $"A fed starter needs time to ripen: the reminder comes {DisplayFormat.Number(hours, 1)} h before kneading, the time to peak of this starter."
+            : "Set the time to peak of this starter to get the reminder.";
+
     private static string RecipeTitle(NewBatchData data, BatchItemForm item) =>
         data.Recipes.FirstOrDefault(r => r.Id.ToString() == item.RecipeId)?.Title ?? "recipe";
 
@@ -100,12 +107,6 @@ public sealed partial class NewBatchPage
     private void UseFullRecipe()
     {
         _form.IngredientScale = null;
-        SchedulePreview();
-    }
-
-    private void SetReminder(BatchItemForm item, int minutes)
-    {
-        item.ReminderMinutes = minutes;
         SchedulePreview();
     }
 

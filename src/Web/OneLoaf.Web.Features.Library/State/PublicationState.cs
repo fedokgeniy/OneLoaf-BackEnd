@@ -20,6 +20,9 @@ public sealed record PublicationState(
         : this(null, Loadable<PublishedRecipeDto>.Idle, Loadable<PagedList<CommentDto>>.Idle, null)
     {
     }
+
+    /// <summary>The own ingredients, loaded when the recipe is about to be saved; null before that.</summary>
+    public IReadOnlyList<IngredientDto>? MyIngredients { get; init; }
 }
 
 /// <summary>Intent: open a publication.</summary>
@@ -46,8 +49,14 @@ public sealed record RemoveComment(Guid CommentId);
 /// <summary>Intent: set (or with null remove) the own reaction.</summary>
 public sealed record SetReaction(string? Reaction);
 
-/// <summary>Intent: copy the recipe into the user's recipes (US-42).</summary>
-public sealed record CopyPublication;
+/// <summary>Intent: load the own ingredients, to match them to those of the recipe before it is saved.</summary>
+public sealed record PrepareCopy;
+
+/// <summary>Result: the own ingredients (empty when they could not be loaded: everything is added as new).</summary>
+public sealed record CopyIngredientsLoaded(IReadOnlyList<IngredientDto> Ingredients);
+
+/// <summary>Intent: save the recipe to the own recipes with the chosen ingredients.</summary>
+public sealed record CopyPublication(CopyPublicationRequest Request);
 
 /// <summary>Result: copied; the page opens the new recipe.</summary>
 public sealed record PublicationCopied(Guid RecipeId);
@@ -98,6 +107,15 @@ public static class PublicationReducers
     /// <summary>Reacting.</summary>
     [ReducerMethod(typeof(SetReaction))]
     public static PublicationState OnReact(PublicationState state) => state with { Running = nameof(SetReaction) };
+
+    /// <summary>The own ingredients arrived for the matching dialog.</summary>
+    [ReducerMethod]
+    public static PublicationState OnCopyIngredients(PublicationState state, CopyIngredientsLoaded action) =>
+        state with { MyIngredients = action.Ingredients };
+
+    /// <summary>The dialog opens again: the own ingredients are loaded afresh.</summary>
+    [ReducerMethod(typeof(PrepareCopy))]
+    public static PublicationState OnPrepareCopy(PublicationState state) => state with { MyIngredients = null };
 
     /// <summary>Copying.</summary>
     [ReducerMethod(typeof(CopyPublication))]
@@ -222,21 +240,31 @@ public sealed class PublicationEffects(ILibraryApi api, IState<PublicationState>
         dispatcher.Dispatch(new PublicationCommandDone(nameof(SetReaction), null));
     }
 
-    /// <summary>Copies the recipe into the user's recipes.</summary>
-    [EffectMethod(typeof(CopyPublication))]
-    public async Task HandleCopy(IDispatcher dispatcher)
+    /// <summary>Loads the own ingredients for the matching dialog.</summary>
+    [EffectMethod(typeof(PrepareCopy))]
+    public async Task HandlePrepareCopy(IDispatcher dispatcher)
     {
+        ArgumentNullException.ThrowIfNull(dispatcher);
+        dispatcher.Dispatch(new CopyIngredientsLoaded(
+            await api.ListIngredientsAsync() is ApiResult<PagedResult<IngredientDto>>.Success { Value: var page } ? page.Items : []));
+    }
+
+    /// <summary>Saves the recipe to the user's recipes.</summary>
+    [EffectMethod]
+    public async Task HandleCopy(CopyPublication action, IDispatcher dispatcher)
+    {
+        ArgumentNullException.ThrowIfNull(action);
         ArgumentNullException.ThrowIfNull(dispatcher);
         if (state.Value.Id is not { } id)
         {
             return;
         }
 
-        switch (await api.CopyAsync(id))
+        switch (await api.CopyAsync(id, action.Request))
         {
             case ApiResult<RecipeDto>.Success { Value: var recipe }:
                 dispatcher.Dispatch(new PublicationCommandDone(nameof(CopyPublication), null));
-                dispatcher.Dispatch(new ShowToast(Toast.Success($"{recipe.Title} copied to your recipes")));
+                dispatcher.Dispatch(new ShowToast(Toast.Success($"{recipe.Title} saved to your recipes")));
                 dispatcher.Dispatch(new RecipesChanged());
                 dispatcher.Dispatch(new PublicationCopied(recipe.Id));
                 break;

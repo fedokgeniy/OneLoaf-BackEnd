@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Npgsql;
 using OneLoaf.CoreApi.Application.Common;
+using OneLoaf.CoreApi.Application.History;
 using OneLoaf.CoreApi.Application.Library;
 using OneLoaf.CoreApi.Infrastructure.Caching;
 using OneLoaf.Domain;
@@ -75,6 +76,7 @@ public sealed class LibraryRepository(OneLoafDbContext db, HybridCache cache, Ca
                 p.Snapshot,
                 Comments = p.Comments.Count(c => !c.IsRemoved),
                 MyReaction = p.Reactions.Where(r => r.UserId == viewerId).Select(r => (ReactionType?)r.Reaction).FirstOrDefault(),
+                HasPhoto = p.SourceRecipe != null && p.SourceRecipe.PhotoKey != null,
             })
             .FirstOrDefaultAsync(cancellationToken);
         if (row is null)
@@ -89,8 +91,15 @@ public sealed class LibraryRepository(OneLoafDbContext db, HybridCache cache, Ca
             .ToDictionaryAsync(g => g.Key, g => g.Count, cancellationToken);
         using var snapshot = JsonDocument.Parse(row.Snapshot);
         return new PublishedRecipeDto(row.Id, row.Title, row.Description, row.DisplayName, row.Status, Utc(row.PublishedAt),
-            snapshot.RootElement.Clone(), row.Comments, reactions, row.MyReaction, row.AuthorId == viewerId);
+            snapshot.RootElement.Clone(), row.Comments, reactions, row.MyReaction, row.AuthorId == viewerId, row.HasPhoto);
     }
+
+    /// <inheritdoc />
+    public async Task<PhotoSlot?> GetPhotoAsync(Guid publicationId, CancellationToken cancellationToken) =>
+        await db.PublishedRecipes.AsNoTracking()
+            .Where(p => p.Id == publicationId && p.Status == PublicationStatus.Published && p.SourceRecipe!.PhotoKey != null)
+            .Select(p => new PhotoSlot(p.SourceRecipe!.PhotoKey, p.SourceRecipe.PhotoContentType))
+            .SingleOrDefaultAsync(cancellationToken);
 
     /// <inheritdoc />
     public Task<PublicationState?> GetStateAsync(Guid id, CancellationToken cancellationToken) =>
@@ -265,9 +274,13 @@ public sealed class LibraryRepository(OneLoafDbContext db, HybridCache cache, Ca
             .OrderByDescending(r => r.PublishedAt).ThenBy(r => r.Id)
             .Skip(Paging.Skip(page, pageSize)).Take(pageSize)
             .ToListAsync(cancellationToken);
+        var ids = rows.Select(r => r.Id).ToList();
+        var withPhoto = (await db.PublishedRecipes.AsNoTracking()
+            .Where(p => ids.Contains(p.Id) && p.SourceRecipe!.PhotoKey != null)
+            .Select(p => p.Id).ToListAsync(cancellationToken)).ToHashSet();
         return new PagedResult<LibraryItemDto>(
             rows.Select(r => new LibraryItemDto(r.Id, r.Title, r.Description, r.AuthorName, r.PublishedAt, r.YieldLoaves,
-                r.IngredientCount, r.StageCount, r.CommentCount, r.ReactionCount)).ToList(),
+                r.IngredientCount, r.StageCount, r.CommentCount, r.ReactionCount, withPhoto.Contains(r.Id))).ToList(),
             page, pageSize, total);
     }
 

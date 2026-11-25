@@ -30,7 +30,17 @@
         var stages = AllStages(batch);
         var current = CurrentStage(stages);
         var open = batch.Status is BatchStatuses.Planned or BatchStatuses.InProgress;
-        <ShellTitle Text="@($"{batch.Name} · {DisplayFormat.Loaves(batch.Items.Sum(i => i.Loaves))}")" BackHref="batches" BackLabel="Back to the calendar" />
+        <ShellTitle Text="@($"{batch.Name} · {DisplayFormat.Loaves(batch.Items.Sum(i => i.Loaves))}")" BackHref="batches" BackLabel="Back to the calendar">
+            <Actions>
+                @* Next to the profile button, so it is in the same place at every stage of the batch. *@
+                @if (open)
+                {
+                    <OlButton Variant="ButtonVariant.Secondary" Icon="IconName.Close" Disabled="State.Value.BusyBatch" class="app-hide-compact" OnClick="() => AskCancel(batch)">Cancel batch</OlButton>
+                    @* On a phone the name of the batch needs the width: the same action as an icon button. *@
+                    <span class="ol-show-compact"><OlIconButton Icon="IconName.Close" Label="Cancel batch" Disabled="State.Value.BusyBatch" OnClick="() => AskCancel(batch)" /></span>
+                }
+            </Actions>
+        </ShellTitle>
         <div class="ol-container batch">
             <section class="batch__summary" aria-label="Progress">
                 <div class="batch__summary-line">
@@ -55,8 +65,8 @@
                     {
                         <OlStageItem Stage="current" Number="stages.IndexOf(current) + 1" Busy="State.Value.BusyStageId == current.Id" Actionable="open"
                                      OnStart="s => Run(batch, s, StageCommandKind.Start)" OnComplete="s => Run(batch, s, StageCommandKind.Complete)"
-                                     OnExtend="s => Run(batch, s, StageCommandKind.Extend)" OnSkip="s => Run(batch, s, StageCommandKind.Skip)"
-                                     OnAdjust="OpenAdjust" />
+                                     OnSkip="s => Run(batch, s, StageCommandKind.Skip)" OnAdjust="a => Adjust(batch, a)"
+                                     OnReset="s => Run(batch, s, StageCommandKind.Reset)" />
                     }
                     else if (batch.Status == BatchStatuses.Done)
                     {
@@ -86,7 +96,7 @@
                                 <span class="batch__figure-meta">
                                     @(item.StarterAmountG is { } starter ? $"Starter {DisplayFormat.Grams(starter)}" : "No starter")
                                     · @(item.KneadingCycles switch { null => "kneading cycles unknown", 1 => "1 kneading cycle", var n => $"{n} kneading cycles" })
-                                    @(item.StarterReminderMinutes is { } remind ? $" · reminder {remind} min before kneading" : null)
+                                    @(item.StarterReminderMinutes is { } remind ? $" · feeding reminder {DisplayFormat.Duration(remind)} before kneading" : null)
                                 </span>
                             </div>
                         }
@@ -108,14 +118,10 @@
                         </span>
                     </div>
 
-                    @if (open)
+                    @if (open && current is null)
                     {
                         <div class="batch__actions">
-                            @if (current is null)
-                            {
-                                <OlButton Large="true" Loading="State.Value.BusyBatch" OnClick="() => Dispatcher.Dispatch(new CompleteBatch(batch.Id))">Complete batch</OlButton>
-                            }
-                            <OlButton Variant="ButtonVariant.Ghost" Disabled="State.Value.BusyBatch" OnClick="() => AskCancel(batch)">Cancel batch</OlButton>
+                            <OlButton Large="true" Loading="State.Value.BusyBatch" OnClick="() => Dispatcher.Dispatch(new CompleteBatch(batch.Id))">Complete batch</OlButton>
                         </div>
                     }
                     @if (batch.Status == BatchStatuses.Done || stages.Any(s => s.ActualEndAt is not null))
@@ -153,32 +159,6 @@
                 </section>
             </div>
         </div>
-
-        <OlDialog Open="_adjust is not null" Title="@($"Adjust {_adjust?.Name}")" OnClose="() => _adjust = null">
-            <ChildContent>
-                @if (_adjust is not null)
-                {
-                    <div class="batch__adjust">
-                        <OlNumberStepper Label="Minimum" Value="_adjustMin" Min="0" Max="10080" Step="5" DecreaseLabel="5 minutes less" IncreaseLabel="5 minutes more"
-                                         ValueChanged="v => _adjustMin = v" />
-                        <OlNumberStepper Label="Maximum" Value="_adjustMax" Min="0" Max="10080" Step="5" DecreaseLabel="5 minutes less" IncreaseLabel="5 minutes more"
-                                         ValueChanged="v => _adjustMax = v" />
-                        @if (_adjustMax < _adjustMin)
-                        {
-                            <p class="ol-field__error" role="alert">The maximum must not be shorter than the minimum.</p>
-                        }
-                    </div>
-                }
-            </ChildContent>
-            <Footer>
-                @if (_adjust is { IsOverridden: true })
-                {
-                    <OlButton Variant="ButtonVariant.Ghost" OnClick="() => SubmitAdjust(batch, reset: true)">Reset to recipe</OlButton>
-                }
-                <OlButton Variant="ButtonVariant.Secondary" OnClick="() => _adjust = null">Cancel</OlButton>
-                <OlButton Disabled="@(_adjustMax < _adjustMin)" OnClick="() => SubmitAdjust(batch, reset: false)">Save durations</OlButton>
-            </Footer>
-        </OlDialog>
 
         <OlDialog Open="_confirmCancel" Title="Cancel this batch?" OnClose="() => _confirmCancel = false">
             <ChildContent>

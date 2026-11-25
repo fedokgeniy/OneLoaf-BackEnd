@@ -1,8 +1,10 @@
-@* Recipe card (.ol-card): the whole card is one link to the recipe. Shows only what the list API returns. *@
+@* Recipe card (.ol-card): the whole card is one link to the recipe, with the photo of the loaf on top as on the
+   Recipes boards. Shows only what the list API returns. *@
 @using OneLoaf.Web.Features.Recipes.State
 @using OneLoaf.Web.Shared.Formatting
 
 <a class="ol-card ol-card--interactive" href="@($"recipes/{Model.Recipe.Id}")">
+    <OlCardPhoto Src="@PhotoSrc" Loading="Model.Recipe.HasPhoto" />
     <div class="ol-card__body">
         @if (Model.IsVariant)
         {
@@ -25,4 +27,7 @@
 @code {
     /// <summary>The card to show.</summary>
     [Parameter, EditorRequired] public RecipeCardModel Model { get; set; } = default!;
+
+    /// <summary>Photo of the recipe as a data URL; null while it loads or when there is none.</summary>
+    [Parameter] public string? PhotoSrc { get; set; }
 }

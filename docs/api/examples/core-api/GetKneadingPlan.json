@@ -2,18 +2,18 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/batches/0b290b06-3df8-4a8a-9f4d-abedf6125b86/kneading-plan",
+    "path": "/api/v1/batches/3db01792-317f-4561-9dbf-92efc8f4bcdb/kneading-plan",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "batchId": "0b290b06-3df8-4a8a-9f4d-abedf6125b86",
+      "batchId": "3db01792-317f-4561-9dbf-92efc8f4bcdb",
       "groups": [
         {
-          "recipeId": "699803e1-119d-4ea6-80fb-0938962fc855",
+          "recipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2",
           "recipeTitle": "Country sourdough",
           "itemIds": [
-            "2fbb086d-24af-4885-b4ed-cb41c801055e"
+            "d2509bb5-4ac4-4668-8d7f-56c2c02b843b"
           ],
           "loaves": 3,
           "doughWeightG": 2880.0000000000000000,

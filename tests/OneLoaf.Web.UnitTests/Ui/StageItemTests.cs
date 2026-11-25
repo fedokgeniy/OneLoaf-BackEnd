@@ -17,24 +17,39 @@ public sealed class StageItemTests : BunitContext
 
         Assert.Same(stage, started);
         Assert.Equal("Planned", cut.Find(".ol-badge").TextContent);
-        Assert.Contains("Start bulk fermentation", cut.Find(".ol-stage__actions").TextContent);
-        Assert.Contains("Skip", cut.Find(".ol-stage__actions").TextContent);
+        Assert.Equal("Start", cut.FindAll(".ol-stage__actions button")[0].TextContent.Trim());
+        Assert.Contains("Skip", cut.Find(".stage-adjust__more").TextContent);
+
+        // Nothing is chosen on the slider of a pending stage, so Adjust waits.
+        Assert.True(cut.FindAll(".ol-stage__actions button")[1].HasAttribute("disabled"));
         Assert.Equal("2", cut.Find(".ol-stage__marker").TextContent.Trim());
     }
 
     [Fact]
-    public void Render_RunningStage_OffersCompleteAndThirtyMoreMinutes()
+    public void Render_RunningStage_OffersCompleteAndAdjustsByTheSliderMinutes()
     {
         var stage = Stage(StageStatuses.Running) with { ActualStartAt = DateTimeOffset.UnixEpoch.AddHours(1), ExtendedMinutes = 30 };
-        BatchStageDto? extended = null;
+        StageAdjustment? adjusted = null;
+        BatchStageDto? completed = null;
 
-        var cut = Render<OlStageItem>(p => p.Add(s => s.Stage, stage).Add(s => s.OnExtend, (BatchStageDto s) => extended = s));
-        cut.FindAll(".ol-stage__actions button").Single(b => b.TextContent.Contains("+30 min", StringComparison.Ordinal)).Click();
+        var cut = Render<OlStageItem>(p => p.Add(s => s.Stage, stage)
+            .Add(s => s.OnAdjust, (StageAdjustment a) => adjusted = a)
+            .Add(s => s.OnComplete, (BatchStageDto s) => completed = s));
+        var buttons = cut.FindAll(".ol-stage__actions button");
 
-        Assert.Same(stage, extended);
+        // Complete carries no stage name and stands first; Adjust is second and uses the slider (half an hour by default).
+        Assert.Equal("Complete", buttons[0].TextContent.Trim());
+        Assert.Equal("Adjust", buttons[1].TextContent.Trim());
+        buttons[0].Click();
+        Assert.Same(stage, completed);
+
+        cut.Find(".stage-adjust__slider").Input("45");
+        Assert.Contains("+45 min", cut.Find(".stage-adjust__value").TextContent);
+        cut.FindAll(".ol-stage__actions button")[1].Click();
+        Assert.Equal(new StageAdjustment(stage, 45), adjusted);
+
         Assert.Contains("is-running", cut.Find(".ol-stage").ClassList);
         Assert.Equal("Running", cut.Find(".ol-badge").TextContent);
-        Assert.Contains("Complete bulk fermentation", cut.Find(".ol-stage__actions").TextContent);
         Assert.Contains("since", cut.Find(".ol-stage__times").TextContent);
         Assert.Contains("+30 min", cut.Find(".ol-stage__deviation").TextContent);
     }

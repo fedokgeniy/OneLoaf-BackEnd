@@ -14,14 +14,14 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "e86bb6b6-071e-4713-9965-129f260d38f5",
+      "id": "1477ce50-150b-409c-95f4-7d2236d4070c",
       "name": "Bread flour T550",
       "flourTypeCode": "wheat",
       "proteinPercent": 12.5,
       "grind": "fine",
       "notes": null,
-      "createdAt": "2026-11-24T21:18:01.909946+00:00",
-      "updatedAt": "2026-11-24T21:18:01.909946+00:00"
+      "createdAt": "2026-11-24T23:58:03.093237+00:00",
+      "updatedAt": "2026-11-24T23:58:03.093237+00:00"
     }
   },
   {
@@ -44,8 +44,8 @@
       "status": 409,
       "detail": "A flour with this name already exists.",
       "instance": "/api/v1/flours",
-      "traceId": "00-92cf5d50dff85eb33b00e922deab521d-033cd39384485a78-02",
-      "correlationId": "d23c5cff627e421b9848dd6210e43be0"
+      "traceId": "00-e842404dacfc453d995bc2b95ff78cf9-263f6b71f9483dec-02",
+      "correlationId": "241adf0798244bd5b1d14142374c888a"
     }
   },
   {
@@ -63,14 +63,14 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "cd5170e3-c36c-4a77-88e6-a4a860e84aed",
+      "id": "8ed518b6-767f-47ba-932d-40a9dec2de60",
       "name": "Spare spelt",
       "flourTypeCode": "spelt",
       "proteinPercent": 11.0,
       "grind": null,
       "notes": null,
-      "createdAt": "2026-11-24T21:18:01.979134+00:00",
-      "updatedAt": "2026-11-24T21:18:01.979134+00:00"
+      "createdAt": "2026-11-24T23:58:03.170113+00:00",
+      "updatedAt": "2026-11-24T23:58:03.170113+00:00"
     }
   }
 ]

@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "PATCH",
-    "path": "/api/v1/bake-records/b96889e3-e70b-4e14-a45b-70e3fe132a34",
+    "path": "/api/v1/bake-records/11656437-e094-4620-a1b1-ce7df5c8c422",
     "authenticated": true,
     "requestBody": {
       "rating": 4,
@@ -11,8 +11,8 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "b96889e3-e70b-4e14-a45b-70e3fe132a34",
-      "batchId": "0b290b06-3df8-4a8a-9f4d-abedf6125b86",
+      "id": "11656437-e094-4620-a1b1-ce7df5c8c422",
+      "batchId": "3db01792-317f-4561-9dbf-92efc8f4bcdb",
       "bakedOn": "2026-11-24",
       "totalLoaves": 3,
       "totalCost": 8.95,
@@ -23,22 +23,22 @@
       "analysisAt": null,
       "items": [
         {
-          "id": "87b775fb-36f6-4f01-9017-c1d1135c6ffc",
-          "recipeId": "699803e1-119d-4ea6-80fb-0938962fc855",
+          "id": "6ee4973d-77d7-4cfc-b54d-0d36479e49e2",
+          "recipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
           "cost": 8.95
         }
       ],
-      "createdAt": "2026-11-24T21:18:04.417633+00:00",
-      "updatedAt": "2026-11-24T21:18:04.744086+00:00",
+      "createdAt": "2026-11-24T23:58:05.65317+00:00",
+      "updatedAt": "2026-11-24T23:58:06.040743+00:00",
       "photos": []
     }
   },
   {
     "case": "rating out of range",
     "method": "PATCH",
-    "path": "/api/v1/bake-records/b96889e3-e70b-4e14-a45b-70e3fe132a34",
+    "path": "/api/v1/bake-records/11656437-e094-4620-a1b1-ce7df5c8c422",
     "authenticated": true,
     "requestBody": {
       "rating": 9,
@@ -50,14 +50,14 @@
       "type": "https://oneloaf.app/problems/validation",
       "title": "One or more validation errors occurred.",
       "status": 400,
-      "instance": "/api/v1/bake-records/b96889e3-e70b-4e14-a45b-70e3fe132a34",
+      "instance": "/api/v1/bake-records/11656437-e094-4620-a1b1-ce7df5c8c422",
       "errors": {
         "rating": [
           "'Rating' должно быть в диапазоне от 1 до 5. Введенное значение: 9."
         ]
       },
-      "traceId": "00-adb19c8fc198d7267a465855355fec17-ec07ab0f042eb98e-02",
-      "correlationId": "cd0f563a13b342cb908e3af53ee340f4"
+      "traceId": "00-d84ada166a1ff5fe42b8cc06bcf066c3-da7761f95f478c7a-02",
+      "correlationId": "817dae589707476890e7bd9eac05bb3d"
     }
   }
 ]

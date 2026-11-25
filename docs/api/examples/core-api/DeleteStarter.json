@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "DELETE",
-    "path": "/api/v1/starters/45d15b9b-ffaa-4bcb-9133-43cbce175092",
+    "path": "/api/v1/starters/5f319f1c-3a7e-4555-944a-fdfea167aa4f",
     "authenticated": true,
     "status": 204
   }

@@ -2,13 +2,13 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/recipes/4f2807e6-35db-45b3-aa2f-71d18f2d1fdf/comparison",
+    "path": "/api/v1/recipes/6bc19792-0788-44ae-a566-fd54b16ceb23/comparison",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "recipeId": "4f2807e6-35db-45b3-aa2f-71d18f2d1fdf",
-      "parentRecipeId": "699803e1-119d-4ea6-80fb-0938962fc855",
+      "recipeId": "6bc19792-0788-44ae-a566-fd54b16ceb23",
+      "parentRecipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2",
       "changedFields": [
         "title",
         "notes"
@@ -17,8 +17,8 @@
         {
           "change": "removed",
           "parent": {
-            "lineId": "29703ebe-9118-4a64-8f98-e2316a0c02cc",
-            "ingredientId": "a371fd97-976c-4bcc-aebf-bb7cf5625d33",
+            "lineId": "b229a8d7-e8b6-4064-a24c-8b1683599954",
+            "ingredientId": "ecf99f68-e072-43a8-98d4-1864be976247",
             "ingredientName": "Bread flour",
             "categoryCode": "flour",
             "unitCode": "g",
@@ -34,8 +34,8 @@
         {
           "change": "removed",
           "parent": {
-            "lineId": "5fbea80d-9c6b-40cc-9fdf-e8d4c3fd99a4",
-            "ingredientId": "35997ae2-07af-49e6-818d-eff5db2679f3",
+            "lineId": "9462f411-0427-4f92-9a09-72581f1f57e2",
+            "ingredientId": "99fc2c1d-3cc7-49d0-b22f-716c67323a35",
             "ingredientName": "Water",
             "categoryCode": "water",
             "unitCode": "g",
@@ -51,8 +51,8 @@
         {
           "change": "removed",
           "parent": {
-            "lineId": "287ae6aa-616f-48bf-80b9-1ed45f153c86",
-            "ingredientId": "c892e73a-0c70-48bf-a54b-df5c57d7f1ad",
+            "lineId": "196ee230-f8a9-4a6d-a940-9636534e0fc9",
+            "ingredientId": "06cd16db-2357-4039-acf9-a733c76384e4",
             "ingredientName": "Sea salt",
             "categoryCode": "salt",
             "unitCode": "g",
@@ -68,8 +68,8 @@
         {
           "change": "removed",
           "parent": {
-            "lineId": "a5860ca7-cca5-4680-8ca3-a1da2aaf9160",
-            "ingredientId": "04be5a2e-945e-497b-939c-7fca43afd766",
+            "lineId": "2e740955-e7f3-41b0-bfc1-caa08a2dafe3",
+            "ingredientId": "372ea90e-42da-4ed8-b537-6b9cfd8da9c6",
             "ingredientName": "Rye starter",
             "categoryCode": "starter",
             "unitCode": "g",
@@ -86,8 +86,8 @@
           "change": "added",
           "parent": null,
           "variant": {
-            "lineId": "a8f0e7a3-8c40-4068-84dd-8f822f51a0fe",
-            "ingredientId": "a371fd97-976c-4bcc-aebf-bb7cf5625d33",
+            "lineId": "01582279-7b78-4691-817e-1d987d533a28",
+            "ingredientId": "ecf99f68-e072-43a8-98d4-1864be976247",
             "ingredientName": "Bread flour",
             "categoryCode": "flour",
             "unitCode": "g",
@@ -103,8 +103,8 @@
           "change": "added",
           "parent": null,
           "variant": {
-            "lineId": "24611cc3-2af8-45dd-9bcc-8c8defbff80f",
-            "ingredientId": "35997ae2-07af-49e6-818d-eff5db2679f3",
+            "lineId": "3621f853-6c12-4c6e-8faf-985d664662ae",
+            "ingredientId": "99fc2c1d-3cc7-49d0-b22f-716c67323a35",
             "ingredientName": "Water",
             "categoryCode": "water",
             "unitCode": "g",
@@ -120,8 +120,8 @@
           "change": "added",
           "parent": null,
           "variant": {
-            "lineId": "91fcc474-26fa-4647-89e4-2c0f591ec000",
-            "ingredientId": "c892e73a-0c70-48bf-a54b-df5c57d7f1ad",
+            "lineId": "ec5a5cdc-92a6-4c11-978a-358a9d980203",
+            "ingredientId": "06cd16db-2357-4039-acf9-a733c76384e4",
             "ingredientName": "Sea salt",
             "categoryCode": "salt",
             "unitCode": "g",
@@ -137,8 +137,8 @@
           "change": "added",
           "parent": null,
           "variant": {
-            "lineId": "0cb24ea2-bd09-40e1-be5b-dca4472e5495",
-            "ingredientId": "04be5a2e-945e-497b-939c-7fca43afd766",
+            "lineId": "0664304d-e037-468b-8c59-09abaf4ad853",
+            "ingredientId": "372ea90e-42da-4ed8-b537-6b9cfd8da9c6",
             "ingredientName": "Rye starter",
             "categoryCode": "starter",
             "unitCode": "g",
@@ -155,7 +155,7 @@
         {
           "change": "removed",
           "parent": {
-            "lineId": "89f2db9b-6e50-42c9-baa3-38b05ba469dd",
+            "lineId": "dfee39eb-4044-4e7e-95d2-cc86f461f3c9",
             "sortOrder": 1,
             "name": "Mix",
             "stageTypeCode": "mix",
@@ -175,7 +175,7 @@
         {
           "change": "removed",
           "parent": {
-            "lineId": "0d1aca08-04ca-4d1e-a947-e5a3018a33bc",
+            "lineId": "88c96b52-2ca9-4f17-8d02-1b28964dcda3",
             "sortOrder": 2,
             "name": "Bulk fermentation",
             "stageTypeCode": "bulk_fermentation",
@@ -195,7 +195,7 @@
         {
           "change": "removed",
           "parent": {
-            "lineId": "b0b94952-de91-4108-a206-5c24df0c3b91",
+            "lineId": "a7cec245-384c-4000-a4a1-f7ef660c867f",
             "sortOrder": 3,
             "name": "Shape",
             "stageTypeCode": "shape",
@@ -215,7 +215,7 @@
         {
           "change": "removed",
           "parent": {
-            "lineId": "abcc79a6-296a-46cd-9026-6e263c7b12ff",
+            "lineId": "62d3796f-711e-4e09-8701-6d72961943ea",
             "sortOrder": 4,
             "name": "Cold proof",
             "stageTypeCode": "proof",
@@ -235,7 +235,7 @@
         {
           "change": "removed",
           "parent": {
-            "lineId": "0c8d1bf9-74b3-422c-a0d8-1ac032da2aef",
+            "lineId": "3ad9786d-b45a-4f44-87ca-b0724101cd08",
             "sortOrder": 5,
             "name": "Bake",
             "stageTypeCode": "bake",
@@ -256,7 +256,7 @@
           "change": "added",
           "parent": null,
           "variant": {
-            "lineId": "5b1711b8-bddc-4f6d-be87-750fe0129204",
+            "lineId": "bcf41d08-1da9-413d-b4fc-1854e659363a",
             "sortOrder": 1,
             "name": "Mix",
             "stageTypeCode": "mix",
@@ -276,7 +276,7 @@
           "change": "added",
           "parent": null,
           "variant": {
-            "lineId": "06f013f5-e098-435b-bd08-bb55fdd7a4ca",
+            "lineId": "eb5e084c-f038-42c0-824e-e901adbf8b2f",
             "sortOrder": 2,
             "name": "Bulk fermentation",
             "stageTypeCode": "bulk_fermentation",
@@ -296,7 +296,7 @@
           "change": "added",
           "parent": null,
           "variant": {
-            "lineId": "2807818a-856e-4b84-928e-315c2316d9cb",
+            "lineId": "7a8b66f8-4273-4a1c-a28d-1c7c07713d73",
             "sortOrder": 3,
             "name": "Shape",
             "stageTypeCode": "shape",
@@ -316,7 +316,7 @@
           "change": "added",
           "parent": null,
           "variant": {
-            "lineId": "ba81b0aa-f9be-4484-9cf6-c8142b54db50",
+            "lineId": "17ac27e2-3828-47f8-a1e7-0279d6083f61",
             "sortOrder": 4,
             "name": "Cold proof",
             "stageTypeCode": "proof",
@@ -336,7 +336,7 @@
           "change": "added",
           "parent": null,
           "variant": {
-            "lineId": "834fab86-bbe9-42c6-a0b8-ca652038ce63",
+            "lineId": "1cf1e0dc-0b45-43fa-b132-59eb69cf40f7",
             "sortOrder": 5,
             "name": "Bake",
             "stageTypeCode": "bake",
@@ -358,7 +358,7 @@
   {
     "case": "not a variant",
     "method": "GET",
-    "path": "/api/v1/recipes/699803e1-119d-4ea6-80fb-0938962fc855/comparison",
+    "path": "/api/v1/recipes/e6e62d43-bafb-462e-8b2d-88853bb427c2/comparison",
     "authenticated": true,
     "status": 422,
     "responseContentType": "application/problem+json",
@@ -367,9 +367,9 @@
       "title": "The request violates a business rule.",
       "status": 422,
       "detail": "Only a variant can be compared with its parent recipe.",
-      "instance": "/api/v1/recipes/699803e1-119d-4ea6-80fb-0938962fc855/comparison",
-      "traceId": "00-eaddbc00e522910865ac03015d0e1cfc-13efa6eab3a5485f-02",
-      "correlationId": "bab7098d8d8e4e7bab8e6263f8e7a0c0"
+      "instance": "/api/v1/recipes/e6e62d43-bafb-462e-8b2d-88853bb427c2/comparison",
+      "traceId": "00-6877ab67ad0a28c85f83025274727466-e5b442449f3b9858-02",
+      "correlationId": "6e33e4d6a5374e788c46ea0cb3200d65"
     }
   }
 ]

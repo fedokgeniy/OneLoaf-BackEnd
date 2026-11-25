@@ -237,7 +237,10 @@ public sealed class IngredientRepository(OneLoafDbContext db) : IIngredientRepos
     public async Task<Guid> AddAdjustmentAsync(
         Guid ingredientId, decimal quantity, DateOnly occurredOn, string note, CancellationToken cancellationToken)
     {
-        await using var transaction = await db.Database.BeginTransactionAsync(cancellationToken);
+        // Part of a larger transaction (a recipe saved from the library) or one of its own.
+        await using var transaction = db.Database.CurrentTransaction is null
+            ? await db.Database.BeginTransactionAsync(cancellationToken)
+            : null;
         var movement = new StockMovement
         {
             IngredientId = ingredientId,
@@ -250,7 +253,10 @@ public sealed class IngredientRepository(OneLoafDbContext db) : IIngredientRepos
         await db.SaveChangesAsync(cancellationToken);
         await db.Ingredients.Where(i => i.Id == ingredientId)
             .ExecuteUpdateAsync(s => s.SetProperty(i => i.TrackStock, true), cancellationToken);
-        await transaction.CommitAsync(cancellationToken);
+        if (transaction is not null)
+        {
+            await transaction.CommitAsync(cancellationToken);
+        }
         db.ChangeTracker.Clear();
         return movement.Id;
     }

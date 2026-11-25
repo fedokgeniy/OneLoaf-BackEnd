@@ -4,6 +4,8 @@
 @using OneLoaf.Web.Features.Recipes.State
 @using OneLoaf.Web.Shared.Contracts.Core
 @using OneLoaf.Web.Shared.State
+@using OneLoaf.Web.Shared.State.Photos
+@inject IState<OneLoaf.Web.Shared.State.Photos.PhotosState> Photos
 
 <ShellTitle Text="Recipes" />
 
@@ -67,7 +69,7 @@
                     <div class="ol-cards">
                         @foreach (var card in Cards)
                         {
-                            <RecipeCard @key="card.Recipe.Id" Model="card" />
+                            <RecipeCard @key="card.Recipe.Id" Model="card" PhotoSrc="@Photos.Value.For(PhotoKeys.Recipe(card.Recipe.Id))" />
                         }
                     </div>
                     @if (State.Value.List.Value is { HasMore: true })

@@ -335,7 +335,7 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
             name = "Weekend bake",
             plannedStartAt = start,
             source = "manual",
-            items = new[] { new { recipeId = recipe, loaves = 3, starterId = (string?)starter, starterReminderMinutes = (int?)60 } },
+            items = new[] { new { recipeId = recipe, loaves = 3, starterId = (string?)starter, remindToFeedStarter = true } },
         };
         await api.CallAsync("PreviewBatch", "typical", HttpMethod.Post, "/api/v1/batches/preview", batchBody);
         var batch = await api.CallAsync("CreateBatch", "typical", HttpMethod.Post, "/api/v1/batches", batchBody);
@@ -427,13 +427,26 @@ public sealed class ApiDocsGenerator(ApiFixture fixture)
         await api.CallAsync("SearchLibrary", "anonymous search", HttpMethod.Get, "/api/v1/library?search=sourdough&page=1&pageSize=20");
         await api.CallAsync("GetPublication", "anonymous", HttpMethod.Get, $"/api/v1/library/{publication}");
         await api.CallAsync("GetPublication", "not found", HttpMethod.Get, $"/api/v1/library/{Missing}");
+        await api.CallAsync("GetPublicationPhoto", "recipe without a photo", HttpMethod.Get, $"/api/v1/library/{publication}/photo");
         api.As(fixture.TokenFor(Seed.Boris));
         var comment = Id(await api.CallAsync("AddComment", "typical", HttpMethod.Post, $"/api/v1/library/{publication}/comments",
             new { body = "Baked it on Sunday, lovely crumb!" }));
         await api.CallAsync("AddComment", "empty body", HttpMethod.Post, $"/api/v1/library/{publication}/comments", new { body = " " });
         await api.CallAsync("SetReaction", "typical", HttpMethod.Put, $"/api/v1/library/{publication}/reactions/me", new { reaction = "want_to_bake" });
         await api.CallAsync("ListComments", "typical", HttpMethod.Get, $"/api/v1/library/{publication}/comments?page=1&pageSize=20");
-        await api.CallAsync("CopyPublication", "typical", HttpMethod.Post, $"/api/v1/library/{publication}/copy");
+        // The reader calls the flour of the recipe by another name: the own flour is used, and the salt is added with
+        // what is on the shelf.
+        var ownFlour = Id(await api.CallAsync("CreateIngredient", "own name for the flour of a published recipe", HttpMethod.Post,
+            "/api/v1/ingredients", new { name = "Strong white flour", categoryCode = "flour", unitCode = "g", flourId = (Guid?)null }));
+        await api.CallAsync("CopyPublication", "typical", HttpMethod.Post, $"/api/v1/library/{publication}/copy",
+            new
+            {
+                ingredients = new object[]
+                {
+                    new { name = "Bread flour", useIngredientId = ownFlour, stockQuantity = (decimal?)null },
+                    new { name = "Salt", useIngredientId = (Guid?)null, stockQuantity = 500m },
+                },
+            });
         await api.CallAsync("RemoveReaction", "typical", HttpMethod.Delete, $"/api/v1/library/{publication}/reactions/me");
         var report = Id(await api.CallAsync("ReportContent", "a comment", HttpMethod.Post, $"/api/v1/library/{publication}/reports",
             new { reason = "Off-topic advertising link", commentId = comment }), "reportId");

@@ -40,7 +40,7 @@ flowchart TB
     historyRec -->|Ask the assistant| analysis[[Analysis panel]]
     assistant -->|Confirm plan| batch
     library --> libDetail[/library/:id/]
-    libDetail -->|Copy to my recipes| recipe
+    libDetail -->|Save to my recipes| recipe
     settings --> kitchen[/settings/kitchen/]
     settings --> ingredients[/ingredients/]
     settings -->|Sign out| login
@@ -176,7 +176,7 @@ assistant's suggestion and are labelled so; the cost stays incomplete until the 
 ## 7. Flow — public library (US-39–US-42, LR-11)
 
 Visitor: `/library` (search) → `/library/:id` → actions show "Sign in to copy, react and comment" → `/login?returnUrl=…`.
-Baker: react (toggle), comment, **Copy to my recipes** → navigate to the new `/recipes/:id`; **Report** → dialog with a
+Baker: react (toggle), comment, **Save to my recipes** → dialog that matches the ingredients of the recipe to the own ones (use an own ingredient instead, or add it with what is on the shelf) → navigate to the new `/recipes/:id`; **Report** → dialog with a
 reason. Owner on their publication: **Unpublish**. Admin: `/admin/reports` → open report → Resolve (keep) or Remove
 publication.
 

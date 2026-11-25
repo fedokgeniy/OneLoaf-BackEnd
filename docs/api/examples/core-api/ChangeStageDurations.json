@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "PATCH",
-    "path": "/api/v1/batches/e7bf51f2-8140-4a25-8388-e6672123c859/stages/9bab8de0-d25d-4543-9a48-c2693183fdc8",
+    "path": "/api/v1/batches/e4be33d1-fb4b-4aba-885c-903dfcef15ea/stages/ceae05f0-5ef7-4cd2-823c-5f28bfee0f84",
     "authenticated": true,
     "requestBody": {
       "plannedMinMinutes": 270,
@@ -11,7 +11,7 @@
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "e7bf51f2-8140-4a25-8388-e6672123c859",
+      "id": "e4be33d1-fb4b-4aba-885c-903dfcef15ea",
       "name": "Weekday bake",
       "status": "planned",
       "source": "manual",
@@ -20,24 +20,24 @@
       "plannedReadyTo": "2026-11-30T00:50:00+00:00",
       "actualStartAt": null,
       "completedAt": null,
-      "priceDate": "2026-11-24",
+      "priceDate": "2026-11-25",
       "totalCost": 8.95,
       "currency": "EUR",
       "notes": null,
       "items": [
         {
-          "id": "e2c544f7-605a-4544-817c-b46799b84836",
-          "recipeId": "699803e1-119d-4ea6-80fb-0938962fc855",
+          "id": "934015d4-19bf-4574-9355-2d03c4b9ef5c",
+          "recipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "797cc670-8bdb-4748-9add-b7c0a31fa8cc",
+          "starterId": "9d2f63d3-eac7-4a52-a3a6-bae64c20507f",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
-          "starterReminderMinutes": 60,
+          "starterReminderMinutes": 480,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "20fbc299-0454-4b4a-88a4-3197810dd87a",
+              "id": "6b6878ff-596d-4b36-95f9-d0321b89224d",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
@@ -55,7 +55,7 @@
               "note": null
             },
             {
-              "id": "9bab8de0-d25d-4543-9a48-c2693183fdc8",
+              "id": "ceae05f0-5ef7-4cd2-823c-5f28bfee0f84",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
@@ -73,7 +73,7 @@
               "note": null
             },
             {
-              "id": "d6d92e66-f245-4ce8-bde9-a912e9fb5991",
+              "id": "8028b68d-3be5-48c5-b2a5-4fb9759b7fae",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
@@ -91,7 +91,7 @@
               "note": null
             },
             {
-              "id": "947583e7-6155-4064-b46a-f70b5c0540cd",
+              "id": "4039067c-27fc-40de-a7b4-92de8a023262",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
@@ -109,7 +109,7 @@
               "note": null
             },
             {
-              "id": "47b874e8-62d5-463a-8ef7-8d403febf0e2",
+              "id": "33ca339a-de5d-41e7-9f9b-a846ca725b87",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",
@@ -137,7 +137,7 @@
   {
     "case": "minimum longer than maximum",
     "method": "PATCH",
-    "path": "/api/v1/batches/e7bf51f2-8140-4a25-8388-e6672123c859/stages/9bab8de0-d25d-4543-9a48-c2693183fdc8",
+    "path": "/api/v1/batches/e4be33d1-fb4b-4aba-885c-903dfcef15ea/stages/ceae05f0-5ef7-4cd2-823c-5f28bfee0f84",
     "authenticated": true,
     "requestBody": {
       "plannedMinMinutes": 400,
@@ -149,14 +149,14 @@
       "type": "https://oneloaf.app/problems/validation",
       "title": "One or more validation errors occurred.",
       "status": 400,
-      "instance": "/api/v1/batches/e7bf51f2-8140-4a25-8388-e6672123c859/stages/9bab8de0-d25d-4543-9a48-c2693183fdc8",
+      "instance": "/api/v1/batches/e4be33d1-fb4b-4aba-885c-903dfcef15ea/stages/ceae05f0-5ef7-4cd2-823c-5f28bfee0f84",
       "errors": {
         "plannedMaxMinutes": [
           "'Planned Max Minutes' должно быть больше или равно '400'."
         ]
       },
-      "traceId": "00-10ba98f84d162cb40b18b75953348a83-25bf3855a5e6e4cc-02",
-      "correlationId": "4bc24068b2d74f0e8e57143754f6529a"
+      "traceId": "00-ad667dcaa59aab6719c50b299d933758-e2010540baf823ac-02",
+      "correlationId": "d28e1b2ab63d4d729e858cd8a82cad9a"
     }
   }
 ]

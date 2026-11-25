@@ -19,7 +19,7 @@ public enum StageCommandKind
     /// <summary>Skip an optional stage.</summary>
     Skip,
 
-    /// <summary>+30 minutes (US-24).</summary>
+    /// <summary>More minutes for a running stage (US-24).</summary>
     Extend,
 
     /// <summary>New planned durations (US-21).</summary>
@@ -45,8 +45,12 @@ public sealed record OpenBatch(Guid Id);
 /// <summary>Result: batch (and kneading plan) loaded.</summary>
 public sealed record BatchLoaded(Guid Id, Loadable<BatchDto> Batch, Loadable<KneadingPlanDto> Plan);
 
-/// <summary>Intent: run a stage command; <paramref name="Durations"/> only for <see cref="StageCommandKind.Adjust"/>.</summary>
-public sealed record RunStageCommand(Guid BatchId, Guid StageId, StageCommandKind Kind, StageDurationRequest? Durations = null);
+/// <summary>
+/// Intent: run a stage command; <paramref name="Durations"/> only for <see cref="StageCommandKind.Adjust"/>,
+/// <paramref name="Minutes"/> only for <see cref="StageCommandKind.Extend"/>.
+/// </summary>
+public sealed record RunStageCommand(
+    Guid BatchId, Guid StageId, StageCommandKind Kind, StageDurationRequest? Durations = null, int Minutes = 30);
 
 /// <summary>Result: the API returned the updated batch.</summary>
 public sealed record StageCommandDone(BatchDto Batch);
@@ -162,7 +166,7 @@ public sealed class BatchEffects(IProductionApi api)
             StageCommandKind.Start => await api.StageActionAsync(action.BatchId, action.StageId, "start", none),
             StageCommandKind.Complete => await api.StageActionAsync(action.BatchId, action.StageId, "complete", none),
             StageCommandKind.Skip => await api.StageActionAsync(action.BatchId, action.StageId, "skip", none),
-            StageCommandKind.Extend => await api.ExtendStageAsync(action.BatchId, action.StageId, 30),
+            StageCommandKind.Extend => await api.ExtendStageAsync(action.BatchId, action.StageId, action.Minutes),
             StageCommandKind.Adjust => await api.ChangeDurationsAsync(action.BatchId, action.StageId, action.Durations!),
             StageCommandKind.Reset => await api.ResetStageAsync(action.BatchId, action.StageId),
             _ => throw new ArgumentOutOfRangeException(nameof(action)),

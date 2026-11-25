@@ -47,10 +47,24 @@
     list-style: none;
 }
 
+/* The photo of the bake beside its figures; above them on a phone. */
 .history__card {
-    display: block;
+    display: grid;
+    grid-template-columns: minmax(0, 10rem) minmax(0, 1fr);
     color: inherit;
     text-decoration: none;
+    overflow: hidden;
+}
+
+.history__photo {
+    display: block;
+    min-width: 0;
+}
+
+@media (max-width: 37.49em) {
+    .history__card {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 .history__card:focus-visible {

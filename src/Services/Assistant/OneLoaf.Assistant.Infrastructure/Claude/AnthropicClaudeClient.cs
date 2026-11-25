@@ -21,7 +21,7 @@ public sealed class AnthropicOptions
 
     /// <summary>Model id; switching models needs no code change.</summary>
     [Required]
-    public string Model { get; set; } = "claude-haiku-4-5";
+    public string Model { get; set; } = "claude-haiku-5-5";
 
     /// <summary>Output token limit per request.</summary>
     [Range(256, 64_000)]
@@ -68,6 +68,11 @@ public sealed class AnthropicClaudeClient : IClaudeClient, IDisposable
         {
             Model = _options.Model,
             MaxTokens = _options.MaxTokens,
+
+            // Claude Haiku 5.5 thinks by default. The assistant answers short questions with tool calls and replays only
+            // text and tool blocks, so thinking stays off: nothing of the token limit goes to it and no thinking block
+            // has to be passed back with the tool results.
+            Thinking = new ThinkingConfigDisabled(),
             System = new List<TextBlockParam>
             {
                 new() { Text = request.System, CacheControl = new CacheControlEphemeral() },

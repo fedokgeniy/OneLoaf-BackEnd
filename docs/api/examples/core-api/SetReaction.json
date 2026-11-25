@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "PUT",
-    "path": "/api/v1/library/2e8a953f-51ab-418a-b265-bd2152a57a6d/reactions/me",
+    "path": "/api/v1/library/4183c7fb-b3fc-4f46-b2dc-2ee80e31490a/reactions/me",
     "authenticated": true,
     "requestBody": {
       "reaction": "want_to_bake"

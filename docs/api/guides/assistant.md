@@ -1,6 +1,6 @@
 # AI Assistant
 
-The assistant is a chat with Anthropic Claude (model from configuration, default `claude-haiku-4-5`) that answers
+The assistant is a chat with Anthropic Claude (model from configuration, default `claude-haiku-5-5`) that answers
 baking questions with the baker's own data and can prepare batches.
 
 ## Conversation flow (UC-01)

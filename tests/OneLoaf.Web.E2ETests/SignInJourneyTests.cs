@@ -42,10 +42,8 @@ public sealed class SignInJourneyTests(WebAppFixture app) : IClassFixture<WebApp
         await page.ScreenshotAsync(new PageScreenshotOptions { Path = Path.Combine(ScreenshotDir, $"home-{navigation}-{width}.png") });
         await Accessibility.AssertNoSeriousViolationsAsync(page, "home");
 
-        if (navigation == "bottom-bar")
-        {
-            await page.GetByRole(AriaRole.Button, new() { Name = "Profile and settings" }).ClickAsync();
-        }
+        // Sign out is in the profile menu in every navigation pattern.
+        await page.GetByRole(AriaRole.Button, new() { Name = "Profile and settings" }).ClickAsync();
 
         await page.GetByRole(AriaRole.Button, new() { Name = "Sign out" }).ClickAsync();
         await page.WaitForURLAsync("**/login");

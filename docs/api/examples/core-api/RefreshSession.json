@@ -11,8 +11,8 @@
       "title": "The session has ended. Sign in again.",
       "status": 401,
       "instance": "/api/v1/auth/refresh",
-      "traceId": "00-c89b0baa86cedfb81fbe25a7b7b8624d-59e97e15129a78b6-02",
-      "correlationId": "ebc402eb980d471db0aaac4b543da736"
+      "traceId": "00-8e1a2f7bd9b0f1b7f6f56cc81484de98-2e0413bf52b47cde-02",
+      "correlationId": "c8dc2a4d703244cdbed6fa1d202a1493"
     }
   }
 ]

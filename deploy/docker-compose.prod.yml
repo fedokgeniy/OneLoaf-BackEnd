@@ -131,7 +131,7 @@ services:
     environment:
       <<: *dotnet-env
       Anthropic__ApiKey: ${Anthropic__ApiKey}
-      Anthropic__Model: ${Anthropic__Model:-claude-haiku-4-5}
+      Anthropic__Model: ${Anthropic__Model:-claude-haiku-5-5}
       Assistant__CoreApiBaseUrl: http://core-api:8080
       Assistant__DailyRequestLimit: ${Assistant__DailyRequestLimit:-50}
       Assistant__DailyTokenLimit: ${Assistant__DailyTokenLimit:-200000}

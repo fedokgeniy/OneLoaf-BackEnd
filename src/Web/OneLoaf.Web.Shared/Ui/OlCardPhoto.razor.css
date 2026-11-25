@@ -1,0 +1,22 @@
+.card-photo {
+    display: grid;
+    place-items: center;
+}
+
+.card-photo__empty {
+    display: grid;
+    place-items: center;
+    color: var(--ink-muted);
+    opacity: 0.5;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .card-photo__empty--loading {
+        animation: card-photo-pulse 1.2s ease-in-out infinite alternate;
+    }
+}
+
+@keyframes card-photo-pulse {
+    from { opacity: 0.25; }
+    to { opacity: 0.6; }
+}

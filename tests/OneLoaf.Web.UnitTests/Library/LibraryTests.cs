@@ -16,6 +16,7 @@ public sealed class LibraryTests : BunitContext
 {
     private static readonly Guid PublicationId = Guid.NewGuid();
     private static readonly Guid CopyId = Guid.NewGuid();
+    private static readonly IngredientDto Own = new(Guid.NewGuid(), "Wheat flour T550", "flour", "g", null, null, null, null, DateTimeOffset.UnixEpoch, DateTimeOffset.UnixEpoch);
     private readonly Api _api = new();
     private readonly BunitAuthorizationContext _auth;
 
@@ -62,9 +63,15 @@ public sealed class LibraryTests : BunitContext
         var cut = Render<LibraryDetailPage>(p => p.Add(x => x.Id, PublicationId));
         cut.WaitForAssertion(() => cut.Find(".publication__title"));
 
-        cut.FindAll("button").Single(b => b.TextContent.Contains("Copy to my recipes", StringComparison.Ordinal)).Click();
+        cut.FindAll("button").Single(b => b.TextContent.Contains("Save to my recipes", StringComparison.Ordinal)).Click();
+
+        // The recipe names its flour "Bread flour"; the baker has "Wheat flour T550" and uses it instead of a duplicate.
+        cut.WaitForAssertion(() => cut.Find(".copy__row select"));
+        cut.Find(".copy__row select").Change(Own.Id.ToString());
+        cut.FindAll("button").Single(b => b.TextContent.Contains("Save recipe", StringComparison.Ordinal)).Click();
 
         cut.WaitForAssertion(() => Assert.EndsWith($"/recipes/{CopyId}", Services.GetRequiredService<NavigationManager>().Uri, StringComparison.Ordinal));
+        Assert.Equal(new CopyIngredientChoice("Bread flour", Own.Id, null), Assert.Single(_api.Copied!.Ingredients));
     }
 
     [Fact]
@@ -171,8 +178,20 @@ public sealed class LibraryTests : BunitContext
             return Task.FromResult(ApiResult.Ok);
         }
 
-        public Task<ApiResult<RecipeDto>> CopyAsync(Guid id, CancellationToken ct = default) =>
-            Task.FromResult<ApiResult<RecipeDto>>(new ApiResult<RecipeDto>.Success(Recipe(CopyId)));
+        public CopyPublicationRequest? Copied { get; private set; }
+
+        public Task<ApiResult<RecipeDto>> CopyAsync(Guid id, CopyPublicationRequest request, CancellationToken ct = default)
+        {
+            Copied = request;
+            return Ok(Recipe(CopyId));
+        }
+
+        public Task<ApiResult<FileDownload>> GetPhotoAsync(Guid id, CancellationToken ct = default) =>
+            Task.FromResult<ApiResult<FileDownload>>(new ApiResult<FileDownload>.Failure(ApiError.Network(null)));
+
+        /// <summary>The baker already has this flour, under another name.</summary>
+        public Task<ApiResult<PagedResult<IngredientDto>>> ListIngredientsAsync(CancellationToken ct = default) =>
+            Ok(new PagedResult<IngredientDto>([Own], 1, 100, 1));
 
         public Task<ApiResult<ReportCreatedResponse>> ReportAsync(Guid id, ReportRequest request, CancellationToken ct = default)
         {

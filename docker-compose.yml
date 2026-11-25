@@ -124,7 +124,7 @@ services:
       Serilog__MinimumLevel__Default: ${Serilog__MinimumLevel__Default:-Information}
       Redis__ConnectionString: "redis:6379,password=${REDIS_PASSWORD}"
       Anthropic__ApiKey: ${Anthropic__ApiKey:-}
-      Anthropic__Model: ${Anthropic__Model:-claude-haiku-4-5}
+      Anthropic__Model: ${Anthropic__Model:-claude-haiku-5-5}
       Anthropic__MaxTokens: ${Anthropic__MaxTokens:-1024}
       Anthropic__TimeoutSeconds: ${Anthropic__TimeoutSeconds:-30}
       Assistant__CoreApiBaseUrl: http://core-api:8080

@@ -141,11 +141,11 @@ Preview first (nothing is saved), then create:
 ```http
 POST /api/v1/batches/preview
 { "name": "Weekend bake", "plannedStartAt": "2026-12-05T08:00:00+02:00", "source": "manual",
-  "items": [ { "recipeId": "<recipe>", "loaves": 3, "starterId": "<starter>", "starterReminderMinutes": 60 } ] }
+  "items": [ { "recipeId": "<recipe>", "loaves": 3, "starterId": "<starter>", "remindToFeedStarter": true } ] }
 ```
 
 `POST /api/v1/batches` with the same body returns `201` with every stage's planned window. The database also schedules
-reminders (e.g. feed the starter 60 minutes before kneading); they appear in `GET /api/v1/reminders` of the
+reminders (with `remindToFeedStarter`: feed the starter its time to peak before kneading, so it is ripe in time); they appear in `GET /api/v1/reminders` of the
 Notification service.
 
 While baking, drive the stages: `POST /batches/{id}/stages/{stageId}/start`, `/complete` (with the measured

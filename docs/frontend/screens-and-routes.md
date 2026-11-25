@@ -14,7 +14,7 @@ Auth: **A** = signed-in baker, **P** = public (anonymous allowed), **Adm** = adm
 | `/login` | `LoginPage` (Host) | P | `Login-*` | US-02 | `POST /core/api/v1/auth/login` |
 | `/register` | `RegisterPage` (Host) | P | `Register-*` | US-01, LR-01/02 | `POST /auth/register` then login |
 | `/` | `HomePage` (Host) | A | `Home-*`, `Home-Phone-16x9` | US-23, US-28, US-31 | `GET /me`, `GET /batches?status=running`, `GET /starters`, `GET /bake-records?pageSize=3`, `GET /bake-records/statistics`, `GET /notify/api/v1/reminders` |
-| `/recipes` | `RecipesPage` (Recipes) | A | `Main` (phone), `Recipes-*`, `Recipes-Foldable`, `Recipes-Phone-offline`, `Calculator-Ultrawide` | US-05, US-07, US-37 (filter) | `GET /recipes?search=&includeArchived=&minProteinPercent=&page=` |
+| `/recipes` | `RecipesPage` (Recipes) — cards with the photo of the loaf | A | `Main` (phone), `Recipes-*`, `Recipes-Foldable`, `Recipes-Phone-offline`, `Calculator-Ultrawide` | US-05, US-07, US-37 (filter) | `GET /recipes?search=&includeArchived=&minProteinPercent=&page=`, `GET /recipes/{id}/photo` for the cards |
 | `/recipes/new`, `/recipes/{id}/edit` | `RecipeEditorPage` (Recipes) | A | `RecipeEditor-*` | US-05, US-09, US-10 | `GET /recipes/{id}`, `POST /recipes`, `PUT /recipes/{id}`, `GET/POST /ingredients`, `GET/PUT/DELETE /recipes/{id}/photo`, `GET /reference/units`, `/reference/stage-types`, `/reference/ingredient-categories` |
 | `/recipes/{id}` | `RecipeDetailPage` (Recipes) — tabs Ingredients · Stages · Cost · Timeline | A | `Calculator-*`, `Calculator-Desktop-dark` | US-06, US-14–18, US-47–49, US-52, US-11 | `GET /recipes/{id}`, `/scaled?loaves=`, `/cost?loaves=&asOf=`, `/production-figures?loaves=`, `/timeline?start=`, `/start-window?readyAt=` |
 | `/recipes/{id}/variant` | `CreateVariantDialog` on the detail page | A | — (DS Dialog) | US-07 | `POST /recipes/{id}/variants` |
@@ -27,10 +27,10 @@ Auth: **A** = signed-in baker, **P** = public (anonymous allowed), **Adm** = adm
 | `/batches/{id}` | `BatchPage` (Production) — stage list, current stage, stage log, figures | A | `Batch-*`, `Batch-Phone-landscape`, `Batch-Watch` | US-23, US-24, US-21, US-22, US-31, US-25, ST-04 | `GET /batches/{id}`, `POST …/stages/{stageId}/start\|complete\|skip\|extend\|reset`, `PATCH …/stages/{stageId}`, `GET /batches/{id}/kneading-plan`, `POST /batches/{id}/complete\|cancel?ingredientsUsed=\|save-as-variant`, `DELETE /batches/{id}?ingredientsUsed=` |
 | `/starters` | `StartersPage` (Production) — cards + feeding log | A | `Starters-*` | US-27, US-28, US-30 | `GET /starters`, `GET/POST /starters/{id}/feedings` |
 | `/starters/new`, `/starters/{id}/edit` | `StarterEditorPage` (Production) | A | `NewStarter-*` | US-27, US-29, ST-06, ST-08 | `POST/PUT /starters`, `GET /ingredients` |
-| `/history` | `HistoryPage` (History, lazy) — list + filters + stats | A | `History-*` | US-31, US-33 | `GET /bake-records?recipeId=&from=&to=&minRating=`, `GET /bake-records/statistics` |
+| `/history` | `HistoryPage` (History, lazy) — list with the first crumb photo of each bake + filters + stats | A | `History-*` | US-31, US-33 | `GET /bake-records?recipeId=&from=&to=&minRating=`, `GET /bake-records/statistics`, `GET /bake-records/{id}/photos/{photoId}` for the cards |
 | `/history/{id}` | `BakeRecordPage` (History) — rating, comment, stage log, photos, analysis | A | `History-Desktop` (detail pane) | US-32, US-36, US-51 | `GET/PATCH /bake-records/{id}`, `GET /bake-records/{id}/stage-log`, photos, `POST /assistant/api/v1/bake-records/{id}/analysis` |
 | `/assistant`, `/assistant/{conversationId}` | `AssistantPage` (Assistant, lazy) | A | `Assistant-*`, `Assistant-Phone-keyboard` | US-34, US-35, US-37, US-38, AS-01, AS-02, LR-10, LR-12 | `GET/POST /conversations`, `GET/POST /conversations/{id}/messages`, `POST …/actions/{actionId}/confirm\|decline`, `GET /usage/me` |
-| `/library` | `LibraryPage` (Library, lazy) | P | `Library-*` | US-40 | `GET /library?search=&page=` |
+| `/library` | `LibraryPage` (Library, lazy) — cards with the photo of the loaf | P | `Library-*` | US-40 | `GET /library?search=&page=`, `GET /library/{id}/photo` for the cards |
 | `/library/{id}` | `LibraryDetailPage` (Library) | P (actions A) | `LibraryDetail-*` | US-40, US-41, US-42, LR-11 | `GET /library/{id}`, `GET/POST /library/{id}/comments`, `PUT/DELETE /library/{id}/reactions/me`, `POST /library/{id}/copy`, `POST /library/{id}/reports`, `POST /library/{id}/unpublish` (owner) |
 | `/admin/reports` | `ModerationPage` (Library, lazy) | Adm | — (DS table + Dialog; no mockup) | LR-11 | `GET /admin/reports?status=`, `POST /admin/reports/{id}/resolve` (`remove` takes the content down, `reject` keeps it) |
 | `/settings` | `SettingsPage` (Host) — Display, Reminders, Account | A | `Settings-*` | US-04, US-29, US-50, adaptive UI settings | `GET /me`, `DELETE /me`, `GET /export/*.csv`, push: `GET /notify/api/v1/push/vapid-public-key`, `POST/DELETE /push/subscriptions`, `POST /push/test` |
@@ -44,8 +44,8 @@ Components and states: `Components-States` board = the component library with al
 | Size class | Pattern | Items |
 |---|---|---|
 | compact (phones) | bottom bar, 5 items + top bar avatar menu | Home · Recipes · Batches · Starters · Assistant; the avatar menu (top bar "Profile and settings") holds Library, History, Ingredients, My kitchen, Settings, **Sign out** |
-| medium (tablets, phone landscape) | navigation rail | Home, Recipes, Batches, Starters, Assistant, Library, History at the top; Ingredients, My kitchen, Settings and **Sign out** pinned to the bottom; the avatar menu keeps Settings and Sign out |
-| expanded+ (desktop, ultrawide) | espresso sidebar | Home, Recipes, Batches, Starters, Assistant, Library, History at the top; Ingredients, My kitchen, Settings and **Sign out** pinned to the bottom; the avatar menu keeps Settings and Sign out |
+| medium (tablets, phone landscape) | navigation rail | Home, Recipes, Batches, Starters, Assistant, Library, History at the top; Ingredients and My kitchen pinned to the bottom; the avatar menu keeps Settings and Sign out |
+| expanded+ (desktop, ultrawide) | espresso sidebar | Home, Recipes, Batches, Starters, Assistant, Library, History at the top; Ingredients and My kitchen pinned to the bottom; the avatar menu keeps Settings and Sign out |
 | watch | single column + menu button | current batch stage only |
 
 ## Story coverage (Must = M, Should = S, Could = C)
@@ -79,12 +79,12 @@ Components and states: `Components-States` board = the component library with al
 | US-23 Start / complete stage | M | `/batches/{id}` | optimistic disable, then reload batch |
 | US-21 Adjust / reset stage | S | stage item overflow menu → dialog | `OlDialog` with min/max fields + "Reset to recipe" |
 | US-22 Merge kneads | S | batch figures + `kneading-plan` | show "2 cycles · merged: …" explanation from the API |
-| US-24 Extend +30 min | S | stage item | |
+| US-24 Extend a stage | S | stage item | *Complete* on the left, *Adjust* on the right and a slider under them that chooses the minutes: more time for a running stage (half an hour by default), shorter or longer for a stage that has not started |
 | US-26 Calendar | S | `/batches` | week navigation, today, status legend |
 | US-25 Save as variant | C | batch overflow menu | |
 | US-27 Create starter | M | `/starters/new` | |
 | US-28 Feeding + next | M | `/starters` log feeding sheet | |
-| US-29 Reminders | M | new batch checkbox, starter form, settings → push subscription | Web Push permission asked only after the switch is pressed; the device is registered with `POST /push/subscriptions` (the same call returns the id needed to unsubscribe); *Send test*; browsers without push see an explanation |
+| US-29 Reminders | M | new batch switch *Remind me to feed the starter in time*, starter form, settings → push subscription | the feeding reminder of a batch comes the time to peak of its starter before kneading (the form shows that time; the API schedules it); Web Push permission asked only after the switch is pressed; the device is registered with `POST /push/subscriptions` (the same call returns the id needed to unsubscribe); *Send test*; browsers without push see an explanation |
 | US-30 Expected peak | S | starter card | |
 | US-31 Auto record | M | history list after batch complete | completing a batch resets the history list and statistics, so the new record appears on the next visit |
 | US-32 Rating + comment | M | `/history/{id}` | 1–5 radio group in a fieldset (arrow keys, "4 of 5" labels) plus *No rating*; `PATCH` with null clears a value |
@@ -100,7 +100,7 @@ Components and states: `Components-States` board = the component library with al
 | US-39 Publish / unpublish | S | publish dialog, library detail (owner) | the API publishes a snapshot of the recipe (no body): the dialog shows the title and description that will be public; the author removes it with *Remove from library* |
 | US-40 Browse catalog | S | `/library` | works signed out (public layout with a "Sign in to copy and comment" notice); search; paging ("Show more recipes") |
 | US-41 Comment, react | S | `/library/{id}` | like / love / want to bake as toggle buttons (`aria-pressed`); counts are reloaded from the API after each change; own comments can be deleted |
-| US-42 Copy | C | `/library/{id}` | *Copy to my recipes*, then the new recipe opens and the recipe list reloads |
+| US-42 Copy | C | `/library/{id}` | *Save to my recipes* opens a dialog that matches every ingredient of the recipe to the own catalog: use an own ingredient instead (another name for the same flour makes no duplicate) or add it, with what is on the shelf; then the new recipe opens and the recipe list reloads |
 | LR-11 Report / moderate | — | `/library/{id}` Report, `/admin/reports` | report the publication or a comment with a reason; administrators decide each open report with a reason (409 "already decided" reloads the queue) |
 | US-43 360 px phone | M | all | Playwright at 360×640 |
 | US-44 PWA offline | S | all | installable (manifest, icons); the published service worker caches the app shell and recipe reads (network first); offline banner; cached recipe data is dropped on sign out |
@@ -108,7 +108,7 @@ Components and states: `Components-States` board = the component library with al
 | ST-01 Record a purchase | S | `/ingredients` → *Add record* | one dialog for what was bought: packs × size of one pack + amount paid + date; the price of that date is created or replaced and the stock grows; the first record starts keeping the stock; *Only price* records the price and leaves the stock alone |
 | ST-02 See the stock | S | `/ingredients` list and tab Stock | stock in the ingredient unit from the API; *Low stock* as badge with icon and text; ingredients whose stock is not kept show no stock |
 | ST-03 Correct the stock | S | tab Stock → *Correct stock* | counted quantity + required reason; the API writes the difference |
-| ST-04 Batch takes and returns ingredients | S | `/batches/new`, `/batches/{id}` | creating a batch takes the ingredients (API); *Cancel batch* and *Delete batch* ask "The ingredients were already used" and send `ingredientsUsed` |
+| ST-04 Batch takes and returns ingredients | S | `/batches/new`, `/batches/{id}` | creating a batch takes the ingredients (API); *Cancel batch* (in the top bar, next to the profile button) and *Delete batch* ask "The ingredients were already used" and send `ingredientsUsed` |
 | ST-05 Not enough in stock | S | `/batches/new` preview, assistant plan card | the preview lists the missing ingredients and offers *Reduce to N loaves* and *Bake from what is in stock* (same loaves, less dough); both figures come from `stock.maxLoaves` and `stock.maxScale` of the API; planning anyway is allowed |
 | ST-06 Feedings take flour and water | S | `/starters/new`, `/starters/{id}/edit`, `/starters` log feeding sheet | the usual flour of a starter is a flour ingredient, the water an optional water ingredient; the feeding form proposes them and lets the baker name another flour or water for this feeding; the API takes the feeding from their stock and sets the price of the starter from their prices (an unpriced starter shows *Priced at feeding* in `/ingredients`) |
 | ST-07 Keep or ignore the stock | S | ingredient form | switch *Keep the stock of this ingredient* and the reorder level; an ingredient without it is not consumed and not checked |

@@ -51,7 +51,6 @@ public sealed class BatchRequestValidator : AbstractValidator<BatchRequest>
             item.RuleFor(i => i.RecipeId).NotEmpty();
             item.RuleFor(i => i.Loaves).InclusiveBetween(1, RecipeLimits.MaxLoaves);
             item.RuleFor(i => i.StarterId).NotEqual(Guid.Empty);
-            item.RuleFor(i => i.StarterReminderMinutes).InclusiveBetween(0, BatchLimits.MaxMinutes);
         });
     }
 }
@@ -110,6 +109,9 @@ public sealed partial class BatchService(
     ICurrentUser currentUser,
     ILogger<BatchService> logger)
 {
+    /// <summary>Message when a feeding reminder is asked for a starter without a time to peak.</summary>
+    public const string StarterPeakMissingMessage = "Set the time to peak of this starter to get a feeding reminder.";
+
     /// <summary>Message for a missing batch.</summary>
     public const string NotFoundMessage = "The batch was not found.";
 
@@ -304,6 +306,7 @@ public sealed partial class BatchService(
     private async Task<NewBatch> PrepareAsync(BatchRequest request, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
+        var items = new List<BatchItemRequest>(request.Items.Count);
         for (var i = 0; i < request.Items.Count; i++)
         {
             var item = request.Items[i];
@@ -312,16 +315,27 @@ public sealed partial class BatchService(
                 throw ValidationFailures.For($"items[{i}].recipeId", RecipeService.NotFoundMessage);
             }
 
-            if (item.StarterId is { } starterId && !await starters.ExistsAsync(currentUser.Id, starterId, cancellationToken))
+            int? reminderMinutes = null;
+            if (item.StarterId is { } starterId)
             {
-                throw ValidationFailures.For($"items[{i}].starterId", StarterService.NotFoundMessage);
+                var starter = await starters.GetAsync(currentUser.Id, starterId, cancellationToken)
+                    ?? throw ValidationFailures.For($"items[{i}].starterId", StarterService.NotFoundMessage);
+                if (item.RemindToFeedStarter)
+                {
+                    // A starter fed now is ripe after its time to peak: that is how early the reminder has to come.
+                    reminderMinutes = starter.RiseHours is { } hours
+                        ? (int)Math.Round(hours * 60m, MidpointRounding.AwayFromZero)
+                        : throw ValidationFailures.For($"items[{i}].remindToFeedStarter", StarterPeakMissingMessage);
+                }
             }
+
+            items.Add(item with { StarterReminderMinutes = reminderMinutes });
         }
 
         var settings = await kitchen.GetAsync(cancellationToken);
         var priceDate = request.PriceDate ?? await TodayInKitchenAsync(cancellationToken);
         return new NewBatch(request.Name.Trim(), request.Source, request.PlannedStartAt, priceDate, settings.Currency,
-            string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim(), request.Items, request.IngredientScale ?? 1m);
+            string.IsNullOrWhiteSpace(request.Notes) ? null : request.Notes.Trim(), items, request.IngredientScale ?? 1m);
     }
 
     private async Task<DateOnly> TodayInKitchenAsync(CancellationToken cancellationToken)

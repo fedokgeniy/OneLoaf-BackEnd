@@ -18,7 +18,7 @@ Coverage gate for `OneLoaf.Web.Shared` and feature libraries: **70 %** lines (sa
 |---|---|---|
 | `OlTextFieldTests` | `OlTextField` | label is linked to the input; error state sets `aria-invalid` + `aria-describedby`; suffix renders; two-way binding updates the model |
 | `CostTableTests` | `CostTable` (Recipes) | renders every line returned by the API in order incl. electricity, packaging, loss, labor; shows the API total (not a client sum); "cost incomplete" warning lists missing prices; stacked rows on compact |
-| `StageItemTests` | `OlStageItem` | upcoming → Start; running → Complete + "+30 min"; done → no actions; callbacks fire with the stage id; status word present (not colour only) |
+| `StageItemTests` | `OlStageItem` | upcoming → Start, Skip and a waiting Adjust; running → Complete and Adjust by the minutes of the slider; done → no actions; callbacks fire with the stage id; status word present (not colour only) |
 | `AssistantTests` | `PlanCard`, `AssistantPage` (Assistant) | the card shows start, loaves, starter amount, kneading cycles, ready window and total cost from the mapped `BatchDto`; Confirm raises its callback; a reply with a proposal saves nothing until Confirm, then the card links to `/batches/{id}` and `BatchCreated` is dispatched; 503 keeps the draft and offers the manual form; the recorded `SendMessage` plan maps to a batch |
 | `NewBatchFormTests` | `NewBatchPage` form | required fields, loaves 1–100, at least one recipe; server `errors["items[0].loaves"]` appears under the right field; submit disabled while saving |
 | `LoginPageTests` | `LoginPage` | 401 shows one generic message; success dispatches `LoggedIn` and navigates to `returnUrl` |

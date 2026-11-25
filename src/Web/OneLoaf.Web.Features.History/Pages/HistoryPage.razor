@@ -7,6 +7,8 @@
 @using OneLoaf.Web.Shared.State
 @inject IState<HistoryState> State
 @inject IDispatcher Dispatcher
+@using OneLoaf.Web.Shared.State.Photos
+@inject IState<OneLoaf.Web.Shared.State.Photos.PhotosState> Photos
 
 <ShellTitle Text="Baking history" />
 
@@ -77,6 +79,10 @@
                     {
                         <li @key="bake.Id">
                             <a class="ol-card history__card" href="@($"history/{bake.Id}")">
+                                <span class="history__photo">
+                                    <OlCardPhoto Src="@(bake.CoverPhotoId is { } cover ? Photos.Value.For(PhotoKeys.Bake(bake.Id, cover)) : null)"
+                                                 Loading="bake.CoverPhotoId is not null" />
+                                </span>
                                 <span class="ol-card__body">
                                     <span class="history__card-head">
                                         <span class="ol-card__title">@string.Join(", ", bake.RecipeTitles)</span>

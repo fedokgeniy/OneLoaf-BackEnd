@@ -53,10 +53,11 @@ public sealed class BakeRecordRepository(OneLoafDbContext db) : IBakeRecordRepos
                 HasAnalysis = r.AssistantAnalysis != null,
                 Titles = r.Items.Select(i => i.RecipeTitle).ToList(),
                 Photos = r.Photos.Count,
+                Cover = r.Photos.OrderBy(p => p.CreatedAt).ThenBy(p => p.Id).Select(p => (Guid?)p.Id).FirstOrDefault(),
             })
             .ToListAsync(cancellationToken);
         var items = rows.Select(r => new BakeRecordSummaryDto(r.Id, r.BatchId, r.BakedOn, r.TotalLoaves, r.TotalCost,
-            r.Currency.Trim(), r.Rating, r.HasAnalysis, r.Titles, r.Photos)).ToList();
+            r.Currency.Trim(), r.Rating, r.HasAnalysis, r.Titles, r.Photos, r.Cover)).ToList();
         return new PagedResult<BakeRecordSummaryDto>(items, query.Page, query.PageSize, total);
     }
 
