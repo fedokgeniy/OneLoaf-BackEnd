@@ -17,7 +17,7 @@ public sealed class StageItemTests : BunitContext
 
         Assert.Same(stage, started);
         Assert.Equal("Planned", cut.Find(".ol-badge").TextContent);
-        Assert.Contains("Start bulk fermentation", cut.Find(".ol-stage__actions").TextContent);
+        Assert.Equal("Start", cut.FindAll(".ol-stage__actions button")[0].TextContent.Trim());
         Assert.Contains("Skip", cut.Find(".stage-adjust__more").TextContent);
 
         // Nothing is chosen on the slider of a pending stage, so Adjust waits.

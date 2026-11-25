@@ -40,7 +40,7 @@
         <div class="ol-stage__actions stage-actions">
             @if (Stage.Status == StageStatuses.Pending)
             {
-                <OlButton Large="true" Loading="Busy" OnClick="() => OnStart.InvokeAsync(Stage)">Start @Stage.Name.ToLowerInvariant()</OlButton>
+                <OlButton Large="true" Loading="Busy" OnClick="() => OnStart.InvokeAsync(Stage)">Start</OlButton>
             }
             else
             {
