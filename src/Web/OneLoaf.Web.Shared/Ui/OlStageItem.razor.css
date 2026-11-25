@@ -26,17 +26,42 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* The slider is drawn here as a line and a circle; the range control underneath only supplies the behaviour.
-   --position (0 to 1) comes from the component; the filled part of the line ends under the centre of the circle. */
-.stage-adjust__slider {
+/* The slider is drawn here as a line and a circle; the range control on top only supplies the behaviour and its
+   circle. The whole line is the ::before of the wrapper, the filled part is a span whose width the component sets. */
+.stage-adjust__control {
     --thumb: 1.5rem;
     --line: 0.25rem;
-    --filled: calc(var(--position, 0) * (100% - var(--thumb)) + var(--thumb) / 2);
+    position: relative;
+    height: var(--target-min);
+}
+
+.stage-adjust__control::before,
+.stage-adjust__fill {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: calc(50% - var(--line) / 2);
+    height: var(--line);
+    border-radius: var(--line);
+    pointer-events: none;
+}
+
+.stage-adjust__control::before {
+    width: 100%;
+    background: var(--border-control);
+}
+
+.stage-adjust__fill {
+    background: var(--primary);
+}
+
+.stage-adjust__slider {
     -webkit-appearance: none;
     appearance: none;
+    position: relative;
     display: block;
     width: 100%;
-    height: var(--target-min);
+    height: 100%;
     margin: 0;
     padding: 0;
     background: transparent;
@@ -47,23 +72,15 @@
     outline: none;
 }
 
-/* The line. */
+/* The control's own line is not shown. */
 .stage-adjust__slider::-webkit-slider-runnable-track {
     height: var(--line);
-    border-radius: var(--line);
-    background: linear-gradient(to right, var(--primary) var(--filled), var(--border-control) var(--filled));
+    background: transparent;
 }
 
 .stage-adjust__slider::-moz-range-track {
     height: var(--line);
-    border-radius: var(--line);
-    background: var(--border-control);
-}
-
-.stage-adjust__slider::-moz-range-progress {
-    height: var(--line);
-    border-radius: var(--line);
-    background: var(--primary);
+    background: transparent;
 }
 
 /* The circle. */

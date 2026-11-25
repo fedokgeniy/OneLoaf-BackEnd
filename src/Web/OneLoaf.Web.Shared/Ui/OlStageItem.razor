@@ -51,11 +51,14 @@
         </div>
         <div class="stage-adjust">
             <label class="stage-adjust__label" for="@SliderId">Change the time by <output class="stage-adjust__value" for="@SliderId">@DeltaText</output></label>
-            @* A line and a circle drawn by the stylesheet over the range control, which keeps the keyboard, touch and
-               screen-reader behaviour. The filled part of the line ends under the circle: its position is a computed
-               value that cannot be a class. *@
-            <input id="@SliderId" class="stage-adjust__slider" type="range" min="@MinMinutes" max="@MaxMinutes" step="@StepMinutes"
-                   value="@_minutes" disabled="@Busy" aria-valuetext="@DeltaText" style="--position: @Position" @oninput="OnSlide" />
+            @* A line and a circle drawn by the stylesheet; the range control on top keeps the keyboard, touch and
+               screen-reader behaviour and shows only its circle. *@
+            <div class="stage-adjust__control">
+                @* Width is where the circle stands on the line: a computed value that cannot be a class. *@
+                <span class="stage-adjust__fill" aria-hidden="true" style="width: @FillWidth"></span>
+                <input id="@SliderId" class="stage-adjust__slider" type="range" min="@MinMinutes" max="@MaxMinutes" step="@StepMinutes"
+                       value="@_minutes" disabled="@Busy" aria-valuetext="@DeltaText" @oninput="OnSlide" />
+            </div>
             <div class="stage-adjust__scale @(MinMinutes < 0 ? "stage-adjust__scale--five" : "stage-adjust__scale--four")" aria-hidden="true">
                 @if (MinMinutes < 0)
                 {
@@ -125,9 +128,18 @@
 
     private string SliderId => _id;
 
-    /// <summary>Where the circle stands on the line, from 0 (left end) to 1 (right end).</summary>
-    private string Position =>
-        ((_minutes - MinMinutes) / (double)(MaxMinutes - MinMinutes)).ToString("0.####", System.Globalization.CultureInfo.InvariantCulture);
+    /// <summary>
+    /// Width of the filled part of the line: it ends under the centre of the circle, which travels the line less its
+    /// own width (1.5rem, as in the stylesheet).
+    /// </summary>
+    private string FillWidth
+    {
+        get
+        {
+            var share = ((_minutes - MinMinutes) / (double)(MaxMinutes - MinMinutes)).ToString("0.####", System.Globalization.CultureInfo.InvariantCulture);
+            return $"calc({share} * (100% - 1.5rem) + 0.75rem)";
+        }
+    }
 
     private string DeltaText => _minutes switch
     {
