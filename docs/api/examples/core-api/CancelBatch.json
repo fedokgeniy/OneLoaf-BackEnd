@@ -2,14 +2,14 @@
   {
     "case": "untouched batch, ingredients returned to the stock",
     "method": "POST",
-    "path": "/api/v1/batches/5dd94486-35ce-48c2-9e2d-f5a0eba6dc65/cancel?ingredientsUsed=false",
+    "path": "/api/v1/batches/00b4cd00-2597-42fc-b3b7-c53dc8de859e/cancel?ingredientsUsed=false",
     "authenticated": true,
     "status": 204
   },
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/batches/13eff78d-632b-41b5-890b-c44955c39894/cancel",
+    "path": "/api/v1/batches/e4be33d1-fb4b-4aba-885c-903dfcef15ea/cancel",
     "authenticated": true,
     "status": 204
   },
@@ -26,8 +26,8 @@
       "status": 404,
       "detail": "The batch was not found.",
       "instance": "/api/v1/batches/00000000-0000-4000-9999-000000000000/cancel",
-      "traceId": "00-a0ab75560babeb9b03c4bc425acbba52-5f79dcee3d6eae34-02",
-      "correlationId": "a5d71bf41fec44278da9dc60f2e1045b"
+      "traceId": "00-870993682d143aab0f8250dc72f2ddb1-af0c72b1cf65edfa-02",
+      "correlationId": "e773d76b53eb4bf5b33d729b10a6d28e"
     }
   }
 ]

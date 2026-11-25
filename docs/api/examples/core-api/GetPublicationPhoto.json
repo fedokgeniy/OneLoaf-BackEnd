@@ -2,7 +2,7 @@
   {
     "case": "recipe without a photo",
     "method": "GET",
-    "path": "/api/v1/library/8ac591d6-0f8a-4cf0-871c-db37438ac6d1/photo",
+    "path": "/api/v1/library/4183c7fb-b3fc-4f46-b2dc-2ee80e31490a/photo",
     "authenticated": false,
     "status": 404,
     "responseContentType": "application/problem+json",
@@ -11,9 +11,9 @@
       "title": "The requested resource was not found.",
       "status": 404,
       "detail": "The photo was not found.",
-      "instance": "/api/v1/library/8ac591d6-0f8a-4cf0-871c-db37438ac6d1/photo",
-      "traceId": "00-8e8227afe0ab0217bf3c64429bdeab38-c10c1736878c09f1-02",
-      "correlationId": "dab5d366b619465f84772d7cfa283d06"
+      "instance": "/api/v1/library/4183c7fb-b3fc-4f46-b2dc-2ee80e31490a/photo",
+      "traceId": "00-c87e08707260f7b9ca2dee648720d07b-02e09e2576d350ba-02",
+      "correlationId": "732240da14b3453497a7c4efaabd3849"
     }
   }
 ]

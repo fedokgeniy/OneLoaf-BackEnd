@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "PUT",
-    "path": "/api/v1/ingredients/cf9efa3a-ab0f-4714-84f4-ba51af337c92/photo",
+    "path": "/api/v1/ingredients/44e5222a-743e-47d6-bcb1-b263d78ed2b3/photo",
     "authenticated": true,
     "requestBody": {
       "multipart/form-data": {
@@ -14,7 +14,7 @@
   {
     "case": "not an image",
     "method": "PUT",
-    "path": "/api/v1/ingredients/cf9efa3a-ab0f-4714-84f4-ba51af337c92/photo",
+    "path": "/api/v1/ingredients/44e5222a-743e-47d6-bcb1-b263d78ed2b3/photo",
     "authenticated": true,
     "requestBody": {
       "multipart/form-data": {
@@ -28,9 +28,9 @@
       "title": "The request violates a business rule.",
       "status": 422,
       "detail": "Only JPEG, PNG and WebP images are accepted.",
-      "instance": "/api/v1/ingredients/cf9efa3a-ab0f-4714-84f4-ba51af337c92/photo",
-      "traceId": "00-bb109c57f6dc875db0d5405c2fa4bb70-0a97d22d2f7a9dd7-02",
-      "correlationId": "9789ca1201b2412a83907e6c40f61ffe"
+      "instance": "/api/v1/ingredients/44e5222a-743e-47d6-bcb1-b263d78ed2b3/photo",
+      "traceId": "00-7959a572f996bd92c76f70023c12f880-8ba2a1dc61002848-02",
+      "correlationId": "87e3587df5cc419fa43ec39d3c43b900"
     }
   }
 ]

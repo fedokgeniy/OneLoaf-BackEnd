@@ -2,12 +2,12 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/recipes/0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2/cost?loaves=3",
+    "path": "/api/v1/recipes/e6e62d43-bafb-462e-8b2d-88853bb427c2/cost?loaves=3",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "recipeId": "0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2",
+      "recipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2",
       "loaves": 3,
       "asOf": "2026-11-25",
       "currency": "EUR",
@@ -16,7 +16,7 @@
         {
           "lineNo": 1,
           "type": "ingredient",
-          "ingredientId": "e736b253-6cdc-4b97-bc7b-7316a5e1831c",
+          "ingredientId": "ecf99f68-e072-43a8-98d4-1864be976247",
           "description": "Bread flour",
           "quantity": 1500.0000000000000000,
           "unit": "g",
@@ -27,7 +27,7 @@
         {
           "lineNo": 2,
           "type": "ingredient",
-          "ingredientId": "780331c7-d507-4e75-92e7-f211654340ba",
+          "ingredientId": "99fc2c1d-3cc7-49d0-b22f-716c67323a35",
           "description": "Water",
           "quantity": 1050.0000000000000000,
           "unit": "g",
@@ -38,7 +38,7 @@
         {
           "lineNo": 3,
           "type": "ingredient",
-          "ingredientId": "91dfc767-089c-4e69-8c26-ecb5840267d3",
+          "ingredientId": "06cd16db-2357-4039-acf9-a733c76384e4",
           "description": "Sea salt",
           "quantity": 30.0000000000000000,
           "unit": "g",
@@ -49,7 +49,7 @@
         {
           "lineNo": 4,
           "type": "ingredient",
-          "ingredientId": "647922e7-01a0-474d-9555-8d80566cbb10",
+          "ingredientId": "372ea90e-42da-4ed8-b537-6b9cfd8da9c6",
           "description": "Rye starter",
           "quantity": 300.0000000000000000,
           "unit": "g",
@@ -120,7 +120,7 @@
   {
     "case": "loaves out of range",
     "method": "GET",
-    "path": "/api/v1/recipes/0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2/cost?loaves=0",
+    "path": "/api/v1/recipes/e6e62d43-bafb-462e-8b2d-88853bb427c2/cost?loaves=0",
     "authenticated": true,
     "status": 400,
     "responseContentType": "application/problem+json",
@@ -128,14 +128,14 @@
       "type": "https://oneloaf.app/problems/validation",
       "title": "One or more validation errors occurred.",
       "status": 400,
-      "instance": "/api/v1/recipes/0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2/cost",
+      "instance": "/api/v1/recipes/e6e62d43-bafb-462e-8b2d-88853bb427c2/cost",
       "errors": {
         "loaves": [
           "'Loaves' должно быть в диапазоне от 1 до 1000. Введенное значение: 0."
         ]
       },
-      "traceId": "00-bd2fedf2d290e1df2081d2c576aa2d41-04222ac0af4b8ee7-02",
-      "correlationId": "542c0df44f8749a4a763ae0540d3d1ff"
+      "traceId": "00-3a98262ea57698e2319694afc17619b8-f1aa403d94697324-02",
+      "correlationId": "bd49b56eab6540f29eab63bfec2c0031"
     }
   }
 ]

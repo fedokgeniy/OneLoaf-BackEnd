@@ -2,12 +2,12 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/bake-records/e02666d1-11e1-46f6-b4ad-6627f9b92363/analysis",
+    "path": "/api/v1/bake-records/11656437-e094-4620-a1b1-ce7df5c8c422/analysis",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "bakeRecordId": "e02666d1-11e1-46f6-b4ad-6627f9b92363",
+      "bakeRecordId": "11656437-e094-4620-a1b1-ce7df5c8c422",
       "analysis": "The rating is good. The tight crumb suggests the bulk fermentation was a little short for the room temperature; let the dough rise longer before shaping next time.",
       "unverifiedNumbers": []
     }
@@ -25,8 +25,8 @@
       "status": 404,
       "detail": "The bake record was not found.",
       "instance": "/api/v1/bake-records/00000000-0000-4000-9999-000000000000/analysis",
-      "traceId": "00-10e3c4b0d31fec0891f98726561a5c2d-32e281d11f281a36-02",
-      "correlationId": "60c32f89295e405f854963087bfe05ac"
+      "traceId": "00-ececa56749229c7f2fa1c5736f7d1d4f-4abd7d49814bc6a3-02",
+      "correlationId": "d87a1e4fb5f8415bae152fc9a770a193"
     }
   }
 ]

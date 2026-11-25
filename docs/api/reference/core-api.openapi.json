@@ -6058,6 +6058,26 @@
                 }
               }
             }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileStreamHttpResult"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileStreamHttpResult"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileStreamHttpResult"
+                }
+              }
+            }
           }
         }
       }

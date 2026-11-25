@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/ingredients/cf9efa3a-ab0f-4714-84f4-ba51af337c92/photo",
+    "path": "/api/v1/ingredients/44e5222a-743e-47d6-bcb1-b263d78ed2b3/photo",
     "authenticated": true,
     "status": 200,
     "responseContentType": "image/png",
@@ -11,7 +11,7 @@
   {
     "case": "no photo",
     "method": "GET",
-    "path": "/api/v1/ingredients/cf9efa3a-ab0f-4714-84f4-ba51af337c92/photo",
+    "path": "/api/v1/ingredients/44e5222a-743e-47d6-bcb1-b263d78ed2b3/photo",
     "authenticated": true,
     "status": 404,
     "responseContentType": "application/problem+json",
@@ -20,9 +20,9 @@
       "title": "The requested resource was not found.",
       "status": 404,
       "detail": "The photo was not found.",
-      "instance": "/api/v1/ingredients/cf9efa3a-ab0f-4714-84f4-ba51af337c92/photo",
-      "traceId": "00-cc3d33de8c2e4a590f1330428e8d32f6-77e38167ed1d1b39-02",
-      "correlationId": "b9500e18d6824ad398e786e9582a89b8"
+      "instance": "/api/v1/ingredients/44e5222a-743e-47d6-bcb1-b263d78ed2b3/photo",
+      "traceId": "00-6065876ca4e7ee0bfe23e72d6dce56ad-179f5c6d77a60e46-02",
+      "correlationId": "69e220eb34724fb38867a99107fad6c2"
     }
   }
 ]

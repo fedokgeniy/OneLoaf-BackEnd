@@ -2,71 +2,71 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/conversations/a533000f-67e4-4540-93be-519a392258d9/messages",
+    "path": "/api/v1/conversations/85bd4bc6-cea7-4a44-b609-b2de57cf13e5/messages",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": [
       {
-        "id": "8773a422-f8a2-4fd6-be7c-2b71d2ad0f92",
+        "id": "8383ad62-6794-4f53-bbfe-6168ff38e232",
         "role": "user",
         "content": "Plan 2 loaves of my Country sourdough for next Saturday morning.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T23:42:14.739412+00:00"
+        "createdAt": "2026-11-24T23:58:07.417784+00:00"
       },
       {
-        "id": "045e19b3-6a1d-4046-8131-509110b3087f",
+        "id": "98a2830f-c99d-43fe-9bd6-866223582d36",
         "role": "assistant",
         "content": "I am an AI assistant. I prepared the Saturday bake of Country sourdough; it costs 7.98 EUR. Please confirm it.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T23:42:14.873028+00:00"
+        "createdAt": "2026-11-24T23:58:07.551469+00:00"
       },
       {
-        "id": "74677dd8-188d-498f-95ef-e3924fb584be",
+        "id": "215acba9-13de-46c6-b4cc-e260b0814d94",
         "role": "assistant",
         "content": "The batch is saved. You can follow it in the production calendar.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T23:42:14.947957+00:00"
+        "createdAt": "2026-11-24T23:58:07.625551+00:00"
       },
       {
-        "id": "260ab3cb-88e8-4115-97c0-d51d60594ffa",
+        "id": "7c73b8be-b439-4c88-8383-69f215d976d0",
         "role": "user",
         "content": "And one loaf on Sunday.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T23:42:14.96055+00:00"
+        "createdAt": "2026-11-24T23:58:07.637862+00:00"
       },
       {
-        "id": "02789f4a-f150-44f3-b3c2-c0d684638bda",
+        "id": "46c40cda-50e5-4c44-94f3-276e6ace9465",
         "role": "assistant",
         "content": "I prepared the Sunday bake as well. Confirm or decline it.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T23:42:14.987106+00:00"
+        "createdAt": "2026-11-24T23:58:07.665675+00:00"
       }
     ]
   },
   {
     "case": "audit with tool calls",
     "method": "GET",
-    "path": "/api/v1/conversations/a533000f-67e4-4540-93be-519a392258d9/messages?includeTools=true",
+    "path": "/api/v1/conversations/85bd4bc6-cea7-4a44-b609-b2de57cf13e5/messages?includeTools=true",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": [
       {
-        "id": "8773a422-f8a2-4fd6-be7c-2b71d2ad0f92",
+        "id": "8383ad62-6794-4f53-bbfe-6168ff38e232",
         "role": "user",
         "content": "Plan 2 loaves of my Country sourdough for next Saturday morning.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T23:42:14.739412+00:00"
+        "createdAt": "2026-11-24T23:58:07.417784+00:00"
       },
       {
-        "id": "365c7f32-8fce-4709-a66c-136c7c01d326",
+        "id": "e7980b3a-43ee-421c-9fbb-142458449a98",
         "role": "tool",
         "content": "ok",
         "toolName": "find_recipes",
@@ -78,41 +78,41 @@
             "page": 1,
             "items": [
               {
-                "id": "0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2",
+                "id": "e6e62d43-bafb-462e-8b2d-88853bb427c2",
                 "title": "Country sourdough",
                 "hasPhoto": false,
-                "updatedAt": "2026-11-24T23:42:14.160199+00:00",
+                "updatedAt": "2026-11-24T23:58:06.702813+00:00",
                 "isArchived": false,
                 "yieldLoaves": 1,
                 "parentRecipeId": null
               },
               {
-                "id": "dc61aaac-c96e-47a5-b48a-f7ab139fdde6",
+                "id": "fed62b47-3e21-479b-be23-d3cf3403cdec",
                 "title": "Country sourdough, as baked",
                 "hasPhoto": false,
-                "updatedAt": "2026-11-24T23:42:13.247719+00:00",
+                "updatedAt": "2026-11-24T23:58:05.706349+00:00",
                 "isArchived": false,
                 "yieldLoaves": 1,
-                "parentRecipeId": "0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2"
+                "parentRecipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2"
               },
               {
-                "id": "4ec0b1cd-a603-474b-9829-7a15931e6879",
+                "id": "6bc19792-0788-44ae-a566-fd54b16ceb23",
                 "title": "Country sourdough, longer bulk",
                 "hasPhoto": false,
-                "updatedAt": "2026-11-24T23:42:12.29438+00:00",
+                "updatedAt": "2026-11-24T23:58:04.673756+00:00",
                 "isArchived": false,
                 "yieldLoaves": 1,
-                "parentRecipeId": "0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2"
+                "parentRecipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2"
               }
             ],
             "pageSize": 10,
             "totalCount": 3
           }
         },
-        "createdAt": "2026-11-24T23:42:14.82529+00:00"
+        "createdAt": "2026-11-24T23:58:07.503056+00:00"
       },
       {
-        "id": "0aa382fe-9a1b-4cf8-a198-d22fe846753a",
+        "id": "f353fcb0-9aba-463e-95a4-75587dd01878",
         "role": "tool",
         "content": "ok",
         "toolName": "propose_batch",
@@ -122,7 +122,7 @@
             "items": [
               {
                 "loaves": 2,
-                "recipeId": "0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2"
+                "recipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2"
               }
             ],
             "plannedStartAt": "2026-12-03T08:00:00.0000000+02:00"
@@ -227,7 +227,7 @@
                       "actualTemperatureC": null
                     }
                   ],
-                  "recipeId": "0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2",
+                  "recipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2",
                   "sortOrder": 1,
                   "starterId": null,
                   "recipeTitle": "Country sourdough",
@@ -251,37 +251,37 @@
               "ingredientScale": 1.0000,
               "plannedReadyFrom": "2026-12-03T21:05:00+00:00"
             },
-            "actionId": "b7561814-a413-4fb6-8022-7afe92243df3"
+            "actionId": "e7e0f86f-a053-4b30-b894-11074d4696b0"
           }
         },
-        "createdAt": "2026-11-24T23:42:14.864414+00:00"
+        "createdAt": "2026-11-24T23:58:07.542466+00:00"
       },
       {
-        "id": "045e19b3-6a1d-4046-8131-509110b3087f",
+        "id": "98a2830f-c99d-43fe-9bd6-866223582d36",
         "role": "assistant",
         "content": "I am an AI assistant. I prepared the Saturday bake of Country sourdough; it costs 7.98 EUR. Please confirm it.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T23:42:14.873028+00:00"
+        "createdAt": "2026-11-24T23:58:07.551469+00:00"
       },
       {
-        "id": "74677dd8-188d-498f-95ef-e3924fb584be",
+        "id": "215acba9-13de-46c6-b4cc-e260b0814d94",
         "role": "assistant",
         "content": "The batch is saved. You can follow it in the production calendar.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T23:42:14.947957+00:00"
+        "createdAt": "2026-11-24T23:58:07.625551+00:00"
       },
       {
-        "id": "260ab3cb-88e8-4115-97c0-d51d60594ffa",
+        "id": "7c73b8be-b439-4c88-8383-69f215d976d0",
         "role": "user",
         "content": "And one loaf on Sunday.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T23:42:14.96055+00:00"
+        "createdAt": "2026-11-24T23:58:07.637862+00:00"
       },
       {
-        "id": "f6320bdc-3fcf-4b7d-b2a1-c0ff2dde0156",
+        "id": "eec65b3b-a6d6-4118-ad26-703fed01bacb",
         "role": "tool",
         "content": "ok",
         "toolName": "propose_batch",
@@ -291,7 +291,7 @@
             "items": [
               {
                 "loaves": 1,
-                "recipeId": "0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2"
+                "recipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2"
               }
             ],
             "plannedStartAt": "2026-12-04T08:00:00.0000000+02:00"
@@ -396,7 +396,7 @@
                       "actualTemperatureC": null
                     }
                   ],
-                  "recipeId": "0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2",
+                  "recipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2",
                   "sortOrder": 1,
                   "starterId": null,
                   "recipeTitle": "Country sourdough",
@@ -420,25 +420,25 @@
               "ingredientScale": 1.0000,
               "plannedReadyFrom": "2026-12-04T21:05:00+00:00"
             },
-            "actionId": "a6d1f879-9066-493d-9f27-42d4aeccc7ac"
+            "actionId": "4216299e-bc0e-4156-9d43-e85eb2105aae"
           }
         },
-        "createdAt": "2026-11-24T23:42:14.984086+00:00"
+        "createdAt": "2026-11-24T23:58:07.662395+00:00"
       },
       {
-        "id": "02789f4a-f150-44f3-b3c2-c0d684638bda",
+        "id": "46c40cda-50e5-4c44-94f3-276e6ace9465",
         "role": "assistant",
         "content": "I prepared the Sunday bake as well. Confirm or decline it.",
         "toolName": null,
         "toolPayload": null,
-        "createdAt": "2026-11-24T23:42:14.987106+00:00"
+        "createdAt": "2026-11-24T23:58:07.665675+00:00"
       }
     ]
   },
   {
     "case": "deleted conversation",
     "method": "GET",
-    "path": "/api/v1/conversations/6e408d8e-d65a-4960-a77e-9b1903216ec1/messages",
+    "path": "/api/v1/conversations/332a882e-dff3-45dc-bf74-75091dc3c59e/messages",
     "authenticated": true,
     "status": 404,
     "responseContentType": "application/problem+json",
@@ -447,9 +447,9 @@
       "title": "The requested resource was not found.",
       "status": 404,
       "detail": "The conversation was not found.",
-      "instance": "/api/v1/conversations/6e408d8e-d65a-4960-a77e-9b1903216ec1/messages",
-      "traceId": "00-635e99ca2a86b6ef2846766677649124-6f5e6d823d47da6e-02",
-      "correlationId": "1c80e201254e4d3d8f9f59b5281b22fe"
+      "instance": "/api/v1/conversations/332a882e-dff3-45dc-bf74-75091dc3c59e/messages",
+      "traceId": "00-c5df6d7ebdb59d635b1baeb7fd19f27d-2a9df2261bf3f692-02",
+      "correlationId": "6359defd41a74433bffe8442d78bd1fe"
     }
   }
 ]

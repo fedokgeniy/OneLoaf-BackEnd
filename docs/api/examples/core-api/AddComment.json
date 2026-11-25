@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/library/8ac591d6-0f8a-4cf0-871c-db37438ac6d1/comments",
+    "path": "/api/v1/library/4183c7fb-b3fc-4f46-b2dc-2ee80e31490a/comments",
     "authenticated": true,
     "requestBody": {
       "body": "Baked it on Sunday, lovely crumb!"
@@ -10,10 +10,10 @@
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "bdb9c055-06b0-493e-b9d1-810465969248",
+      "id": "a1b359da-11b3-4301-b794-dd039f880c5a",
       "authorName": "Boris Novak",
       "body": "Baked it on Sunday, lovely crumb!",
-      "createdAt": "2026-11-24T23:42:13.858548+00:00",
+      "createdAt": "2026-11-24T23:58:06.387239+00:00",
       "editedAt": null,
       "isMine": true
     }
@@ -21,7 +21,7 @@
   {
     "case": "empty body",
     "method": "POST",
-    "path": "/api/v1/library/8ac591d6-0f8a-4cf0-871c-db37438ac6d1/comments",
+    "path": "/api/v1/library/4183c7fb-b3fc-4f46-b2dc-2ee80e31490a/comments",
     "authenticated": true,
     "requestBody": {
       "body": " "
@@ -32,15 +32,15 @@
       "type": "https://oneloaf.app/problems/validation",
       "title": "One or more validation errors occurred.",
       "status": 400,
-      "instance": "/api/v1/library/8ac591d6-0f8a-4cf0-871c-db37438ac6d1/comments",
+      "instance": "/api/v1/library/4183c7fb-b3fc-4f46-b2dc-2ee80e31490a/comments",
       "errors": {
         "body": [
           "'Body' должно быть заполнено.",
           "Не выполнено указанное условие для 'Body'."
         ]
       },
-      "traceId": "00-2c41996b838b587eae79836408a4e5f1-33e0336597c7ecdf-02",
-      "correlationId": "66a73ff5e0a04a518c52dad10f214385"
+      "traceId": "00-c23660afe659ff32df466ae3c87367f8-f6868b3ee0972dc3-02",
+      "correlationId": "471793365d1f465dbc181e104bb8824d"
     }
   }
 ]

@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/recipes/0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2/photo",
+    "path": "/api/v1/recipes/e6e62d43-bafb-462e-8b2d-88853bb427c2/photo",
     "authenticated": true,
     "status": 200,
     "responseContentType": "image/png",
@@ -11,7 +11,7 @@
   {
     "case": "no photo",
     "method": "GET",
-    "path": "/api/v1/recipes/0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2/photo",
+    "path": "/api/v1/recipes/e6e62d43-bafb-462e-8b2d-88853bb427c2/photo",
     "authenticated": true,
     "status": 404,
     "responseContentType": "application/problem+json",
@@ -20,9 +20,9 @@
       "title": "The requested resource was not found.",
       "status": 404,
       "detail": "The photo was not found.",
-      "instance": "/api/v1/recipes/0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2/photo",
-      "traceId": "00-dddb8dcd4567d57cdde4bd9cbadba007-90ae809db165876f-02",
-      "correlationId": "0d876d993ee349039c1f7ebe29a98c19"
+      "instance": "/api/v1/recipes/e6e62d43-bafb-462e-8b2d-88853bb427c2/photo",
+      "traceId": "00-fe4c8a1149b57ecc2545a26ce1c222ee-25604a7ed2885568-02",
+      "correlationId": "e5bff3e26f554ee89283b4eb072098f1"
     }
   }
 ]

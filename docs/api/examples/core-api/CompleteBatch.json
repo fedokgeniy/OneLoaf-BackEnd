@@ -2,18 +2,18 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/batches/b514208f-e151-4b50-af87-aef53c3f6c07/complete",
+    "path": "/api/v1/batches/3db01792-317f-4561-9dbf-92efc8f4bcdb/complete",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "bakeRecordId": "e02666d1-11e1-46f6-b4ad-6627f9b92363"
+      "bakeRecordId": "11656437-e094-4620-a1b1-ce7df5c8c422"
     }
   },
   {
     "case": "already completed",
     "method": "POST",
-    "path": "/api/v1/batches/b514208f-e151-4b50-af87-aef53c3f6c07/complete",
+    "path": "/api/v1/batches/3db01792-317f-4561-9dbf-92efc8f4bcdb/complete",
     "authenticated": true,
     "status": 409,
     "responseContentType": "application/problem+json",
@@ -22,9 +22,9 @@
       "title": "The request conflicts with existing data.",
       "status": 409,
       "detail": "The batch is already finished.",
-      "instance": "/api/v1/batches/b514208f-e151-4b50-af87-aef53c3f6c07/complete",
-      "traceId": "00-2b655f7d6473cb1561414bdd7d180617-13ab706614b36d6d-02",
-      "correlationId": "31df5da6a36f49b49aae4ba9f7293020"
+      "instance": "/api/v1/batches/3db01792-317f-4561-9dbf-92efc8f4bcdb/complete",
+      "traceId": "00-2d8f479c24798f20a204e0c998fffe2c-cae5c1a442c59486-02",
+      "correlationId": "d1e4f04b7e85415b8f3372eca0dfa9b4"
     }
   }
 ]

@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "DELETE",
-    "path": "/api/v1/conversations/6e408d8e-d65a-4960-a77e-9b1903216ec1",
+    "path": "/api/v1/conversations/332a882e-dff3-45dc-bf74-75091dc3c59e",
     "authenticated": true,
     "status": 204
   }

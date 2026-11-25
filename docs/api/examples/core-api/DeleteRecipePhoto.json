@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "DELETE",
-    "path": "/api/v1/recipes/0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2/photo",
+    "path": "/api/v1/recipes/e6e62d43-bafb-462e-8b2d-88853bb427c2/photo",
     "authenticated": true,
     "status": 204
   }

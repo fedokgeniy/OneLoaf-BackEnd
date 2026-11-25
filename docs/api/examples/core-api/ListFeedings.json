@@ -2,21 +2,21 @@
   {
     "case": "typical",
     "method": "GET",
-    "path": "/api/v1/starters/172b8904-4aa5-498c-b4df-0d8b7643d345/feedings",
+    "path": "/api/v1/starters/9d2f63d3-eac7-4a52-a3a6-bae64c20507f/feedings",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
       "items": [
         {
-          "id": "08410a8a-d28d-401a-884f-47b69f25bdae",
-          "fedAt": "2026-11-24T22:42:12.446624+00:00",
+          "id": "c7197efe-5e09-4adb-8401-99d5ac728dd4",
+          "fedAt": "2026-11-24T22:58:04.838391+00:00",
           "flourG": 50.0,
           "waterG": 50.0,
           "starterKeptG": 20.0,
           "temperatureC": 24.0,
-          "nextFeedingAt": "2026-11-25T10:42:12.446624+00:00",
-          "expectedPeakAt": "2026-11-25T06:42:12.446624+00:00",
+          "nextFeedingAt": "2026-11-25T10:58:04.838391+00:00",
+          "expectedPeakAt": "2026-11-25T06:58:04.838391+00:00",
           "note": null,
           "flourIngredientId": null,
           "waterIngredientId": null

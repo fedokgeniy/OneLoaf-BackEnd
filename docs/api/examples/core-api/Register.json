@@ -5,14 +5,14 @@
     "path": "/api/v1/auth/register",
     "authenticated": false,
     "requestBody": {
-      "email": "docs.baker.bfcc613f0@example.com",
+      "email": "docs.baker.588c65fcd@example.com",
       "password": "Rye-Bread-2026!",
       "displayName": "Docs Baker"
     },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "userId": "5d6f9c20-d3e0-412d-b704-526a53b07540"
+      "userId": "2274e188-d337-453a-b5fb-d8394a0d2447"
     }
   },
   {
@@ -21,7 +21,7 @@
     "path": "/api/v1/auth/register",
     "authenticated": false,
     "requestBody": {
-      "email": "docs.baker.bfcc613f0@example.com",
+      "email": "docs.baker.588c65fcd@example.com",
       "password": "Rye-Bread-2026!",
       "displayName": "Docs Baker"
     },
@@ -33,8 +33,8 @@
       "status": 409,
       "detail": "An account with this e-mail already exists.",
       "instance": "/api/v1/auth/register",
-      "traceId": "00-fb790bdc62df7274111ca8e65980c9f0-1b48c75401347832-02",
-      "correlationId": "2debc2d666a249b7b5931a241f460809"
+      "traceId": "00-fe570f224aa5b92daa312cb1036c4f3f-abc243c1e5618e15-02",
+      "correlationId": "0e4050de71824d5c82f65a313286f03b"
     }
   },
   {
@@ -66,8 +66,8 @@
           "'Display Name' must not be blank."
         ]
       },
-      "traceId": "00-cbcbaa67d1b7e1af22b5cfe2b657b1ca-c37cff391feab655-02",
-      "correlationId": "e32b9af92ef5418f89d06c100b4ae340"
+      "traceId": "00-113e03988c6f4a06b72a86159a19a1c4-dc70749b7be44eb2-02",
+      "correlationId": "c4b2648436f246e7838f56530fa62901"
     }
   },
   {
@@ -76,14 +76,14 @@
     "path": "/api/v1/auth/register",
     "authenticated": false,
     "requestBody": {
-      "email": "leaving.1c59fcd7@example.com",
+      "email": "leaving.07ea2036@example.com",
       "password": "Rye-Bread-2026!",
       "displayName": "Leaving Baker"
     },
     "status": 201,
     "responseContentType": "application/json",
     "responseBody": {
-      "userId": "18e39eeb-2b67-4952-85c9-13c03d9635eb"
+      "userId": "8b323c55-e3fe-4375-955a-9b1de3f1d735"
     }
   }
 ]

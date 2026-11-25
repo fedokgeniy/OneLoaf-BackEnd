@@ -40,6 +40,7 @@ public static class LibraryEndpoints
                 return TypedResults.Stream(photo.Content, photo.ContentType);
             })
             .AllowAnonymous().ProducesProblem(StatusCodes.Status404NotFound)
+            .Produces<FileStreamHttpResult>(StatusCodes.Status200OK, "image/jpeg", "image/png", "image/webp")
             .WithName("GetPublicationPhoto").WithSummary("The photo of a published recipe")
             .WithDescription("Anonymous. The photo of the recipe the publication was made from; 404 without a photo or for a hidden publication.");
         library.MapGet("/{id:guid}/comments", async (Guid id, [AsParameters] CommentListQuery query, LibraryService s, CancellationToken ct) =>

@@ -2,12 +2,12 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/batches/13eff78d-632b-41b5-890b-c44955c39894/stages/fb45532e-261c-4788-b4bf-52ccd2757a55/reset",
+    "path": "/api/v1/batches/e4be33d1-fb4b-4aba-885c-903dfcef15ea/stages/ceae05f0-5ef7-4cd2-823c-5f28bfee0f84/reset",
     "authenticated": true,
     "status": 200,
     "responseContentType": "application/json",
     "responseBody": {
-      "id": "13eff78d-632b-41b5-890b-c44955c39894",
+      "id": "e4be33d1-fb4b-4aba-885c-903dfcef15ea",
       "name": "Weekday bake",
       "status": "planned",
       "source": "manual",
@@ -22,18 +22,18 @@
       "notes": null,
       "items": [
         {
-          "id": "c69843d7-6ed2-4856-ad0a-211f7c5b87a7",
-          "recipeId": "0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2",
+          "id": "934015d4-19bf-4574-9355-2d03c4b9ef5c",
+          "recipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2",
           "recipeTitle": "Country sourdough",
           "loaves": 3,
-          "starterId": "172b8904-4aa5-498c-b4df-0d8b7643d345",
+          "starterId": "9d2f63d3-eac7-4a52-a3a6-bae64c20507f",
           "starterAmountG": 300.0,
           "kneadingCycles": 1,
           "starterReminderMinutes": 480,
           "sortOrder": 1,
           "stages": [
             {
-              "id": "2d5a9fb5-957b-44e3-8711-554b862087fe",
+              "id": "6b6878ff-596d-4b36-95f9-d0321b89224d",
               "sortOrder": 1,
               "name": "Mix",
               "stageTypeCode": "mix",
@@ -51,7 +51,7 @@
               "note": null
             },
             {
-              "id": "fb45532e-261c-4788-b4bf-52ccd2757a55",
+              "id": "ceae05f0-5ef7-4cd2-823c-5f28bfee0f84",
               "sortOrder": 2,
               "name": "Bulk fermentation",
               "stageTypeCode": "bulk_fermentation",
@@ -69,7 +69,7 @@
               "note": null
             },
             {
-              "id": "91d0a31b-8c43-4c45-9d73-495c2b99181c",
+              "id": "8028b68d-3be5-48c5-b2a5-4fb9759b7fae",
               "sortOrder": 3,
               "name": "Shape",
               "stageTypeCode": "shape",
@@ -87,7 +87,7 @@
               "note": null
             },
             {
-              "id": "053b9286-03f7-4e69-b81a-e74e917fc678",
+              "id": "4039067c-27fc-40de-a7b4-92de8a023262",
               "sortOrder": 4,
               "name": "Cold proof",
               "stageTypeCode": "proof",
@@ -105,7 +105,7 @@
               "note": null
             },
             {
-              "id": "11edd9df-2bd9-4f2a-bd46-84b7a9ebe655",
+              "id": "33ca339a-de5d-41e7-9f9b-a846ca725b87",
               "sortOrder": 5,
               "name": "Bake",
               "stageTypeCode": "bake",
@@ -133,7 +133,7 @@
   {
     "case": "stage already running",
     "method": "POST",
-    "path": "/api/v1/batches/13eff78d-632b-41b5-890b-c44955c39894/stages/2d5a9fb5-957b-44e3-8711-554b862087fe/reset",
+    "path": "/api/v1/batches/e4be33d1-fb4b-4aba-885c-903dfcef15ea/stages/6b6878ff-596d-4b36-95f9-d0321b89224d/reset",
     "authenticated": true,
     "status": 409,
     "responseContentType": "application/problem+json",
@@ -142,9 +142,9 @@
       "title": "The request conflicts with existing data.",
       "status": 409,
       "detail": "The action is not allowed for the stage in its current state.",
-      "instance": "/api/v1/batches/13eff78d-632b-41b5-890b-c44955c39894/stages/2d5a9fb5-957b-44e3-8711-554b862087fe/reset",
-      "traceId": "00-5c466234c49e5bd65f83e5152c707b99-32365423d4a669c5-02",
-      "correlationId": "b09306210f1b41d69ed91647e6c3f8af"
+      "instance": "/api/v1/batches/e4be33d1-fb4b-4aba-885c-903dfcef15ea/stages/6b6878ff-596d-4b36-95f9-d0321b89224d/reset",
+      "traceId": "00-22867a77ca3eb93004f9c98d45beaf3b-f85e715845105643-02",
+      "correlationId": "483d063d6bb34354a220dd495fb6b2e2"
     }
   }
 ]

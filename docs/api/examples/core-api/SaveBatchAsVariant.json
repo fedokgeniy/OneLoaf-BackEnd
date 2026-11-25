@@ -2,7 +2,7 @@
   {
     "case": "typical",
     "method": "POST",
-    "path": "/api/v1/batches/b514208f-e151-4b50-af87-aef53c3f6c07/save-as-variant",
+    "path": "/api/v1/batches/3db01792-317f-4561-9dbf-92efc8f4bcdb/save-as-variant",
     "authenticated": true,
     "requestBody": {
       "itemId": null,
@@ -12,8 +12,8 @@
     "responseContentType": "application/json",
     "responseBody": {
       "recipe": {
-        "id": "dc61aaac-c96e-47a5-b48a-f7ab139fdde6",
-        "parentRecipeId": "0c5dadaa-7cbf-4ca2-91e2-82f2eeae1ad2",
+        "id": "fed62b47-3e21-479b-be23-d3cf3403cdec",
+        "parentRecipeId": "e6e62d43-bafb-462e-8b2d-88853bb427c2",
         "title": "Country sourdough, as baked",
         "description": "Open crumb, crisp crust.",
         "yieldLoaves": 1,
@@ -22,8 +22,8 @@
         "isArchived": false,
         "ingredients": [
           {
-            "lineId": "53658ddc-54c8-4c18-bfd6-a500161855d1",
-            "ingredientId": "e736b253-6cdc-4b97-bc7b-7316a5e1831c",
+            "lineId": "b229a8d7-e8b6-4064-a24c-8b1683599954",
+            "ingredientId": "ecf99f68-e072-43a8-98d4-1864be976247",
             "ingredientName": "Bread flour",
             "categoryCode": "flour",
             "unitCode": "g",
@@ -35,8 +35,8 @@
             "isInherited": true
           },
           {
-            "lineId": "38218da8-4080-48e8-b0a8-aa8e461c3841",
-            "ingredientId": "780331c7-d507-4e75-92e7-f211654340ba",
+            "lineId": "9462f411-0427-4f92-9a09-72581f1f57e2",
+            "ingredientId": "99fc2c1d-3cc7-49d0-b22f-716c67323a35",
             "ingredientName": "Water",
             "categoryCode": "water",
             "unitCode": "g",
@@ -48,8 +48,8 @@
             "isInherited": true
           },
           {
-            "lineId": "6736bfb9-8818-410e-a6c4-440324279d2e",
-            "ingredientId": "91dfc767-089c-4e69-8c26-ecb5840267d3",
+            "lineId": "196ee230-f8a9-4a6d-a940-9636534e0fc9",
+            "ingredientId": "06cd16db-2357-4039-acf9-a733c76384e4",
             "ingredientName": "Sea salt",
             "categoryCode": "salt",
             "unitCode": "g",
@@ -61,8 +61,8 @@
             "isInherited": true
           },
           {
-            "lineId": "e04e30c5-335f-4ad0-bf3d-4670390f7626",
-            "ingredientId": "647922e7-01a0-474d-9555-8d80566cbb10",
+            "lineId": "2e740955-e7f3-41b0-bfc1-caa08a2dafe3",
+            "ingredientId": "372ea90e-42da-4ed8-b537-6b9cfd8da9c6",
             "ingredientName": "Rye starter",
             "categoryCode": "starter",
             "unitCode": "g",
@@ -76,7 +76,7 @@
         ],
         "stages": [
           {
-            "lineId": "071a7f5e-8621-40ab-a4a6-d2492c18ea7e",
+            "lineId": "dccdb2f5-996d-464a-88fd-34f0b2e230c8",
             "sortOrder": 1,
             "name": "Mix",
             "stageTypeCode": "mix",
@@ -92,7 +92,7 @@
             "isInherited": false
           },
           {
-            "lineId": "425b8db9-97ff-4ce2-b9f4-78a79d3cb673",
+            "lineId": "1f6599cc-8b6f-43c0-b991-97e72aca620e",
             "sortOrder": 2,
             "name": "Bulk fermentation",
             "stageTypeCode": "bulk_fermentation",
@@ -108,7 +108,7 @@
             "isInherited": false
           },
           {
-            "lineId": "c7fe3979-198a-4da6-b17c-b73f739a43a3",
+            "lineId": "83dd5837-50b8-4bba-b8e3-8ef097a51a48",
             "sortOrder": 3,
             "name": "Shape",
             "stageTypeCode": "shape",
@@ -124,7 +124,7 @@
             "isInherited": false
           },
           {
-            "lineId": "fb414ead-8dc3-4b41-a94f-f16af732433b",
+            "lineId": "22029fc4-5dcf-4b1a-9e89-eca0c6b6645d",
             "sortOrder": 4,
             "name": "Cold proof",
             "stageTypeCode": "proof",
@@ -140,7 +140,7 @@
             "isInherited": false
           },
           {
-            "lineId": "6f7d0939-55d3-407e-8c88-9d2d311d9ef9",
+            "lineId": "b81e75c9-bc5e-4503-a492-4695e7b9fea3",
             "sortOrder": 5,
             "name": "Bake",
             "stageTypeCode": "bake",
@@ -156,8 +156,8 @@
             "isInherited": false
           }
         ],
-        "createdAt": "2026-11-24T23:42:13.247719+00:00",
-        "updatedAt": "2026-11-24T23:42:13.247719+00:00",
+        "createdAt": "2026-11-24T23:58:05.706349+00:00",
+        "updatedAt": "2026-11-24T23:58:05.706349+00:00",
         "hasPhoto": false
       },
       "changes": [
@@ -207,7 +207,7 @@
   {
     "case": "batch followed the recipe",
     "method": "POST",
-    "path": "/api/v1/batches/5dd94486-35ce-48c2-9e2d-f5a0eba6dc65/save-as-variant",
+    "path": "/api/v1/batches/00b4cd00-2597-42fc-b3b7-c53dc8de859e/save-as-variant",
     "authenticated": true,
     "requestBody": {
       "itemId": null,
@@ -220,9 +220,9 @@
       "title": "The request violates a business rule.",
       "status": 422,
       "detail": "The batch followed the recipe; there is nothing to save as a variant.",
-      "instance": "/api/v1/batches/5dd94486-35ce-48c2-9e2d-f5a0eba6dc65/save-as-variant",
-      "traceId": "00-be1483bcaf8cf8b6cd0d584e1233029e-8caca097c7e54dc9-02",
-      "correlationId": "022df0b23c504222927de37e8b2c56e7"
+      "instance": "/api/v1/batches/00b4cd00-2597-42fc-b3b7-c53dc8de859e/save-as-variant",
+      "traceId": "00-7fe669841a0c482005239a9c909a2dbd-7064d148f580aa63-02",
+      "correlationId": "a422a921a32b4e7daee292fbb7b5f86a"
     }
   }
 ]
